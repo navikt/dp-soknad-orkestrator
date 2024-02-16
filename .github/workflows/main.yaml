@@ -9,6 +9,10 @@ on:
       - '.github/workflows/deploy-staus-no-alert.yaml'
       - '.github/workflows/reviewdog.yaml'
 
+permissions:
+  contents: "read"
+  id-token: "write"
+
 jobs:
   build:
     name: Build and publish Docker image
