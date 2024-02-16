@@ -1,4 +1,4 @@
-FROM eclipse-temurin:17 as jre-build
+FROM eclipse-temurin:21 as jre-build
 
 # Create a custom Java runtime
 RUN $JAVA_HOME/bin/jlink \
@@ -30,4 +30,4 @@ COPY --from=cprof /opt/cprof /opt/cprof
 COPY build/install/* /
 
 USER nobody
-CMD ["mediator"]
+CMD ["dp-soknad-orkestrator"]
