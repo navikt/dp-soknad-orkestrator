@@ -1,5 +1,5 @@
 package no.nav
 
 fun main() {
-    println("Hello world!")
+    ApplicationBuilder(Configuration.config).start()
 }
