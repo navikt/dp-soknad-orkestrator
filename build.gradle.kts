@@ -5,7 +5,7 @@ val logback_version: String by project
 plugins {
     kotlin("jvm") version "1.9.22"
     id("com.diffplug.spotless") version "6.20.0"
-    application
+    id("io.ktor.plugin") version "2.3.8"
 }
 
 group = "no.nav"
