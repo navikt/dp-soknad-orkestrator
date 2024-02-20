@@ -1,12 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktor_version: String by project
-val kotlin_version: String by project
-val logback_version: String by project
+val ktorVersion: String by project
+val kotlinVersion: String by project
+val logbackVersion: String by project
 
 plugins {
     kotlin("jvm") version "1.9.22"
-    id("com.diffplug.spotless") version "6.20.0"
+    id("com.diffplug.spotless") version "6.25.0"
     id("io.ktor.plugin") version "2.3.8"
 }
 
@@ -30,11 +30,11 @@ tasks.test {
 
 spotless {
     kotlin {
-        ktlint()
+        ktlint("1.1.1")
     }
 
     kotlinGradle {
-        ktlint()
+        ktlint("1.1.1")
     }
 }
 
