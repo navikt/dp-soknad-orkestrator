@@ -4,9 +4,6 @@ on:
   push:
     branches: [ main ]
     paths-ignore:
-      - 'docs/**'
-      - 'alerts/**'
-      - '.github/workflows/deploy-staus-no-alert.yaml'
       - '.github/workflows/reviewdog.yaml'
 
 permissions:
