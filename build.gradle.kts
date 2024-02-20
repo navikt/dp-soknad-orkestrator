@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
@@ -22,6 +24,24 @@ application {
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
+spotless {
+    kotlin {
+        ktlint()
+    }
+
+    kotlinGradle {
+        ktlint()
+    }
+}
+
+tasks.withType<KotlinCompile>().configureEach {
+    dependsOn("spotlessApply")
+}
+
 repositories {
     mavenCentral()
     maven { setUrl("https://github-package-registry-mirror.gc.nav.no/cached/maven-release") }
@@ -35,8 +55,4 @@ dependencies {
     testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
     testImplementation("io.kotest:kotest-assertions-core:5.8.0")
     testImplementation("io.kotest:kotest-property:5.8.0")
-}
-
-tasks.test {
-    useJUnitPlatform()
 }
