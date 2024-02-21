@@ -11,6 +11,7 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
 
     init {
         rapidsConnection.register(this)
+        SøknadMottak(rapidsConnection)
     }
 
     internal fun start() {
