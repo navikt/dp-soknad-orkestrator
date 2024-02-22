@@ -16,6 +16,6 @@ class SøknadMottak(rapidsConnection: RapidsConnection) : River.PacketListener {
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        // TODO: Implement
+        context.publish("{}")
     }
 }

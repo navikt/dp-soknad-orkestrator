@@ -1,5 +1,6 @@
 package no.nav
 
+import io.kotest.matchers.shouldBe
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -17,7 +18,8 @@ class SøknadMottakTest {
 
     @Test
     fun `Skal kunne ta i mot innsending_ferdigstilt event`() {
-        // TODO: Teste at onPacket gjør det den skal (når vi har fått logikk der)
+        testRapid.sendTestMessage(innsending_ferdigstilt_event)
+        testRapid.inspektør.size shouldBe 1
     }
 }
 
