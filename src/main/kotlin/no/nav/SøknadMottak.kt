@@ -9,6 +9,10 @@ class SøknadMottak(rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "innsending_ferdigstilt") }
+            validate { it.demandAny("type", listOf("NySøknad")) }
+            validate { it.requireKey("fødselsnummer") }
+            validate { it.requireKey("søknadsData") }
+            validate { it.interestedIn("@id", "@opprettet") }
         }.register(this)
     }
 
@@ -16,6 +20,8 @@ class SøknadMottak(rapidsConnection: RapidsConnection) : River.PacketListener {
         packet: JsonMessage,
         context: MessageContext,
     ) {
+        val ident = packet["fødselsnummer"].asText()
+        val søknadsData = packet["søknadsData"]
         context.publish("{}")
     }
 }
