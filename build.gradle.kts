@@ -1,8 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-val ktorVersion: String by project
-val kotlinVersion: String by project
-val logbackVersion: String by project
 
 plugins {
     kotlin("jvm") version "1.9.22"
@@ -48,11 +45,9 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.navikt:rapids-and-rivers:2023120410321701682379.55cc1a24d803")
-    implementation("com.natpryce:konfig:1.6.10.0")
+    implementation(libs.rapids.and.rivers)
+    implementation(libs.konfig)
 
     testImplementation(kotlin("test"))
-    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
-    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
-    testImplementation("io.kotest:kotest-property:5.8.0")
+    testImplementation(libs.bundles.kotest.assertions)
 }
