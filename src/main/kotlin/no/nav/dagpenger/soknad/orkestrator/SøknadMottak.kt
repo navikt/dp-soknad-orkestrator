@@ -1,4 +1,4 @@
-package no.nav
+package no.nav.dagpenger.soknad.orkestrator
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext

@@ -1,6 +1,7 @@
-package no.nav
+package no.orkestrator
 
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.soknad.orkestrator.SøknadMottak
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
