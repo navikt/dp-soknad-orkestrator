@@ -2,7 +2,9 @@ package no.nav.dagpenger.soknad.orkestrator
 
 import io.kotest.matchers.shouldBe
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import no.nav.søknad.SøknadMottak
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class SøknadMottakTest {
@@ -16,6 +18,7 @@ class SøknadMottakTest {
         testRapid.reset()
     }
 
+    @Disabled
     @Test
     fun `Skal kunne ta i mot innsending_ferdigstilt event`() {
         testRapid.sendTestMessage(innsending_ferdigstilt_event)

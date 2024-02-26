@@ -1,9 +1,11 @@
-package no.nav.dagpenger.soknad.orkestrator
+package no.nav.søknad
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.objectMapper
+import no.nav.opplysning.Opplysning
 
 class SøknadMottak(rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
@@ -20,8 +22,12 @@ class SøknadMottak(rapidsConnection: RapidsConnection) : River.PacketListener {
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        val ident = packet["fødselsnummer"].asText()
-        val søknadsData = packet["søknadsData"]
-        context.publish("{}")
+        val søknad = objectMapper.readValue(packet.toJson(), Søknad::class.java)
+        val opplysninger =
+            søknad.søknadsData.seksjoner.map { seksjon ->
+                seksjon.fakta.map { fakta ->
+                    Opplysning(fakta.svar, fakta.beskrivendeId)
+                }
+            }.toList()
     }
 }
