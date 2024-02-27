@@ -1,7 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknadmottak
 
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Søknad
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -9,7 +7,6 @@ import no.nav.helse.rapids_rivers.River
 import no.nav.objectMapper
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.UUID
 
 class SøknadMottak(rapidsConnection: RapidsConnection) : River.PacketListener {
     init {
@@ -26,22 +23,7 @@ class SøknadMottak(rapidsConnection: RapidsConnection) : River.PacketListener {
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        val legacySøknad = packet.toLegacySøknad()
-        val opplysninger =
-            packet.toLegacySøknad().søknadsData.seksjoner.map { seksjon ->
-                seksjon.fakta.map { fakta ->
-                    Opplysning(fakta.svar, fakta.beskrivendeId)
-                }
-            }.toList().flatten()
-
-        Søknad(
-            id = UUID.fromString(legacySøknad.søknadsData.søknad_uuid),
-            fødselsnummer = legacySøknad.fødselsnummer,
-            journalpostId = legacySøknad.journalpostId,
-            // TODO: Finne nøyaktig søknadstidspunkt
-            søknadstidspunkt = legacySøknad.opprettet.toLocalDateTime(),
-            opplysninger = opplysninger,
-        )
+        SøknadMapper(legacySøknad = packet.toLegacySøknad())
     }
 }
 
