@@ -50,4 +50,5 @@ dependencies {
 
     testImplementation(kotlin("test"))
     testImplementation(libs.bundles.kotest.assertions)
+    testImplementation(libs.mockk)
 }
