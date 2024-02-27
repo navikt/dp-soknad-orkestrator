@@ -23,7 +23,7 @@ class SøknadMottak(rapidsConnection: RapidsConnection) : River.PacketListener {
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        SøknadMapper(legacySøknad = packet.toLegacySøknad())
+        SøknadMapper().toSøknad(packet.toLegacySøknad())
     }
 }
 
