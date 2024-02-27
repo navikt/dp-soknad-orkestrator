@@ -22,5 +22,6 @@ val objectMapper =
 
         registerModules(JavaTimeModule())
         configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+        configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
         setSerializationInclusion(JsonInclude.Include.NON_NULL)
     }

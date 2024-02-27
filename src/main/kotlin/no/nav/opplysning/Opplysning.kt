@@ -1,7 +1,7 @@
 package no.nav.opplysning
 
-internal class Opplysning(private val svar: String, private val beskrivendeId: String) {
+internal class Opplysning(private val svar: List<String>, private val beskrivendeId: String) {
     fun svar() = svar
 
-    fun tekstId() = beskrivendeId
+    fun beskrivendeId() = beskrivendeId
 }
