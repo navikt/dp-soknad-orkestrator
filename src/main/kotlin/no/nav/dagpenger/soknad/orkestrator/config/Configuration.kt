@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator
+package no.nav.dagpenger.soknad.orkestrator.config
 
 import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties

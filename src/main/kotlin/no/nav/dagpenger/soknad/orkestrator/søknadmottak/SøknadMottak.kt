@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknadmottak
 
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
