@@ -4,7 +4,6 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.objectMapper
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 

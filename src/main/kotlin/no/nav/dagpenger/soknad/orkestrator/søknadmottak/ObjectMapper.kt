@@ -1,4 +1,4 @@
-package no.nav
+package no.nav.dagpenger.soknad.orkestrator.søknadmottak
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
