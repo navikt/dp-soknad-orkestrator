@@ -1,4 +1,4 @@
-package no.nav.søknad
+package no.nav.dagpenger.soknad.orkestrator.søknadmottak
 
 import com.fasterxml.jackson.annotation.JsonProperty
 

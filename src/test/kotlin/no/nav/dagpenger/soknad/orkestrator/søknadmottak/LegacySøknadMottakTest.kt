@@ -1,13 +1,12 @@
-package no.nav.dagpenger.soknad.orkestrator
+package no.nav.dagpenger.soknad.orkestrator.søknadmottak
 
 import io.kotest.matchers.shouldBe
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
-import no.nav.søknad.SøknadMottak
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
-class SøknadMottakTest {
+class LegacySøknadMottakTest {
     private val testRapid =
         TestRapid().also {
             SøknadMottak(it)
@@ -26,7 +25,6 @@ class SøknadMottakTest {
     }
 }
 
-//language=JSON
 private val innsending_ferdigstilt_event =
     """
     {

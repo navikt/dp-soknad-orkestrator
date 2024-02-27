@@ -1,8 +1,8 @@
-package no.nav.søknad
+package no.nav.dagpenger.soknad.orkestrator.søknadmottak
 
 import com.fasterxml.jackson.annotation.JsonProperty
 
-data class Søknad(
+data class LegacySøknad(
     @JsonProperty("@event_name")
     val event_name: String,
     @JsonProperty("@id")

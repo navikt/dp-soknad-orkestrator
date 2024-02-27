@@ -1,8 +1,8 @@
 package no.nav.dagpenger.soknad.orkestrator
 
+import no.nav.dagpenger.soknad.orkestrator.søknadmottak.SøknadMottak
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.søknad.SøknadMottak
 
 internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsConnection.StatusListener {
     private val rapidsConnection =

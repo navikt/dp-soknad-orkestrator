@@ -1,4 +1,4 @@
-package no.nav.søknad
+package no.nav.dagpenger.soknad.orkestrator.søknadmottak
 
 data class Seksjoner(
     val beskrivendeId: String,
