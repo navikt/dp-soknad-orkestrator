@@ -1,5 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknadmottak
 
+import com.fasterxml.jackson.databind.JsonMappingException
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -24,16 +26,27 @@ class SøknadMottakTest {
     }
 
     @Test
-    fun `Skal kunne ta i mot innsending_ferdigstilt event`() {
+    fun `skal kunne ta imot og dekomponere dinnsending_ferdigstilt event`() {
         val slot = slot<LegacySøknad>()
         every { anyConstructed<SøknadMapper>().toSøknad(capture(slot)) } returns mockk<Søknad>()
 
         testRapid.sendTestMessage(innsending_ferdigstilt_event)
 
         with(slot.captured) {
+            id shouldBe "675eb2c2-bfba-4939-926c-cf5aac73d163"
+            opprettet shouldBe "2024-02-21T11:00:27.899791748"
             fødselsnummer shouldBe "12345678903"
             journalpostId shouldBe "637582711"
-            søknadsData.søknad_uuid shouldBe "123e4567-e89b-12d3-a456-426614174000"
+        }
+    }
+
+    @Test
+    fun `skal kunne feile dersom forventet felt mangler`() {
+        val slot = slot<LegacySøknad>()
+        every { anyConstructed<SøknadMapper>().toSøknad(capture(slot)) } returns mockk<Søknad>()
+
+        shouldThrow<JsonMappingException> {
+            testRapid.sendTestMessage(innsending_ferdigstilt_event_uten_fakta)
         }
     }
 }
@@ -61,6 +74,28 @@ private val innsending_ferdigstilt_event =
             "beskrivendeId": "faktum.hvilket-land-bor-du-i"
           } 
           ],
+        "beskrivendeId": "bostedsland"
+        } 
+        ]
+      }
+    }
+    """.trimIndent()
+
+private val innsending_ferdigstilt_event_uten_fakta =
+    //language=json
+    """
+     {
+      "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+      "@event_name": "innsending_ferdigstilt",
+      "@opprettet": "2024-02-21T11:00:27.899791748",
+      "journalpostId": "637582711",
+      "type": "NySøknad",
+      "fødselsnummer": "12345678903",
+      "søknadsData": {
+        "søknad_uuid": "123e4567-e89b-12d3-a456-426614174000",
+        "@opprettet": "2024-02-21T11:00:27.899791748",
+        "seksjoner": [
+        {
         "beskrivendeId": "bostedsland"
         } 
         ]

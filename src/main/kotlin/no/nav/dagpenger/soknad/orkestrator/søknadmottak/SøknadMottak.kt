@@ -1,5 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknadmottak
 
+import com.fasterxml.jackson.core.JsonProcessingException
+import com.fasterxml.jackson.databind.JsonMappingException
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -23,7 +25,8 @@ class SøknadMottak(rapidsConnection: RapidsConnection) : River.PacketListener {
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        SøknadMapper().toSøknad(packet.toLegacySøknad())
+        val legacySøknad = packet.toLegacySøknad()
+        SøknadMapper().toSøknad(legacySøknad)
     }
 }
 
@@ -32,5 +35,13 @@ fun String.toLocalDateTime(): LocalDateTime {
 }
 
 fun JsonMessage.toLegacySøknad(): LegacySøknad {
-    return objectMapper.readValue(this.toJson(), LegacySøknad::class.java)
+    try {
+        return objectMapper.readValue(this.toJson(), LegacySøknad::class.java)
+    } catch (e: JsonMappingException) {
+        throw e
+    } catch (e: JsonProcessingException) {
+        throw e
+    } catch (e: Exception) {
+        throw e
+    }
 }
