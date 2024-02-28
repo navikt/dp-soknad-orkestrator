@@ -2,21 +2,24 @@ package no.nav.dagpenger.soknad.orkestrator.søknadmottak
 
 import com.fasterxml.jackson.databind.JsonMappingException
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.ints.exactly
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkConstructor
 import io.mockk.slot
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Søknad
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class SøknadMottakTest {
+    private val søknadMapper = mockk<SøknadMapper>()
     private val testRapid = TestRapid()
 
     init {
-        SøknadMottak(rapidsConnection = testRapid)
+        SøknadMottak(rapidsConnection = testRapid, søknadMapper)
     }
 
     @BeforeEach
@@ -26,24 +29,25 @@ class SøknadMottakTest {
     }
 
     @Test
-    fun `skal kunne ta imot og dekomponere dinnsending_ferdigstilt event`() {
+    fun `skal kunne ta imot og dekomponere metadata til innsending_ferdigstilt event`() {
         val slot = slot<LegacySøknad>()
-        every { anyConstructed<SøknadMapper>().toSøknad(capture(slot)) } returns mockk<Søknad>()
+        every { søknadMapper.toSøknad(capture(slot)) } returns mockk<Søknad>()
 
         testRapid.sendTestMessage(innsending_ferdigstilt_event)
 
+        verify(exactly = 1) { søknadMapper.toSøknad(any()) }
         with(slot.captured) {
             id shouldBe "675eb2c2-bfba-4939-926c-cf5aac73d163"
             opprettet shouldBe "2024-02-21T11:00:27.899791748"
             fødselsnummer shouldBe "12345678903"
             journalpostId shouldBe "637582711"
+            søknadsData.søknad_uuid shouldBe "123e4567-e89b-12d3-a456-426614174000"
         }
     }
 
     @Test
     fun `skal kunne feile dersom forventet felt mangler`() {
-        val slot = slot<LegacySøknad>()
-        every { anyConstructed<SøknadMapper>().toSøknad(capture(slot)) } returns mockk<Søknad>()
+        every { søknadMapper.toSøknad(any()) } returns mockk<Søknad>()
 
         shouldThrow<JsonMappingException> {
             testRapid.sendTestMessage(innsending_ferdigstilt_event_uten_fakta)

@@ -7,10 +7,8 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
-class SøknadMottak(rapidsConnection: RapidsConnection) : River.PacketListener {
+class SøknadMottak(rapidsConnection: RapidsConnection, private val søknadMapper: SøknadMapper) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "innsending_ferdigstilt") }
@@ -25,13 +23,8 @@ class SøknadMottak(rapidsConnection: RapidsConnection) : River.PacketListener {
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        val legacySøknad = packet.toLegacySøknad()
-        SøknadMapper().toSøknad(legacySøknad)
+        søknadMapper.toSøknad(packet.toLegacySøknad())
     }
-}
-
-fun String.toLocalDateTime(): LocalDateTime {
-    return LocalDateTime.parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS"))
 }
 
 fun JsonMessage.toLegacySøknad(): LegacySøknad {

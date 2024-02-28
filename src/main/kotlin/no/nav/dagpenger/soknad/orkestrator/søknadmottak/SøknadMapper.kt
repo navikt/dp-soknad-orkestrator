@@ -2,6 +2,8 @@ package no.nav.dagpenger.soknad.orkestrator.søknadmottak
 
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Søknad
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 class SøknadMapper() {
@@ -22,4 +24,8 @@ class SøknadMapper() {
             opplysninger = opplysninger,
         )
     }
+}
+
+fun String.toLocalDateTime(): LocalDateTime {
+    return LocalDateTime.parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS"))
 }
