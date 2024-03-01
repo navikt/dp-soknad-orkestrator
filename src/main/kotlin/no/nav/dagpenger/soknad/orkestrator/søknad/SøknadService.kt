@@ -1,8 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-
 class SøknadService {
     fun håndter(legacySøknad: LegacySøknad) {
         toSøknad(legacySøknad)
@@ -25,8 +22,4 @@ fun toSøknad(legacySøknad: LegacySøknad): Søknad {
         søknadstidspunkt = legacySøknad.opprettet,
         opplysninger = opplysninger,
     )
-}
-
-fun String.toLocalDateTime(): LocalDateTime {
-    return LocalDateTime.parse(this, DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS"))
 }

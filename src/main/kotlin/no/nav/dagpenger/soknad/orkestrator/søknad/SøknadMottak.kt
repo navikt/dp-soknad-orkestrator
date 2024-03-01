@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonMappingException
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -31,8 +30,6 @@ fun JsonMessage.toLegacySøknad(): LegacySøknad {
     try {
         return objectMapper.readValue(this.toJson(), LegacySøknad::class.java)
     } catch (e: JsonMappingException) {
-        throw e
-    } catch (e: JsonProcessingException) {
         throw e
     } catch (e: Exception) {
         throw e

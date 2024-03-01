@@ -2,7 +2,6 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
-import java.time.LocalDateTime
 import java.util.UUID
 
 class SøknadServiceTest {
@@ -15,12 +14,12 @@ class SøknadServiceTest {
         val legacySøknad =
             LegacySøknad(
                 id = id,
-                opprettet = LocalDateTime.of(2024, 2, 21, 11, 0, 0),
+                opprettet = 20.februar.atStartOfDay(),
                 fødselsnummer = "12345678901",
                 journalpostId = journalpostId,
                 søknadsData =
                     SøknadsData(
-                        opprettet = LocalDateTime.of(2024, 2, 21, 11, 0, 0),
+                        opprettet = 20.februar.atStartOfDay(),
                         søknadUUID = søknadUUID,
                         seksjoner =
                             listOf(
