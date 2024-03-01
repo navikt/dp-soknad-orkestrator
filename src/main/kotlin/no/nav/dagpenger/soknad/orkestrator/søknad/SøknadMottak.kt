@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.søknadmottak
+package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonMappingException
@@ -8,7 +8,7 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-class SøknadMottak(rapidsConnection: RapidsConnection, private val søknadMapper: SøknadMapper) : River.PacketListener {
+class SøknadMottak(rapidsConnection: RapidsConnection, private val søknadService: SøknadService) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "innsending_ferdigstilt") }
@@ -23,7 +23,7 @@ class SøknadMottak(rapidsConnection: RapidsConnection, private val søknadMappe
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        søknadMapper.toSøknad(packet.toLegacySøknad())
+        søknadService.håndter(packet.toLegacySøknad())
     }
 }
 

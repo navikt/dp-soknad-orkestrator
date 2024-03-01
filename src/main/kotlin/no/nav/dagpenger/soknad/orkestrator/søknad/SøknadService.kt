@@ -1,13 +1,15 @@
-package no.nav.dagpenger.soknad.orkestrator.søknadmottak
+package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Søknad
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-class SøknadMapper() {
-    fun toSøknad(legacySøknad: LegacySøknad): Søknad {
+class SøknadService {
+    fun håndter(legacySøknad: LegacySøknad) {
+        toSøknad(legacySøknad)
+    }
+
+    private fun toSøknad(legacySøknad: LegacySøknad): Søknad {
         val opplysninger =
             legacySøknad.søknadsData.seksjoner.map { seksjon ->
                 seksjon.fakta.map { fakta ->

@@ -1,7 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator
 
-import no.nav.dagpenger.soknad.orkestrator.søknadmottak.SøknadMapper
-import no.nav.dagpenger.soknad.orkestrator.søknadmottak.SøknadMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 
@@ -13,7 +13,7 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
 
     init {
         rapidsConnection.register(this)
-        SøknadMottak(rapidsConnection, SøknadMapper())
+        SøknadMottak(rapidsConnection, SøknadService())
     }
 
     internal fun start() {
