@@ -8,24 +8,24 @@ class SøknadService {
     fun håndter(legacySøknad: LegacySøknad) {
         toSøknad(legacySøknad)
     }
+}
 
-    private fun toSøknad(legacySøknad: LegacySøknad): Søknad {
-        val opplysninger =
-            legacySøknad.søknadsData.seksjoner.map { seksjon ->
-                seksjon.fakta.map { fakta ->
-                    Opplysning(fakta.svar, fakta.beskrivendeId)
-                }
-            }.toList().flatten()
+fun toSøknad(legacySøknad: LegacySøknad): Søknad {
+    val opplysninger =
+        legacySøknad.søknadsData.seksjoner.map { seksjon ->
+            seksjon.fakta.map { fakta ->
+                Opplysning(fakta.svar, fakta.beskrivendeId)
+            }
+        }.toList().flatten()
 
-        return Søknad(
-            id = UUID.fromString(legacySøknad.søknadsData.søknad_uuid),
-            fødselsnummer = legacySøknad.fødselsnummer,
-            journalpostId = legacySøknad.journalpostId,
-            // TODO: Finne nøyaktig søknadstidspunkt
-            søknadstidspunkt = legacySøknad.opprettet.toLocalDateTime(),
-            opplysninger = opplysninger,
-        )
-    }
+    return Søknad(
+        id = UUID.fromString(legacySøknad.søknadsData.søknad_uuid),
+        fødselsnummer = legacySøknad.fødselsnummer,
+        journalpostId = legacySøknad.journalpostId,
+        // TODO: Finne nøyaktig søknadstidspunkt
+        søknadstidspunkt = legacySøknad.opprettet.toLocalDateTime(),
+        opplysninger = opplysninger,
+    )
 }
 
 fun String.toLocalDateTime(): LocalDateTime {

@@ -16,8 +16,8 @@ data class Seksjoner(
 data class SøknadsData(
     @JsonProperty("@opprettet")
     val opprettet: String,
-    val seksjoner: List<Seksjoner>,
     val søknad_uuid: String,
+    val seksjoner: List<Seksjoner>,
 )
 
 data class LegacySøknad(
