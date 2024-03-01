@@ -9,6 +9,7 @@ import io.mockk.verify
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class SøknadMottakTest {
     private val søknadService = mockk<SøknadService>(relaxed = true)
@@ -32,7 +33,7 @@ class SøknadMottakTest {
         verify(exactly = 1) { søknadService.håndter(capture(slot)) }
         with(slot.captured) {
             javaClass.name shouldBe LegacySøknad::class.java.name
-            id shouldBe "675eb2c2-bfba-4939-926c-cf5aac73d163"
+            id shouldBe UUID.fromString("675eb2c2-bfba-4939-926c-cf5aac73d163")
         }
     }
 

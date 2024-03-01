@@ -2,7 +2,6 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import java.util.UUID
 
 class SøknadService {
     fun håndter(legacySøknad: LegacySøknad) {
@@ -19,11 +18,11 @@ fun toSøknad(legacySøknad: LegacySøknad): Søknad {
         }.toList().flatten()
 
     return Søknad(
-        id = UUID.fromString(legacySøknad.søknadsData.søknad_uuid),
+        id = legacySøknad.søknadsData.søknadUUID,
         fødselsnummer = legacySøknad.fødselsnummer,
         journalpostId = legacySøknad.journalpostId,
         // TODO: Finne nøyaktig søknadstidspunkt
-        søknadstidspunkt = legacySøknad.opprettet.toLocalDateTime(),
+        søknadstidspunkt = legacySøknad.opprettet,
         opplysninger = opplysninger,
     )
 }

@@ -2,24 +2,26 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import io.kotest.matchers.shouldBe
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 import java.util.UUID
 
 class SøknadServiceTest {
     @Test
     fun `vi kan mappe LegacySøknad til Søknad`() {
         val id = UUID.randomUUID()
-        val journalpostId = UUID.randomUUID()
+        val søknadUUID = UUID.randomUUID()
+        val journalpostId = "637582711"
 
         val legacySøknad =
             LegacySøknad(
-                id = "$id",
-                opprettet = "2024-02-21T11:00:27.899791748",
+                id = id,
+                opprettet = LocalDateTime.of(2024, 2, 21, 11, 0, 0),
                 fødselsnummer = "12345678901",
-                journalpostId = "$journalpostId",
+                journalpostId = journalpostId,
                 søknadsData =
                     SøknadsData(
-                        opprettet = "2024-02-21T11:00:27.899791748",
-                        søknad_uuid = "123e4567-e89b-12d3-a456-426614174000",
+                        opprettet = LocalDateTime.of(2024, 2, 21, 11, 0, 0),
+                        søknadUUID = søknadUUID,
                         seksjoner =
                             listOf(
                                 Seksjoner(

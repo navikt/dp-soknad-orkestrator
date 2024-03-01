@@ -1,6 +1,8 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import java.time.LocalDateTime
+import java.util.UUID
 
 data class Fakta(
     val beskrivendeId: String,
@@ -15,16 +17,17 @@ data class Seksjoner(
 
 data class SøknadsData(
     @JsonProperty("@opprettet")
-    val opprettet: String,
-    val søknad_uuid: String,
+    val opprettet: LocalDateTime,
+    @JsonProperty("søknad_uuid")
+    val søknadUUID: UUID,
     val seksjoner: List<Seksjoner>,
 )
 
 data class LegacySøknad(
     @JsonProperty("@id")
-    val id: String,
+    val id: UUID,
     @JsonProperty("@opprettet")
-    val opprettet: String,
+    val opprettet: LocalDateTime,
     val fødselsnummer: String,
     val journalpostId: String,
     val søknadsData: SøknadsData,
