@@ -54,6 +54,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
+    implementation("io.github.microutils:kotlin-logging:3.0.5")
 
     testImplementation(kotlin("test"))
     testImplementation(libs.bundles.kotest.assertions)
