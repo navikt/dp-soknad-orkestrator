@@ -7,7 +7,8 @@ import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-class SøknadMottak(rapidsConnection: RapidsConnection, private val søknadService: SøknadService) : River.PacketListener {
+class SøknadMottak(rapidsConnection: RapidsConnection, private val søknadService: SøknadService) :
+    River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "innsending_ferdigstilt") }
@@ -22,7 +23,8 @@ class SøknadMottak(rapidsConnection: RapidsConnection, private val søknadServi
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        søknadService.håndter(packet.toLegacySøknad())
+        val søknad = søknadService.mapTilSøknad(packet.toLegacySøknad())
+        søknadService.publiserMeldingOmNySøknad(søknad)
     }
 }
 

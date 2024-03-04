@@ -30,7 +30,7 @@ class SøknadMottakTest {
 
         testRapid.sendTestMessage(innsending_ferdigstilt_event)
 
-        verify(exactly = 1) { søknadService.håndter(capture(slot)) }
+        verify(exactly = 1) { søknadService.mapTilSøknad(capture(slot)) }
         with(slot.captured) {
             javaClass.name shouldBe LegacySøknad::class.java.name
             id shouldBe UUID.fromString("675eb2c2-bfba-4939-926c-cf5aac73d163")

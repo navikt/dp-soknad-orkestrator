@@ -1,8 +1,12 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-class SøknadService {
-    fun håndter(legacySøknad: LegacySøknad) {
-        toSøknad(legacySøknad)
+import no.nav.helse.rapids_rivers.RapidsConnection
+
+class SøknadService(private val rapid: RapidsConnection) {
+    fun mapTilSøknad(legacySøknad: LegacySøknad) = toSøknad(legacySøknad)
+
+    fun publiserMeldingOmNySøknad(søknad: Søknad) {
+        rapid.publish(MeldingOmNySøknad(søknad.id, søknad.fødselsnummer).asMessage().toJson())
     }
 }
 

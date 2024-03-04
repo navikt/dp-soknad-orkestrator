@@ -13,7 +13,7 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
 
     init {
         rapidsConnection.register(this)
-        SøknadMottak(rapidsConnection, SøknadService())
+        SøknadMottak(rapidsConnection, SøknadService(rapidsConnection))
     }
 
     internal fun start() {

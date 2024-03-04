@@ -1,10 +1,14 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import io.kotest.matchers.shouldBe
+import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
 class SøknadServiceTest {
+    private val testRapid = TestRapid()
+    private var søknadService = SøknadService(testRapid)
+
     @Test
     fun `vi kan mappe LegacySøknad til Søknad`() {
         val id = UUID.randomUUID()
@@ -47,6 +51,35 @@ class SøknadServiceTest {
             opplysninger.size shouldBe 1
             opplysninger.first().beskrivendeId() shouldBe "faktum.hvilket-land-bor-du-i"
             opplysninger.first().svar() shouldBe listOf("NOR")
+        }
+    }
+
+    @Test
+    fun `vi kan sende ut melding om ny søknad på rapiden`() {
+        val ident = "12345678901"
+        val søknadUUID = UUID.randomUUID()
+        val søknad =
+            Søknad(
+                id = søknadUUID,
+                fødselsnummer = ident,
+                journalpostId = "637582711",
+                søknadstidspunkt = 20.februar.atStartOfDay(),
+                opplysninger =
+                    listOf(
+                        Opplysning(
+                            beskrivendeId = "faktum.hvilket-land-bor-du-i",
+                            svar = listOf("NOR"),
+                        ),
+                    ),
+            )
+
+        søknadService.publiserMeldingOmNySøknad(søknad)
+
+        with(testRapid.inspektør) {
+            size shouldBe 1
+            field(0, "@event_name").asText() shouldBe "MeldingOmNySøknad"
+            field(0, "søknad_uuid").asText() shouldBe søknadUUID.toString()
+            field(0, "ident").asText() shouldBe ident
         }
     }
 }
