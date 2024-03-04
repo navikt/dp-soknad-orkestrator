@@ -39,7 +39,12 @@ class OpplysningRepositoryPostgresTest {
 
         opplysningRepository.lagre(opplysning)
 
-        val hentetOpplysning = opplysningRepository.hent(beskrivendeId, fødselsnummer, søknadsId)
+        val hentetOpplysning =
+            opplysningRepository.hent(
+                beskrivendeId,
+                fødselsnummer,
+                søknadsId,
+            )
 
         hentetOpplysning.beskrivendeId() shouldBe beskrivendeId
         hentetOpplysning.svar() shouldBe listOf("svar1")
