@@ -69,6 +69,8 @@ class SøknadServiceTest {
                         Opplysning(
                             beskrivendeId = "faktum.hvilket-land-bor-du-i",
                             svar = listOf("NOR"),
+                            søknadsId = søknadUUID,
+                            fødselsnummer = ident,
                         ),
                     ),
             )

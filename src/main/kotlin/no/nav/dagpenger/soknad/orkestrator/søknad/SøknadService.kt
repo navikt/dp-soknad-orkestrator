@@ -14,7 +14,12 @@ fun toSøknad(legacySøknad: LegacySøknad): Søknad {
     val opplysninger =
         legacySøknad.søknadsData.seksjoner.map { seksjon ->
             seksjon.fakta.map { fakta ->
-                Opplysning(fakta.svar, fakta.beskrivendeId)
+                Opplysning(
+                    svar = fakta.svar,
+                    beskrivendeId = fakta.beskrivendeId,
+                    søknadsId = legacySøknad.søknadsData.søknadUUID,
+                    fødselsnummer = legacySøknad.fødselsnummer,
+                )
             }
         }.toList().flatten()
 

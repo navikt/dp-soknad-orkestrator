@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val exposedVersion: String by project
 
 plugins {
     kotlin("jvm") version "1.9.22"
@@ -47,8 +48,15 @@ repositories {
 dependencies {
     implementation(libs.rapids.and.rivers)
     implementation(libs.konfig)
+    implementation(libs.bundles.postgres)
+    implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-crypt:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
 
     testImplementation(kotlin("test"))
     testImplementation(libs.bundles.kotest.assertions)
     testImplementation(libs.mockk)
+    testImplementation(libs.bundles.postgres.test)
 }
