@@ -8,13 +8,14 @@ import no.nav.helse.rapids_rivers.River
 
 class OpplysningBehovMottak(
     rapidsConnection: RapidsConnection,
+    private val opplysningService: OpplysningService,
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
             validate {
                 it.demand("@behov") { jsonNode ->
-                    jsonNode["@behov"].asText().let { behovUrn ->
+                    jsonNode[0].asText().let { behovUrn ->
                         val urn = URN.rfc8141().parse(behovUrn)
                         if (urn.namespaceIdentifier().toString() != "opplysning") {
                             throw IllegalArgumentException("Behov inneholder ikke opplysning: $behovUrn")
@@ -22,8 +23,8 @@ class OpplysningBehovMottak(
                     }
                 }
             }
-            validate { it.requireKey("ident", "søknad_id", "behandlingId") }
-        }
+            validate { it.requireKey("ident", "søknad_id", "behandling_id") }
+        }.register(this)
     }
 
     override fun onPacket(
@@ -32,11 +33,14 @@ class OpplysningBehovMottak(
     ) {
         val ident = packet["ident"].asText()
         val søknadId = packet["søknad_id"].asText()
-        val behandlingId = packet["behandlingId"].asText()
+        val behandlingId = packet["behandling_id"].asText()
+
         val beskrivendeId =
             "faktum." +
                 URN.rfc8141()
-                    .parse(packet["@behov"].asText())
+                    .parse(packet["@behov"][0].asText())
                     .namespaceSpecificString().toString()
+
+        opplysningService.hentOpplysning(ident, søknadId, behandlingId, beskrivendeId)
     }
 }
