@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,10 +14,11 @@ import java.util.UUID
 
 class SøknadMottakTest {
     private val søknadService = mockk<SøknadService>(relaxed = true)
+    private val opplysningRepository = mockk<OpplysningRepository>(relaxed = true)
     private val testRapid = TestRapid()
 
     init {
-        SøknadMottak(rapidsConnection = testRapid, søknadService = søknadService)
+        SøknadMottak(rapidsConnection = testRapid, søknadService = søknadService, opplysningRepository = opplysningRepository)
     }
 
     @BeforeEach

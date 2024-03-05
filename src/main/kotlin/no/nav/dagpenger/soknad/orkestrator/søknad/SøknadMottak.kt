@@ -2,12 +2,17 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.databind.JsonMappingException
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
+import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningRepository
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 
-class SøknadMottak(rapidsConnection: RapidsConnection, private val søknadService: SøknadService) :
+class SøknadMottak(
+    rapidsConnection: RapidsConnection,
+    private val søknadService: SøknadService,
+    private val opplysningRepository: OpplysningRepository,
+) :
     River.PacketListener {
     init {
         River(rapidsConnection).apply {
@@ -24,6 +29,9 @@ class SøknadMottak(rapidsConnection: RapidsConnection, private val søknadServi
         context: MessageContext,
     ) {
         val søknad = søknadService.mapTilSøknad(packet.toLegacySøknad())
+
+        søknad.opplysninger.forEach(opplysningRepository::lagre)
+
         søknadService.publiserMeldingOmNySøknad(søknad)
     }
 }

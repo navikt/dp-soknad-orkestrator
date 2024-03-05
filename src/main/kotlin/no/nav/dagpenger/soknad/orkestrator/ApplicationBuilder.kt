@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
+import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.helse.rapids_rivers.RapidApplication
@@ -33,6 +34,6 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
                 runMigration()
             }
 
-        SøknadMottak(rapidsConnection, SøknadService(rapidsConnection))
+        SøknadMottak(rapidsConnection, SøknadService(rapidsConnection), OpplysningRepositoryPostgres(dataSource))
     }
 }
