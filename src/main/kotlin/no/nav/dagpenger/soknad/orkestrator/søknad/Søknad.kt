@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import java.time.LocalDateTime
 import java.util.UUID
 

@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.søknad
+package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Query

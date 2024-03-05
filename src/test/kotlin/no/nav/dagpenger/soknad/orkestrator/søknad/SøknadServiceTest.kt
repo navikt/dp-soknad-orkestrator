@@ -1,6 +1,8 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.utils.februar
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.Test
 import java.util.UUID

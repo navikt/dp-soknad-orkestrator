@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.søknad
+package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.zaxxer.hikari.HikariDataSource
 import io.kotest.matchers.shouldBe
