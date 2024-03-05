@@ -34,9 +34,10 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
         søknadsId: UUID,
     ): Opplysning {
         return transaction {
-            OpplysningTabell.selectAll()
-                .filtererMed(beskrivendeId, fødselsnummer, søknadsId)
-                .map(mapTilOpplysning())
+            OpplysningTabell
+                .selectAll()
+                .somMatcher(beskrivendeId, fødselsnummer, søknadsId)
+                .map(tilOpplysning())
                 .firstOrNull()
                 ?: throw NoSuchElementException(
                     "Ingen opplysning funnet med gitt beskrivendeId:" + " $beskrivendeId," +
@@ -65,7 +66,7 @@ fun OpplysningTabell.leggTil(opplysning: Opplysning) {
     }
 }
 
-fun Query.filtererMed(
+fun Query.somMatcher(
     beskrivendeId: String,
     fødselsnummer: String,
     søknadsId: UUID,
@@ -76,7 +77,7 @@ fun Query.filtererMed(
             (OpplysningTabell.søknadsId eq søknadsId)
     }
 
-private fun mapTilOpplysning(): (ResultRow) -> Opplysning =
+private fun tilOpplysning(): (ResultRow) -> Opplysning =
     {
         Opplysning(
             beskrivendeId = it[OpplysningTabell.beskrivendeId],
