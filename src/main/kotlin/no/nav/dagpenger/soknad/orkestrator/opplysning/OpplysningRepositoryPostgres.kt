@@ -49,11 +49,11 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
 }
 
 object OpplysningTabell : Table() {
-    val beskrivendeId = varchar("beskrivendeId", 255)
+    val beskrivendeId = varchar("beskrivende_id", 255)
     val svar = varchar("svar", 255)
     val fødselsnummer = varchar("fødselsnummer", 11)
-    val søknadsId = uuid("søknadsId").nullable()
-    val behandlingsId = uuid("behandlingsId").nullable()
+    val søknadsId = uuid("søknads_id").nullable()
+    val behandlingsId = uuid("behandlings_id").nullable()
 }
 
 fun OpplysningTabell.leggTil(opplysning: Opplysning) {
