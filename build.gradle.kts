@@ -55,6 +55,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
+    implementation("de.slub-dresden:urnlib:2.0.1")
 
     testImplementation(kotlin("test"))
     testImplementation(libs.bundles.kotest.assertions)
