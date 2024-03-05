@@ -1,28 +1,13 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import com.zaxxer.hikari.HikariDataSource
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
+import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import org.junit.jupiter.api.Test
-import org.testcontainers.containers.PostgreSQLContainer
 import java.util.UUID
-import javax.sql.DataSource
 
 class OpplysningRepositoryPostgresTest {
-    private val database = PostgreSQLContainer("postgres:15")
-    private val dataSource: DataSource
-
-    private var opplysningRepository: OpplysningRepository
-
-    init {
-        database.start()
-        dataSource =
-            HikariDataSource().apply {
-                jdbcUrl = database.jdbcUrl
-                username = database.username
-                password = database.password
-            }
-        opplysningRepository = OpplysningRepositoryPostgres(dataSource)
-    }
+    private var opplysningRepository = OpplysningRepositoryPostgres(dataSource)
 
     @Test
     fun `vi kan lagre opplysning`() {
@@ -37,17 +22,19 @@ class OpplysningRepositoryPostgresTest {
                 søknadsId = søknadsId,
             )
 
-        opplysningRepository.lagre(opplysning)
+        withMigratedDb {
+            opplysningRepository.lagre(opplysning)
 
-        val hentetOpplysning =
-            opplysningRepository.hent(
-                beskrivendeId,
-                fødselsnummer,
-                søknadsId,
-            )
+            val hentetOpplysning =
+                opplysningRepository.hent(
+                    beskrivendeId,
+                    fødselsnummer,
+                    søknadsId,
+                )
 
-        hentetOpplysning.beskrivendeId() shouldBe beskrivendeId
-        hentetOpplysning.svar() shouldBe listOf("svar1")
-        hentetOpplysning.fødselsnummer shouldBe fødselsnummer
+            hentetOpplysning.beskrivendeId() shouldBe beskrivendeId
+            hentetOpplysning.svar() shouldBe listOf("svar1")
+            hentetOpplysning.fødselsnummer shouldBe fødselsnummer
+        }
     }
 }

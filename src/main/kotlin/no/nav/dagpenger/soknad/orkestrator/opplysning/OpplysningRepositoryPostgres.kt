@@ -3,7 +3,6 @@ package no.nav.dagpenger.soknad.orkestrator.opplysning
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
@@ -14,13 +13,6 @@ import javax.sql.DataSource
 
 class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepository {
     val database = Database.connect(dataSource)
-
-    init {
-        transaction {
-            // TODO Skal bruke flyway til å opprette tabellene
-            SchemaUtils.createMissingTablesAndColumns(OpplysningTabell)
-        }
-    }
 
     override fun lagre(opplysning: Opplysning) {
         transaction {
@@ -48,11 +40,11 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
     }
 }
 
-object OpplysningTabell : Table() {
+object OpplysningTabell : Table("opplysning") {
     val beskrivendeId = varchar("beskrivende_id", 255)
     val svar = varchar("svar", 255)
-    val fødselsnummer = varchar("fødselsnummer", 11)
-    val søknadsId = uuid("søknads_id").nullable()
+    val fødselsnummer = varchar("fodselsnummer", 11)
+    val søknadsId = uuid("soknads_id").nullable()
     val behandlingsId = uuid("behandlings_id").nullable()
 }
 
