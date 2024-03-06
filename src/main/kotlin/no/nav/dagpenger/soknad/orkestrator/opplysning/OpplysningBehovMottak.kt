@@ -24,6 +24,7 @@ class OpplysningBehovMottak(
                 }
             }
             validate { it.requireKey("ident", "søknad_id", "behandling_id") }
+            validate { it.rejectKey("@løsning") }
         }.register(this)
     }
 
