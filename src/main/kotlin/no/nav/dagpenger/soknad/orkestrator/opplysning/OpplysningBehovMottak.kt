@@ -37,10 +37,9 @@ class OpplysningBehovMottak(
         val behandlingId = packet["behandling_id"].asText()
 
         val beskrivendeId =
-            "faktum." +
-                URN.rfc8141()
-                    .parse(packet["@behov"][0].asText())
-                    .namespaceSpecificString().toString()
+            URN.rfc8141()
+                .parse(packet["@behov"][0].asText())
+                .namespaceSpecificString().toString()
 
         opplysningService.hentOpplysning(ident, søknadId, behandlingId, beskrivendeId)
     }

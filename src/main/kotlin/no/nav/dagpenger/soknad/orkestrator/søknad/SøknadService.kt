@@ -17,7 +17,7 @@ fun toSøknad(legacySøknad: LegacySøknad): Søknad {
             seksjon.fakta.map { fakta ->
                 Opplysning(
                     svar = fakta.svar,
-                    beskrivendeId = fakta.beskrivendeId,
+                    beskrivendeId = fakta.beskrivendeId.substringAfter("faktum."),
                     søknadsId = legacySøknad.søknadsData.søknadUUID,
                     fødselsnummer = legacySøknad.fødselsnummer,
                 )

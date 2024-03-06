@@ -51,7 +51,7 @@ class SøknadServiceTest {
             journalpostId shouldBe journalpostId
             fødselsnummer shouldBe "12345678901"
             opplysninger.size shouldBe 1
-            opplysninger.first().beskrivendeId() shouldBe "faktum.hvilket-land-bor-du-i"
+            opplysninger.first().beskrivendeId() shouldBe "hvilket-land-bor-du-i"
             opplysninger.first().svar() shouldBe listOf("NOR")
         }
     }
