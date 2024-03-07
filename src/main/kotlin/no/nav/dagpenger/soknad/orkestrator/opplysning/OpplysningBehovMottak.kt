@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
+import com.fasterxml.jackson.databind.JsonNode
 import de.slub.urn.URN
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -13,16 +14,7 @@ class OpplysningBehovMottak(
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
-            validate {
-                it.demand("@behov") { jsonNode ->
-                    jsonNode[0].asText().let { behovUrn ->
-                        val urn = URN.rfc8141().parse(behovUrn)
-                        if (urn.namespaceIdentifier().toString() != "opplysning") {
-                            throw IllegalArgumentException("Behov inneholder ikke opplysning: $behovUrn")
-                        }
-                    }
-                }
-            }
+            validate { it.demand("@behov", behovParser) }
             validate { it.requireKey("ident", "søknad_id", "behandling_id") }
             validate { it.rejectKey("@løsning") }
         }.register(this)
@@ -32,15 +24,23 @@ class OpplysningBehovMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        val ident = packet["ident"].asText()
-        val søknadId = packet["søknad_id"].asText()
-        val behandlingId = packet["behandling_id"].asText()
+        with(packet) {
+            val beskrivendeId = get("@behov")[0].asText().toBeskrivendeId()
+            val ident = get("ident").asText()
+            val søknadId = get("søknad_id").asText()
+            val behandlingId = get("behandling_id").asText()
 
-        val beskrivendeId =
-            URN.rfc8141()
-                .parse(packet["@behov"][0].asText())
-                .namespaceSpecificString().toString()
-
-        opplysningService.hentOpplysning(ident, søknadId, behandlingId, beskrivendeId)
+            opplysningService.hentOpplysning(ident, søknadId, behandlingId, beskrivendeId)
+        }
     }
 }
+
+val behovParser: (JsonNode) -> Unit = { jsonNode ->
+    jsonNode[0].asText().let { behovUrn ->
+        URN.rfc8141().parse(behovUrn).takeIf {
+            it.namespaceIdentifier().toString() == "opplysning"
+        } ?: throw IllegalArgumentException("Behov inneholder ikke opplysning: $behovUrn")
+    }
+}
+
+fun String.toBeskrivendeId() = URN.rfc8141().parse(this).namespaceSpecificString().toString()
