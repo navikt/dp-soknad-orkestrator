@@ -30,12 +30,15 @@ class OpplysningBehovMottak(
             val søknadId = get("søknad_id").asText()
             val behandlingId = get("behandling_id").asText()
 
-            opplysningService.hentOpplysning(
-                beskrivendeId = beskrivendeId,
-                ident = ident,
-                søknadId = søknadId,
-                behandlingId = behandlingId,
-            )
+            val opplysning =
+                opplysningService.hentOpplysning(
+                    beskrivendeId = beskrivendeId,
+                    ident = ident,
+                    søknadId = søknadId,
+                    behandlingId = behandlingId,
+                )
+
+            opplysningService.publiserMeldingOmOpplysningBehovLøsning(opplysning)
         }
     }
 }

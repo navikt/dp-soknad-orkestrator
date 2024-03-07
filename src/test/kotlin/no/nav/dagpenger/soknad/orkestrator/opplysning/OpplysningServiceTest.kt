@@ -13,7 +13,7 @@ import java.util.UUID
 class OpplysningServiceTest {
     private val testRapid = TestRapid()
     private val repository = OpplysningRepositoryPostgres(dataSource)
-    private val opplysningService = OpplysningService(repository)
+    private val opplysningService = OpplysningService(testRapid, repository)
 
     @BeforeEach
     fun reset() {
@@ -55,6 +55,30 @@ class OpplysningServiceTest {
                 søknadId = UUID.randomUUID().toString(),
                 behandlingId = behandligId.toString(),
             )
+        }
+    }
+
+    @Test
+    fun `vi kan sende ut melding om løsning til opplysningsbehov på rapiden`() {
+        val opplysning =
+            Opplysning(
+                fødselsnummer = "12345678910",
+                søknadsId = UUID.randomUUID(),
+                beskrivendeId = "dagpenger-søknadsdato",
+                svar = listOf("2021-01-01"),
+            )
+
+        opplysningService.publiserMeldingOmOpplysningBehovLøsning(opplysning)
+
+        with(testRapid.inspektør) {
+            size shouldBe 1
+
+            field(0, "ident").asText() shouldBe "12345678910"
+            field(0, "søknad_id").asText() shouldBe opplysning.søknadsId.toString()
+            field(0, "behandling_id").asText() shouldBe opplysning.behandlingsId.toString()
+
+            field(0, "@behov").toList().first().asText() shouldBe "urn:opplysning:dagpenger-søknadsdato"
+            field(0, "@løsning").get("urn:opplysning:dagpenger-søknadsdato:hypotese").asText() shouldBe "2021-01-01"
         }
     }
 }

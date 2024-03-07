@@ -36,7 +36,17 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
                 runMigration()
             }
 
-        SøknadMottak(rapidsConnection, SøknadService(rapidsConnection), OpplysningRepositoryPostgres(dataSource))
-        OpplysningBehovMottak(rapidsConnection, OpplysningService(OpplysningRepositoryPostgres(dataSource)))
+        SøknadMottak(
+            rapidsConnection,
+            SøknadService(rapidsConnection),
+            OpplysningRepositoryPostgres(dataSource),
+        )
+        OpplysningBehovMottak(
+            rapidsConnection,
+            OpplysningService(
+                rapidsConnection,
+                OpplysningRepositoryPostgres(dataSource),
+            ),
+        )
     }
 }
