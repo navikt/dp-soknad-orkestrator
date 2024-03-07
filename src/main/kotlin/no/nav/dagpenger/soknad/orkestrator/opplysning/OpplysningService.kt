@@ -1,11 +1,18 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-class OpplysningService {
+import java.util.UUID
+
+class OpplysningService(private val repository: OpplysningRepository) {
     fun hentOpplysning(
+        beskrivendeId: String,
         ident: String,
         søknadId: String,
         behandlingId: String,
-        beskrivendeId: String,
-    ) {
+    ): Opplysning {
+        return repository.hent(
+            beskrivendeId,
+            ident,
+            UUID.fromString(søknadId),
+        )
     }
 }

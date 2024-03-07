@@ -37,6 +37,6 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
             }
 
         SøknadMottak(rapidsConnection, SøknadService(rapidsConnection), OpplysningRepositoryPostgres(dataSource))
-        OpplysningBehovMottak(rapidsConnection, OpplysningService())
+        OpplysningBehovMottak(rapidsConnection, OpplysningService(OpplysningRepositoryPostgres(dataSource)))
     }
 }

@@ -32,8 +32,8 @@ class OpplysningRepositoryPostgresTest {
                     søknadsId,
                 )
 
-            hentetOpplysning.beskrivendeId() shouldBe beskrivendeId
-            hentetOpplysning.svar() shouldBe listOf("svar1")
+            hentetOpplysning.beskrivendeId shouldBe beskrivendeId
+            hentetOpplysning.svar shouldBe listOf("svar1")
             hentetOpplysning.fødselsnummer shouldBe fødselsnummer
         }
     }

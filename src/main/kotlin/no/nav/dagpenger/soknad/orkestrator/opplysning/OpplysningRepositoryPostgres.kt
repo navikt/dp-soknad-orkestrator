@@ -50,8 +50,8 @@ object OpplysningTabell : Table("opplysning") {
 
 fun OpplysningTabell.leggTil(opplysning: Opplysning) {
     insert {
-        it[beskrivendeId] = opplysning.beskrivendeId()
-        it[svar] = opplysning.svar().joinToString()
+        it[beskrivendeId] = opplysning.beskrivendeId
+        it[svar] = opplysning.svar.joinToString()
         it[fødselsnummer] = opplysning.fødselsnummer
         it[søknadsId] = opplysning.søknadsId
         it[behandlingsId] = opplysning.behandlingsId
