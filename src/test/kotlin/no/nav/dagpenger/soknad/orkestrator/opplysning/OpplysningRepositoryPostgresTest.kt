@@ -16,9 +16,8 @@ class OpplysningRepositoryPostgresTest {
         val søknadsId = UUID.randomUUID()
         val behandlingsId = UUID.randomUUID()
         val opplysning =
-            Opplysning(
+            opplysningMed(
                 beskrivendeId = beskrivendeId,
-                svar = listOf("svar1"),
                 ident = ident,
                 søknadsId = søknadsId,
                 behandlingsId = behandlingsId,
@@ -27,17 +26,42 @@ class OpplysningRepositoryPostgresTest {
         withMigratedDb {
             opplysningRepository.lagre(opplysning)
 
-            val hentetOpplysning =
-                opplysningRepository.hent(
-                    beskrivendeId,
-                    ident,
-                    søknadsId,
-                    behandlingsId,
-                )
+            opplysningRepository.hent(
+                beskrivendeId,
+                ident,
+                søknadsId,
+                behandlingsId,
+            ) shouldBe opplysning
+        }
+    }
 
-            hentetOpplysning.beskrivendeId shouldBe beskrivendeId
-            hentetOpplysning.svar shouldBe listOf("svar1")
-            hentetOpplysning.ident shouldBe ident
+    @Test
+    fun `vi lagrer ikke opplysning dersom den er allerede lagret`() {
+        val ident = "12345678901"
+        val søknadsId = UUID.randomUUID()
+        val behandlingsId = UUID.randomUUID()
+        val opplysning1 = opplysningMed(ident = ident, søknadsId = søknadsId, behandlingsId = behandlingsId)
+        val opplysning2 = opplysningMed(ident = ident, søknadsId = søknadsId, behandlingsId = behandlingsId)
+
+        withMigratedDb {
+            opplysningRepository.lagre(opplysning1)
+            opplysningRepository.antall() shouldBe 1
+
+            opplysningRepository.lagre(opplysning2)
+            opplysningRepository.antall() shouldBe 1
         }
     }
 }
+
+fun opplysningMed(
+    ident: String,
+    beskrivendeId: String = "beskrivendeId",
+    søknadsId: UUID = UUID.randomUUID(),
+    behandlingsId: UUID = UUID.randomUUID(),
+) = Opplysning(
+    beskrivendeId = beskrivendeId,
+    svar = listOf("svar"),
+    ident = ident,
+    søknadsId = søknadsId,
+    behandlingsId = behandlingsId,
+)

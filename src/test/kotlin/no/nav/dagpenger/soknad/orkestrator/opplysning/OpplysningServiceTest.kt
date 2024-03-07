@@ -26,16 +26,24 @@ class OpplysningServiceTest {
         val ident = "12345678910"
         val søknadsId = UUID.randomUUID()
         val behandligsId = UUID.randomUUID()
-        val forventetOpplysning = opplysningMed(beskrivendeId, ident, søknadsId, behandligsId)
 
-        withMigratedDb { repository.lagre(forventetOpplysning) }
+        val opplysning =
+            Opplysning(
+                ident = ident,
+                søknadsId = søknadsId,
+                beskrivendeId = beskrivendeId,
+                behandlingsId = behandligsId,
+                svar = listOf("2021-01-01"),
+            )
+
+        withMigratedDb { repository.lagre(opplysning) }
 
         opplysningService.hentOpplysning(
             beskrivendeId = beskrivendeId,
             ident = ident,
             søknadsId = søknadsId.toString(),
             behandlingsId = behandligsId.toString(),
-        ) shouldBe forventetOpplysning
+        ) shouldBe opplysning
     }
 
     @Test
@@ -44,9 +52,16 @@ class OpplysningServiceTest {
         val ident = "12345678910"
         val søknadsId = UUID.randomUUID()
         val behandligsId = UUID.randomUUID()
-        val forventetOpplysning = opplysningMed(beskrivendeId, ident, søknadsId)
 
-        withMigratedDb { repository.lagre(forventetOpplysning) }
+        val opplysning =
+            Opplysning(
+                ident = ident,
+                søknadsId = søknadsId,
+                beskrivendeId = beskrivendeId,
+                svar = listOf("2021-01-01"),
+            )
+
+        withMigratedDb { repository.lagre(opplysning) }
 
         shouldThrow<NoSuchElementException> {
             opplysningService.hentOpplysning(
@@ -82,17 +97,3 @@ class OpplysningServiceTest {
         }
     }
 }
-
-fun opplysningMed(
-    beskrivendeId: String,
-    ident: String,
-    søknadsId: UUID = UUID.randomUUID(),
-    behandlingsId: UUID = UUID.randomUUID(),
-    svar: List<String> = listOf("svar"),
-) = Opplysning(
-    ident = ident,
-    søknadsId = søknadsId,
-    behandlingsId = behandlingsId,
-    beskrivendeId = beskrivendeId,
-    svar = svar,
-)

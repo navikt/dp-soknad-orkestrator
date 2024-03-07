@@ -11,12 +11,18 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 import javax.sql.DataSource
 
+fun main() {
+    println("hello ")
+}
+
 class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepository {
     val database = Database.connect(dataSource)
 
     override fun lagre(opplysning: Opplysning) {
         transaction {
-            OpplysningTabell.leggTil(opplysning)
+            if (!opplysningEksisterer(opplysning)) {
+                OpplysningTabell.leggTil(opplysning)
+            }
         }
     }
 
@@ -40,6 +46,12 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
                 )
         }
     }
+
+    override fun antall(): Long {
+        return transaction {
+            OpplysningTabell.selectAll().count()
+        }
+    }
 }
 
 object OpplysningTabell : Table("opplysning") {
@@ -49,6 +61,14 @@ object OpplysningTabell : Table("opplysning") {
     val søknadsId = uuid("soknads_id").nullable()
     val behandlingsId = uuid("behandlings_id").nullable()
 }
+
+private fun opplysningEksisterer(opplysning: Opplysning): Boolean =
+    OpplysningTabell.selectAll().somMatcher(
+        opplysning.beskrivendeId,
+        opplysning.ident,
+        opplysning.søknadsId,
+        opplysning.behandlingsId,
+    ).any()
 
 fun OpplysningTabell.leggTil(opplysning: Opplysning) {
     insert {
@@ -63,8 +83,8 @@ fun OpplysningTabell.leggTil(opplysning: Opplysning) {
 fun Query.somMatcher(
     beskrivendeId: String,
     ident: String,
-    søknadsId: UUID,
-    behandlingsId: UUID,
+    søknadsId: UUID?,
+    behandlingsId: UUID?,
 ): Query =
     where {
         OpplysningTabell.beskrivendeId eq beskrivendeId and
