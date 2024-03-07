@@ -31,8 +31,8 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
 
     override fun onStartup(rapidsConnection: RapidsConnection) {
         Database.connect(datasource = dataSource)
-            .apply {
-                logger.info { "Koblet til database $name}" }
+            .also {
+                logger.info { "Koblet til database ${it.name}}" }
                 runMigration()
             }
 
