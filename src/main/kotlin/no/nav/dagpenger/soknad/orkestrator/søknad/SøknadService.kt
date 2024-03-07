@@ -27,7 +27,6 @@ fun toSøknad(legacySøknad: LegacySøknad): Søknad {
     return Søknad(
         id = legacySøknad.søknadsData.søknadUUID,
         ident = legacySøknad.ident,
-        // TODO: Finne nøyaktig søknadstidspunkt
         opplysninger = opplysninger,
     )
 }

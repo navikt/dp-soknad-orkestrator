@@ -28,11 +28,9 @@ class SøknadMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        val søknad = søknadService.mapTilSøknad(packet.toLegacySøknad())
-
-        søknad.opplysninger.forEach(opplysningRepository::lagre)
-
-        søknadService.publiserMeldingOmNySøknad(søknad)
+        søknadService.mapTilSøknad(packet.toLegacySøknad())
+            .also { it.opplysninger.forEach(opplysningRepository::lagre) }
+            .also(søknadService::publiserMeldingOmNySøknad)
     }
 }
 
