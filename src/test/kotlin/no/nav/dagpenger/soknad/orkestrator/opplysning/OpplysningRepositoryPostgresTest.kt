@@ -12,13 +12,13 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre opplysning`() {
         val beskrivendeId = "beskrivendeId"
-        val fødselsnummer = "12345678901"
+        val ident = "12345678901"
         val søknadsId = UUID.randomUUID()
         val opplysning =
             Opplysning(
                 beskrivendeId = beskrivendeId,
                 svar = listOf("svar1"),
-                fødselsnummer = fødselsnummer,
+                ident = ident,
                 søknadsId = søknadsId,
             )
 
@@ -28,13 +28,13 @@ class OpplysningRepositoryPostgresTest {
             val hentetOpplysning =
                 opplysningRepository.hent(
                     beskrivendeId,
-                    fødselsnummer,
+                    ident,
                     søknadsId,
                 )
 
             hentetOpplysning.beskrivendeId shouldBe beskrivendeId
             hentetOpplysning.svar shouldBe listOf("svar1")
-            hentetOpplysning.fødselsnummer shouldBe fødselsnummer
+            hentetOpplysning.ident shouldBe ident
         }
     }
 }

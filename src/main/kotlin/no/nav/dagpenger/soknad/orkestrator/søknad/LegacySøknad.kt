@@ -28,7 +28,8 @@ data class LegacySøknad(
     val id: UUID,
     @JsonProperty("@opprettet")
     val opprettet: LocalDateTime,
-    val fødselsnummer: String,
+    @JsonProperty("fødselsnummer")
+    val ident: String,
     val journalpostId: String,
     val søknadsData: SøknadsData,
 )

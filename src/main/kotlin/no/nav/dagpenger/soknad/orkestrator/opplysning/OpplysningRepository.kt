@@ -7,7 +7,7 @@ interface OpplysningRepository {
 
     fun hent(
         beskrivendeId: String,
-        fødselsnummer: String,
+        ident: String,
         søknadsId: UUID,
     ): Opplysning
 }

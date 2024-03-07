@@ -62,7 +62,7 @@ class OpplysningServiceTest {
     fun `vi kan sende ut melding om løsning til opplysningsbehov på rapiden`() {
         val opplysning =
             Opplysning(
-                fødselsnummer = "12345678910",
+                ident = "12345678910",
                 søknadsId = UUID.randomUUID(),
                 beskrivendeId = "dagpenger-søknadsdato",
                 svar = listOf("2021-01-01"),
@@ -89,7 +89,7 @@ fun opplysningMed(
     søknadId: UUID = UUID.randomUUID(),
     svar: List<String> = listOf("svar"),
 ) = Opplysning(
-    fødselsnummer = ident,
+    ident = ident,
     søknadsId = søknadId,
     beskrivendeId = beskrivendeId,
     svar = svar,

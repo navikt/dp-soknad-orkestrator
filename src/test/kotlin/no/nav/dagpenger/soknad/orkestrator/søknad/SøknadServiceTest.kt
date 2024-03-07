@@ -21,7 +21,7 @@ class SøknadServiceTest {
             LegacySøknad(
                 id = id,
                 opprettet = 20.februar.atStartOfDay(),
-                fødselsnummer = "12345678901",
+                ident = "12345678901",
                 journalpostId = journalpostId,
                 søknadsData =
                     SøknadsData(
@@ -49,7 +49,7 @@ class SøknadServiceTest {
         with(søknad) {
             id shouldBe id
             journalpostId shouldBe journalpostId
-            fødselsnummer shouldBe "12345678901"
+            ident shouldBe "12345678901"
             opplysninger.size shouldBe 1
             opplysninger.first().beskrivendeId shouldBe "hvilket-land-bor-du-i"
             opplysninger.first().svar shouldBe listOf("NOR")
@@ -63,16 +63,14 @@ class SøknadServiceTest {
         val søknad =
             Søknad(
                 id = søknadUUID,
-                fødselsnummer = ident,
-                journalpostId = "637582711",
-                søknadstidspunkt = 20.februar.atStartOfDay(),
+                ident = ident,
                 opplysninger =
                     listOf(
                         Opplysning(
                             beskrivendeId = "faktum.hvilket-land-bor-du-i",
                             svar = listOf("NOR"),
                             søknadsId = søknadUUID,
-                            fødselsnummer = ident,
+                            ident = ident,
                         ),
                     ),
             )

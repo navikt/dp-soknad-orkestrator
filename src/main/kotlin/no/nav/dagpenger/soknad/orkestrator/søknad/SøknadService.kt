@@ -7,7 +7,7 @@ class SøknadService(private val rapid: RapidsConnection) {
     fun mapTilSøknad(legacySøknad: LegacySøknad) = toSøknad(legacySøknad)
 
     fun publiserMeldingOmNySøknad(søknad: Søknad) {
-        rapid.publish(MeldingOmNySøknad(søknad.id, søknad.fødselsnummer).asMessage().toJson())
+        rapid.publish(MeldingOmNySøknad(søknad.id, søknad.ident).asMessage().toJson())
     }
 }
 
@@ -19,17 +19,15 @@ fun toSøknad(legacySøknad: LegacySøknad): Søknad {
                     svar = fakta.svar,
                     beskrivendeId = fakta.beskrivendeId.substringAfter("faktum."),
                     søknadsId = legacySøknad.søknadsData.søknadUUID,
-                    fødselsnummer = legacySøknad.fødselsnummer,
+                    ident = legacySøknad.ident,
                 )
             }
         }.toList().flatten()
 
     return Søknad(
         id = legacySøknad.søknadsData.søknadUUID,
-        fødselsnummer = legacySøknad.fødselsnummer,
-        journalpostId = legacySøknad.journalpostId,
+        ident = legacySøknad.ident,
         // TODO: Finne nøyaktig søknadstidspunkt
-        søknadstidspunkt = legacySøknad.opprettet,
         opplysninger = opplysninger,
     )
 }

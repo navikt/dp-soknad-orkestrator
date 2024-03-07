@@ -8,7 +8,7 @@ class MeldingOmOpplysningBehovLøsning(private val opplysning: Opplysning) {
             eventName = "behov",
             map =
                 mapOf(
-                    "ident" to opplysning.fødselsnummer,
+                    "ident" to opplysning.ident,
                     "søknad_id" to opplysning.søknadsId.toString(),
                     "behandling_id" to opplysning.behandlingsId.toString(),
                     "@behov" to listOf("urn:opplysning:${opplysning.beskrivendeId}"),
