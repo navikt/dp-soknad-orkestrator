@@ -24,17 +24,17 @@ class OpplysningServiceTest {
     fun `vi henter opplysning ved riktige kriterium`() {
         val beskrivendeId = "dagpenger-søknadsdato"
         val ident = "12345678910"
-        val søknadId = UUID.randomUUID()
-        val behandligId = UUID.randomUUID()
-        val forventetOpplysning = opplysningMed(beskrivendeId, ident, søknadId, behandligId)
+        val søknadsId = UUID.randomUUID()
+        val behandligsId = UUID.randomUUID()
+        val forventetOpplysning = opplysningMed(beskrivendeId, ident, søknadsId, behandligsId)
 
         withMigratedDb { repository.lagre(forventetOpplysning) }
 
         opplysningService.hentOpplysning(
             beskrivendeId = beskrivendeId,
             ident = ident,
-            søknadId = søknadId.toString(),
-            behandlingId = behandligId.toString(),
+            søknadsId = søknadsId.toString(),
+            behandlingsId = behandligsId.toString(),
         ) shouldBe forventetOpplysning
     }
 
@@ -42,9 +42,9 @@ class OpplysningServiceTest {
     fun `vi henter ikke opplysning dersom ett av kriteriene ikke stemmer`() {
         val beskrivendeId = "dagpenger-søknadsdato"
         val ident = "12345678910"
-        val søknadId = UUID.randomUUID()
-        val behandligId = UUID.randomUUID()
-        val forventetOpplysning = opplysningMed(beskrivendeId, ident, søknadId)
+        val søknadsId = UUID.randomUUID()
+        val behandligsId = UUID.randomUUID()
+        val forventetOpplysning = opplysningMed(beskrivendeId, ident, søknadsId)
 
         withMigratedDb { repository.lagre(forventetOpplysning) }
 
@@ -52,8 +52,8 @@ class OpplysningServiceTest {
             opplysningService.hentOpplysning(
                 beskrivendeId = beskrivendeId,
                 ident = ident,
-                søknadId = UUID.randomUUID().toString(),
-                behandlingId = behandligId.toString(),
+                søknadsId = UUID.randomUUID().toString(),
+                behandlingsId = behandligsId.toString(),
             )
         }
     }
@@ -86,13 +86,13 @@ class OpplysningServiceTest {
 fun opplysningMed(
     beskrivendeId: String,
     ident: String,
-    søknadId: UUID = UUID.randomUUID(),
-    behandlingsid: UUID = UUID.randomUUID(),
+    søknadsId: UUID = UUID.randomUUID(),
+    behandlingsId: UUID = UUID.randomUUID(),
     svar: List<String> = listOf("svar"),
 ) = Opplysning(
     ident = ident,
-    søknadsId = søknadId,
-    behandlingsId = behandlingsid,
+    søknadsId = søknadsId,
+    behandlingsId = behandlingsId,
     beskrivendeId = beskrivendeId,
     svar = svar,
 )

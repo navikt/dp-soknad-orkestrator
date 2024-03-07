@@ -7,14 +7,14 @@ class OpplysningService(private val rapid: RapidsConnection, private val reposit
     fun hentOpplysning(
         beskrivendeId: String,
         ident: String,
-        søknadId: String,
-        behandlingId: String,
+        søknadsId: String,
+        behandlingsId: String,
     ): Opplysning {
         return repository.hent(
-            beskrivendeId,
-            ident,
-            UUID.fromString(søknadId),
-            UUID.fromString(behandlingId),
+            beskrivendeId = beskrivendeId,
+            ident = ident,
+            søknadsId = UUID.fromString(søknadsId),
+            behandlingsId = UUID.fromString(behandlingsId),
         )
     }
 

@@ -27,14 +27,14 @@ class OpplysningBehovMottak(
         with(packet) {
             val beskrivendeId = get("@behov")[0].asText().toBeskrivendeId()
             val ident = get("ident").asText()
-            val søknadId = get("søknad_id").asText()
-            val behandlingId = get("behandling_id").asText()
+            val søknadsId = get("søknad_id").asText()
+            val behandlingsId = get("behandling_id").asText()
 
             opplysningService.hentOpplysning(
                 beskrivendeId = beskrivendeId,
                 ident = ident,
-                søknadId = søknadId,
-                behandlingId = behandlingId,
+                søknadsId = søknadsId,
+                behandlingsId = behandlingsId,
             ).also(opplysningService::publiserMeldingOmOpplysningBehovLøsning)
         }
     }
