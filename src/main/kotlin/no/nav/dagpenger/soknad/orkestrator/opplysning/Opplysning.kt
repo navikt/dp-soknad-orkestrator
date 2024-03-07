@@ -14,6 +14,7 @@ class Opplysning(
             other.ident == ident &&
             other.søknadsId == søknadsId &&
             other.beskrivendeId == beskrivendeId &&
+            other.behandlingsId == behandlingsId &&
             other.svar == svar
 
     override fun hashCode() =

@@ -26,7 +26,7 @@ class OpplysningServiceTest {
         val ident = "12345678910"
         val søknadId = UUID.randomUUID()
         val behandligId = UUID.randomUUID()
-        val forventetOpplysning = opplysningMed(beskrivendeId, ident, søknadId)
+        val forventetOpplysning = opplysningMed(beskrivendeId, ident, søknadId, behandligId)
 
         withMigratedDb { repository.lagre(forventetOpplysning) }
 
@@ -87,10 +87,12 @@ fun opplysningMed(
     beskrivendeId: String,
     ident: String,
     søknadId: UUID = UUID.randomUUID(),
+    behandlingsid: UUID = UUID.randomUUID(),
     svar: List<String> = listOf("svar"),
 ) = Opplysning(
     ident = ident,
     søknadsId = søknadId,
+    behandlingsId = behandlingsid,
     beskrivendeId = beskrivendeId,
     svar = svar,
 )

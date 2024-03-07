@@ -14,6 +14,7 @@ class OpplysningService(private val rapid: RapidsConnection, private val reposit
             beskrivendeId,
             ident,
             UUID.fromString(søknadId),
+            UUID.fromString(behandlingId),
         )
     }
 

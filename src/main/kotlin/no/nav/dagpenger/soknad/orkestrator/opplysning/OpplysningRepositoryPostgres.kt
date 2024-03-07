@@ -24,17 +24,19 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
         beskrivendeId: String,
         ident: String,
         søknadsId: UUID,
+        behandlingsId: UUID,
     ): Opplysning {
         return transaction {
             OpplysningTabell
                 .selectAll()
-                .somMatcher(beskrivendeId, ident, søknadsId)
+                .somMatcher(beskrivendeId, ident, søknadsId, behandlingsId)
                 .map(tilOpplysning())
                 .firstOrNull()
                 ?: throw NoSuchElementException(
                     "Ingen opplysning funnet med gitt beskrivendeId:" + " $beskrivendeId," +
                         " ident: $ident, " +
-                        "og søknadsId: $søknadsId",
+                        "og søknadsId: $søknadsId" +
+                        "og behandlingsId: $behandlingsId",
                 )
         }
     }
@@ -62,11 +64,13 @@ fun Query.somMatcher(
     beskrivendeId: String,
     ident: String,
     søknadsId: UUID,
+    behandlingsId: UUID,
 ): Query =
     where {
         OpplysningTabell.beskrivendeId eq beskrivendeId and
             (OpplysningTabell.ident eq ident) and
-            (OpplysningTabell.søknadsId eq søknadsId)
+            (OpplysningTabell.søknadsId eq søknadsId) and
+            (OpplysningTabell.behandlingsId eq behandlingsId)
     }
 
 private fun tilOpplysning(): (ResultRow) -> Opplysning =

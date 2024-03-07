@@ -14,12 +14,14 @@ class OpplysningRepositoryPostgresTest {
         val beskrivendeId = "beskrivendeId"
         val ident = "12345678901"
         val søknadsId = UUID.randomUUID()
+        val behandlingsId = UUID.randomUUID()
         val opplysning =
             Opplysning(
                 beskrivendeId = beskrivendeId,
                 svar = listOf("svar1"),
                 ident = ident,
                 søknadsId = søknadsId,
+                behandlingsId = behandlingsId,
             )
 
         withMigratedDb {
@@ -30,6 +32,7 @@ class OpplysningRepositoryPostgresTest {
                     beskrivendeId,
                     ident,
                     søknadsId,
+                    behandlingsId,
                 )
 
             hentetOpplysning.beskrivendeId shouldBe beskrivendeId
