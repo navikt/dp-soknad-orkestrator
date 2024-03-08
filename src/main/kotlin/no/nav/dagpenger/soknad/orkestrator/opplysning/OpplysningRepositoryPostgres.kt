@@ -11,10 +11,6 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 import javax.sql.DataSource
 
-fun main() {
-    println("hello ")
-}
-
 class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepository {
     val database = Database.connect(dataSource)
 
