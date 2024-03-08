@@ -74,7 +74,7 @@ class OpplysningServiceTest {
     }
 
     @Test
-    fun `vi kan sende ut melding om løsning til opplysningsbehov på rapiden`() {
+    fun `vi sender ut melding om løsning for opplysningsbehov i riktig format på rapiden`() {
         val opplysning =
             Opplysning(
                 ident = "12345678910",
@@ -91,9 +91,11 @@ class OpplysningServiceTest {
             field(0, "ident").asText() shouldBe "12345678910"
             field(0, "søknad_id").asText() shouldBe opplysning.søknadsId.toString()
             field(0, "behandling_id").asText() shouldBe opplysning.behandlingsId.toString()
-
             field(0, "@behov").toList().first().asText() shouldBe "urn:opplysning:dagpenger-søknadsdato"
-            field(0, "@løsning").get("urn:opplysning:dagpenger-søknadsdato:hypotese").asText() shouldBe "2021-01-01"
+            field(0, "@løsning").get("urn:opplysning:dagpenger-søknadsdato").let {
+                it.get("status").asText() shouldBe "hypotese"
+                it.get("verdi").asText() shouldBe "2021-01-01"
+            }
         }
     }
 }

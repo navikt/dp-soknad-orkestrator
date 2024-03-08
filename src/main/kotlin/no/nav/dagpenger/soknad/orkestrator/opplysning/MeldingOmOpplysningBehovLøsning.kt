@@ -14,7 +14,11 @@ class MeldingOmOpplysningBehovLøsning(private val opplysning: Opplysning) {
                     "@behov" to listOf("urn:opplysning:${opplysning.beskrivendeId}"),
                     "@løsning" to
                         mapOf(
-                            "urn:opplysning:${opplysning.beskrivendeId}:hypotese" to opplysning.svar.joinToString(""),
+                            "urn:opplysning:${opplysning.beskrivendeId}" to
+                                mapOf(
+                                    "status" to "hypotese",
+                                    "verdi" to opplysning.svar.first(),
+                                ),
                         ),
                 ),
         )
