@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val exposedVersion: String by project
 
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "1.9.23"
     id("com.diffplug.spotless") version "6.25.0"
     id("io.ktor.plugin") version "2.3.9"
 }
