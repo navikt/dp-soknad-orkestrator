@@ -11,6 +11,4 @@ interface OpplysningRepository {
         søknadsId: UUID,
         behandlingsId: UUID,
     ): Opplysning
-
-    fun antall(): Long
 }

@@ -42,12 +42,6 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
                 )
         }
     }
-
-    override fun antall(): Long {
-        return transaction {
-            OpplysningTabell.selectAll().count()
-        }
-    }
 }
 
 object OpplysningTabell : Table("opplysning") {

@@ -3,6 +3,8 @@ package no.nav.dagpenger.soknad.orkestrator.opplysning
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -36,7 +38,7 @@ class OpplysningRepositoryPostgresTest {
     }
 
     @Test
-    fun `vi lagrer ikke opplysning dersom den er allerede lagret`() {
+    fun `vi lagrer ikke opplysning dersom den allerede er lagret`() {
         val ident = "12345678901"
         val søknadsId = UUID.randomUUID()
         val behandlingsId = UUID.randomUUID()
@@ -45,10 +47,12 @@ class OpplysningRepositoryPostgresTest {
 
         withMigratedDb {
             opplysningRepository.lagre(opplysning1)
-            opplysningRepository.antall() shouldBe 1
+            val antallEtterFørsteLagring = transaction { OpplysningTabell.selectAll().count() }
+            antallEtterFørsteLagring shouldBe 1
 
             opplysningRepository.lagre(opplysning2)
-            opplysningRepository.antall() shouldBe 1
+            val antallEtterAndreLagring = transaction { OpplysningTabell.selectAll().count() }
+            antallEtterAndreLagring shouldBe 1
         }
     }
 }
