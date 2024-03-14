@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningRepository
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -26,7 +27,8 @@ class SøknadMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        SøknadMapper(packet).søknad
+        val jsonNode = objectMapper.readTree(packet.toJson())
+        SøknadMapper(jsonNode).søknad
             .also { it.opplysninger.forEach(opplysningRepository::lagre) }
             .also(søknadService::publiserMeldingOmNySøknad)
     }

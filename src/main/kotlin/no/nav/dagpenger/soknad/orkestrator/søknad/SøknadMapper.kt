@@ -1,20 +1,20 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
+import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.helse.rapids_rivers.JsonMessage
 import java.util.UUID
 
-class SøknadMapper(private val packet: JsonMessage) {
+class SøknadMapper(private val jsonNode: JsonNode) {
     val søknad by lazy {
+        val ident = jsonNode.get("fødselsnummer").asText()
+        val søknadsData = jsonNode.get("søknadsData") ?: throw IllegalArgumentException("Mangler søknadsData")
         val id =
-            UUID.fromString(packet["@id"].asText())
-                ?: throw IllegalArgumentException("Mangler id")
-        val ident =
-            packet["fødselsnummer"].asText()
-                ?: throw IllegalArgumentException("Mangler fødselsnummer")
+            søknadsData["søknad_uuid"]?.let {
+                UUID.fromString(it.asText())
+            } ?: throw IllegalArgumentException("Mangler søknad_uuid")
 
         val seksjoner =
-            packet["søknadsData"].get("seksjoner")
+            søknadsData["seksjoner"]
                 ?: throw IllegalArgumentException("Mangler seksjoner")
 
         val opplysninger =
@@ -26,6 +26,7 @@ class SøknadMapper(private val packet: JsonMessage) {
 
                     val svar =
                         when (type) {
+                            // TODO - Håndter disse faktumtypene
                             "generator" -> ""
                             "periode" -> ""
                             else -> faktum.get("svar").asText()
