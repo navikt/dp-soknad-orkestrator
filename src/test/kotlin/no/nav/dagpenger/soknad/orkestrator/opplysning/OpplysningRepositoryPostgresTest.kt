@@ -64,7 +64,7 @@ fun opplysningMed(
     behandlingsId: UUID = UUID.randomUUID(),
 ) = Opplysning(
     beskrivendeId = beskrivendeId,
-    svar = listOf("svar"),
+    svar = "svar",
     ident = ident,
     søknadsId = søknadsId,
     behandlingsId = behandlingsId,

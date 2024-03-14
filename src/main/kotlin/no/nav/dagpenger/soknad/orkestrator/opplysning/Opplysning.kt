@@ -4,7 +4,7 @@ import java.util.UUID
 
 class Opplysning(
     val beskrivendeId: String,
-    val svar: List<String>,
+    val svar: String,
     val ident: String,
     val søknadsId: UUID? = null,
     val behandlingsId: UUID? = null,

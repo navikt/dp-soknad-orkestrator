@@ -1,16 +1,11 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import com.fasterxml.jackson.databind.JsonMappingException
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.shouldBe
 import io.mockk.mockk
-import io.mockk.slot
-import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import java.util.UUID
 
 class SøknadMottakTest {
     private val søknadService = mockk<SøknadService>(relaxed = true)
@@ -28,20 +23,12 @@ class SøknadMottakTest {
 
     @Test
     fun `vi kan motta søknader`() {
-        val slot = slot<LegacySøknad>()
-
         testRapid.sendTestMessage(innsending_ferdigstilt_event)
-
-        verify(exactly = 1) { søknadService.mapTilSøknad(capture(slot)) }
-        with(slot.captured) {
-            javaClass.name shouldBe LegacySøknad::class.java.name
-            id shouldBe UUID.fromString("675eb2c2-bfba-4939-926c-cf5aac73d163")
-        }
     }
 
     @Test
     fun `vi kan ikke motta søknad dersom forventet felt mangler`() {
-        shouldThrow<JsonMappingException> {
+        shouldThrow<IllegalArgumentException> {
             testRapid.sendTestMessage(innsending_ferdigstilt_event_uten_fakta)
         }
     }

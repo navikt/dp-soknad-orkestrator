@@ -33,7 +33,7 @@ class OpplysningServiceTest {
                 søknadsId = søknadsId,
                 beskrivendeId = beskrivendeId,
                 behandlingsId = behandligsId,
-                svar = listOf("2021-01-01"),
+                svar = "2021-01-01",
             )
 
         withMigratedDb { repository.lagre(opplysning) }
@@ -58,7 +58,7 @@ class OpplysningServiceTest {
                 ident = ident,
                 søknadsId = søknadsId,
                 beskrivendeId = beskrivendeId,
-                svar = listOf("2021-01-01"),
+                svar = "2021-01-01",
             )
 
         withMigratedDb { repository.lagre(opplysning) }
@@ -80,7 +80,7 @@ class OpplysningServiceTest {
                 ident = "12345678910",
                 søknadsId = UUID.randomUUID(),
                 beskrivendeId = "dagpenger-søknadsdato",
-                svar = listOf("2021-01-01"),
+                svar = "2021-01-01",
             )
 
         opplysningService.publiserMeldingOmOpplysningBehovLøsning(opplysning)

@@ -17,7 +17,7 @@ class MeldingOmOpplysningBehovLøsning(private val opplysning: Opplysning) {
                             "urn:opplysning:${opplysning.beskrivendeId}" to
                                 mapOf(
                                     "status" to "hypotese",
-                                    "verdi" to opplysning.svar.first(),
+                                    "verdi" to opplysning.svar,
                                 ),
                         ),
                 ),

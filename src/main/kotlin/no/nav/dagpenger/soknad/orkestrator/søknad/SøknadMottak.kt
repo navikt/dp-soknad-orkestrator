@@ -1,7 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import com.fasterxml.jackson.databind.JsonMappingException
-import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningRepository
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -28,18 +26,8 @@ class SøknadMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        søknadService.mapTilSøknad(packet.toLegacySøknad())
+        SøknadMapper(packet).søknad
             .also { it.opplysninger.forEach(opplysningRepository::lagre) }
             .also(søknadService::publiserMeldingOmNySøknad)
-    }
-}
-
-fun JsonMessage.toLegacySøknad(): LegacySøknad {
-    try {
-        return objectMapper.readValue(this.toJson(), LegacySøknad::class.java)
-    } catch (e: JsonMappingException) {
-        throw e
-    } catch (e: Exception) {
-        throw e
     }
 }

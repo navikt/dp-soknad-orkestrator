@@ -63,7 +63,7 @@ private fun opplysningEksisterer(opplysning: Opplysning): Boolean =
 fun OpplysningTabell.leggTil(opplysning: Opplysning) {
     insert {
         it[beskrivendeId] = opplysning.beskrivendeId
-        it[svar] = opplysning.svar.joinToString()
+        it[svar] = opplysning.svar
         it[ident] = opplysning.ident
         it[søknadsId] = opplysning.søknadsId
         it[behandlingsId] = opplysning.behandlingsId
@@ -87,7 +87,7 @@ private fun tilOpplysning(): (ResultRow) -> Opplysning =
     {
         Opplysning(
             beskrivendeId = it[OpplysningTabell.beskrivendeId],
-            svar = it[OpplysningTabell.svar].split(","),
+            svar = it[OpplysningTabell.svar],
             ident = it[OpplysningTabell.ident],
             søknadsId = it[OpplysningTabell.søknadsId],
             behandlingsId = it[OpplysningTabell.behandlingsId],
