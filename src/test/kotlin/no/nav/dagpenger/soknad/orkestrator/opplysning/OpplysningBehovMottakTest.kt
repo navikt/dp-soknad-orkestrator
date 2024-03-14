@@ -23,16 +23,17 @@ class OpplysningBehovMottakTest {
 
     @Test
     fun `vi kan motta opplysningsbehov`() {
-        testRapid.sendTestMessage(opplysning_behov_event)
+        val behov = listOf("Søknadstidspunkt", "JobbetUtenforNorge", "ØnskerDagpengerFraDato")
+        testRapid.sendTestMessage(opplysning_behov_event(behov))
 
-        verify(exactly = 1) { opplysningService.hentOpplysning(any(), any(), any(), any()) }
+        verify(exactly = 1) { opplysningService.løsBehov(behov) }
     }
 
     @Test
     fun `vi mottar ikke opplysningsbehov dersom påkrevd felt mangler`() {
         testRapid.sendTestMessage(opplysning_behov_event_mangler_ident)
 
-        verify(exactly = 0) { opplysningService.hentOpplysning(any(), any(), any(), any()) }
+        verify(exactly = 0) { opplysningService.løsBehov(any()) }
     }
 
     @Test
@@ -41,39 +42,44 @@ class OpplysningBehovMottakTest {
 
         verify(exactly = 0) { opplysningService.hentOpplysning(any(), any(), any(), any()) }
     }
-
-    @Test
-    fun `vi mottar ikke opplysningsbehov dersom opplysning ikke er en del av behov-urn `() {
-        testRapid.sendTestMessage(opplysning_behov_event_uten_opplysning_i_behov_urn)
-
-        verify(exactly = 0) { opplysningService.hentOpplysning(any(), any(), any(), any()) }
-    }
 }
 
-private val opplysning_behov_event =
+private fun opplysning_behov_event(
+    behov: List<String> =
+        listOf(
+            "Søknadstidspunkt",
+            "JobbetUtenforNorge",
+            "ØnskerDagpengerFraDato",
+            "EøsArbeid",
+            "KanJobbeDeltid",
+            "HelseTilAlleTyperJobb",
+            "KanJobbeHvorSomHelst",
+            "VilligTilÅBytteYrke",
+        ),
+): String {
+    val behovString = behov.joinToString(prefix = "[", postfix = "]") { "\"$it\"" }
     //language=JSON
-    """
-     {
-    "@event_name": "behov",
-    "ident": "12345678987",
-    "søknad_id": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
-    "behandling_id": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
-    "@behov": [
-      "urn:opplysning:dagpenger-soknadsdato"
-    ]
-    }
-    """.trimIndent()
+    return """
+        {
+          "@event_name": "behov",
+          "ident": "12345678987",
+          "søknad_id": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
+          "behandling_id": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
+          "@behov": $behovString
+        }
+        """.trimIndent()
+}
 
 private val opplysning_behov_event_mangler_ident =
     //language=JSON
     """
-     {
-    "@event_name": "behov",
-    "søknad_id": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
-    "behandling_id": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
-    "@behov": [
-      "urn:opplysning:dagpenger-soknadsdato"
-    ]
+    {
+      "@event_name": "behov",
+      "søknad_id": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
+      "behandling_id": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
+      "@behov": [
+        "Søknadstidspunkt"
+      ]
     }
     """.trimIndent()
 
@@ -86,24 +92,10 @@ private val opplysning_behov_event_med_løsning =
       "søknad_id": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
       "behandling_id": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
       "@behov": [
-        "urn:opplysning:dagpenger-soknadsdato"
+        "Søknadstidspunkt"
       ],
       "@løsning": {
-        "urn:opplysning:dagpenger-soknadsdato:hypotese": "12.03.2024"
+        "Søknadstidspunkt": "12.03.2024"
       }
-    }
-    """.trimIndent()
-
-private val opplysning_behov_event_uten_opplysning_i_behov_urn =
-    //language=JSON
-    """
-    {
-      "@event_name": "behov",
-      "ident": "12345678987",
-      "søknad_id": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
-      "behandling_id": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
-      "@behov": [
-        "urn:ikkeopplysning:dagpenger-soknadsdato"
-      ]
     }
     """.trimIndent()
