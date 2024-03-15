@@ -40,6 +40,6 @@ class OpplysningService(private val rapid: RapidsConnection, private val reposit
         behandlingsId: UUID,
         løsning: Map<String, Any>,
     ) {
-        rapid.publish(MeldingOmOpplysningBehovLøsning(ident, søknadsId, behandlingsId, løsning).asMessage().toJson())
+        rapid.publish(MeldingOmBehovLøsning(ident, søknadsId, behandlingsId, løsning).asMessage().toJson())
     }
 }

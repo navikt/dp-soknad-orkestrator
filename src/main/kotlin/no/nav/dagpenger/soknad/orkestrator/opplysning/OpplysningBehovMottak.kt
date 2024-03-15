@@ -8,24 +8,14 @@ import java.util.UUID
 
 class OpplysningBehovMottak(
     rapidsConnection: RapidsConnection,
-    private val opplysningService: OpplysningService,
+    private val behovLøsere: List<Behovsløser>,
 ) : River.PacketListener {
-    private val opplysningBehov =
-        listOf(
-            "Søknadstidspunkt",
-            "JobbetUtenforNorge",
-            "ØnskerDagpengerFraDato",
-            "EøsArbeid",
-            "KanJobbeDeltid",
-            "HelseTilAlleTyperJobb",
-            "KanJobbeHvorSomHelst",
-            "VilligTilÅBytteYrke",
-        )
+    private val løserBehov = behovLøsere.map { it.behov }
 
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
-            validate { it.demandAllOrAny("@behov", opplysningBehov) }
+            validate { it.demandAllOrAny("@behov", løserBehov) }
             validate { it.requireKey("ident", "søknad_id", "behandling_id") }
             validate { it.rejectKey("@løsning") }
         }.register(this)
@@ -40,16 +30,14 @@ class OpplysningBehovMottak(
             val søknadsId = UUID.fromString(get("søknad_id").asText())
             val behandlingsId = UUID.fromString(get("behandling_id").asText())
 
-            val behov: List<String> = get("@behov").map { it.asText() }.filter { it in opplysningBehov }
-            val løsning = opplysningService.løsBehov(behov)
+            val mottatteBehov: List<String> = get("@behov").map { it.asText() }.filter { it in løserBehov }
 
-            // TODO: Publiser melding med løsning når løsBehvo er implementert
-//            opplysningService.publiserMeldingOmOpplysningBehovLøsning(
-//                ident = ident,
-//                søknadsId = søknadsId,
-//                behandlingsId = behandlingsId,
-//                løsning = løsning,
-//            )
+            mottatteBehov.forEach { behov ->
+                val behovLøser =
+                    behovLøsere.find { it.behov == behov }
+                        ?: throw IllegalArgumentException("Kan ikke løse behov: $behov")
+                behovLøser.løs(ident, søknadsId, behandlingsId)
+            }
         }
     }
 }
