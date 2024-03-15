@@ -3,8 +3,8 @@ package no.nav.dagpenger.soknad.orkestrator
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovLøserFactory
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
-import no.nav.dagpenger.soknad.orkestrator.behov.ØnskerDagpengerFraDatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
@@ -43,10 +43,7 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
         )
         BehovMottak(
             rapidsConnection = rapidsConnection,
-            behovLøsere =
-                listOf(
-                    ØnskerDagpengerFraDatoBehovløser(rapidsConnection, OpplysningRepositoryPostgres(dataSource)),
-                ),
+            behovLøserFactory = BehovLøserFactory(rapidsConnection, OpplysningRepositoryPostgres(dataSource)),
         )
     }
 }

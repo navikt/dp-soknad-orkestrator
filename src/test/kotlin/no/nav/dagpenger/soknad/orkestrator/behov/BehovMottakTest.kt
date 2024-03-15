@@ -11,18 +11,14 @@ import org.junit.jupiter.api.Test
 
 class BehovMottakTest {
     private val testRapid = TestRapid()
-    val ønskerDagpengerFraDatoBehovLøser =
+    private val behovLøserFactory = mockk<BehovLøserFactory>(relaxed = true)
+    private val ønskerDagpengerFraDatoBehovLøser =
         mockk<ØnskerDagpengerFraDatoBehovløser>(relaxed = true).also {
             every { it.behov } returns "ØnskerDagpengerFraDato"
         }
 
-    private val behovLøsere =
-        listOf(
-            ønskerDagpengerFraDatoBehovLøser,
-        )
-
     init {
-        BehovMottak(rapidsConnection = testRapid, behovLøsere)
+        BehovMottak(rapidsConnection = testRapid, behovLøserFactory = behovLøserFactory)
     }
 
     @BeforeEach
@@ -35,7 +31,7 @@ class BehovMottakTest {
         val behov = listOf("ØnskerDagpengerFraDato")
         testRapid.sendTestMessage(opplysning_behov_event(behov))
 
-        verify(exactly = 1) { ønskerDagpengerFraDatoBehovLøser.løs(any(), any(), any()) }
+        verify(exactly = 1) { behovLøserFactory.behovsløser(any()) }
     }
 
     @Test
@@ -53,19 +49,7 @@ class BehovMottakTest {
     }
 }
 
-private fun opplysning_behov_event(
-    behov: List<String> =
-        listOf(
-            "Søknadstidspunkt",
-            "JobbetUtenforNorge",
-            "ØnskerDagpengerFraDato",
-            "EøsArbeid",
-            "KanJobbeDeltid",
-            "HelseTilAlleTyperJobb",
-            "KanJobbeHvorSomHelst",
-            "VilligTilÅBytteYrke",
-        ),
-): String {
+private fun opplysning_behov_event(behov: List<String>): String {
     val behovString = behov.joinToString(prefix = "[", postfix = "]") { "\"$it\"" }
     //language=JSON
     return """

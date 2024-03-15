@@ -7,15 +7,25 @@ import no.nav.helse.rapids_rivers.River
 import java.util.UUID
 
 class BehovMottak(
-    rapidsConnection: RapidsConnection,
-    private val behovLøsere: List<Behovsløser>,
+    val rapidsConnection: RapidsConnection,
+    private val behovLøserFactory: BehovLøserFactory,
 ) : River.PacketListener {
-    private val løserBehov = behovLøsere.map { it.behov }
+    private val behov =
+        listOf(
+            "Søknadstidspunkt",
+            "JobbetUtenforNorge",
+            "ØnskerDagpengerFraDato",
+            "EøsArbeid",
+            "KanJobbeDeltid",
+            "HelseTilAlleTyperJobb",
+            "KanJobbeHvorSomHelst",
+            "VilligTilÅBytteYrke",
+        )
 
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
-            validate { it.demandAllOrAny("@behov", løserBehov) }
+            validate { it.demandAllOrAny("@behov", behov) }
             validate { it.requireKey("ident", "søknad_id", "behandling_id") }
             validate { it.rejectKey("@løsning") }
         }.register(this)
@@ -30,13 +40,11 @@ class BehovMottak(
             val søknadsId = UUID.fromString(get("søknad_id").asText())
             val behandlingsId = UUID.fromString(get("behandling_id").asText())
 
-            val mottatteBehov: List<String> = get("@behov").map { it.asText() }.filter { it in løserBehov }
+            val mottatteBehov = get("@behov").map { it.asText() }
 
             mottatteBehov.forEach { behov ->
-                val behovLøser =
-                    behovLøsere.find { it.behov == behov }
-                        ?: throw IllegalArgumentException("Kan ikke løse behov: $behov")
-                behovLøser.løs(ident, søknadsId, behandlingsId)
+                val behovløser = behovLøserFactory.behovsløser(behov)
+                behovløser.løs(ident, søknadsId, behandlingsId)
             }
         }
     }
