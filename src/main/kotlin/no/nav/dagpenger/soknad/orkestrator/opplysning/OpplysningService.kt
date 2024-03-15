@@ -1,5 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
+import no.nav.dagpenger.soknad.orkestrator.behov.MeldingOmBehovLøsning
+import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
 

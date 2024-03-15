@@ -1,6 +1,8 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning
+package no.nav.dagpenger.soknad.orkestrator.behov
 
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
 import kotlin.test.Test
@@ -30,25 +32,5 @@ class ØnskerDagpengerFraDatoBehovløserTest {
         behovløser.løs(ident, søknadsId, behandlingsId)
 
         testRapid.inspektør.message(0)["@løsning"]["ØnskerDagpengerFraDato"]["verdi"].asText() shouldBe svar
-    }
-}
-
-class InMemoryOpplysningRepository : OpplysningRepository {
-    private val opplysninger = mutableListOf<Opplysning>()
-
-    override fun lagre(opplysning: Opplysning) {
-        opplysninger.add(opplysning)
-    }
-
-    override fun hent(
-        beskrivendeId: String,
-        ident: String,
-        søknadsId: UUID,
-        behandlingsId: UUID,
-    ): Opplysning {
-        return opplysninger.find {
-            it.beskrivendeId == beskrivendeId && it.ident == ident && it.søknadsId == søknadsId && it.behandlingsId == behandlingsId
-        }
-            ?: throw IllegalArgumentException("Fant ikke opplysning")
     }
 }

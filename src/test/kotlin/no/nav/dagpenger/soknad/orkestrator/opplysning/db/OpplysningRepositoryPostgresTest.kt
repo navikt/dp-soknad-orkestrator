@@ -1,8 +1,9 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning
+package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test

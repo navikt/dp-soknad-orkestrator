@@ -1,6 +1,6 @@
 @file:Suppress("ktlint:standard:no-wildcard-imports")
 
-package no.nav.dagpenger.soknad.orkestrator.opplysning
+package no.nav.dagpenger.soknad.orkestrator.behov
 
 import io.mockk.every
 import io.mockk.mockk
@@ -9,7 +9,7 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-class OpplysningBehovMottakTest {
+class BehovMottakTest {
     private val testRapid = TestRapid()
     val ønskerDagpengerFraDatoBehovLøser =
         mockk<ØnskerDagpengerFraDatoBehovløser>(relaxed = true).also {
@@ -22,7 +22,7 @@ class OpplysningBehovMottakTest {
         )
 
     init {
-        OpplysningBehovMottak(rapidsConnection = testRapid, behovLøsere)
+        BehovMottak(rapidsConnection = testRapid, behovLøsere)
     }
 
     @BeforeEach

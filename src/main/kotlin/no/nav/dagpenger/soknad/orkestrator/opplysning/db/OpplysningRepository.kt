@@ -1,5 +1,6 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning
+package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import java.util.UUID
 
 interface OpplysningRepository {

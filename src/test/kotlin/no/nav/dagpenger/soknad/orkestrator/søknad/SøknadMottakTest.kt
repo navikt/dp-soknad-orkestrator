@@ -2,7 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.mockk
-import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

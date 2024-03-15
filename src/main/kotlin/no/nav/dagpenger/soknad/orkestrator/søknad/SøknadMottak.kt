@@ -1,7 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
-import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection

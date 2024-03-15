@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning
+package no.nav.dagpenger.soknad.orkestrator.behov
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -6,7 +6,7 @@ import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
 import java.util.UUID
 
-class OpplysningBehovMottak(
+class BehovMottak(
     rapidsConnection: RapidsConnection,
     private val behovLøsere: List<Behovsløser>,
 ) : River.PacketListener {

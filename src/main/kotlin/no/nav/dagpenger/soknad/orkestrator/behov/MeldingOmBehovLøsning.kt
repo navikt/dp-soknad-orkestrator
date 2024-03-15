@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning
+package no.nav.dagpenger.soknad.orkestrator.behov
 
 import no.nav.helse.rapids_rivers.JsonMessage
 import java.util.UUID
