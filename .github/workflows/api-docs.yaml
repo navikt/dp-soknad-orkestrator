@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - openapi/src/main/resources/*
+      - asyncapi/src/main/resources/*
   workflow_dispatch:
 
 permissions:
@@ -28,6 +28,6 @@ jobs:
       - uses: actions/configure-pages@v4
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: 'openapi/src/main/resources/'
+          path: 'asyncapi/src/main/resources/'
       - id: deployment
         uses: actions/deploy-pages@v4
