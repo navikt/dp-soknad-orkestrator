@@ -10,7 +10,6 @@ abstract class Behovsløser(val rapidsConnection: RapidsConnection) {
     abstract fun løs(
         ident: String,
         søknadsId: UUID,
-        behandlingsId: UUID,
     )
 }
 

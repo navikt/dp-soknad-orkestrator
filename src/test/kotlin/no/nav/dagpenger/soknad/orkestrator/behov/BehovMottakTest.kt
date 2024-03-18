@@ -54,14 +54,14 @@ class BehovMottakTest {
     fun `vi mottar ikke opplysningsbehov dersom påkrevd felt mangler`() {
         testRapid.sendTestMessage(opplysning_behov_event_mangler_ident)
 
-        verify(exactly = 0) { ønskerDagpengerFraDatoBehovLøser.løs(any(), any(), any()) }
+        verify(exactly = 0) { ønskerDagpengerFraDatoBehovLøser.løs(any(), any()) }
     }
 
     @Test
     fun `vi mottar ikke opplysningsbehov dersom den har løsning`() {
         testRapid.sendTestMessage(opplysning_behov_event_med_løsning)
 
-        verify(exactly = 0) { ønskerDagpengerFraDatoBehovLøser.løs(any(), any(), any()) }
+        verify(exactly = 0) { ønskerDagpengerFraDatoBehovLøser.løs(any(), any()) }
     }
 }
 

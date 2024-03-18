@@ -6,7 +6,7 @@ import java.util.UUID
 
 class ØnskerDagpengerFraDatoBehovløser(
     rapidsConnection: RapidsConnection,
-    val opplysningRepository: OpplysningRepository,
+    private val opplysningRepository: OpplysningRepository,
 ) : Behovsløser(rapidsConnection) {
     private val beskrivendeId = "dagpenger-soknadsdato"
     override val behov = "ØnskerDagpengerFraDato"
@@ -14,21 +14,18 @@ class ØnskerDagpengerFraDatoBehovløser(
     override fun løs(
         ident: String,
         søknadsId: UUID,
-        behandlingsId: UUID,
     ) {
         val svar =
             opplysningRepository.hent(
                 beskrivendeId = beskrivendeId,
                 ident = ident,
                 søknadsId = søknadsId,
-                behandlingsId = behandlingsId,
             ).svar
 
         val løsning =
             MeldingOmBehovLøsning(
                 ident = ident,
                 søknadsId = søknadsId,
-                behandlingsId = behandlingsId,
                 løsning =
                     mapOf(
                         behov to

@@ -15,21 +15,19 @@ class ØnskerDagpengerFraDatoBehovløserTest {
     fun `Behovløser publiserer løsning på behov ØnskerDagpengerFraDato`() {
         val ident = "12345678910"
         val søknadsId = UUID.randomUUID()
-        val behandlingsId = UUID.randomUUID()
         val svar = "2021-01-01"
 
         val opplysning =
             Opplysning(
                 beskrivendeId = "dagpenger-soknadsdato",
+                svar = svar,
                 ident = ident,
                 søknadsId = søknadsId,
-                behandlingsId = behandlingsId,
-                svar = svar,
             )
 
         opplysningRepository.lagre(opplysning)
         val behovløser = ØnskerDagpengerFraDatoBehovløser(testRapid, opplysningRepository)
-        behovløser.løs(ident, søknadsId, behandlingsId)
+        behovløser.løs(ident, søknadsId)
 
         testRapid.inspektør.message(0)["@løsning"]["ØnskerDagpengerFraDato"]["verdi"].asText() shouldBe svar
     }

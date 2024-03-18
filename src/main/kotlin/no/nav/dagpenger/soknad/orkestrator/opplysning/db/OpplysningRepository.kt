@@ -10,6 +10,5 @@ interface OpplysningRepository {
         beskrivendeId: String,
         ident: String,
         søknadsId: UUID,
-        behandlingsId: UUID,
     ): Opplysning
 }

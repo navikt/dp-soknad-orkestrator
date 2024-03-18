@@ -38,13 +38,12 @@ class BehovMottak(
         with(packet) {
             val ident = get("ident").asText()
             val søknadsId = UUID.fromString(get("søknad_id").asText())
-            val behandlingsId = UUID.fromString(get("behandling_id").asText())
 
             val mottatteBehov = get("@behov").map { it.asText() }
 
             mottatteBehov.forEach { behov ->
                 val behovløser = behovLøserFactory.behovsløser(behov)
-                behovløser.løs(ident, søknadsId, behandlingsId)
+                behovløser.løs(ident, søknadsId)
             }
         }
     }

@@ -15,10 +15,9 @@ class InMemoryOpplysningRepository : OpplysningRepository {
         beskrivendeId: String,
         ident: String,
         søknadsId: UUID,
-        behandlingsId: UUID,
     ): Opplysning {
         return opplysninger.find {
-            it.beskrivendeId == beskrivendeId && it.ident == ident && it.søknadsId == søknadsId && it.behandlingsId == behandlingsId
+            it.beskrivendeId == beskrivendeId && it.ident == ident && it.søknadsId == søknadsId
         }
             ?: throw IllegalArgumentException("Fant ikke opplysning")
     }

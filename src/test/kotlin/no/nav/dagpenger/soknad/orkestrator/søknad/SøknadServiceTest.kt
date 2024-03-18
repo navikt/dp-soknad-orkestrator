@@ -23,8 +23,8 @@ class SøknadServiceTest {
                         Opplysning(
                             beskrivendeId = "faktum.hvilket-land-bor-du-i",
                             svar = "NOR",
-                            søknadsId = søknadUUID,
                             ident = ident,
+                            søknadsId = søknadUUID,
                         ),
                     ),
             )

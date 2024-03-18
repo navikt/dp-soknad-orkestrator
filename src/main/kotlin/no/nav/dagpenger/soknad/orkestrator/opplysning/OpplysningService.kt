@@ -26,22 +26,19 @@ class OpplysningService(private val rapid: RapidsConnection, private val reposit
         beskrivendeId: String,
         ident: String,
         søknadsId: String,
-        behandlingsId: String,
     ): Opplysning {
         return repository.hent(
             beskrivendeId = beskrivendeId,
             ident = ident,
             søknadsId = UUID.fromString(søknadsId),
-            behandlingsId = UUID.fromString(behandlingsId),
         )
     }
 
     fun publiserMeldingOmOpplysningBehovLøsning(
         ident: String,
         søknadsId: UUID,
-        behandlingsId: UUID,
         løsning: Map<String, Any>,
     ) {
-        rapid.publish(MeldingOmBehovLøsning(ident, søknadsId, behandlingsId, løsning).asMessage().toJson())
+        rapid.publish(MeldingOmBehovLøsning(ident, søknadsId, løsning).asMessage().toJson())
     }
 }

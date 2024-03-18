@@ -30,11 +30,10 @@ class OpplysningServiceTest {
 
         val opplysning =
             Opplysning(
+                beskrivendeId = beskrivendeId,
+                svar = "2021-01-01",
                 ident = ident,
                 søknadsId = søknadsId,
-                beskrivendeId = beskrivendeId,
-                behandlingsId = behandligsId,
-                svar = "2021-01-01",
             )
 
         withMigratedDb { repository.lagre(opplysning) }
@@ -43,7 +42,6 @@ class OpplysningServiceTest {
             beskrivendeId = beskrivendeId,
             ident = ident,
             søknadsId = søknadsId.toString(),
-            behandlingsId = behandligsId.toString(),
         ) shouldBe opplysning
     }
 
@@ -56,10 +54,10 @@ class OpplysningServiceTest {
 
         val opplysning =
             Opplysning(
-                ident = ident,
-                søknadsId = søknadsId,
                 beskrivendeId = beskrivendeId,
                 svar = "2021-01-01",
+                ident = ident,
+                søknadsId = søknadsId,
             )
 
         withMigratedDb { repository.lagre(opplysning) }
@@ -69,7 +67,6 @@ class OpplysningServiceTest {
                 beskrivendeId = beskrivendeId,
                 ident = ident,
                 søknadsId = UUID.randomUUID().toString(),
-                behandlingsId = behandligsId.toString(),
             )
         }
     }
@@ -92,7 +89,6 @@ class OpplysningServiceTest {
 //
 //            field(0, "ident").asText() shouldBe "12345678910"
 //            field(0, "søknad_id").asText() shouldBe opplysning.søknadsId.toString()
-//            field(0, "behandling_id").asText() shouldBe opplysning.behandlingsId.toString()
 //            field(0, "@behov").toList().first().asText() shouldBe "urn:opplysning:dagpenger-søknadsdato"
 //            field(0, "@løsning").get("urn:opplysning:dagpenger-søknadsdato").let {
 //                it.get("status").asText() shouldBe "hypotese"

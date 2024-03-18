@@ -27,19 +27,17 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
         beskrivendeId: String,
         ident: String,
         søknadsId: UUID,
-        behandlingsId: UUID,
     ): Opplysning {
         return transaction {
             OpplysningTabell
                 .selectAll()
-                .somMatcher(beskrivendeId, ident, søknadsId, behandlingsId)
+                .somMatcher(beskrivendeId, ident, søknadsId)
                 .map(tilOpplysning())
                 .firstOrNull()
                 ?: throw NoSuchElementException(
                     "Ingen opplysning funnet med gitt beskrivendeId:" + " $beskrivendeId," +
                         " ident: $ident, " +
-                        "og søknadsId: $søknadsId" +
-                        "og behandlingsId: $behandlingsId",
+                        "og søknadsId: $søknadsId",
                 )
         }
     }
@@ -50,7 +48,6 @@ object OpplysningTabell : Table("opplysning") {
     val svar = varchar("svar", 255)
     val ident = varchar("ident", 11)
     val søknadsId = uuid("soknads_id").nullable()
-    val behandlingsId = uuid("behandlings_id").nullable()
 }
 
 private fun opplysningEksisterer(opplysning: Opplysning): Boolean =
@@ -58,7 +55,6 @@ private fun opplysningEksisterer(opplysning: Opplysning): Boolean =
         opplysning.beskrivendeId,
         opplysning.ident,
         opplysning.søknadsId,
-        opplysning.behandlingsId,
     ).any()
 
 fun OpplysningTabell.leggTil(opplysning: Opplysning) {
@@ -67,7 +63,6 @@ fun OpplysningTabell.leggTil(opplysning: Opplysning) {
         it[svar] = opplysning.svar
         it[ident] = opplysning.ident
         it[søknadsId] = opplysning.søknadsId
-        it[behandlingsId] = opplysning.behandlingsId
     }
 }
 
@@ -75,13 +70,11 @@ fun Query.somMatcher(
     beskrivendeId: String,
     ident: String,
     søknadsId: UUID?,
-    behandlingsId: UUID?,
 ): Query =
     where {
         OpplysningTabell.beskrivendeId eq beskrivendeId and
             (OpplysningTabell.ident eq ident) and
-            (OpplysningTabell.søknadsId eq søknadsId) and
-            (OpplysningTabell.behandlingsId eq behandlingsId)
+            (OpplysningTabell.søknadsId eq søknadsId)
     }
 
 private fun tilOpplysning(): (ResultRow) -> Opplysning =
@@ -91,6 +84,5 @@ private fun tilOpplysning(): (ResultRow) -> Opplysning =
             svar = it[OpplysningTabell.svar],
             ident = it[OpplysningTabell.ident],
             søknadsId = it[OpplysningTabell.søknadsId],
-            behandlingsId = it[OpplysningTabell.behandlingsId],
         )
     }

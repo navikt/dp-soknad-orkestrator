@@ -17,13 +17,11 @@ class OpplysningRepositoryPostgresTest {
         val beskrivendeId = "beskrivendeId"
         val ident = "12345678901"
         val søknadsId = UUID.randomUUID()
-        val behandlingsId = UUID.randomUUID()
         val opplysning =
             opplysningMed(
                 beskrivendeId = beskrivendeId,
                 ident = ident,
                 søknadsId = søknadsId,
-                behandlingsId = behandlingsId,
             )
 
         withMigratedDb {
@@ -33,7 +31,6 @@ class OpplysningRepositoryPostgresTest {
                 beskrivendeId,
                 ident,
                 søknadsId,
-                behandlingsId,
             ) shouldBe opplysning
         }
     }
@@ -42,9 +39,8 @@ class OpplysningRepositoryPostgresTest {
     fun `vi lagrer ikke opplysning dersom den allerede er lagret`() {
         val ident = "12345678901"
         val søknadsId = UUID.randomUUID()
-        val behandlingsId = UUID.randomUUID()
-        val opplysning1 = opplysningMed(ident = ident, søknadsId = søknadsId, behandlingsId = behandlingsId)
-        val opplysning2 = opplysningMed(ident = ident, søknadsId = søknadsId, behandlingsId = behandlingsId)
+        val opplysning1 = opplysningMed(ident = ident, søknadsId = søknadsId)
+        val opplysning2 = opplysningMed(ident = ident, søknadsId = søknadsId)
 
         withMigratedDb {
             opplysningRepository.lagre(opplysning1)
@@ -62,11 +58,9 @@ fun opplysningMed(
     ident: String,
     beskrivendeId: String = "beskrivendeId",
     søknadsId: UUID = UUID.randomUUID(),
-    behandlingsId: UUID = UUID.randomUUID(),
 ) = Opplysning(
     beskrivendeId = beskrivendeId,
     svar = "svar",
     ident = ident,
     søknadsId = søknadsId,
-    behandlingsId = behandlingsId,
 )

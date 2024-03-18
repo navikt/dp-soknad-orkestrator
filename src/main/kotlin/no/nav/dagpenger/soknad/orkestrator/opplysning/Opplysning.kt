@@ -7,14 +7,12 @@ class Opplysning(
     val svar: String,
     val ident: String,
     val søknadsId: UUID? = null,
-    val behandlingsId: UUID? = null,
 ) {
     override fun equals(other: Any?) =
         other is Opplysning &&
             other.ident == ident &&
             other.søknadsId == søknadsId &&
             other.beskrivendeId == beskrivendeId &&
-            other.behandlingsId == behandlingsId &&
             other.svar == svar
 
     override fun hashCode() =
