@@ -15,7 +15,6 @@ class HelseTilAlleTyperJobbBehovløserTest {
     fun `Behovløser publiserer løsning på behov HelseTilAlleTyperJobb`() {
         val ident = "12345678910"
         val søknadsId = UUID.randomUUID()
-        val behandlingsId = UUID.randomUUID()
         val svar = "true"
 
         val opplysning =
@@ -23,13 +22,12 @@ class HelseTilAlleTyperJobbBehovløserTest {
                 beskrivendeId = "alle-typer-arbeid",
                 ident = ident,
                 søknadsId = søknadsId,
-                behandlingsId = behandlingsId,
                 svar = svar,
             )
 
         opplysningRepository.lagre(opplysning)
         val behovløser = HelseTilAlleTyperJobbBehovløser(testRapid, opplysningRepository)
-        behovløser.løs(ident, søknadsId, behandlingsId)
+        behovløser.løs(ident, søknadsId)
 
         testRapid.inspektør.message(0)["@løsning"]["HelseTilAlleTyperJobb"]["verdi"].asText() shouldBe svar
     }
