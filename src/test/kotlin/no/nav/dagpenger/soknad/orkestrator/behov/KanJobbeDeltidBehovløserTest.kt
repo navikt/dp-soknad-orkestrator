@@ -15,7 +15,7 @@ class KanJobbeDeltidBehovløserTest {
     fun `Behovløser publiserer løsning på behov KanJobbeDeltid`() {
         val ident = "12345678910"
         val søknadsId = UUID.randomUUID()
-        val svar = "2021-01-01"
+        val svar = "true"
 
         val opplysning =
             Opplysning(

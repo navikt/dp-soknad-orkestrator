@@ -15,7 +15,7 @@ class EøsArbeidBehovløserTest {
     fun `Behovløser publiserer løsning på behov EøsArbeid`() {
         val ident = "12345678910"
         val søknadsId = UUID.randomUUID()
-        val svar = "2021-01-01"
+        val svar = "false"
 
         val opplysning =
             Opplysning(
