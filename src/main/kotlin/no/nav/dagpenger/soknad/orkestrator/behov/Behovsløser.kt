@@ -19,19 +19,19 @@ class BehovLøserFactory(
 ) {
     fun behovsløser(behov: String): Behovsløser {
         return when (behov) {
-            "ØnskerDagpengerFraDatoBehovløser" ->
+            "ØnskerDagpengerFraDato" ->
                 ØnskerDagpengerFraDatoBehovløser(
                     rapidsConnection,
                     opplysningRepository,
                 )
 
-            "EøsArbeidBehovløser" ->
+            "EøsArbeid" ->
                 EøsArbeidBehovløser(
                     rapidsConnection,
                     opplysningRepository,
                 )
 
-            "KanJobbeDeltidBehovløser" ->
+            "KanJobbeDeltid" ->
                 KanJobbeDeltidBehovløser(
                     rapidsConnection,
                     opplysningRepository,
