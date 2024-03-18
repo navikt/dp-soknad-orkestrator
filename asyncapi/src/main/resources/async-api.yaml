@@ -1,0 +1,36 @@
+asyncapi: '2.6.0'
+info:
+  title: Behandling
+  version: 0.0.1
+  description: Eventformat for behandling
+
+channels:
+  teamdagpenger.rapid.v1:
+    publish:
+      message:
+        oneOf:
+          - $ref: '#/components/messages/behandling_opprettet'
+
+components:
+  messages:
+    behandling_opprettet:
+      payload:
+        type: object
+        properties:
+          '@event_type':
+            type: string
+            description: Event som forteller om at en behandling er opprettet
+            enum: [
+              "behandling_opprettet"
+            ]
+          ident:
+            type: string
+            description: Ident til mottaker av vedtaket
+          behandlingId:
+            type: string
+            format: uuid
+            description: Behandling id
+          søknadId:
+            type: string
+            format: uuid
+            description: Søknad id som førte til behandlingen
