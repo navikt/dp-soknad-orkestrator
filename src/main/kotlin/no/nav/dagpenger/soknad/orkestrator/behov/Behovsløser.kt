@@ -37,6 +37,12 @@ class BehovLøserFactory(
                     opplysningRepository,
                 )
 
+            "HelseTilAlleTyperJobb" ->
+                HelseTilAlleTyperJobbBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                )
+
             else -> throw IllegalArgumentException("Kan ikke løse behov: $behov")
         }
     }
