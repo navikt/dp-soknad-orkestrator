@@ -3,7 +3,7 @@ name: Publiser API docs
 on:
   push:
     branches:
-      - main
+      - asyncapi
     paths:
       - asyncapi/src/main/resources/*
   workflow_dispatch:
