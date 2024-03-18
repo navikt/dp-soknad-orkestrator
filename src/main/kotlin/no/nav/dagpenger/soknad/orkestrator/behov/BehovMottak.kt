@@ -18,7 +18,7 @@ class BehovMottak(
             "EøsArbeid",
             "KanJobbeDeltid",
             "HelseTilAlleTyperJobb",
-            // "KanJobbeHvorSomHelst",
+            "KanJobbeHvorSomHelst",
             // "VilligTilÅBytteYrke",
         )
 
