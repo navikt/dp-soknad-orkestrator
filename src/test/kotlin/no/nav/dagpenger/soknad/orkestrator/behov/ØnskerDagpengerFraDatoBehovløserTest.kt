@@ -12,7 +12,7 @@ class ØnskerDagpengerFraDatoBehovløserTest {
     val testRapid = TestRapid()
 
     @Test
-    fun `Behovløser publiserer løsning på behov`() {
+    fun `Behovløser publiserer løsning på behov ØnskerDagpengerFraDato`() {
         val ident = "12345678910"
         val søknadsId = UUID.randomUUID()
         val behandlingsId = UUID.randomUUID()
