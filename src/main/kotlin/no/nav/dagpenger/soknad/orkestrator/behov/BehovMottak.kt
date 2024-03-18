@@ -12,14 +12,14 @@ class BehovMottak(
 ) : River.PacketListener {
     private val behov =
         listOf(
-            "Søknadstidspunkt",
-            "JobbetUtenforNorge",
+            // "Søknadstidspunkt",
+            // "JobbetUtenforNorge",
             "ØnskerDagpengerFraDato",
             "EøsArbeid",
-            "KanJobbeDeltid",
-            "HelseTilAlleTyperJobb",
-            "KanJobbeHvorSomHelst",
-            "VilligTilÅBytteYrke",
+            // "KanJobbeDeltid",
+            // "HelseTilAlleTyperJobb",
+            // "KanJobbeHvorSomHelst",
+            // "VilligTilÅBytteYrke",
         )
 
     init {

@@ -25,6 +25,11 @@ class BehovLøserFactory(
                     rapidsConnection,
                     opplysningRepository,
                 )
+            "EøsArbeidBehovløser" ->
+                EøsArbeidBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                )
 
             else -> throw IllegalArgumentException("Kan ikke løse behov: $behov")
         }
