@@ -1,12 +1,6 @@
 name: Publiser API docs
 
-on:
-  push:
-    branches:
-      - asyncapi
-    paths:
-      - asyncapi/src/main/resources/*
-  workflow_dispatch:
+on: [push]
 
 permissions:
   contents: read
