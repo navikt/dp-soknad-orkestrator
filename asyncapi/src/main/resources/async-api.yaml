@@ -1,0 +1,32 @@
+asyncapi: '2.6.0'
+info:
+  title: Søknad Orkestrator
+  version: 0.0.1
+  description: Eventformat for søknad orkestrator
+
+channels:
+  teamdagpenger.rapid.v1:
+    publish:
+      message:
+        oneOf:
+          - $ref: '#/components/messages/melding_om_ny_søknad'
+
+components:
+  messages:
+    melding_om_ny_søknad:
+      payload:
+        type: object
+        properties:
+          '@event_type':
+            type: string
+            description: Event som forteller om at en søknad er mottatt
+            enum: [
+              "MeldingOmNySøknad"
+            ]
+          søknad_uuid:
+            type: string
+            format: uuid
+            description: Søknad id
+          ident:
+            type: string
+            description: Ident til mottaker av vedtaket
