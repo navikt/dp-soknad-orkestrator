@@ -1,5 +1,7 @@
-package no.nav.dagpenger.soknad.orkestrator.behov
+package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import no.nav.dagpenger.soknad.orkestrator.behov.Behovsløser
+import no.nav.dagpenger.soknad.orkestrator.behov.MeldingOmBehovløsning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
@@ -24,7 +26,7 @@ class EøsArbeidBehovløser(
             ).svar
 
         val løsning =
-            MeldingOmBehovLøsning(
+            MeldingOmBehovløsning(
                 ident = ident,
                 søknadsId = søknadsId,
                 løsning =

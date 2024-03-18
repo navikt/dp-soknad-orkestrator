@@ -1,15 +1,18 @@
-package no.nav.dagpenger.soknad.orkestrator.behov
+package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import no.nav.dagpenger.soknad.orkestrator.behov.Behovsløser
+import no.nav.dagpenger.soknad.orkestrator.behov.MeldingOmBehovløsning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
 
-class ØnskerDagpengerFraDatoBehovløser(
+class HelseTilAlleTyperJobbBehovløser(
     rapidsConnection: RapidsConnection,
-    private val opplysningRepository: OpplysningRepository,
-) : Behovsløser(rapidsConnection) {
-    private val beskrivendeId = "dagpenger-soknadsdato"
-    override val behov = "ØnskerDagpengerFraDato"
+    val opplysningRepository: OpplysningRepository,
+) :
+    Behovsløser(rapidsConnection) {
+    private val beskrivendeId = "alle-typer-arbeid"
+    override val behov = "HelseTilAlleTyperJobb"
 
     override fun løs(
         ident: String,
@@ -23,7 +26,7 @@ class ØnskerDagpengerFraDatoBehovløser(
             ).svar
 
         val løsning =
-            MeldingOmBehovLøsning(
+            MeldingOmBehovløsning(
                 ident = ident,
                 søknadsId = søknadsId,
                 løsning =

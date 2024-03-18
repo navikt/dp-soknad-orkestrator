@@ -1,5 +1,11 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EøsArbeidBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HelseTilAlleTyperJobbBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeDeltidBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeHvorSomHelstBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnskerDagpengerFraDatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID

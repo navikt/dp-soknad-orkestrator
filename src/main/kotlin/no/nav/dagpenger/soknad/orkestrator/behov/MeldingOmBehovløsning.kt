@@ -3,7 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 import no.nav.helse.rapids_rivers.JsonMessage
 import java.util.UUID
 
-class MeldingOmBehovLøsning(
+class MeldingOmBehovløsning(
     private val ident: String,
     private val søknadsId: UUID,
     private val løsning: Map<String, Any>,

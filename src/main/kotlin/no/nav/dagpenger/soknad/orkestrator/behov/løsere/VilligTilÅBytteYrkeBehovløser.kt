@@ -1,16 +1,18 @@
-package no.nav.dagpenger.soknad.orkestrator.behov
+package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import no.nav.dagpenger.soknad.orkestrator.behov.Behovsløser
+import no.nav.dagpenger.soknad.orkestrator.behov.MeldingOmBehovløsning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
 
-class KanJobbeHvorSomHelstBehovløser(
+class VilligTilÅBytteYrkeBehovløser(
     rapidsConnection: RapidsConnection,
     val opplysningRepository: OpplysningRepository,
 ) :
     Behovsløser(rapidsConnection) {
-    private val beskrivendeId = "jobbe-hele-norge"
-    override val behov = "KanJobbeHvorSomHelst"
+    private val beskrivendeId = "bytte-yrke-ned-i-lonn"
+    override val behov = "VilligTilÅBytteYrke"
 
     override fun løs(
         ident: String,
@@ -24,7 +26,7 @@ class KanJobbeHvorSomHelstBehovløser(
             ).svar
 
         val løsning =
-            MeldingOmBehovLøsning(
+            MeldingOmBehovløsning(
                 ident = ident,
                 søknadsId = søknadsId,
                 løsning =
