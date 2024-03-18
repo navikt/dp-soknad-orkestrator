@@ -16,7 +16,7 @@ class BehovMottak(
             // "JobbetUtenforNorge",
             "ØnskerDagpengerFraDato",
             "EøsArbeid",
-            // "KanJobbeDeltid",
+            "KanJobbeDeltid",
             // "HelseTilAlleTyperJobb",
             // "KanJobbeHvorSomHelst",
             // "VilligTilÅBytteYrke",

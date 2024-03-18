@@ -25,8 +25,15 @@ class BehovLøserFactory(
                     rapidsConnection,
                     opplysningRepository,
                 )
+
             "EøsArbeidBehovløser" ->
                 EøsArbeidBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                )
+
+            "KanJobbeDeltidBehovløser" ->
+                KanJobbeDeltidBehovløser(
                     rapidsConnection,
                     opplysningRepository,
                 )
