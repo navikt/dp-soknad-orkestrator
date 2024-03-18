@@ -2,7 +2,6 @@
 
 package no.nav.dagpenger.soknad.orkestrator.behov
 
-import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -12,10 +11,6 @@ import org.junit.jupiter.api.Test
 class BehovMottakTest {
     private val testRapid = TestRapid()
     private val behovLøserFactory = mockk<BehovLøserFactory>(relaxed = true)
-    private val ønskerDagpengerFraDatoBehovLøser =
-        mockk<ØnskerDagpengerFraDatoBehovløser>(relaxed = true).also {
-            every { it.behov } returns "ØnskerDagpengerFraDato"
-        }
 
     init {
         BehovMottak(rapidsConnection = testRapid, behovLøserFactory = behovLøserFactory)
@@ -62,14 +57,14 @@ class BehovMottakTest {
     fun `vi mottar ikke opplysningsbehov dersom påkrevd felt mangler`() {
         testRapid.sendTestMessage(opplysning_behov_event_mangler_ident)
 
-        verify(exactly = 0) { ønskerDagpengerFraDatoBehovLøser.løs(any(), any()) }
+        verify(exactly = 0) { behovLøserFactory.behovsløser(any()) }
     }
 
     @Test
     fun `vi mottar ikke opplysningsbehov dersom den har løsning`() {
         testRapid.sendTestMessage(opplysning_behov_event_med_løsning)
 
-        verify(exactly = 0) { ønskerDagpengerFraDatoBehovLøser.løs(any(), any()) }
+        verify(exactly = 0) { behovLøserFactory.behovsløser(any()) }
     }
 }
 
