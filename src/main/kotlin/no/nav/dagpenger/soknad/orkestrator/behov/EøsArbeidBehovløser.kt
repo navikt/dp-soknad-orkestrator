@@ -15,21 +15,18 @@ class EøsArbeidBehovløser(
     override fun løs(
         ident: String,
         søknadsId: UUID,
-        behandlingsId: UUID,
     ) {
         val svar =
             opplysningRepository.hent(
                 beskrivendeId = beskrivendeId,
                 ident = ident,
                 søknadsId = søknadsId,
-                behandlingsId = behandlingsId,
             ).svar
 
         val løsning =
             MeldingOmBehovLøsning(
                 ident = ident,
                 søknadsId = søknadsId,
-                behandlingsId = behandlingsId,
                 løsning =
                     mapOf(
                         behov to

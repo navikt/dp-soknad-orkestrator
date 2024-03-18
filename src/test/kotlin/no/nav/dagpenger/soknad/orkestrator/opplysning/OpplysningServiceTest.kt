@@ -14,7 +14,7 @@ import java.util.UUID
 class OpplysningServiceTest {
     private val testRapid = TestRapid()
     private val repository = OpplysningRepositoryPostgres(dataSource)
-    private val opplysningService = OpplysningService(testRapid, repository)
+    private val opplysningService = OpplysningService(repository)
 
     @BeforeEach
     fun reset() {
@@ -26,7 +26,6 @@ class OpplysningServiceTest {
         val beskrivendeId = "dagpenger-søknadsdato"
         val ident = "12345678910"
         val søknadsId = UUID.randomUUID()
-        val behandligsId = UUID.randomUUID()
 
         val opplysning =
             Opplysning(
@@ -50,7 +49,6 @@ class OpplysningServiceTest {
         val beskrivendeId = "dagpenger-søknadsdato"
         val ident = "12345678910"
         val søknadsId = UUID.randomUUID()
-        val behandligsId = UUID.randomUUID()
 
         val opplysning =
             Opplysning(

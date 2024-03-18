@@ -15,7 +15,6 @@ class EøsArbeidBehovløserTest {
     fun `Behovløser publiserer løsning på behov EøsArbeid`() {
         val ident = "12345678910"
         val søknadsId = UUID.randomUUID()
-        val behandlingsId = UUID.randomUUID()
         val svar = "2021-01-01"
 
         val opplysning =
@@ -23,13 +22,12 @@ class EøsArbeidBehovløserTest {
                 beskrivendeId = "eos-arbeid-siste-36-mnd",
                 ident = ident,
                 søknadsId = søknadsId,
-                behandlingsId = behandlingsId,
                 svar = svar,
             )
 
         opplysningRepository.lagre(opplysning)
         val behovløser = EøsArbeidBehovløser(testRapid, opplysningRepository)
-        behovløser.løs(ident, søknadsId, behandlingsId)
+        behovløser.løs(ident, søknadsId)
 
         testRapid.inspektør.message(0)["@løsning"]["EøsArbeid"]["verdi"].asText() shouldBe svar
     }

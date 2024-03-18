@@ -15,7 +15,6 @@ class KanJobbeDeltidBehovløserTest {
     fun `Behovløser publiserer løsning på behov KanJobbeDeltid`() {
         val ident = "12345678910"
         val søknadsId = UUID.randomUUID()
-        val behandlingsId = UUID.randomUUID()
         val svar = "2021-01-01"
 
         val opplysning =
@@ -23,13 +22,12 @@ class KanJobbeDeltidBehovløserTest {
                 beskrivendeId = "jobbe-hel-deltid",
                 ident = ident,
                 søknadsId = søknadsId,
-                behandlingsId = behandlingsId,
                 svar = svar,
             )
 
         opplysningRepository.lagre(opplysning)
         val behovløser = KanJobbeDeltidBehovløser(testRapid, opplysningRepository)
-        behovløser.løs(ident, søknadsId, behandlingsId)
+        behovløser.løs(ident, søknadsId)
 
         testRapid.inspektør.message(0)["@løsning"]["KanJobbeDeltid"]["verdi"].asText() shouldBe svar
     }
