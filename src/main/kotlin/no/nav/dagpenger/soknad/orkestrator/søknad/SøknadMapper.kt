@@ -2,43 +2,57 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import java.util.UUID
+import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 
 class SøknadMapper(private val jsonNode: JsonNode) {
     val søknad by lazy {
-        val ident = jsonNode.get("fødselsnummer").asText()
-        val søknadsData = jsonNode.get("søknadsData") ?: throw IllegalArgumentException("Mangler søknadsData")
-        val id =
-            søknadsData["søknad_uuid"]?.let {
-                UUID.fromString(it.asText())
-            } ?: throw IllegalArgumentException("Mangler søknad_uuid")
+        val ident = jsonNode.get("ident").asText()
+        val søknadId = jsonNode.get("søknadId").asUUID()
+        val søknadstidspunkt = jsonNode.get("søknadstidspunkt").asText()
+        val søknadData = jsonNode.get("søknadData")
 
-        val seksjoner =
-            søknadsData["seksjoner"]
-                ?: throw IllegalArgumentException("Mangler seksjoner")
+        val søknadstidspunktOpplysning =
+            Opplysning(
+                beskrivendeId = "søknadstidspunkt",
+                svar = søknadstidspunkt,
+                ident = ident,
+                søknadsId = søknadId,
+            )
 
-        val opplysninger =
-            seksjoner.asIterable().map { seksjon ->
-                val fakta = seksjon.get("fakta") ?: throw IllegalArgumentException("Mangler fakta")
-                fakta.asIterable().map { faktum ->
-                    val beskrivendeId = faktum.get("beskrivendeId").asText()
-                    val type = faktum.get("type").asText()
-
-                    val svar =
-                        when (type) {
-                            // TODO - Håndter disse faktumtypene
-                            "generator" -> ""
-                            "periode" -> ""
-                            else -> faktum.get("svar").asText()
-                        }
-                    Opplysning(beskrivendeId, svar, ident)
-                }
-            }
+        val opplysninger = mutableListOf<Opplysning>()
+        opplysninger.addAll(faktaTilOpplysninger(søknadData, ident))
+        opplysninger.add(søknadstidspunktOpplysning)
 
         Søknad(
-            id = id,
+            id = søknadId,
             ident = ident,
-            opplysninger = opplysninger.flatten(),
+            opplysninger = opplysninger,
         )
+    }
+
+    private fun faktaTilOpplysninger(
+        søknadData: JsonNode,
+        ident: String,
+    ): List<Opplysning> {
+        val seksjoner =
+            søknadData["seksjoner"]
+                ?: throw IllegalArgumentException("Mangler seksjoner")
+
+        return seksjoner.asIterable().map { seksjon ->
+            val fakta = seksjon.get("fakta") ?: throw IllegalArgumentException("Mangler fakta")
+            fakta.asIterable().map { faktum ->
+                val beskrivendeId = faktum.get("beskrivendeId").asText()
+                val type = faktum.get("type").asText()
+
+                val svar =
+                    when (type) {
+                        // TODO - Håndter disse faktumtypene
+                        "generator" -> ""
+                        "periode" -> ""
+                        else -> faktum.get("svar").asText()
+                    }
+                Opplysning(beskrivendeId, svar, ident)
+            }
+        }.flatten()
     }
 }

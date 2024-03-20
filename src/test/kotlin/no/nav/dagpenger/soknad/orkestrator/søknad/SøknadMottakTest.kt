@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -8,9 +8,9 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class SøknadMottakTest {
-    private val søknadService = mockk<SøknadService>(relaxed = true)
-    private val opplysningRepository = mockk<OpplysningRepository>(relaxed = true)
     private val testRapid = TestRapid()
+    private val opplysningRepository = mockk<OpplysningRepository>(relaxed = true)
+    private val søknadService = SøknadService(testRapid)
 
     init {
         SøknadMottak(rapidsConnection = testRapid, søknadService = søknadService, opplysningRepository = opplysningRepository)
@@ -23,65 +23,152 @@ class SøknadMottakTest {
 
     @Test
     fun `vi kan motta søknader`() {
-        testRapid.sendTestMessage(innsending_ferdigstilt_event)
+        testRapid.sendTestMessage(søknad_innsendt_event)
+        testRapid.inspektør.size shouldBe 1
     }
 
     @Test
-    fun `vi kan ikke motta søknad dersom forventet felt mangler`() {
-        shouldThrow<IllegalArgumentException> {
-            testRapid.sendTestMessage(innsending_ferdigstilt_event_uten_fakta)
-        }
+    fun `vi mottar ikke meldinger som mangler påkrevde felter`() {
+        testRapid.sendTestMessage(søknad_innsendt_event_uten_ident)
+        testRapid.inspektør.size shouldBe 0
+
+        testRapid.sendTestMessage(søknad_innsendt_event_uten_søknadId)
+        testRapid.inspektør.size shouldBe 0
+
+        testRapid.sendTestMessage(søknad_innsendt_event_uten_søknadstidspunkt)
+        testRapid.inspektør.size shouldBe 0
+
+        testRapid.sendTestMessage(søknad_innsendt_event_uten_søknadData)
+        testRapid.inspektør.size shouldBe 0
     }
 }
 
-private val innsending_ferdigstilt_event =
+private val søknad_innsendt_event =
     //language=json
     """
-     {
+    {
       "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-      "@event_name": "innsending_ferdigstilt",
+      "@event_name": "søknad_innsendt",
       "@opprettet": "2024-02-21T11:00:27.899791748",
-      "journalpostId": "637582711",
-      "type": "NySøknad",
-      "fødselsnummer": "12345678903",
-      "søknadsData": {
+      "søknadId": "123e4567-e89b-12d3-a456-426614174000",
+      "ident": "12345678903",
+      "søknadstidspunkt": "2024-02-21T11:00:27.899791748",
+      "søknadData": {
         "søknad_uuid": "123e4567-e89b-12d3-a456-426614174000",
         "@opprettet": "2024-02-21T11:00:27.899791748",
         "seksjoner": [
-        {
-          "fakta": [
           {
-            "id": "6001",
-            "svar": "NOR",
-            "type": "land",
-            "beskrivendeId": "faktum.hvilket-land-bor-du-i"
-          } 
-          ],
-        "beskrivendeId": "bostedsland"
-        } 
+            "fakta": [
+              {
+                "id": "6001",
+                "svar": "NOR",
+                "type": "land",
+                "beskrivendeId": "faktum.hvilket-land-bor-du-i"
+              }
+            ],
+            "beskrivendeId": "bostedsland"
+          }
         ]
       }
     }
     """.trimIndent()
 
-private val innsending_ferdigstilt_event_uten_fakta =
+private val søknad_innsendt_event_uten_ident =
     //language=json
     """
-     {
+    {
       "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-      "@event_name": "innsending_ferdigstilt",
+      "@event_name": "søknad_innsendt",
       "@opprettet": "2024-02-21T11:00:27.899791748",
-      "journalpostId": "637582711",
-      "type": "NySøknad",
-      "fødselsnummer": "12345678903",
-      "søknadsData": {
+      "søknadId": "123e4567-e89b-12d3-a456-426614174000",
+      "søknadstidspunkt": "2024-02-21T11:00:27.899791748",
+      "søknadData": {
         "søknad_uuid": "123e4567-e89b-12d3-a456-426614174000",
         "@opprettet": "2024-02-21T11:00:27.899791748",
         "seksjoner": [
-        {
-        "beskrivendeId": "bostedsland"
-        } 
+          {
+            "fakta": [
+              {
+                "id": "6001",
+                "svar": "NOR",
+                "type": "land",
+                "beskrivendeId": "faktum.hvilket-land-bor-du-i"
+              }
+            ],
+            "beskrivendeId": "bostedsland"
+          }
         ]
       }
+    }
+    """.trimIndent()
+
+private val søknad_innsendt_event_uten_søknadId =
+    //language=json
+    """
+    {
+      "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+      "@event_name": "søknad_innsendt",
+      "@opprettet": "2024-02-21T11:00:27.899791748",
+      "ident": "12345678903",    
+      "søknadstidspunkt": "2024-02-21T11:00:27.899791748",
+      "søknadData": {
+        "søknad_uuid": "123e4567-e89b-12d3-a456-426614174000",
+        "@opprettet": "2024-02-21T11:00:27.899791748",
+        "seksjoner": [
+          {
+            "fakta": [
+              {
+                "id": "6001",
+                "svar": "NOR",
+                "type": "land",
+                "beskrivendeId": "faktum.hvilket-land-bor-du-i"
+              }
+            ],
+            "beskrivendeId": "bostedsland"
+          }
+        ]
+      }
+    }
+    """.trimIndent()
+
+private val søknad_innsendt_event_uten_søknadstidspunkt =
+    //language=json
+    """
+    {
+      "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+      "@event_name": "søknad_innsendt",
+      "@opprettet": "2024-02-21T11:00:27.899791748",
+      "søknadId": "123e4567-e89b-12d3-a456-426614174000",
+      "ident": "12345678903",    
+      "søknadData": {
+        "søknad_uuid": "123e4567-e89b-12d3-a456-426614174000",
+        "@opprettet": "2024-02-21T11:00:27.899791748",
+        "seksjoner": [
+          {
+            "fakta": [
+              {
+                "id": "6001",
+                "svar": "NOR",
+                "type": "land",
+                "beskrivendeId": "faktum.hvilket-land-bor-du-i"
+              }
+            ],
+            "beskrivendeId": "bostedsland"
+          }
+        ]
+      }
+    }
+    """.trimIndent()
+
+private val søknad_innsendt_event_uten_søknadData =
+    //language=json
+    """
+    {
+      "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+      "@event_name": "søknad_innsendt",
+      "@opprettet": "2024-02-21T11:00:27.899791748",
+      "søknadId": "123e4567-e89b-12d3-a456-426614174000",
+      "ident": "12345678903",    
+      "søknadstidspunkt": "2024-02-21T11:00:27.899791748"
     }
     """.trimIndent()
