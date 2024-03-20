@@ -70,6 +70,14 @@ class BehovMottakTest {
     }
 
     @Test
+    fun `vi kan motta opplysningsbehov Søknadstidspunkt`() {
+        val behov = listOf("Søknadstidspunkt")
+        testRapid.sendTestMessage(opplysning_behov_event(behov))
+
+        verify(exactly = 1) { behovLøserFactory.behovsløser(any()) }
+    }
+
+    @Test
     fun `vi mottar ikke opplysningsbehov dersom påkrevd felt mangler`() {
         testRapid.sendTestMessage(opplysning_behov_event_mangler_ident)
 
