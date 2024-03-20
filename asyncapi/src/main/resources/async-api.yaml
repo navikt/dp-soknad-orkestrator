@@ -29,4 +29,4 @@ components:
             description: Søknad id
           ident:
             type: string
-            description: Ident til mottaker av vedtaket
+            description: Søkeren sin ident.
