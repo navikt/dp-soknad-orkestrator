@@ -23,58 +23,58 @@ class BehovMottakTest {
 
     @Test
     fun `vi kan motta opplysningsbehov ØnskerDagpengerFraDato`() {
-        val behov = listOf("ØnskerDagpengerFraDato")
-        testRapid.sendTestMessage(opplysning_behov_event(behov))
+        val behov = "ØnskerDagpengerFraDato"
+        testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(any()) }
+        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
     }
 
     @Test
     fun `vi kan motta opplysningsbehov EøsArbeid`() {
-        val behov = listOf("EøsArbeid")
-        testRapid.sendTestMessage(opplysning_behov_event(behov))
+        val behov = "EøsArbeid"
+        testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(any()) }
+        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
     }
 
     @Test
     fun `vi kan motta opplysningsbehov KanJobbeDeltid`() {
-        val behov = listOf("KanJobbeDeltid")
-        testRapid.sendTestMessage(opplysning_behov_event(behov))
+        val behov = "KanJobbeDeltid"
+        testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(any()) }
+        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
     }
 
     @Test
     fun `vi kan motta opplysningsbehov HelseTilAlleTyperJobb`() {
-        val behov = listOf("HelseTilAlleTyperJobb")
-        testRapid.sendTestMessage(opplysning_behov_event(behov))
+        val behov = "HelseTilAlleTyperJobb"
+        testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(any()) }
+        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
     }
 
     @Test
     fun `vi kan motta opplysningsbehov KanJobbeHvorSomHelst`() {
-        val behov = listOf("KanJobbeHvorSomHelst")
-        testRapid.sendTestMessage(opplysning_behov_event(behov))
+        val behov = "KanJobbeHvorSomHelst"
+        testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(any()) }
+        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
     }
 
     @Test
     fun `vi kan motta opplysningsbehov VilligTilÅBytteYrke`() {
-        val behov = listOf("VilligTilÅBytteYrke")
-        testRapid.sendTestMessage(opplysning_behov_event(behov))
+        val behov = "VilligTilÅBytteYrke"
+        testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(any()) }
+        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
     }
 
     @Test
     fun `vi kan motta opplysningsbehov Søknadstidspunkt`() {
-        val behov = listOf("Søknadstidspunkt")
-        testRapid.sendTestMessage(opplysning_behov_event(behov))
+        val behov = "Søknadstidspunkt"
+        testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(any()) }
+        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
     }
 
     @Test
