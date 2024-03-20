@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test
 
 class BehovMottakTest {
     private val testRapid = TestRapid()
-    private val behovLøserFactory = mockk<BehovLøserFactory>(relaxed = true)
+    private val behovLøserFactory = mockk<BehovløserFactory>(relaxed = true)
 
     init {
         BehovMottak(rapidsConnection = testRapid, behovLøserFactory = behovLøserFactory)

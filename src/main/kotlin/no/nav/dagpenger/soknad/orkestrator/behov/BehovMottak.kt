@@ -8,7 +8,7 @@ import java.util.UUID
 
 class BehovMottak(
     val rapidsConnection: RapidsConnection,
-    private val behovLøserFactory: BehovLøserFactory,
+    private val behovLøserFactory: BehovløserFactory,
 ) : River.PacketListener {
     private val behov =
         listOf(
