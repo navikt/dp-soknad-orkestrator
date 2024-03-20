@@ -21,7 +21,7 @@ components:
             type: string
             description: Event som forteller om at en søknad er mottatt
             enum: [
-              "MeldingOmNySøknad"
+              "melding_om_ny_søknad"
             ]
           søknad_uuid:
             type: string

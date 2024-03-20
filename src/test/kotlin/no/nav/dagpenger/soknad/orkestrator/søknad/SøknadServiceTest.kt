@@ -33,7 +33,7 @@ class SøknadServiceTest {
 
         with(testRapid.inspektør) {
             size shouldBe 1
-            field(0, "@event_name").asText() shouldBe "MeldingOmNySøknad"
+            field(0, "@event_name").asText() shouldBe "melding_om_ny_søknad"
             field(0, "søknad_uuid").asText() shouldBe søknadUUID.toString()
             field(0, "ident").asText() shouldBe ident
         }
