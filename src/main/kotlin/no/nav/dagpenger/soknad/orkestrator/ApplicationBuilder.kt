@@ -36,7 +36,7 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
                 runMigration()
             }
 
-        SøknadMottak(
+        /*SøknadMottak(
             rapidsConnection,
             SøknadService(rapidsConnection),
             OpplysningRepositoryPostgres(dataSource),
@@ -44,6 +44,6 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
         BehovMottak(
             rapidsConnection = rapidsConnection,
             behovLøserFactory = BehovløserFactory(rapidsConnection, OpplysningRepositoryPostgres(dataSource)),
-        )
+        )*/
     }
 }
