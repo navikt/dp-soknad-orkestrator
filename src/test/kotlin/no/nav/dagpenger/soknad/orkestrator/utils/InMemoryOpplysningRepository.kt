@@ -5,9 +5,9 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import java.util.UUID
 
 class InMemoryOpplysningRepository : OpplysningRepository {
-    private val opplysninger = mutableListOf<Opplysning>()
+    private val opplysninger = mutableListOf<Opplysning<*>>()
 
-    override fun lagre(opplysning: Opplysning) {
+    override fun lagre(opplysning: Opplysning<*>) {
         opplysninger.add(opplysning)
     }
 
@@ -15,7 +15,7 @@ class InMemoryOpplysningRepository : OpplysningRepository {
         beskrivendeId: String,
         ident: String,
         søknadsId: UUID,
-    ): Opplysning {
+    ): Opplysning<*> {
         return opplysninger.find {
             it.beskrivendeId == beskrivendeId && it.ident == ident && it.søknadsId == søknadsId
         }

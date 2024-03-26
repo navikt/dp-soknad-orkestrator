@@ -1,24 +1,130 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Arbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.opplysning.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Boolsk
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Dato
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Desimaltall
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Flervalg
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Heltall
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Periode
+import no.nav.dagpenger.soknad.orkestrator.opplysning.PeriodeSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Tekst
+import org.jetbrains.exposed.dao.id.IntIdTable
+import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.javatime.date
+import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 import javax.sql.DataSource
 
 class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepository {
     val database = Database.connect(dataSource)
 
-    override fun lagre(opplysning: Opplysning) {
+    override fun lagre(opplysning: Opplysning<*>) {
         transaction {
             if (!opplysningEksisterer(opplysning)) {
                 OpplysningTabell.leggTil(opplysning)
+
+                val opplysningId =
+                    OpplysningTabell.selectAll().somMatcher(
+                        opplysning.beskrivendeId,
+                        opplysning.ident,
+                        opplysning.søknadsId,
+                    ).first()[OpplysningTabell.id].value
+
+                when (opplysning.type) {
+                    Tekst ->
+                        TekstTabell.insert {
+                            it[TekstTabell.opplysningId] = opplysningId
+                            it[svar] = opplysning.svar as String
+                        }
+
+                    Heltall ->
+                        HeltallTabell.insert {
+                            it[HeltallTabell.opplysningId] = opplysningId
+                            it[svar] = opplysning.svar as Int
+                        }
+
+                    Desimaltall ->
+                        DesimaltallTabell.insert {
+                            it[DesimaltallTabell.opplysningId] = opplysningId
+                            it[svar] = opplysning.svar as Double
+                        }
+
+                    Boolsk ->
+                        BoolskTabell.insert {
+                            it[BoolskTabell.opplysningId] = opplysningId
+                            it[svar] = opplysning.svar as Boolean
+                        }
+
+                    Dato ->
+                        DatoTabell.insert {
+                            it[DatoTabell.opplysningId] = opplysningId
+                            it[svar] = opplysning.svar as LocalDate
+                        }
+
+                    Flervalg -> {
+                        val flervalgId =
+                            FlervalgTabell.insertAndGetId {
+                                it[FlervalgTabell.opplysningId] = opplysningId
+                            }.value
+
+                        (opplysning.svar as List<String>).forEach { flervalgSvar ->
+                            FlervalgSvarTabell.insert {
+                                it[FlervalgSvarTabell.flervalgId] = flervalgId
+                                it[svar] = flervalgSvar
+                            }
+                        }
+                    }
+
+                    Periode ->
+                        (opplysning.svar as PeriodeSvar).also { periodeSvar ->
+                            PeriodeTabell.insert {
+                                it[PeriodeTabell.opplysningId] = opplysningId
+                                it[fom] = periodeSvar.fom
+                                it[tom] = periodeSvar.tom
+                            }
+                        }
+
+                    Arbeidsforhold -> {
+                        val arbeidsforholdId =
+                            ArbeidsforholdTabell.insertAndGetId {
+                                it[ArbeidsforholdTabell.opplysningId] = opplysningId
+                            }.value
+
+                        (opplysning.svar as List<ArbeidsforholdSvar>).forEach { arbeidsforholdSvar ->
+                            val navnSvarId =
+                                TekstTabell.insertAndGetId {
+                                    it[TekstTabell.opplysningId] = opplysningId
+                                    it[svar] = arbeidsforholdSvar.navn
+                                }.value
+
+                            val landSvarId =
+                                TekstTabell.insertAndGetId {
+                                    it[TekstTabell.opplysningId] = opplysningId
+                                    it[svar] = arbeidsforholdSvar.land
+                                }.value
+
+                            ArbeidsforholdSvarTabell.insert {
+                                it[ArbeidsforholdSvarTabell.arbeidsforholdId] = arbeidsforholdId
+                                it[this.navnSvarId] = navnSvarId
+                                it[this.landSvarId] = landSvarId
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -27,7 +133,7 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
         beskrivendeId: String,
         ident: String,
         søknadsId: UUID,
-    ): Opplysning {
+    ): Opplysning<*> {
         return transaction {
             OpplysningTabell
                 .selectAll()
@@ -43,24 +149,75 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
     }
 }
 
-object OpplysningTabell : Table("opplysning") {
-    val beskrivendeId = varchar("beskrivende_id", 255)
-    val svar = varchar("svar", 255)
-    val ident = varchar("ident", 11)
-    val søknadsId = uuid("soknads_id").nullable()
+object OpplysningTabell : IntIdTable("opplysning") {
+    val opprettet: Column<LocalDateTime> = datetime("opprettet").default(LocalDateTime.now())
+    val beskrivendeId: Column<String> = varchar("beskrivende_id", 255)
+    val type: Column<String> = text("type")
+    val ident: Column<String> = varchar("ident", 11)
+    val søknadsId: Column<UUID> = uuid("soknads_id")
 }
 
-private fun opplysningEksisterer(opplysning: Opplysning): Boolean =
+object TekstTabell : IntIdTable("tekst") {
+    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val svar = text("svar")
+}
+
+object HeltallTabell : IntIdTable("heltall") {
+    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val svar = integer("svar")
+}
+
+object DesimaltallTabell : IntIdTable("desimaltall") {
+    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val svar = double("svar")
+}
+
+object BoolskTabell : IntIdTable("boolsk") {
+    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val svar = bool("svar")
+}
+
+object DatoTabell : IntIdTable("dato") {
+    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val svar = date("svar")
+}
+
+object FlervalgTabell : IntIdTable("flervalg") {
+    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+}
+
+object FlervalgSvarTabell : IntIdTable("flervalg_svar") {
+    val flervalgId: Column<Int> = integer("flervalg_id").references(FlervalgTabell.id)
+    val svar = text("svar")
+}
+
+object PeriodeTabell : IntIdTable("periode") {
+    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val fom = date("fom")
+    val tom = date("tom").nullable()
+}
+
+object ArbeidsforholdTabell : IntIdTable("arbeidsforhold") {
+    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+}
+
+object ArbeidsforholdSvarTabell : IntIdTable("arbeidsforhold_svar") {
+    val arbeidsforholdId: Column<Int> = integer("arbeidsforhold_id").references(ArbeidsforholdTabell.id)
+    val navnSvarId: Column<Int> = integer("navn_svar_id").references(TekstTabell.id)
+    val landSvarId: Column<Int> = integer("land_svar_id").references(TekstTabell.id)
+}
+
+private fun opplysningEksisterer(opplysning: Opplysning<*>): Boolean =
     OpplysningTabell.selectAll().somMatcher(
         opplysning.beskrivendeId,
         opplysning.ident,
         opplysning.søknadsId,
     ).any()
 
-fun OpplysningTabell.leggTil(opplysning: Opplysning) {
+fun OpplysningTabell.leggTil(opplysning: Opplysning<*>) {
     insert {
         it[beskrivendeId] = opplysning.beskrivendeId
-        it[svar] = opplysning.svar
+        it[type] = opplysning.type::class.java.simpleName
         it[ident] = opplysning.ident
         it[søknadsId] = opplysning.søknadsId
     }
@@ -69,7 +226,7 @@ fun OpplysningTabell.leggTil(opplysning: Opplysning) {
 fun Query.somMatcher(
     beskrivendeId: String,
     ident: String,
-    søknadsId: UUID?,
+    søknadsId: UUID,
 ): Query =
     where {
         OpplysningTabell.beskrivendeId eq beskrivendeId and
@@ -77,12 +234,164 @@ fun Query.somMatcher(
             (OpplysningTabell.søknadsId eq søknadsId)
     }
 
-private fun tilOpplysning(): (ResultRow) -> Opplysning =
+private fun tilOpplysning(): (ResultRow) -> Opplysning<*> =
     {
-        Opplysning(
-            beskrivendeId = it[OpplysningTabell.beskrivendeId],
-            svar = it[OpplysningTabell.svar],
-            ident = it[OpplysningTabell.ident],
-            søknadsId = it[OpplysningTabell.søknadsId],
-        )
+        when (it[OpplysningTabell.type]) {
+            "Tekst" -> tilTekstOpplysning(it)
+            "Heltall" -> tilHeltallOpplysning(it)
+            "Desimaltall" -> tilDesimaltallOpplysning(it)
+            "Boolsk" -> tilBoolskOpplysning(it)
+            "Dato" -> tilDatoOpplysning(it)
+            "Flervalg" -> tilFlervalgOpplysning(it)
+            "Periode" -> tilPeriodeOpplysning(it)
+            "Arbeidsforhold" -> tilArbeidsforholdOpplysning(it)
+            else -> throw IllegalArgumentException("Ukjent datatype: ${it[OpplysningTabell.type]}")
+        }
     }
+
+private fun tilTekstOpplysning(it: ResultRow) =
+    Opplysning(
+        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        type = Tekst,
+        svar = hentTekstSvar(it),
+        ident = it[OpplysningTabell.ident],
+        søknadsId = it[OpplysningTabell.søknadsId],
+    )
+
+private fun hentTekstSvar(it: ResultRow): String =
+    TekstTabell
+        .select(TekstTabell.svar)
+        .where { TekstTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[TekstTabell.svar]
+
+private fun tilHeltallOpplysning(it: ResultRow) =
+    Opplysning(
+        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        type = Heltall,
+        svar = hentHeltallSvar(it),
+        ident = it[OpplysningTabell.ident],
+        søknadsId = it[OpplysningTabell.søknadsId],
+    )
+
+private fun hentHeltallSvar(it: ResultRow): Int =
+    HeltallTabell
+        .select(HeltallTabell.svar)
+        .where { HeltallTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[HeltallTabell.svar]
+
+private fun tilDesimaltallOpplysning(it: ResultRow) =
+    Opplysning(
+        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        type = Desimaltall,
+        svar = hentDesimaltallSvar(it),
+        ident = it[OpplysningTabell.ident],
+        søknadsId = it[OpplysningTabell.søknadsId],
+    )
+
+private fun hentDesimaltallSvar(it: ResultRow): Double =
+    DesimaltallTabell
+        .select(DesimaltallTabell.svar)
+        .where { DesimaltallTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[DesimaltallTabell.svar]
+
+private fun tilBoolskOpplysning(it: ResultRow) =
+    Opplysning(
+        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        type = Boolsk,
+        svar = hentBoolskSvar(it),
+        ident = it[OpplysningTabell.ident],
+        søknadsId = it[OpplysningTabell.søknadsId],
+    )
+
+private fun hentBoolskSvar(it: ResultRow): Boolean =
+    BoolskTabell
+        .select(BoolskTabell.svar)
+        .where { BoolskTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[BoolskTabell.svar]
+
+private fun tilDatoOpplysning(it: ResultRow) =
+    Opplysning(
+        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        type = Dato,
+        svar = hentDatoSvar(it),
+        ident = it[OpplysningTabell.ident],
+        søknadsId = it[OpplysningTabell.søknadsId],
+    )
+
+private fun hentDatoSvar(it: ResultRow): LocalDate =
+    DatoTabell
+        .select(DatoTabell.svar)
+        .where { DatoTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[DatoTabell.svar]
+
+private fun tilFlervalgOpplysning(it: ResultRow) =
+    Opplysning(
+        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        type = Flervalg,
+        svar = hentFlervalgSvar(it),
+        ident = it[OpplysningTabell.ident],
+        søknadsId = it[OpplysningTabell.søknadsId],
+    )
+
+private fun hentFlervalgSvar(it: ResultRow): List<String> {
+    val flervalgId =
+        FlervalgTabell
+            .select(FlervalgTabell.id)
+            .where { FlervalgTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[FlervalgTabell.id].value
+
+    return FlervalgSvarTabell
+        .select(FlervalgSvarTabell.svar)
+        .where { FlervalgSvarTabell.flervalgId eq flervalgId }
+        .map { it[FlervalgSvarTabell.svar] }
+}
+
+private fun tilPeriodeOpplysning(it: ResultRow) =
+    Opplysning(
+        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        type = Periode,
+        svar = hentPeriodeSvar(it),
+        ident = it[OpplysningTabell.ident],
+        søknadsId = it[OpplysningTabell.søknadsId],
+    )
+
+private fun hentPeriodeSvar(it: ResultRow): PeriodeSvar {
+    return PeriodeTabell
+        .select(PeriodeTabell.fom, PeriodeTabell.tom)
+        .where(PeriodeTabell.opplysningId eq it[OpplysningTabell.id].value)
+        .map {
+            PeriodeSvar(
+                fom = it[PeriodeTabell.fom],
+                tom = it[PeriodeTabell.tom],
+            )
+        }.first()
+}
+
+private fun tilArbeidsforholdOpplysning(it: ResultRow) =
+    Opplysning(
+        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        type = Arbeidsforhold,
+        svar = hentArbeidsforholdSvar(it),
+        ident = it[OpplysningTabell.ident],
+        søknadsId = it[OpplysningTabell.søknadsId],
+    )
+
+fun hentArbeidsforholdSvar(it: ResultRow): List<ArbeidsforholdSvar> {
+    val arbeidsforholdId =
+        ArbeidsforholdTabell
+            .select(ArbeidsforholdTabell.id)
+            .where { ArbeidsforholdTabell.opplysningId eq it[OpplysningTabell.id].value }
+            .first()[ArbeidsforholdTabell.id].value
+
+    return ArbeidsforholdSvarTabell
+        .select(ArbeidsforholdSvarTabell.navnSvarId, ArbeidsforholdSvarTabell.landSvarId)
+        .where { ArbeidsforholdSvarTabell.arbeidsforholdId eq arbeidsforholdId }
+        .map {
+            ArbeidsforholdSvar(
+                navn =
+                    TekstTabell
+                        .select(TekstTabell.svar)
+                        .where { TekstTabell.id eq it[ArbeidsforholdSvarTabell.navnSvarId] }
+                        .first()[TekstTabell.svar],
+                land =
+                    TekstTabell
+                        .select(TekstTabell.svar)
+                        .where { TekstTabell.id eq it[ArbeidsforholdSvarTabell.landSvarId] }
+                        .first()[TekstTabell.svar],
+            )
+        }
+}

@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
@@ -20,9 +21,10 @@ class KanJobbeHvorSomHelstBehovløserTest {
         val opplysning =
             Opplysning(
                 beskrivendeId = "jobbe-hele-norge",
+                type = Tekst,
+                svar = svar,
                 ident = ident,
                 søknadsId = søknadsId,
-                svar = svar,
             )
 
         opplysningRepository.lagre(opplysning)

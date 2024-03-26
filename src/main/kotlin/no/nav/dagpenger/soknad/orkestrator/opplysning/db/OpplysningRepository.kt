@@ -4,11 +4,11 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import java.util.UUID
 
 interface OpplysningRepository {
-    fun lagre(opplysning: Opplysning)
+    fun lagre(opplysning: Opplysning<*>)
 
     fun hent(
         beskrivendeId: String,
         ident: String,
         søknadsId: UUID,
-    ): Opplysning
+    ): Opplysning<*>
 }

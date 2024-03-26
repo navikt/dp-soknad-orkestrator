@@ -3,11 +3,6 @@ package no.nav.dagpenger.soknad.orkestrator
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
-import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
-import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import org.jetbrains.exposed.sql.Database

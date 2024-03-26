@@ -6,5 +6,5 @@ import java.util.UUID
 class Søknad(
     val id: UUID,
     val ident: String,
-    val opplysninger: List<Opplysning>,
+    val opplysninger: List<Opplysning<*>>,
 )
