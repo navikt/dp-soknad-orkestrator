@@ -5,6 +5,8 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Dato
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Desimaltall
+import no.nav.dagpenger.soknad.orkestrator.opplysning.EøsArbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.opplysning.EøsArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Flervalg
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Heltall
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
@@ -124,6 +126,48 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
                             }
                         }
                     }
+
+                    EøsArbeidsforhold -> {
+                        val arbeidsforholdId =
+                            ArbeidsforholdTabell.insertAndGetId {
+                                it[ArbeidsforholdTabell.opplysningId] = opplysningId
+                            }.value
+
+                        (opplysning.svar as List<EøsArbeidsforholdSvar>).forEach { eøsArbeidsforholdSvar ->
+                            val bedriftnavnSvarId =
+                                TekstTabell.insertAndGetId {
+                                    it[TekstTabell.opplysningId] = opplysningId
+                                    it[svar] = eøsArbeidsforholdSvar.bedriftnavn
+                                }.value
+
+                            val landSvarId =
+                                TekstTabell.insertAndGetId {
+                                    it[TekstTabell.opplysningId] = opplysningId
+                                    it[svar] = eøsArbeidsforholdSvar.land
+                                }.value
+
+                            val personnummerSvarId =
+                                TekstTabell.insertAndGetId {
+                                    it[TekstTabell.opplysningId] = opplysningId
+                                    it[svar] = eøsArbeidsforholdSvar.personnummerIArbeidsland
+                                }.value
+
+                            val varighetSvarId =
+                                PeriodeTabell.insertAndGetId {
+                                    it[PeriodeTabell.opplysningId] = opplysningId
+                                    it[fom] = eøsArbeidsforholdSvar.varighet.fom
+                                    it[tom] = eøsArbeidsforholdSvar.varighet.tom
+                                }.value
+
+                            EøsArbeidsforholdSvarTabell.insert {
+                                it[EøsArbeidsforholdSvarTabell.arbeidsforholdId] = arbeidsforholdId
+                                it[this.bedriftnavnSvarId] = bedriftnavnSvarId
+                                it[this.landSvarId] = landSvarId
+                                it[this.personnummerSvarId] = personnummerSvarId
+                                it[this.varighetSvarId] = varighetSvarId
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -207,6 +251,14 @@ object ArbeidsforholdSvarTabell : IntIdTable("arbeidsforhold_svar") {
     val landSvarId: Column<Int> = integer("land_svar_id").references(TekstTabell.id)
 }
 
+object EøsArbeidsforholdSvarTabell : IntIdTable("eøs_arbeidsforhold_svar") {
+    val arbeidsforholdId: Column<Int> = integer("arbeidsforhold_id").references(ArbeidsforholdTabell.id)
+    val bedriftnavnSvarId: Column<Int> = integer("bedrift_navn_svar_id").references(TekstTabell.id)
+    val landSvarId: Column<Int> = integer("land_svar_id").references(TekstTabell.id)
+    val personnummerSvarId: Column<Int> = integer("personnummer_svar_id").references(TekstTabell.id)
+    val varighetSvarId: Column<Int> = integer("varighet_svar_id").references(PeriodeTabell.id)
+}
+
 private fun opplysningEksisterer(opplysning: Opplysning<*>): Boolean =
     OpplysningTabell.selectAll().somMatcher(
         opplysning.beskrivendeId,
@@ -245,6 +297,7 @@ private fun tilOpplysning(): (ResultRow) -> Opplysning<*> =
             "Flervalg" -> tilFlervalgOpplysning(it)
             "Periode" -> tilPeriodeOpplysning(it)
             "Arbeidsforhold" -> tilArbeidsforholdOpplysning(it)
+            "EøsArbeidsforhold" -> tilEøsArbeidsforholdOpplysning(it)
             else -> throw IllegalArgumentException("Ukjent datatype: ${it[OpplysningTabell.type]}")
         }
     }
@@ -392,6 +445,61 @@ fun hentArbeidsforholdSvar(it: ResultRow): List<ArbeidsforholdSvar> {
                         .select(TekstTabell.svar)
                         .where { TekstTabell.id eq it[ArbeidsforholdSvarTabell.landSvarId] }
                         .first()[TekstTabell.svar],
+            )
+        }
+}
+
+private fun tilEøsArbeidsforholdOpplysning(it: ResultRow) =
+    Opplysning(
+        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        type = EøsArbeidsforhold,
+        svar = hentEøsArbeidsforholdSvar(it),
+        ident = it[OpplysningTabell.ident],
+        søknadsId = it[OpplysningTabell.søknadsId],
+    )
+
+fun hentEøsArbeidsforholdSvar(it: ResultRow): List<EøsArbeidsforholdSvar> {
+    val arbeidsforholdId =
+        ArbeidsforholdTabell
+            .select(ArbeidsforholdTabell.id)
+            .where { ArbeidsforholdTabell.opplysningId eq it[OpplysningTabell.id].value }
+            .first()[ArbeidsforholdTabell.id].value
+
+    return EøsArbeidsforholdSvarTabell
+        .select(
+            EøsArbeidsforholdSvarTabell.bedriftnavnSvarId,
+            EøsArbeidsforholdSvarTabell.landSvarId,
+            EøsArbeidsforholdSvarTabell.personnummerSvarId,
+            EøsArbeidsforholdSvarTabell.varighetSvarId,
+        )
+        .where { EøsArbeidsforholdSvarTabell.arbeidsforholdId eq arbeidsforholdId }
+        .map {
+            EøsArbeidsforholdSvar(
+                bedriftnavn =
+                    TekstTabell
+                        .select(TekstTabell.svar)
+                        .where { TekstTabell.id eq it[EøsArbeidsforholdSvarTabell.bedriftnavnSvarId] }
+                        .first()[TekstTabell.svar],
+                land =
+                    TekstTabell
+                        .select(TekstTabell.svar)
+                        .where { TekstTabell.id eq it[EøsArbeidsforholdSvarTabell.landSvarId] }
+                        .first()[TekstTabell.svar],
+                personnummerIArbeidsland =
+                    TekstTabell
+                        .select(TekstTabell.svar)
+                        .where { TekstTabell.id eq it[EøsArbeidsforholdSvarTabell.personnummerSvarId] }
+                        .first()[TekstTabell.svar],
+                varighet =
+                    PeriodeTabell
+                        .select(PeriodeTabell.fom, PeriodeTabell.tom)
+                        .where { PeriodeTabell.id eq it[EøsArbeidsforholdSvarTabell.varighetSvarId] }
+                        .map {
+                            PeriodeSvar(
+                                fom = it[PeriodeTabell.fom],
+                                tom = it[PeriodeTabell.tom],
+                            )
+                        }.first(),
             )
         }
 }

@@ -7,11 +7,14 @@ import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.EøsArbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.opplysning.EøsArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.PeriodeSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.februar
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
+import no.nav.dagpenger.soknad.orkestrator.utils.mars
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -67,8 +70,8 @@ class SøknadMapperTest {
     }
 
     @Test
-    fun `kan mappe svar på generatorfaktum`() {
-        val søknad = SøknadMapper(søknadsDataMedGeneratorFaktum).søknad
+    fun `kan mappe svar på generatorfaktum - Arbeidsforhold`() {
+        val søknad = SøknadMapper(søknadsDataMedGeneratorArbeidsforhold).søknad
         søknad.opplysninger.size shouldBe 2
         søknad.opplysninger.single { it.beskrivendeId == "faktum.arbeidsforhold" }.also { arbeidsforhold ->
             arbeidsforhold.beskrivendeId shouldBe "faktum.arbeidsforhold"
@@ -84,6 +87,32 @@ class SøknadMapperTest {
 
                 it[1].navn shouldBe "Bank AS"
                 it[1].land shouldBe "NOR"
+            }
+        }
+    }
+
+    @Test
+    fun `kan mappe svar på generatorfaktum - Eøs Arbeidsforhold`() {
+        val søknad = SøknadMapper(søknadsDataMedGeneratorEøsArbeidsforhold).søknad
+        søknad.opplysninger.size shouldBe 2
+        søknad.opplysninger.single { it.beskrivendeId == "faktum.eos-arbeidsforhold" }.also { eøsArbeidsforhold ->
+            eøsArbeidsforhold.beskrivendeId shouldBe "faktum.eos-arbeidsforhold"
+            eøsArbeidsforhold.søknadsId shouldBe søknadId
+            eøsArbeidsforhold.ident shouldBe ident
+            eøsArbeidsforhold.svar is EøsArbeidsforhold
+
+            (eøsArbeidsforhold.svar as List<EøsArbeidsforholdSvar>).let {
+                it.size shouldBe 2
+
+                it[0].bedriftnavn shouldBe "Utlandet AS"
+                it[0].land shouldBe "NLD"
+                it[0].personnummerIArbeidsland shouldBe "123567890"
+                it[0].varighet shouldBe PeriodeSvar(11.mars(2024), 24.mars(2024))
+
+                it[1].bedriftnavn shouldBe "Utlandet 2 AS"
+                it[1].land shouldBe "FRA"
+                it[1].personnummerIArbeidsland shouldBe "23456789"
+                it[1].varighet shouldBe PeriodeSvar(6.februar(2024), null)
             }
         }
     }
@@ -203,7 +232,7 @@ private val søknadsDataMedPeriodeFaktum =
         """.trimIndent(),
     )
 
-private val søknadsDataMedGeneratorFaktum =
+private val søknadsDataMedGeneratorArbeidsforhold =
     ObjectMapper().readTree(
         //language=json
         """
@@ -327,6 +356,87 @@ private val søknadsDataMedGeneratorFaktum =
                   }
                 ],
                 "beskrivendeId": "din-situasjon"
+              }
+            ]
+          }
+        }
+        """.trimIndent(),
+    )
+
+private val søknadsDataMedGeneratorEøsArbeidsforhold =
+    ObjectMapper().readTree(
+        //language=json
+        """
+        {
+          "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+          "@event_name": "søknad_innsendt",
+          "@opprettet": "2024-02-21T11:00:27.899791748",
+          "søknadId": "$søknadId",
+          "ident": "$ident",
+          "søknadstidspunkt": "$søknadstidspunkt",
+          "søknadData": {
+            "søknad_uuid": "$søknadId",
+            "@opprettet": "2024-02-21T11:00:27.899791748",
+            "seksjoner": [
+              {
+                "fakta": [
+                  {
+                    "svar": [
+                      [
+                        {
+                          "svar": "Utlandet AS",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.eos-arbeidsforhold.arbeidsgivernavn"
+                        },
+                        {
+                          "svar": "NLD",
+                          "type": "land",
+                          "beskrivendeId": "faktum.eos-arbeidsforhold.land"
+                        },
+                        {
+                          "svar": "123567890",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.eos-arbeidsforhold.personnummer"
+                        },
+                        {
+                          "svar": {
+                            "fom": "2024-03-11",
+                            "tom": "2024-03-24"
+                          },
+                          "type": "periode",
+                          "beskrivendeId": "faktum.eos-arbeidsforhold.varighet"
+                        }
+                      ],
+                      [
+                        {
+                          "svar": "Utlandet 2 AS",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.eos-arbeidsforhold.arbeidsgivernavn"
+                        },
+                        {
+                          "svar": "FRA",
+                          "type": "land",
+                          "beskrivendeId": "faktum.eos-arbeidsforhold.land"
+                        },
+                        {
+                          "svar": "23456789",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.eos-arbeidsforhold.personnummer"
+                        },
+                        {
+                          "svar": {
+                            "fom": "2024-02-06"
+                          },
+                          "type": "periode",
+                          "beskrivendeId": "faktum.eos-arbeidsforhold.varighet"
+                        }
+                      ]
+                    ],
+                    "type": "generator",
+                    "beskrivendeId": "faktum.eos-arbeidsforhold"
+                  }
+                ],
+                "beskrivendeId": "eos-arbeidsforhold"
               }
             ]
           }

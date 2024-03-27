@@ -6,6 +6,8 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Dato
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Desimaltall
+import no.nav.dagpenger.soknad.orkestrator.opplysning.EøsArbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.opplysning.EøsArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Flervalg
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Heltall
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
@@ -35,7 +37,7 @@ class SøknadMapper(private val jsonNode: JsonNode) {
             )
 
         opplysninger.add(søknadstidspunktOpplysning)
-        opplysninger.addAll(faktaTilOpplysninger(søknadData, ident, søknadId))
+        opplysninger.addAll(søknadDataTilOpplysninger(søknadData, ident, søknadId))
 
         Søknad(
             id = søknadId,
@@ -44,7 +46,7 @@ class SøknadMapper(private val jsonNode: JsonNode) {
         )
     }
 
-    private fun faktaTilOpplysninger(
+    private fun søknadDataTilOpplysninger(
         søknadData: JsonNode,
         ident: String,
         søknadId: UUID,
@@ -150,33 +152,80 @@ private fun generatorSvar(
 ): Opplysning<*> {
     val beskrivendeId = faktum.get("beskrivendeId").asText()
     return when (beskrivendeId) {
-        "faktum.arbeidsforhold" -> {
-            val arbeidsforholdSvar: List<ArbeidsforholdSvar> =
-                faktum.get("svar").map { arbeidsforhold ->
-                    val arbeidsforholdMap = arbeidsforhold.associateBy { it.get("beskrivendeId").asText() }
+        "faktum.arbeidsforhold" -> tilArbeidsforholdOpplysning(faktum, beskrivendeId, ident, søknadId)
 
-                    // TODO: Håndter null på en bedre måte
-                    ArbeidsforholdSvar(
-                        navn = arbeidsforholdMap["faktum.arbeidsforhold.navn-bedrift"]?.get("svar")?.asText() ?: "",
-                        land = arbeidsforholdMap["faktum.arbeidsforhold.land"]?.get("svar")?.asText() ?: "",
-                    )
-                }
-            Opplysning(beskrivendeId, Arbeidsforhold, arbeidsforholdSvar, ident, søknadId)
-        }
+        "faktum.eos-arbeidsforhold" -> tilEøsArbeidsforholdOpplysning(faktum, beskrivendeId, ident, søknadId)
 
-        "faktum.eos-arbeidsforhold" -> Opplysning(beskrivendeId, Tekst, "EOS TODO", ident, søknadId)
-        "faktum.egen-naering-organisasjonsnummer-liste" ->
-            Opplysning(
-                beskrivendeId,
-                Tekst,
-                "EGEN NÆRING TODO",
-                ident,
-                søknadId,
-            )
-
-        "faktum.register.barn-liste" -> Opplysning(beskrivendeId, Tekst, "PDL BARN TODO", ident, søknadId)
-        "faktum.barn-liste" -> Opplysning(beskrivendeId, Tekst, "BARN TODO", ident, søknadId)
+        // TODO: Håndter resten av generatorfaktumene
+        // "faktum.egen-naering-organisasjonsnummer-liste" ->
+        // "faktum.register.barn-liste" ->
+        // "faktum.barn-liste" ->
 
         else -> throw IllegalArgumentException("Ukjent generatorfaktum: $beskrivendeId")
     }
+}
+
+private fun tilArbeidsforholdOpplysning(
+    faktum: JsonNode,
+    beskrivendeId: String,
+    ident: String,
+    søknadId: UUID,
+): Opplysning<List<ArbeidsforholdSvar>> {
+    val arbeidsforholdSvar: List<ArbeidsforholdSvar> =
+        faktum.get("svar").map { arbeidsforhold ->
+            // TODO: Hvordan vil vi håndtere null her?
+            val navnSvar =
+                arbeidsforhold
+                    .find { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.navn-bedrift" }
+                    ?.get("svar")?.asText() ?: ""
+
+            val landFaktum =
+                arbeidsforhold
+                    .find { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.land" }
+                    ?.get("svar")?.asText() ?: ""
+
+            ArbeidsforholdSvar(
+                navn = navnSvar,
+                land = landFaktum,
+            )
+        }
+    return Opplysning(beskrivendeId, Arbeidsforhold, arbeidsforholdSvar, ident, søknadId)
+}
+
+fun tilEøsArbeidsforholdOpplysning(
+    faktum: JsonNode,
+    beskrivendeId: String,
+    ident: String,
+    søknadId: UUID,
+): Opplysning<List<EøsArbeidsforholdSvar>> {
+    val eøsArbeidsforholdSvar: List<EøsArbeidsforholdSvar> =
+        faktum.get("svar").map { eøsArbeidsforhold ->
+            val arbeidsgivernavnSvar =
+                eøsArbeidsforhold
+                    .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.arbeidsgivernavn" }
+                    ?.get("svar")?.asText() ?: ""
+
+            val landSvar =
+                eøsArbeidsforhold
+                    .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.land" }
+                    ?.get("svar")?.asText() ?: ""
+
+            val personnummerSvar =
+                eøsArbeidsforhold
+                    .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.personnummer" }
+                    ?.get("svar")?.asText() ?: ""
+
+            val varighetSvar =
+                eøsArbeidsforhold
+                    .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.varighet" }
+                    ?.get("svar")
+
+            EøsArbeidsforholdSvar(
+                bedriftnavn = arbeidsgivernavnSvar,
+                land = landSvar,
+                personnummerIArbeidsland = personnummerSvar,
+                varighet = periodeSvar(varighetSvar),
+            )
+        }
+    return Opplysning(beskrivendeId, EøsArbeidsforhold, eøsArbeidsforholdSvar, ident, søknadId)
 }

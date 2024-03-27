@@ -9,6 +9,8 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Dato
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Desimaltall
+import no.nav.dagpenger.soknad.orkestrator.opplysning.EøsArbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.opplysning.EøsArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Flervalg
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Heltall
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
@@ -192,6 +194,42 @@ class OpplysningRepositoryPostgresTest {
                     listOf(
                         ArbeidsforholdSvar(navn = "navn", land = "land"),
                         ArbeidsforholdSvar(navn = "navn2", land = "land2"),
+                    ),
+                ident = ident,
+                søknadsId = søknadsId,
+            )
+
+        withMigratedDb {
+            opplysningRepository.lagre(opplysning)
+
+            opplysningRepository.hent(
+                beskrivendeId,
+                ident,
+                søknadsId,
+            ) shouldBe opplysning
+        }
+    }
+
+    @Test
+    fun `vi kan lagre og hente opplysning av type generator - eøs arbeidsforhold`() {
+        val opplysning =
+            Opplysning(
+                beskrivendeId = beskrivendeId,
+                type = EøsArbeidsforhold,
+                svar =
+                    listOf(
+                        EøsArbeidsforholdSvar(
+                            bedriftnavn = "arbeidsgivernavn",
+                            land = "land",
+                            personnummerIArbeidsland = "personnummer",
+                            varighet = PeriodeSvar(LocalDate.now(), LocalDate.now().plusDays(10)),
+                        ),
+                        EøsArbeidsforholdSvar(
+                            bedriftnavn = "arbeidsgivernavn2",
+                            land = "land2",
+                            personnummerIArbeidsland = "personnummer2",
+                            varighet = PeriodeSvar(LocalDate.now(), LocalDate.now().plusDays(10)),
+                        ),
                     ),
                 ident = ident,
                 søknadsId = søknadsId,

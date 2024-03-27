@@ -42,3 +42,15 @@ data class ArbeidsforholdSvar(
     val navn: String,
     val land: String,
 )
+
+@Suppress("UNCHECKED_CAST")
+data object EøsArbeidsforhold : Datatype<List<EøsArbeidsforholdSvar>>(
+    List::class.java as Class<List<EøsArbeidsforholdSvar>>,
+)
+
+data class EøsArbeidsforholdSvar(
+    val bedriftnavn: String,
+    val land: String,
+    val personnummerIArbeidsland: String,
+    val varighet: PeriodeSvar,
+)
