@@ -33,14 +33,7 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
     override fun lagre(opplysning: Opplysning<*>) {
         transaction {
             if (!opplysningEksisterer(opplysning)) {
-                OpplysningTabell.leggTil(opplysning)
-
-                val opplysningId =
-                    OpplysningTabell.selectAll().somMatcher(
-                        opplysning.beskrivendeId,
-                        opplysning.ident,
-                        opplysning.søknadsId,
-                    ).first()[OpplysningTabell.id].value
+                val opplysningId = OpplysningTabell.insertAndGetId(opplysning)
 
                 when (opplysning.type) {
                     Tekst ->
@@ -196,14 +189,13 @@ private fun opplysningEksisterer(opplysning: Opplysning<*>): Boolean =
         opplysning.søknadsId,
     ).any()
 
-fun OpplysningTabell.leggTil(opplysning: Opplysning<*>) {
-    insert {
+fun OpplysningTabell.insertAndGetId(opplysning: Opplysning<*>) =
+    insertAndGetId {
         it[beskrivendeId] = opplysning.beskrivendeId
         it[type] = opplysning.type::class.java.simpleName
         it[ident] = opplysning.ident
         it[søknadsId] = opplysning.søknadsId
-    }
-}
+    }.value
 
 fun Query.somMatcher(
     beskrivendeId: String,
