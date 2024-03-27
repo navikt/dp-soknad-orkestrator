@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EøsArbeidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HelseTilAlleTyperJobbBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.JobbetUtenforNorgeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeDeltidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeHvorSomHelstBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadstidspunktBehovløser
@@ -54,6 +55,12 @@ class BehovløserFactory(
 
             "Søknadstidspunkt" ->
                 SøknadstidspunktBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                )
+
+            "JobbetUtenforNorge" ->
+                JobbetUtenforNorgeBehovløser(
                     rapidsConnection,
                     opplysningRepository,
                 )

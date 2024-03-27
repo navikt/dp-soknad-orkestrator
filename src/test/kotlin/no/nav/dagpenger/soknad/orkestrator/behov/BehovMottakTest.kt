@@ -78,6 +78,14 @@ class BehovMottakTest {
     }
 
     @Test
+    fun `vi kan motta opplysningsbehov JobbetUtenforNorge`() {
+        val behov = "JobbetUtenforNorge"
+        testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
+
+        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
+    }
+
+    @Test
     fun `vi mottar ikke opplysningsbehov dersom påkrevd felt mangler`() {
         testRapid.sendTestMessage(opplysning_behov_event_mangler_ident)
 

@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EøsArbeidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HelseTilAlleTyperJobbBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.JobbetUtenforNorgeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeDeltidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeHvorSomHelstBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadstidspunktBehovløser
@@ -22,5 +23,6 @@ class BehovsløserFactoryTest {
         behovløserFactory.behovsløser("KanJobbeHvorSomHelst") is KanJobbeHvorSomHelstBehovløser
         behovløserFactory.behovsløser("VilligTilÅBytteYrke") is VilligTilÅBytteYrkeBehovløser
         behovløserFactory.behovsløser("Søknadstidspunkt") is SøknadstidspunktBehovløser
+        behovløserFactory.behovsløser("JobbetUtenforNorge") is JobbetUtenforNorgeBehovløser
     }
 }
