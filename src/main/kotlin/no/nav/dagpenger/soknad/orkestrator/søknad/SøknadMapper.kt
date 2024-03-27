@@ -1,17 +1,17 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Arbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Boolsk
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Datatype
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Dato
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Desimaltall
-import no.nav.dagpenger.soknad.orkestrator.opplysning.EøsArbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Flervalg
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Heltall
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Periode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Tekst
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Datatype
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Desimaltall
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Flervalg
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Heltall
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Periode
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import java.util.UUID
 
