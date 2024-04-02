@@ -10,16 +10,17 @@ class BehovMottak(
     val rapidsConnection: RapidsConnection,
     private val behovLøserFactory: BehovløserFactory,
 ) : River.PacketListener {
-    private val behov = listOf(
-        "ØnskerDagpengerFraDato",
-        "EøsArbeid",
-        "KanJobbeDeltid",
-        "HelseTilAlleTyperJobb",
-        "KanJobbeHvorSomHelst",
-        "VilligTilÅBytteYrke",
-        "Søknadstidspunkt",
-        "JobbetUtenforNorge",
-    )
+    private val behov =
+        listOf(
+            "ØnskerDagpengerFraDato",
+            "EøsArbeid",
+            "KanJobbeDeltid",
+            "HelseTilAlleTyperJobb",
+            "KanJobbeHvorSomHelst",
+            "VilligTilÅBytteYrke",
+            "Søknadstidspunkt",
+            "JobbetUtenforNorge",
+        )
 
     init {
         River(rapidsConnection).apply {
@@ -37,18 +38,16 @@ class BehovMottak(
     ) {
         with(packet) {
             mottatteBehov().forEach { behov ->
-                behovsløserFor(behov).løs(ident(), søknadsId())
+                behovsløserFor(behov).løs(ident(), søknadId())
             }
         }
     }
 
     private fun behovsløserFor(behov: String) = behovLøserFactory.behovløserFor(behov)
 
-    private fun JsonMessage.søknadsId(): UUID = UUID.fromString(get("søknad_id").asText())
+    private fun JsonMessage.søknadId(): UUID = UUID.fromString(get("søknad_id").asText())
 
     private fun JsonMessage.ident(): String = get("ident").asText()
 
     private fun JsonMessage.mottatteBehov() = get("@behov").map { it.asText() }
-
-
 }
