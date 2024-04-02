@@ -79,7 +79,7 @@ class SøknadMapperTest {
             arbeidsforhold.ident shouldBe ident
             arbeidsforhold.svar is Arbeidsforhold
 
-            (arbeidsforhold.svar as List<ArbeidsforholdSvar>).let {
+            (arbeidsforhold.svar as List<*>).filterIsInstance<ArbeidsforholdSvar>().let {
                 it.size shouldBe 2
 
                 it[0].navn shouldBe "Elektrikersjappa"
@@ -101,7 +101,7 @@ class SøknadMapperTest {
             eøsArbeidsforhold.ident shouldBe ident
             eøsArbeidsforhold.svar is EøsArbeidsforhold
 
-            (eøsArbeidsforhold.svar as List<EøsArbeidsforholdSvar>).let {
+            (eøsArbeidsforhold.svar as List<*>).filterIsInstance<EøsArbeidsforholdSvar>().let {
                 it.size shouldBe 2
 
                 it[0].bedriftnavn shouldBe "Utlandet AS"
