@@ -15,7 +15,7 @@ class BehovløserFactory(
     private val rapidsConnection: RapidsConnection,
     private val opplysningRepository: OpplysningRepositoryPostgres,
 ) {
-    fun behovsløser(behov: String): Behovsløser {
+    fun behovløserFor(behov: String): Behovsløser {
         return when (behov) {
             "ØnskerDagpengerFraDato" ->
                 ØnskerDagpengerFraDatoBehovløser(

@@ -26,7 +26,7 @@ class BehovMottakTest {
         val behov = "ØnskerDagpengerFraDato"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
+        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -34,7 +34,7 @@ class BehovMottakTest {
         val behov = "EøsArbeid"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
+        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -42,7 +42,7 @@ class BehovMottakTest {
         val behov = "KanJobbeDeltid"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
+        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -50,7 +50,7 @@ class BehovMottakTest {
         val behov = "HelseTilAlleTyperJobb"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
+        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -58,7 +58,7 @@ class BehovMottakTest {
         val behov = "KanJobbeHvorSomHelst"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
+        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -66,7 +66,7 @@ class BehovMottakTest {
         val behov = "VilligTilÅBytteYrke"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
+        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -74,7 +74,7 @@ class BehovMottakTest {
         val behov = "Søknadstidspunkt"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
+        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -82,21 +82,21 @@ class BehovMottakTest {
         val behov = "JobbetUtenforNorge"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovsløser(behov) }
+        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
     }
 
     @Test
     fun `vi mottar ikke opplysningsbehov dersom påkrevd felt mangler`() {
         testRapid.sendTestMessage(opplysning_behov_event_mangler_ident)
 
-        verify(exactly = 0) { behovLøserFactory.behovsløser(any()) }
+        verify(exactly = 0) { behovLøserFactory.behovløserFor(any()) }
     }
 
     @Test
     fun `vi mottar ikke opplysningsbehov dersom den har løsning`() {
         testRapid.sendTestMessage(opplysning_behov_event_med_løsning)
 
-        verify(exactly = 0) { behovLøserFactory.behovsløser(any()) }
+        verify(exactly = 0) { behovLøserFactory.behovløserFor(any()) }
     }
 }
 

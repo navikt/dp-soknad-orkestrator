@@ -16,13 +16,13 @@ class BehovsløserFactoryTest {
 
     @Test
     fun `skal returnere riktig behovløser basert på gitt behov`() {
-        behovløserFactory.behovsløser("ØnskerDagpengerFraDato") is ØnskerDagpengerFraDatoBehovløser
-        behovløserFactory.behovsløser("EøsArbeid") is EøsArbeidBehovløser
-        behovløserFactory.behovsløser("KanJobbeDeltid") is KanJobbeDeltidBehovløser
-        behovløserFactory.behovsløser("HelseTilAlleTyperJobb") is HelseTilAlleTyperJobbBehovløser
-        behovløserFactory.behovsløser("KanJobbeHvorSomHelst") is KanJobbeHvorSomHelstBehovløser
-        behovløserFactory.behovsløser("VilligTilÅBytteYrke") is VilligTilÅBytteYrkeBehovløser
-        behovløserFactory.behovsløser("Søknadstidspunkt") is SøknadstidspunktBehovløser
-        behovløserFactory.behovsløser("JobbetUtenforNorge") is JobbetUtenforNorgeBehovløser
+        behovløserFactory.behovløserFor("ØnskerDagpengerFraDato") is ØnskerDagpengerFraDatoBehovløser
+        behovløserFactory.behovløserFor("EøsArbeid") is EøsArbeidBehovløser
+        behovløserFactory.behovløserFor("KanJobbeDeltid") is KanJobbeDeltidBehovløser
+        behovløserFactory.behovløserFor("HelseTilAlleTyperJobb") is HelseTilAlleTyperJobbBehovløser
+        behovløserFactory.behovløserFor("KanJobbeHvorSomHelst") is KanJobbeHvorSomHelstBehovløser
+        behovløserFactory.behovløserFor("VilligTilÅBytteYrke") is VilligTilÅBytteYrkeBehovløser
+        behovløserFactory.behovløserFor("Søknadstidspunkt") is SøknadstidspunktBehovløser
+        behovløserFactory.behovløserFor("JobbetUtenforNorge") is JobbetUtenforNorgeBehovløser
     }
 }
