@@ -1,5 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
+import EgenNæringSvarTabell
+import EgenNæringTabell
 import OpplysningTabell
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
@@ -8,6 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSv
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Desimaltall
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EgenNæring
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Flervalg
@@ -46,6 +49,7 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
                     Periode -> lagrePeriodeSvar(opplysning, opplysningId)
                     Arbeidsforhold -> lagreArbeidsforholdSvar(opplysningId, opplysning)
                     EøsArbeidsforhold -> lagreEøsArbeidsforholdSvar(opplysningId, opplysning)
+                    EgenNæring -> lagreEgenNæringSvar(opplysningId, opplysning)
                 }
             }
         }
@@ -109,6 +113,7 @@ private fun tilOpplysning(): (ResultRow) -> Opplysning<*> =
             "Periode" -> tilPeriodeOpplysning(it)
             "Arbeidsforhold" -> tilArbeidsforholdOpplysning(it)
             "EøsArbeidsforhold" -> tilEøsArbeidsforholdOpplysning(it)
+            "EgenNæring" -> tilEgenNæringOpplysning(it)
             else -> throw IllegalArgumentException("Ukjent datatype: ${it[OpplysningTabell.type]}")
         }
     }
@@ -468,4 +473,42 @@ fun hentEøsArbeidsforholdSvar(it: ResultRow): List<EøsArbeidsforholdSvar> {
                         }.first(),
             )
         }
+}
+
+private fun tilEgenNæringOpplysning(it: ResultRow) =
+    Opplysning(
+        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        type = EgenNæring,
+        svar = hentEgenNæringSvar(it),
+        ident = it[OpplysningTabell.ident],
+        søknadsId = it[OpplysningTabell.søknadsId],
+    )
+
+private fun lagreEgenNæringSvar(
+    opplysningId: Int,
+    opplysning: Opplysning<*>,
+) {
+    val egenNæringId =
+        EgenNæringTabell.insertAndGetId {
+            it[EgenNæringTabell.opplysningId] = opplysningId
+        }.value
+
+    (opplysning.svar as List<*>).filterIsInstance<Int>().forEach { organisasjonsnummer ->
+        EgenNæringSvarTabell.insert {
+            it[EgenNæringSvarTabell.egenNæringId] = egenNæringId
+            it[EgenNæringSvarTabell.organisasjonsnummer] = organisasjonsnummer
+        }
+    }
+}
+
+private fun hentEgenNæringSvar(it: ResultRow): List<Int> {
+    val egenNæringId =
+        EgenNæringTabell
+            .select(EgenNæringTabell.id)
+            .where { EgenNæringTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[EgenNæringTabell.id].value
+
+    return EgenNæringSvarTabell
+        .select(EgenNæringSvarTabell.organisasjonsnummer)
+        .where { EgenNæringSvarTabell.egenNæringId eq egenNæringId }
+        .map { it[EgenNæringSvarTabell.organisasjonsnummer] }
 }

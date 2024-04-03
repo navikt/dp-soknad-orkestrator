@@ -7,6 +7,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Datatype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Desimaltall
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EgenNæring
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Flervalg
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Heltall
@@ -73,8 +74,8 @@ class SøknadMapper(private val jsonNode: JsonNode) {
                 when (beskrivendeId) {
                     "faktum.arbeidsforhold" -> datatyper.getValue("arbeidsforhold")
                     "faktum.eos-arbeidsforhold" -> datatyper.getValue("eøsArbeidsforhold")
+                    "faktum.egen-naering-organisasjonsnummer-liste" -> datatyper.getValue("egenNæring")
                     // TODO: Håndter resten av generatorfaktumene
-                    // "faktum.egen-naering-organisasjonsnummer-liste"
                     // "faktum.register.barn-liste"
                     // "faktum.barn-liste"
                     else -> throw IllegalArgumentException("Ukjent generator")
@@ -98,5 +99,6 @@ class SøknadMapper(private val jsonNode: JsonNode) {
             "periode" to Periode,
             "arbeidsforhold" to Arbeidsforhold,
             "eøsArbeidsforhold" to EøsArbeidsforhold,
+            "egenNæring" to EgenNæring,
         )
 }

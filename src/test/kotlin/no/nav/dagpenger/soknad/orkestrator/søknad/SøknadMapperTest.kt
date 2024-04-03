@@ -136,6 +136,17 @@ class SøknadMapperTest {
             }
         }
     }
+
+    @Test
+    fun `kan mappe svar på generatorfaktum - Egen næring`() {
+        val søknad = SøknadMapper(søknadsDataMedGeneratorEgenNæring).søknad
+        søknad.opplysninger.single { it.beskrivendeId == "faktum.egen-naering-organisasjonsnummer-liste" }
+            .also { opplysning ->
+                opplysning.søknadsId shouldBe søknadId
+                opplysning.ident shouldBe ident
+                opplysning.svar shouldBe listOf(123456789, 987654321)
+            }
+    }
 }
 
 private val søknad_innsendt_event =
@@ -457,6 +468,51 @@ private val søknadsDataMedGeneratorEøsArbeidsforhold =
                   }
                 ],
                 "beskrivendeId": "eos-arbeidsforhold"
+              }
+            ]
+          }
+        }
+        """.trimIndent(),
+    )
+
+private val søknadsDataMedGeneratorEgenNæring =
+    ObjectMapper().readTree(
+        //language=json
+        """
+        {
+          "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+          "@event_name": "søknad_innsendt",
+          "@opprettet": "2024-02-21T11:00:27.899791748",
+          "søknadId": "$søknadId",
+          "ident": "$ident",
+          "søknadstidspunkt": "$søknadstidspunkt",
+          "søknadData": {
+            "søknad_uuid": "$søknadId",
+            "@opprettet": "2024-02-21T11:00:27.899791748",
+            "seksjoner": [
+              {
+                "fakta": [
+                  {
+                    "svar": [
+                      [
+                        {
+                          "svar": 123456789,
+                          "type": "int",
+                          "beskrivendeId": "faktum.egen-naering-organisasjonsnummer"
+                        }
+                      ],
+                      [
+                        {
+                          "svar": 987654321,
+                          "type": "int",
+                          "beskrivendeId": "faktum.egen-naering-organisasjonsnummer"
+                        }
+                      ]
+                    ],
+                    "type": "generator",
+                    "beskrivendeId": "faktum.egen-naering-organisasjonsnummer-liste"
+                  }
+                ]
               }
             ]
           }

@@ -10,6 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSv
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Desimaltall
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EgenNæring
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Flervalg
@@ -231,6 +232,28 @@ class OpplysningRepositoryPostgresTest {
                             varighet = PeriodeSvar(LocalDate.now(), LocalDate.now().plusDays(10)),
                         ),
                     ),
+                ident = ident,
+                søknadsId = søknadsId,
+            )
+
+        withMigratedDb {
+            opplysningRepository.lagre(opplysning)
+
+            opplysningRepository.hent(
+                beskrivendeId,
+                ident,
+                søknadsId,
+            ) shouldBe opplysning
+        }
+    }
+
+    @Test
+    fun `vi kan lagre og hente opplysning av type generator - egen næring`() {
+        val opplysning =
+            Opplysning(
+                beskrivendeId = beskrivendeId,
+                type = EgenNæring,
+                svar = listOf(123456789, 987654321),
                 ident = ident,
                 søknadsId = søknadsId,
             )

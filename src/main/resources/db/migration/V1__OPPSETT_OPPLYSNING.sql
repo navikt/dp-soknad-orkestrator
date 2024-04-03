@@ -92,15 +92,30 @@ CREATE TABLE IF NOT EXISTS arbeidsforhold_svar
 
 CREATE TABLE IF NOT EXISTS eøs_arbeidsforhold_svar
 (
-    id                        BIGSERIAL NOT NULL PRIMARY KEY,
-    arbeidsforhold_id         BIGINT    NOT NULL,
+    id                   BIGSERIAL NOT NULL PRIMARY KEY,
+    arbeidsforhold_id    BIGINT    NOT NULL,
     bedrift_navn_svar_id BIGINT    NOT NULL,
-    land_svar_id              BIGINT    NOT NULL,
-    personnummer_svar_id      BIGINT    NOT NULL,
-    varighet_svar_id          BIGINT    NOT NULL,
+    land_svar_id         BIGINT    NOT NULL,
+    personnummer_svar_id BIGINT    NOT NULL,
+    varighet_svar_id     BIGINT    NOT NULL,
     FOREIGN KEY (arbeidsforhold_id) REFERENCES arbeidsforhold (id),
     FOREIGN KEY (bedrift_navn_svar_id) REFERENCES tekst (id),
     FOREIGN KEY (land_svar_id) REFERENCES tekst (id),
     FOREIGN KEY (personnummer_svar_id) REFERENCES tekst (id),
     FOREIGN KEY (varighet_svar_id) REFERENCES periode (id)
+);
+
+CREATE TABLE IF NOT EXISTS egen_næring
+(
+    id            BIGSERIAL NOT NULL PRIMARY KEY,
+    opplysning_id BIGINT    NOT NULL,
+    FOREIGN KEY (opplysning_id) REFERENCES opplysning (id)
+);
+
+CREATE TABLE IF NOT EXISTS egen_næring_svar
+(
+    id                  BIGSERIAL NOT NULL PRIMARY KEY,
+    egen_næring_id      BIGINT    NOT NULL,
+    organisasjonsnummer BIGINT      NOT NULL,
+    FOREIGN KEY (egen_næring_id) REFERENCES egen_næring (id)
 );

@@ -70,3 +70,12 @@ object EøsArbeidsforholdSvarTabell : IntIdTable("eøs_arbeidsforhold_svar") {
     val personnummerSvarId: Column<Int> = integer("personnummer_svar_id").references(TekstTabell.id)
     val varighetSvarId: Column<Int> = integer("varighet_svar_id").references(PeriodeTabell.id)
 }
+
+object EgenNæringTabell : IntIdTable("egen_næring") {
+    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+}
+
+object EgenNæringSvarTabell : IntIdTable("egen_næring_svar") {
+    val egenNæringId: Column<Int> = integer("egen_næring_id").references(EgenNæringTabell.id)
+    val organisasjonsnummer = integer("organisasjonsnummer")
+}
