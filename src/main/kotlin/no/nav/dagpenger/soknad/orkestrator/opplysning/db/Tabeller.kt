@@ -79,3 +79,17 @@ object EgenNæringSvarTabell : IntIdTable("egen_næring_svar") {
     val egenNæringId: Column<Int> = integer("egen_næring_id").references(EgenNæringTabell.id)
     val organisasjonsnummer = integer("organisasjonsnummer")
 }
+
+object BarnTabell : IntIdTable("barn") {
+    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+}
+
+object BarnSvarTabell : IntIdTable("barn_svar") {
+    val barnId: Column<Int> = integer("barn_id").references(BarnTabell.id)
+    val fornavnMellomnavnId: Column<Int> = integer("fornavn_mellomnavn_id").references(TekstTabell.id)
+    val etternavnId: Column<Int> = integer("etternavn_id").references(TekstTabell.id)
+    val fødselsdatoId: Column<Int> = integer("fødselsdato_id").references(DatoTabell.id)
+    val statsborgerskapId: Column<Int> = integer("statsborgerskap_id").references(TekstTabell.id)
+    val forsørgerId: Column<Int> = integer("forsørger_barnet_id").references(BoolskTabell.id)
+    val fraRegister = bool("fra_register")
+}

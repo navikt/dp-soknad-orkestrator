@@ -7,6 +7,8 @@ import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Barn
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Desimaltall
@@ -18,6 +20,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Heltall
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Periode
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.PeriodeSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.utils.januar
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
@@ -254,6 +257,46 @@ class OpplysningRepositoryPostgresTest {
                 beskrivendeId = beskrivendeId,
                 type = EgenNæring,
                 svar = listOf(123456789, 987654321),
+                ident = ident,
+                søknadsId = søknadsId,
+            )
+
+        withMigratedDb {
+            opplysningRepository.lagre(opplysning)
+
+            opplysningRepository.hent(
+                beskrivendeId,
+                ident,
+                søknadsId,
+            ) shouldBe opplysning
+        }
+    }
+
+    @Test
+    fun `vi kan lagre og hente opplysning av type generator - barn`() {
+        val opplysning =
+            Opplysning(
+                beskrivendeId = beskrivendeId,
+                type = Barn,
+                svar =
+                    listOf(
+                        BarnSvar(
+                            fornavnOgMellomnavn = "Fornavn Mellomnavn",
+                            etternavn = "Etternavn",
+                            fødselsdato = 1.januar(2024),
+                            statsborgerskap = "NOR",
+                            forsørgerBarnet = true,
+                            fraRegister = false,
+                        ),
+                        BarnSvar(
+                            fornavnOgMellomnavn = "Fornavn Mellomnavn Register",
+                            etternavn = "Etternavn Register",
+                            fødselsdato = 1.januar(2024),
+                            statsborgerskap = "NOR",
+                            forsørgerBarnet = true,
+                            fraRegister = true,
+                        ),
+                    ),
                 ident = ident,
                 søknadsId = søknadsId,
             )

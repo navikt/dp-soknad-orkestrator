@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
+import BarnSvarTabell
 import BoolskTabell
 import DatoTabell
 import DesimaltallTabell
@@ -13,6 +14,8 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Barn
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Desimaltall
@@ -66,6 +69,7 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
                         )
 
                     EgenNæring -> lagreEgenNæringSvar(opplysningId, opplysning.svar.asListOf<Int>())
+                    Barn -> lagreBarnSvar(opplysningId, opplysning.svar.asListOf<BarnSvar>())
                 }
             }
         }
@@ -130,6 +134,7 @@ private fun tilOpplysning(): (ResultRow) -> Opplysning<*> =
             "Arbeidsforhold" -> tilArbeidsforholdOpplysning(it)
             "EøsArbeidsforhold" -> tilEøsArbeidsforholdOpplysning(it)
             "EgenNæring" -> tilEgenNæringOpplysning(it)
+            "Barn" -> tilBarnOpplysning(it)
             else -> throw IllegalArgumentException("Ukjent datatype: ${it[OpplysningTabell.type]}")
         }
     }
@@ -525,4 +530,114 @@ private fun hentEgenNæringSvar(it: ResultRow): List<Int> {
         .select(EgenNæringSvarTabell.organisasjonsnummer)
         .where { EgenNæringSvarTabell.egenNæringId eq egenNæringId }
         .map { it[EgenNæringSvarTabell.organisasjonsnummer] }
+}
+
+private fun tilBarnOpplysning(it: ResultRow) =
+    Opplysning(
+        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        type = Barn,
+        svar = hentBarnSvar(it),
+        ident = it[OpplysningTabell.ident],
+        søknadsId = it[OpplysningTabell.søknadsId],
+    )
+
+private fun hentBarnSvar(it: ResultRow): List<BarnSvar> {
+    val barnId =
+        BarnTabell
+            .select(BarnTabell.id)
+            .where { BarnTabell.opplysningId eq it[OpplysningTabell.id].value }
+            .first()[BarnTabell.id].value
+
+    return BarnSvarTabell
+        .select(
+            BarnSvarTabell.fornavnMellomnavnId,
+            BarnSvarTabell.etternavnId,
+            BarnSvarTabell.fødselsdatoId,
+            BarnSvarTabell.statsborgerskapId,
+            BarnSvarTabell.forsørgerId,
+            BarnSvarTabell.fraRegister,
+        )
+        .where { BarnSvarTabell.barnId eq barnId }
+        .map {
+            BarnSvar(
+                fornavnOgMellomnavn =
+                    TekstTabell
+                        .select(TekstTabell.svar)
+                        .where { TekstTabell.id eq it[BarnSvarTabell.fornavnMellomnavnId] }
+                        .first()[TekstTabell.svar],
+                etternavn =
+                    TekstTabell
+                        .select(TekstTabell.svar)
+                        .where { TekstTabell.id eq it[BarnSvarTabell.etternavnId] }
+                        .first()[TekstTabell.svar],
+                fødselsdato =
+                    DatoTabell
+                        .select(DatoTabell.svar)
+                        .where { DatoTabell.id eq it[BarnSvarTabell.fødselsdatoId] }
+                        .first()[DatoTabell.svar],
+                statsborgerskap =
+                    TekstTabell
+                        .select(TekstTabell.svar)
+                        .where { TekstTabell.id eq it[BarnSvarTabell.statsborgerskapId] }
+                        .first()[TekstTabell.svar],
+                forsørgerBarnet =
+                    BoolskTabell
+                        .select(BoolskTabell.svar)
+                        .where { BoolskTabell.id eq it[BarnSvarTabell.forsørgerId] }
+                        .first()[BoolskTabell.svar],
+                fraRegister = it[BarnSvarTabell.fraRegister],
+            )
+        }
+}
+
+private fun lagreBarnSvar(
+    opplysningId: Int,
+    svar: List<BarnSvar>,
+) {
+    val barnId =
+        BarnTabell.insertAndGetId {
+            it[BarnTabell.opplysningId] = opplysningId
+        }.value
+
+    svar.forEach { barn ->
+        val fornavnMellomnavnId =
+            TekstTabell.insertAndGetId {
+                it[TekstTabell.opplysningId] = opplysningId
+                it[TekstTabell.svar] = barn.fornavnOgMellomnavn
+            }.value
+
+        val etternavnId =
+            TekstTabell.insertAndGetId {
+                it[TekstTabell.opplysningId] = opplysningId
+                it[TekstTabell.svar] = barn.etternavn
+            }.value
+
+        val fødselsdatoId =
+            DatoTabell.insertAndGetId {
+                it[DatoTabell.opplysningId] = opplysningId
+                it[DatoTabell.svar] = barn.fødselsdato
+            }.value
+
+        val statsborgerskapId =
+            TekstTabell.insertAndGetId {
+                it[TekstTabell.opplysningId] = opplysningId
+                it[TekstTabell.svar] = barn.statsborgerskap
+            }.value
+
+        val forsørgerId =
+            BoolskTabell.insertAndGetId {
+                it[BoolskTabell.opplysningId] = opplysningId
+                it[BoolskTabell.svar] = barn.forsørgerBarnet
+            }.value
+
+        BarnSvarTabell.insert {
+            it[BarnSvarTabell.barnId] = barnId
+            it[BarnSvarTabell.fornavnMellomnavnId] = fornavnMellomnavnId
+            it[BarnSvarTabell.etternavnId] = etternavnId
+            it[BarnSvarTabell.fødselsdatoId] = fødselsdatoId
+            it[BarnSvarTabell.statsborgerskapId] = statsborgerskapId
+            it[BarnSvarTabell.forsørgerId] = forsørgerId
+            it[fraRegister] = barn.fraRegister
+        }
+    }
 }

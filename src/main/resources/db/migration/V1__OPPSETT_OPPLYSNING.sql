@@ -116,6 +116,31 @@ CREATE TABLE IF NOT EXISTS egen_næring_svar
 (
     id                  BIGSERIAL NOT NULL PRIMARY KEY,
     egen_næring_id      BIGINT    NOT NULL,
-    organisasjonsnummer BIGINT      NOT NULL,
+    organisasjonsnummer BIGINT    NOT NULL,
     FOREIGN KEY (egen_næring_id) REFERENCES egen_næring (id)
+);
+
+CREATE TABLE IF NOT EXISTS barn
+(
+    id            BIGSERIAL NOT NULL PRIMARY KEY,
+    opplysning_id BIGINT    NOT NULL,
+    FOREIGN KEY (opplysning_id) REFERENCES opplysning (id)
+);
+
+CREATE TABLE IF NOT EXISTS barn_svar
+(
+    id                    BIGSERIAL NOT NULL PRIMARY KEY,
+    barn_id               BIGINT    NOT NULL,
+    fornavn_mellomnavn_id BIGINT    NOT NULL,
+    etternavn_id          BIGINT    NOT NULL,
+    fødselsdato_id        BIGINT    NOT NULL,
+    statsborgerskap_id    BIGINT    NOT NULL,
+    forsørger_barnet_id   BIGINT    NOT NULL,
+    fra_register          BOOLEAN   NOT NULL,
+    FOREIGN KEY (barn_id) REFERENCES barn (id),
+    FOREIGN KEY (fornavn_mellomnavn_id) REFERENCES tekst (id),
+    FOREIGN KEY (etternavn_id) REFERENCES tekst (id),
+    FOREIGN KEY (fødselsdato_id) REFERENCES dato (id),
+    FOREIGN KEY (statsborgerskap_id) REFERENCES tekst (id),
+    FOREIGN KEY (forsørger_barnet_id) REFERENCES boolsk (id)
 );

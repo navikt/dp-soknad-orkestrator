@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Datatype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
@@ -75,9 +76,8 @@ class SøknadMapper(private val jsonNode: JsonNode) {
                     "faktum.arbeidsforhold" -> datatyper.getValue("arbeidsforhold")
                     "faktum.eos-arbeidsforhold" -> datatyper.getValue("eøsArbeidsforhold")
                     "faktum.egen-naering-organisasjonsnummer-liste" -> datatyper.getValue("egenNæring")
-                    // TODO: Håndter resten av generatorfaktumene
-                    // "faktum.register.barn-liste"
-                    // "faktum.barn-liste"
+                    "faktum.register.barn-liste" -> datatyper.getValue("barn")
+                    "faktum.barn-liste" -> datatyper.getValue("barn")
                     else -> throw IllegalArgumentException("Ukjent generator")
                 }
             } else {
@@ -100,5 +100,6 @@ class SøknadMapper(private val jsonNode: JsonNode) {
             "arbeidsforhold" to Arbeidsforhold,
             "eøsArbeidsforhold" to EøsArbeidsforhold,
             "egenNæring" to EgenNæring,
+            "barn" to Barn,
         )
 }

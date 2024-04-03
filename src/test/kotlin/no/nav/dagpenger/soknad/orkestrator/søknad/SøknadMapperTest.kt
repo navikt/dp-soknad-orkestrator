@@ -8,6 +8,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforholdSvar
@@ -121,7 +122,7 @@ class SøknadMapperTest {
 
     @Test
     fun `kan mappe svar på generatorfaktum - Eøs Arbeidsforhold`() {
-        val søknad = SøknadMapper(søknadsDataMedGeneratorEøsArbeidsforhold).søknad
+        val søknad = SøknadMapper(søknadsDataMedEøsArbeidsforhold).søknad
         søknad.opplysninger.size shouldBe 2
         søknad.opplysninger.single { it.beskrivendeId == "faktum.eos-arbeidsforhold" }.also { eøsArbeidsforhold ->
             eøsArbeidsforhold.beskrivendeId shouldBe "faktum.eos-arbeidsforhold"
@@ -147,13 +148,67 @@ class SøknadMapperTest {
 
     @Test
     fun `kan mappe svar på generatorfaktum - Egen næring`() {
-        val søknad = SøknadMapper(søknadsDataMedGeneratorEgenNæring).søknad
+        val søknad = SøknadMapper(søknadsDataMedEgenNæring).søknad
         søknad.opplysninger.single { it.beskrivendeId == "faktum.egen-naering-organisasjonsnummer-liste" }
             .also { opplysning ->
                 opplysning.søknadsId shouldBe søknadId
                 opplysning.ident shouldBe ident
                 opplysning.svar shouldBe listOf(123456789, 987654321)
             }
+    }
+
+    @Test
+    fun `kan mappe svar på generatorfaktum - Register barn`() {
+        val søknad = SøknadMapper(søknadsDataMedRegisterBarn).søknad
+        søknad.opplysninger.single { it.beskrivendeId == "faktum.register.barn-liste" }.also { opplysning ->
+            opplysning.søknadsId shouldBe søknadId
+            opplysning.ident shouldBe ident
+
+            opplysning.svar.asListOf<BarnSvar>().also {
+                it.size shouldBe 2
+
+                it[0].fornavnOgMellomnavn shouldBe "Navn Register"
+                it[0].etternavn shouldBe "Etternavn Register"
+                it[0].fødselsdato shouldBe 1.januar(2024)
+                it[0].statsborgerskap shouldBe "NOR"
+                it[0].forsørgerBarnet shouldBe true
+                it[1].fraRegister shouldBe true
+
+                it[1].fornavnOgMellomnavn shouldBe "Navn Register 2"
+                it[1].etternavn shouldBe "Etternavn Register 2"
+                it[1].fødselsdato shouldBe 1.januar(2024)
+                it[1].statsborgerskap shouldBe "NOR"
+                it[1].forsørgerBarnet shouldBe false
+                it[1].fraRegister shouldBe true
+            }
+        }
+    }
+
+    @Test
+    fun `kan mappe svar på generatorfaktum - Barn`() {
+        val søknad = SøknadMapper(søknadsDataMedBarn).søknad
+        søknad.opplysninger.single { it.beskrivendeId == "faktum.barn-liste" }.also { opplysning ->
+            opplysning.søknadsId shouldBe søknadId
+            opplysning.ident shouldBe ident
+
+            opplysning.svar.asListOf<BarnSvar>().also {
+                it.size shouldBe 2
+
+                it[0].fornavnOgMellomnavn shouldBe "Navn"
+                it[0].etternavn shouldBe "Etternavn"
+                it[0].fødselsdato shouldBe 1.januar(2024)
+                it[0].statsborgerskap shouldBe "NOR"
+                it[0].forsørgerBarnet shouldBe true
+                it[1].fraRegister shouldBe false
+
+                it[1].fornavnOgMellomnavn shouldBe "Navn 2"
+                it[1].etternavn shouldBe "Etternavn 2"
+                it[1].fødselsdato shouldBe 1.januar(2024)
+                it[1].statsborgerskap shouldBe "NOR"
+                it[1].forsørgerBarnet shouldBe false
+                it[1].fraRegister shouldBe false
+            }
+        }
     }
 }
 
@@ -435,7 +490,7 @@ private val søknadsDataMedGeneratorArbeidsforhold =
         """.trimIndent(),
     )
 
-private val søknadsDataMedGeneratorEøsArbeidsforhold =
+private val søknadsDataMedEøsArbeidsforhold =
     ObjectMapper().readTree(
         //language=json
         """
@@ -516,7 +571,7 @@ private val søknadsDataMedGeneratorEøsArbeidsforhold =
         """.trimIndent(),
     )
 
-private val søknadsDataMedGeneratorEgenNæring =
+private val søknadsDataMedEgenNæring =
     ObjectMapper().readTree(
         //language=json
         """
@@ -552,6 +607,176 @@ private val søknadsDataMedGeneratorEgenNæring =
                     ],
                     "type": "generator",
                     "beskrivendeId": "faktum.egen-naering-organisasjonsnummer-liste"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+        """.trimIndent(),
+    )
+
+private val søknadsDataMedRegisterBarn =
+    ObjectMapper().readTree(
+        //language=json
+        """
+        {
+          "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+          "@event_name": "søknad_innsendt",
+          "@opprettet": "2024-02-21T11:00:27.899791748",
+          "søknadId": "$søknadId",
+          "ident": "$ident",
+          "søknadstidspunkt": "$søknadstidspunkt",
+          "søknadData": {
+            "søknad_uuid": "$søknadId",
+            "@opprettet": "2024-02-21T11:00:27.899791748",
+            "seksjoner": [
+              {
+                "fakta": [
+                  {
+                    "svar": [
+                      [
+                        {
+                          "svar": "Navn Register",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.barn-fornavn-mellomnavn"
+                        },
+                        {
+                          "svar": "Etternavn Register",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.barn-etternavn"
+                        },
+                        {
+                          "svar": "2024-01-01",
+                          "type": "localdate",
+                          "beskrivendeId": "faktum.barn-foedselsdato"
+                        },
+                        {
+                          "svar": "NOR",
+                          "type": "land",
+                          "beskrivendeId": "faktum.barn-statsborgerskap"
+                        },
+                        {
+                          "svar": true,
+                          "type": "boolean",
+                          "beskrivendeId": "faktum.forsoerger-du-barnet"
+                        }
+                      ],
+                      [
+                        {
+                          "svar": "Navn Register 2",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.barn-fornavn-mellomnavn"
+                        },
+                        {
+                          "svar": "Etternavn Register 2",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.barn-etternavn"
+                        },
+                        {
+                          "svar": "2024-01-01",
+                          "type": "localdate",
+                          "beskrivendeId": "faktum.barn-foedselsdato"
+                        },
+                        {
+                          "svar": "NOR",
+                          "type": "land",
+                          "beskrivendeId": "faktum.barn-statsborgerskap"
+                        },
+                        {
+                          "svar": false,
+                          "type": "boolean",
+                          "beskrivendeId": "faktum.forsoerger-du-barnet"
+                        }
+                      ]
+                    ],
+                    "type": "generator",
+                    "beskrivendeId": "faktum.register.barn-liste"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+        """.trimIndent(),
+    )
+
+private val søknadsDataMedBarn =
+    ObjectMapper().readTree(
+        //language=json
+        """
+        {
+          "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+          "@event_name": "søknad_innsendt",
+          "@opprettet": "2024-02-21T11:00:27.899791748",
+          "søknadId": "$søknadId",
+          "ident": "$ident",
+          "søknadstidspunkt": "$søknadstidspunkt",
+          "søknadData": {
+            "søknad_uuid": "$søknadId",
+            "@opprettet": "2024-02-21T11:00:27.899791748",
+            "seksjoner": [
+              {
+                "fakta": [
+                  {
+                    "svar": [
+                      [
+                        {
+                          "svar": "Navn",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.barn-fornavn-mellomnavn"
+                        },
+                        {
+                          "svar": "Etternavn",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.barn-etternavn"
+                        },
+                        {
+                          "svar": "2024-01-01",
+                          "type": "localdate",
+                          "beskrivendeId": "faktum.barn-foedselsdato"
+                        },
+                        {
+                          "svar": "NOR",
+                          "type": "land",
+                          "beskrivendeId": "faktum.barn-statsborgerskap"
+                        },
+                        {
+                          "svar": true,
+                          "type": "boolean",
+                          "beskrivendeId": "faktum.forsoerger-du-barnet"
+                        }
+                      ],
+                      [
+                        {
+                          "svar": "Navn 2",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.barn-fornavn-mellomnavn"
+                        },
+                        {
+                          "svar": "Etternavn 2",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.barn-etternavn"
+                        },
+                        {
+                          "svar": "2024-01-01",
+                          "type": "localdate",
+                          "beskrivendeId": "faktum.barn-foedselsdato"
+                        },
+                        {
+                          "svar": "NOR",
+                          "type": "land",
+                          "beskrivendeId": "faktum.barn-statsborgerskap"
+                        },
+                        {
+                          "svar": false,
+                          "type": "boolean",
+                          "beskrivendeId": "faktum.forsoerger-du-barnet"
+                        }
+                      ]
+                    ],
+                    "type": "generator",
+                    "beskrivendeId": "faktum.barn-liste"
                   }
                 ]
               }
