@@ -10,3 +10,7 @@ data class Opplysning<T>(
     val ident: String,
     val søknadsId: UUID,
 )
+
+inline fun <reified T> Any?.asListOf(): List<T> {
+    return (this as? List<*>)?.filterIsInstance<T>() ?: emptyList()
+}

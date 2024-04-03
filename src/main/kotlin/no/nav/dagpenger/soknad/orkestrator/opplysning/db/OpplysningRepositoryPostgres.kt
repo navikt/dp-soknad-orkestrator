@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
 import OpplysningTabell
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
@@ -250,7 +251,7 @@ private fun lagreFlervalgSvar(
             it[FlervalgTabell.opplysningId] = opplysningId
         }.value
 
-    (opplysning.svar as List<*>).filterIsInstance<String>().forEach { flervalgSvar ->
+    opplysning.svar.asListOf<String>().forEach { flervalgSvar ->
         FlervalgSvarTabell.insert {
             it[FlervalgSvarTabell.flervalgId] = flervalgId
             it[svar] = flervalgSvar
@@ -322,7 +323,7 @@ private fun lagreArbeidsforholdSvar(
             it[ArbeidsforholdTabell.opplysningId] = opplysningId
         }.value
 
-    (opplysning.svar as List<*>).filterIsInstance<ArbeidsforholdSvar>().forEach { arbeidsforholdSvar ->
+    opplysning.svar.asListOf<ArbeidsforholdSvar>().forEach { arbeidsforholdSvar ->
         val navnSvarId =
             TekstTabell.insertAndGetId {
                 it[TekstTabell.opplysningId] = opplysningId
@@ -387,7 +388,7 @@ private fun lagreEøsArbeidsforholdSvar(
             it[ArbeidsforholdTabell.opplysningId] = opplysningId
         }.value
 
-    (opplysning.svar as List<*>).filterIsInstance<EøsArbeidsforholdSvar>().forEach { eøsArbeidsforholdSvar ->
+    opplysning.svar.asListOf<EøsArbeidsforholdSvar>().forEach { eøsArbeidsforholdSvar ->
         val bedriftnavnSvarId =
             TekstTabell.insertAndGetId {
                 it[TekstTabell.opplysningId] = opplysningId

@@ -5,6 +5,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
@@ -78,7 +79,27 @@ class SøknadMapperTest {
             arbeidsforhold.ident shouldBe ident
             arbeidsforhold.svar is Arbeidsforhold
 
-            (arbeidsforhold.svar as List<*>).filterIsInstance<ArbeidsforholdSvar>().let {
+            arbeidsforhold.svar.asListOf<ArbeidsforholdSvar>().let {
+                it.size shouldBe 2
+
+                it[0].navn shouldBe "Elektrikersjappa"
+                it[0].land shouldBe "NOR"
+
+                it[1].navn shouldBe "Bank AS"
+                it[1].land shouldBe "NOR"
+            }
+
+            arbeidsforhold.svar.asListOf<ArbeidsforholdSvar>().let {
+                it.size shouldBe 2
+
+                it[0].navn shouldBe "Elektrikersjappa"
+                it[0].land shouldBe "NOR"
+
+                it[1].navn shouldBe "Bank AS"
+                it[1].land shouldBe "NOR"
+            }
+
+            arbeidsforhold.svar.asListOf<ArbeidsforholdSvar>().let {
                 it.size shouldBe 2
 
                 it[0].navn shouldBe "Elektrikersjappa"
@@ -100,7 +121,7 @@ class SøknadMapperTest {
             eøsArbeidsforhold.ident shouldBe ident
             eøsArbeidsforhold.svar is EøsArbeidsforhold
 
-            (eøsArbeidsforhold.svar as List<*>).filterIsInstance<EøsArbeidsforholdSvar>().let {
+            eøsArbeidsforhold.svar.asListOf<EøsArbeidsforholdSvar>().let {
                 it.size shouldBe 2
 
                 it[0].bedriftnavn shouldBe "Utlandet AS"
