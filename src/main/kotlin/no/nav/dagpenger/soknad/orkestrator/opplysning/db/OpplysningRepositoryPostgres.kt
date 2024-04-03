@@ -1,8 +1,14 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
+import BoolskTabell
+import DatoTabell
+import DesimaltallTabell
 import EgenNæringSvarTabell
 import EgenNæringTabell
+import FlervalgSvarTabell
+import HeltallTabell
 import OpplysningTabell
+import TekstTabell
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
@@ -40,16 +46,26 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
                 val opplysningId = OpplysningTabell.insertAndGetId(opplysning)
 
                 when (opplysning.type) {
-                    Tekst -> lagreTekstSvar(opplysningId, opplysning)
-                    Heltall -> lagreHeltallSvar(opplysningId, opplysning)
-                    Desimaltall -> lagreDesimaltallSvar(opplysningId, opplysning)
-                    Boolsk -> lagreBoolskSvar(opplysningId, opplysning)
-                    Dato -> lagreDatoSvar(opplysningId, opplysning)
-                    Flervalg -> lagreFlervalgSvar(opplysningId, opplysning)
-                    Periode -> lagrePeriodeSvar(opplysning, opplysningId)
-                    Arbeidsforhold -> lagreArbeidsforholdSvar(opplysningId, opplysning)
-                    EøsArbeidsforhold -> lagreEøsArbeidsforholdSvar(opplysningId, opplysning)
-                    EgenNæring -> lagreEgenNæringSvar(opplysningId, opplysning)
+                    Tekst -> lagreTekstSvar(opplysningId, opplysning.svar as String)
+                    Heltall -> lagreHeltallSvar(opplysningId, opplysning.svar as Int)
+                    Desimaltall -> lagreDesimaltallSvar(opplysningId, opplysning.svar as Double)
+                    Boolsk -> lagreBoolskSvar(opplysningId, opplysning.svar as Boolean)
+                    Dato -> lagreDatoSvar(opplysningId, opplysning.svar as LocalDate)
+                    Flervalg -> lagreFlervalgSvar(opplysningId, opplysning.svar.asListOf<String>())
+                    Periode -> lagrePeriodeSvar(opplysningId, opplysning.svar as PeriodeSvar)
+                    Arbeidsforhold ->
+                        lagreArbeidsforholdSvar(
+                            opplysningId,
+                            opplysning.svar.asListOf<ArbeidsforholdSvar>(),
+                        )
+
+                    EøsArbeidsforhold ->
+                        lagreEøsArbeidsforholdSvar(
+                            opplysningId,
+                            opplysning.svar.asListOf<EøsArbeidsforholdSvar>(),
+                        )
+
+                    EgenNæring -> lagreEgenNæringSvar(opplysningId, opplysning.svar.asListOf<Int>())
                 }
             }
         }
@@ -129,11 +145,11 @@ private fun tilTekstOpplysning(it: ResultRow) =
 
 private fun lagreTekstSvar(
     opplysningId: Int,
-    opplysning: Opplysning<*>,
+    svar: String,
 ) {
     TekstTabell.insert {
         it[TekstTabell.opplysningId] = opplysningId
-        it[svar] = opplysning.svar as String
+        it[TekstTabell.svar] = svar
     }
 }
 
@@ -153,11 +169,11 @@ private fun tilHeltallOpplysning(it: ResultRow) =
 
 private fun lagreHeltallSvar(
     opplysningId: Int,
-    opplysning: Opplysning<*>,
+    svar: Int,
 ) {
     HeltallTabell.insert {
         it[HeltallTabell.opplysningId] = opplysningId
-        it[svar] = opplysning.svar as Int
+        it[HeltallTabell.svar] = svar
     }
 }
 
@@ -177,11 +193,11 @@ private fun tilDesimaltallOpplysning(it: ResultRow) =
 
 private fun lagreDesimaltallSvar(
     opplysningId: Int,
-    opplysning: Opplysning<*>,
+    svar: Double,
 ) {
     DesimaltallTabell.insert {
         it[DesimaltallTabell.opplysningId] = opplysningId
-        it[svar] = opplysning.svar as Double
+        it[DesimaltallTabell.svar] = svar
     }
 }
 
@@ -201,11 +217,11 @@ private fun tilBoolskOpplysning(it: ResultRow) =
 
 private fun lagreBoolskSvar(
     opplysningId: Int,
-    opplysning: Opplysning<*>,
+    svar: Boolean,
 ) {
     BoolskTabell.insert {
         it[BoolskTabell.opplysningId] = opplysningId
-        it[svar] = opplysning.svar as Boolean
+        it[BoolskTabell.svar] = svar
     }
 }
 
@@ -225,11 +241,11 @@ private fun tilDatoOpplysning(it: ResultRow) =
 
 private fun lagreDatoSvar(
     opplysningId: Int,
-    opplysning: Opplysning<*>,
+    svar: LocalDate,
 ) {
     DatoTabell.insert {
         it[DatoTabell.opplysningId] = opplysningId
-        it[svar] = opplysning.svar as LocalDate
+        it[DatoTabell.svar] = svar
     }
 }
 
@@ -249,17 +265,17 @@ private fun tilFlervalgOpplysning(it: ResultRow) =
 
 private fun lagreFlervalgSvar(
     opplysningId: Int,
-    opplysning: Opplysning<*>,
+    svar: List<String>,
 ) {
     val flervalgId =
         FlervalgTabell.insertAndGetId {
             it[FlervalgTabell.opplysningId] = opplysningId
         }.value
 
-    opplysning.svar.asListOf<String>().forEach { flervalgSvar ->
+    svar.asListOf<String>().forEach { flervalgSvar ->
         FlervalgSvarTabell.insert {
             it[FlervalgSvarTabell.flervalgId] = flervalgId
-            it[svar] = flervalgSvar
+            it[FlervalgSvarTabell.svar] = flervalgSvar
         }
     }
 }
@@ -286,15 +302,13 @@ private fun tilPeriodeOpplysning(it: ResultRow) =
     )
 
 private fun lagrePeriodeSvar(
-    opplysning: Opplysning<*>,
     opplysningId: Int,
+    svar: PeriodeSvar,
 ) {
-    (opplysning.svar as PeriodeSvar).also { periodeSvar ->
-        PeriodeTabell.insert {
-            it[PeriodeTabell.opplysningId] = opplysningId
-            it[fom] = periodeSvar.fom
-            it[tom] = periodeSvar.tom
-        }
+    PeriodeTabell.insert {
+        it[PeriodeTabell.opplysningId] = opplysningId
+        it[fom] = svar.fom
+        it[tom] = svar.tom
     }
 }
 
@@ -321,24 +335,24 @@ private fun tilArbeidsforholdOpplysning(it: ResultRow) =
 
 private fun lagreArbeidsforholdSvar(
     opplysningId: Int,
-    opplysning: Opplysning<*>,
+    svar: List<ArbeidsforholdSvar>,
 ) {
     val arbeidsforholdId =
         ArbeidsforholdTabell.insertAndGetId {
             it[ArbeidsforholdTabell.opplysningId] = opplysningId
         }.value
 
-    opplysning.svar.asListOf<ArbeidsforholdSvar>().forEach { arbeidsforholdSvar ->
+    svar.forEach { arbeidsforholdSvar ->
         val navnSvarId =
             TekstTabell.insertAndGetId {
                 it[TekstTabell.opplysningId] = opplysningId
-                it[svar] = arbeidsforholdSvar.navn
+                it[TekstTabell.svar] = arbeidsforholdSvar.navn
             }.value
 
         val landSvarId =
             TekstTabell.insertAndGetId {
                 it[TekstTabell.opplysningId] = opplysningId
-                it[svar] = arbeidsforholdSvar.land
+                it[TekstTabell.svar] = arbeidsforholdSvar.land
             }.value
 
         ArbeidsforholdSvarTabell.insert {
@@ -386,30 +400,30 @@ private fun tilEøsArbeidsforholdOpplysning(it: ResultRow) =
 
 private fun lagreEøsArbeidsforholdSvar(
     opplysningId: Int,
-    opplysning: Opplysning<*>,
+    svar: List<EøsArbeidsforholdSvar>,
 ) {
     val arbeidsforholdId =
         ArbeidsforholdTabell.insertAndGetId {
             it[ArbeidsforholdTabell.opplysningId] = opplysningId
         }.value
 
-    opplysning.svar.asListOf<EøsArbeidsforholdSvar>().forEach { eøsArbeidsforholdSvar ->
+    svar.forEach { eøsArbeidsforholdSvar ->
         val bedriftnavnSvarId =
             TekstTabell.insertAndGetId {
                 it[TekstTabell.opplysningId] = opplysningId
-                it[svar] = eøsArbeidsforholdSvar.bedriftnavn
+                it[TekstTabell.svar] = eøsArbeidsforholdSvar.bedriftnavn
             }.value
 
         val landSvarId =
             TekstTabell.insertAndGetId {
                 it[TekstTabell.opplysningId] = opplysningId
-                it[svar] = eøsArbeidsforholdSvar.land
+                it[TekstTabell.svar] = eøsArbeidsforholdSvar.land
             }.value
 
         val personnummerSvarId =
             TekstTabell.insertAndGetId {
                 it[TekstTabell.opplysningId] = opplysningId
-                it[svar] = eøsArbeidsforholdSvar.personnummerIArbeidsland
+                it[TekstTabell.svar] = eøsArbeidsforholdSvar.personnummerIArbeidsland
             }.value
 
         val varighetSvarId =
@@ -486,14 +500,14 @@ private fun tilEgenNæringOpplysning(it: ResultRow) =
 
 private fun lagreEgenNæringSvar(
     opplysningId: Int,
-    opplysning: Opplysning<*>,
+    svar: List<Int>,
 ) {
     val egenNæringId =
         EgenNæringTabell.insertAndGetId {
             it[EgenNæringTabell.opplysningId] = opplysningId
         }.value
 
-    (opplysning.svar as List<*>).filterIsInstance<Int>().forEach { organisasjonsnummer ->
+    svar.forEach { organisasjonsnummer ->
         EgenNæringSvarTabell.insert {
             it[EgenNæringSvarTabell.egenNæringId] = egenNæringId
             it[EgenNæringSvarTabell.organisasjonsnummer] = organisasjonsnummer
