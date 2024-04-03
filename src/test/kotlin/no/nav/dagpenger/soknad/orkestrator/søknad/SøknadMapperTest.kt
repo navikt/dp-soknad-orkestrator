@@ -70,6 +70,14 @@ class SøknadMapperTest {
     }
 
     @Test
+    fun `kan mappe svar på flervalg faktum`() {
+        val søknad = SøknadMapper(søknadsDataMedFlervalgFaktum).søknad
+        val flervalgSvar = søknad.opplysninger.find { it.beskrivendeId == "faktum.eget-gaardsbruk-type-gaardsbruk" }?.svar
+
+        flervalgSvar shouldBe listOf("svar.dyr", "svar.jord")
+    }
+
+    @Test
     fun `kan mappe svar på generatorfaktum - Arbeidsforhold`() {
         val søknad = SøknadMapper(søknadsDataMedGeneratorArbeidsforhold).søknad
         søknad.opplysninger.size shouldBe 2
@@ -256,6 +264,39 @@ private val søknadsDataMedPeriodeFaktum =
                   }
                 ],
                 "beskrivendeId": "din-situasjon"
+              }
+            ]
+          }
+        }
+        """.trimIndent(),
+    )
+
+private val søknadsDataMedFlervalgFaktum =
+    ObjectMapper().readTree(
+        //language=json
+        """
+        {
+          "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+          "@event_name": "søknad_innsendt",
+          "@opprettet": "2024-02-21T11:00:27.899791748",
+          "søknadId": "$søknadId",
+          "ident": "$ident",
+          "søknadstidspunkt": "$søknadstidspunkt",
+          "søknadData": {
+            "søknad_uuid": "$søknadId",
+            "@opprettet": "2024-02-21T11:00:27.899791748",
+            "seksjoner": [
+              {
+                "fakta": [
+                  {
+                    "svar": [
+                      "svar.dyr",
+                      "svar.jord"
+                    ],
+                    "type": "flervalg",
+                    "beskrivendeId": "faktum.eget-gaardsbruk-type-gaardsbruk"
+                  }
+                ]
               }
             ]
           }
