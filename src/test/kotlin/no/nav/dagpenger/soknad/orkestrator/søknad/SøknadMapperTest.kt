@@ -2,12 +2,12 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.assertions.throwables.shouldThrow
-import io.kotest.matchers.collections.contain
-import io.kotest.matchers.should
+import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.PeriodeSvar
@@ -22,7 +22,7 @@ import java.util.UUID
 private val søknadId = UUID.randomUUID()
 private val ident = "12345678903"
 private val søknadstidspunkt = ZonedDateTime.now().toString()
-private val ønskerDagpengerFra = 1.januar.toString()
+private val ønskerDagpengerFra = 1.januar
 
 class SøknadMapperTest {
     @Test
@@ -32,8 +32,8 @@ class SøknadMapperTest {
         søknad.ident shouldBe ident
         søknad.opplysninger.size shouldBe 3
 
-        søknad.opplysninger should {
-            contain(
+        søknad.opplysninger shouldContainAll
+            listOf(
                 Opplysning(
                     beskrivendeId = "faktum.mottatt-dagpenger-siste-12-mnd",
                     type = Tekst,
@@ -41,10 +41,9 @@ class SøknadMapperTest {
                     ident = ident,
                     søknadsId = søknadId,
                 ),
+                Opplysning("faktum.dagpenger-soknadsdato", Dato, ønskerDagpengerFra, ident, søknadId),
+                Opplysning("søknadstidspunkt", Tekst, søknadstidspunkt, ident, søknadId),
             )
-            contain(Opplysning("faktum.dagpenger-soknadsdato", Tekst, ønskerDagpengerFra, ident, søknadId))
-            contain(Opplysning("søknadstidspunkt", Tekst, søknadstidspunkt, ident, søknadId))
-        }
     }
 
     @Test
