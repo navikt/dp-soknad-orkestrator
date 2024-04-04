@@ -20,7 +20,7 @@ class HelseTilAlleTyperJobbBehovløserTest {
 
         val opplysning =
             Opplysning(
-                beskrivendeId = "alle-typer-arbeid",
+                beskrivendeId = "faktum.alle-typer-arbeid",
                 type = Tekst,
                 svar = svar,
                 ident = ident,

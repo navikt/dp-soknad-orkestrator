@@ -20,7 +20,7 @@ class VilligTilÅBytteYrkeBehovløserTest {
 
         val opplysning =
             Opplysning(
-                beskrivendeId = "bytte-yrke-ned-i-lonn",
+                beskrivendeId = "faktum.bytte-yrke-ned-i-lonn",
                 type = Tekst,
                 svar = svar,
                 ident = ident,

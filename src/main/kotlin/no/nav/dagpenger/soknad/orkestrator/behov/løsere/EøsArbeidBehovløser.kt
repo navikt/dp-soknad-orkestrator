@@ -12,7 +12,7 @@ class EøsArbeidBehovløser(
     val opplysningRepository: OpplysningRepository,
 ) :
     Behovsløser(rapidsConnection) {
-    private val beskrivendeId = "eos-arbeid-siste-36-mnd"
+    private val beskrivendeId = "faktum.eos-arbeid-siste-36-mnd"
     override val behov = "EøsArbeid"
 
     override fun løs(

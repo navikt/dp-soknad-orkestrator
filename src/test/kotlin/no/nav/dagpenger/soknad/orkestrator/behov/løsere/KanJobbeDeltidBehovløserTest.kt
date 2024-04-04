@@ -20,7 +20,7 @@ class KanJobbeDeltidBehovløserTest {
 
         val opplysning =
             Opplysning(
-                beskrivendeId = "jobbe-hel-deltid",
+                beskrivendeId = "faktum.jobbe-hel-deltid",
                 type = Tekst,
                 svar = svar,
                 ident = ident,

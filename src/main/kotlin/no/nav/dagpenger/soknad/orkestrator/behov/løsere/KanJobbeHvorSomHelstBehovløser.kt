@@ -12,7 +12,7 @@ class KanJobbeHvorSomHelstBehovløser(
     val opplysningRepository: OpplysningRepository,
 ) :
     Behovsløser(rapidsConnection) {
-    private val beskrivendeId = "jobbe-hele-norge"
+    private val beskrivendeId = "faktum.jobbe-hele-norge"
     override val behov = "KanJobbeHvorSomHelst"
 
     override fun løs(

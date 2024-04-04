@@ -11,7 +11,7 @@ class ØnskerDagpengerFraDatoBehovløser(
     rapidsConnection: RapidsConnection,
     private val opplysningRepository: OpplysningRepository,
 ) : Behovsløser(rapidsConnection) {
-    private val beskrivendeId = "dagpenger-soknadsdato"
+    private val beskrivendeId = "faktum.dagpenger-soknadsdato"
     override val behov = "ØnskerDagpengerFraDato"
 
     override fun løs(

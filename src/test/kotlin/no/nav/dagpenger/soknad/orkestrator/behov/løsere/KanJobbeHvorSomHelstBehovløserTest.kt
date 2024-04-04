@@ -20,7 +20,7 @@ class KanJobbeHvorSomHelstBehovløserTest {
 
         val opplysning =
             Opplysning(
-                beskrivendeId = "jobbe-hele-norge",
+                beskrivendeId = "faktum.jobbe-hele-norge",
                 type = Tekst,
                 svar = svar,
                 ident = ident,

@@ -12,7 +12,7 @@ class VilligTilÅBytteYrkeBehovløser(
     val opplysningRepository: OpplysningRepository,
 ) :
     Behovsløser(rapidsConnection) {
-    private val beskrivendeId = "bytte-yrke-ned-i-lonn"
+    private val beskrivendeId = "faktum.bytte-yrke-ned-i-lonn"
     override val behov = "VilligTilÅBytteYrke"
 
     override fun løs(

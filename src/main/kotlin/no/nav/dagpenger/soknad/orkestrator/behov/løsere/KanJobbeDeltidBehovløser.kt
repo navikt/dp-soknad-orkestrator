@@ -12,7 +12,7 @@ class KanJobbeDeltidBehovløser(
     val opplysningRepository: OpplysningRepository,
 ) :
     Behovsløser(rapidsConnection) {
-    private val beskrivendeId = "jobbe-hel-deltid"
+    private val beskrivendeId = "faktum.jobbe-hel-deltid"
     override val behov = "KanJobbeDeltid"
 
     override fun løs(

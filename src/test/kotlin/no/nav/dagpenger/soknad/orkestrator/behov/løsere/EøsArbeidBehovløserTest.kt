@@ -20,7 +20,7 @@ class EøsArbeidBehovløserTest {
 
         val opplysning =
             Opplysning(
-                beskrivendeId = "eos-arbeid-siste-36-mnd",
+                beskrivendeId = "faktum.eos-arbeid-siste-36-mnd",
                 type = Tekst,
                 svar = svar,
                 ident = ident,

@@ -12,7 +12,7 @@ class HelseTilAlleTyperJobbBehovløser(
     val opplysningRepository: OpplysningRepository,
 ) :
     Behovsløser(rapidsConnection) {
-    private val beskrivendeId = "alle-typer-arbeid"
+    private val beskrivendeId = "faktum.alle-typer-arbeid"
     override val behov = "HelseTilAlleTyperJobb"
 
     override fun løs(
