@@ -2,6 +2,7 @@
 
 package no.nav.dagpenger.soknad.orkestrator.behov
 
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -10,10 +11,23 @@ import org.junit.jupiter.api.Test
 
 class BehovMottakTest {
     private val testRapid = TestRapid()
-    private val behovLøserFactory = mockk<BehovløserFactory>(relaxed = true)
+    private val behovløserFactory =
+        mockk<BehovløserFactory>(relaxed = true).also {
+            every { it.behov() } returns
+                listOf(
+                    "ØnskerDagpengerFraDato",
+                    "EøsArbeid",
+                    "KanJobbeDeltid",
+                    "HelseTilAlleTyperJobb",
+                    "KanJobbeHvorSomHelst",
+                    "VilligTilÅBytteYrke",
+                    "Søknadstidspunkt",
+                    "JobbetUtenforNorge",
+                )
+        }
 
     init {
-        BehovMottak(rapidsConnection = testRapid, behovLøserFactory = behovLøserFactory)
+        BehovMottak(rapidsConnection = testRapid, behovløserFactory = behovløserFactory)
     }
 
     @BeforeEach
@@ -26,7 +40,7 @@ class BehovMottakTest {
         val behov = "ØnskerDagpengerFraDato"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
+        verify(exactly = 1) { behovløserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -34,7 +48,7 @@ class BehovMottakTest {
         val behov = "EøsArbeid"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
+        verify(exactly = 1) { behovløserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -42,7 +56,7 @@ class BehovMottakTest {
         val behov = "KanJobbeDeltid"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
+        verify(exactly = 1) { behovløserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -50,7 +64,7 @@ class BehovMottakTest {
         val behov = "HelseTilAlleTyperJobb"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
+        verify(exactly = 1) { behovløserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -58,7 +72,7 @@ class BehovMottakTest {
         val behov = "KanJobbeHvorSomHelst"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
+        verify(exactly = 1) { behovløserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -66,7 +80,7 @@ class BehovMottakTest {
         val behov = "VilligTilÅBytteYrke"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
+        verify(exactly = 1) { behovløserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -74,7 +88,7 @@ class BehovMottakTest {
         val behov = "Søknadstidspunkt"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
+        verify(exactly = 1) { behovløserFactory.behovløserFor(behov) }
     }
 
     @Test
@@ -82,21 +96,21 @@ class BehovMottakTest {
         val behov = "JobbetUtenforNorge"
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov)))
 
-        verify(exactly = 1) { behovLøserFactory.behovløserFor(behov) }
+        verify(exactly = 1) { behovløserFactory.behovløserFor(behov) }
     }
 
     @Test
     fun `vi mottar ikke opplysningsbehov dersom påkrevd felt mangler`() {
         testRapid.sendTestMessage(opplysning_behov_event_mangler_ident)
 
-        verify(exactly = 0) { behovLøserFactory.behovløserFor(any()) }
+        verify(exactly = 0) { behovløserFactory.behovløserFor(any()) }
     }
 
     @Test
     fun `vi mottar ikke opplysningsbehov dersom den har løsning`() {
         testRapid.sendTestMessage(opplysning_behov_event_med_løsning)
 
-        verify(exactly = 0) { behovLøserFactory.behovløserFor(any()) }
+        verify(exactly = 0) { behovløserFactory.behovløserFor(any()) }
     }
 }
 

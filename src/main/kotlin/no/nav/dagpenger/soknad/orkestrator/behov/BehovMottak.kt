@@ -8,24 +8,12 @@ import java.util.UUID
 
 class BehovMottak(
     val rapidsConnection: RapidsConnection,
-    private val behovLøserFactory: BehovløserFactory,
+    private val behovløserFactory: BehovløserFactory,
 ) : River.PacketListener {
-    private val behov =
-        listOf(
-            "ØnskerDagpengerFraDato",
-            "EøsArbeid",
-            "KanJobbeDeltid",
-            "HelseTilAlleTyperJobb",
-            "KanJobbeHvorSomHelst",
-            "VilligTilÅBytteYrke",
-            "Søknadstidspunkt",
-            "JobbetUtenforNorge",
-        )
-
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
-            validate { it.demandAllOrAny("@behov", behov) }
+            validate { it.demandAllOrAny("@behov", behovløserFactory.behov()) }
             validate { it.requireKey("ident", "søknad_id") }
             validate { it.rejectKey("@løsning") }
             validate { it.interestedIn("behandling_id") }
@@ -43,7 +31,7 @@ class BehovMottak(
         }
     }
 
-    private fun behovsløserFor(behov: String) = behovLøserFactory.behovløserFor(behov)
+    internal fun behovsløserFor(behov: String) = behovløserFactory.behovløserFor(behov)
 
     private fun JsonMessage.søknadId(): UUID = UUID.fromString(get("søknad_id").asText())
 

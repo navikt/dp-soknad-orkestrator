@@ -12,60 +12,24 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPos
 import no.nav.helse.rapids_rivers.RapidsConnection
 
 class BehovløserFactory(
-    private val rapidsConnection: RapidsConnection,
-    private val opplysningRepository: OpplysningRepositoryPostgres,
+    rapidsConnection: RapidsConnection,
+    opplysningRepository: OpplysningRepositoryPostgres,
 ) {
+    private var behovløsere: Map<String, Behovsløser> =
+        mapOf(
+            "ØnskerDagpengerFraDato" to ØnskerDagpengerFraDatoBehovløser(rapidsConnection, opplysningRepository),
+            "EøsArbeid" to EøsArbeidBehovløser(rapidsConnection, opplysningRepository),
+            "KanJobbeDeltid" to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository),
+            "HelseTilAlleTyperJobb" to HelseTilAlleTyperJobbBehovløser(rapidsConnection, opplysningRepository),
+            "KanJobbeHvorSomHelst" to KanJobbeHvorSomHelstBehovløser(rapidsConnection, opplysningRepository),
+            "VilligTilÅBytteYrke" to VilligTilÅBytteYrkeBehovløser(rapidsConnection, opplysningRepository),
+            "Søknadstidspunkt" to SøknadstidspunktBehovløser(rapidsConnection, opplysningRepository),
+            "JobbetUtenforNorge" to JobbetUtenforNorgeBehovløser(rapidsConnection, opplysningRepository),
+        )
+
     fun behovløserFor(behov: String): Behovsløser {
-        return when (behov) {
-            "ØnskerDagpengerFraDato" ->
-                ØnskerDagpengerFraDatoBehovløser(
-                    rapidsConnection,
-                    opplysningRepository,
-                )
-
-            "EøsArbeid" ->
-                EøsArbeidBehovløser(
-                    rapidsConnection,
-                    opplysningRepository,
-                )
-
-            "KanJobbeDeltid" ->
-                KanJobbeDeltidBehovløser(
-                    rapidsConnection,
-                    opplysningRepository,
-                )
-
-            "HelseTilAlleTyperJobb" ->
-                HelseTilAlleTyperJobbBehovløser(
-                    rapidsConnection,
-                    opplysningRepository,
-                )
-
-            "KanJobbeHvorSomHelst" ->
-                KanJobbeHvorSomHelstBehovløser(
-                    rapidsConnection,
-                    opplysningRepository,
-                )
-
-            "VilligTilÅBytteYrke" ->
-                VilligTilÅBytteYrkeBehovløser(
-                    rapidsConnection,
-                    opplysningRepository,
-                )
-
-            "Søknadstidspunkt" ->
-                SøknadstidspunktBehovløser(
-                    rapidsConnection,
-                    opplysningRepository,
-                )
-
-            "JobbetUtenforNorge" ->
-                JobbetUtenforNorgeBehovløser(
-                    rapidsConnection,
-                    opplysningRepository,
-                )
-
-            else -> throw IllegalArgumentException("Kan ikke løse behov: $behov")
-        }
+        return behovløsere[behov] ?: throw IllegalArgumentException("Fant ikke behovløser for behov: $behov")
     }
+
+    fun behov() = behovløsere.keys.toList()
 }
