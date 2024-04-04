@@ -76,8 +76,7 @@ class SøknadMapper(private val jsonNode: JsonNode) {
                     "faktum.arbeidsforhold" -> datatyper.getValue("arbeidsforhold")
                     "faktum.eos-arbeidsforhold" -> datatyper.getValue("eøsArbeidsforhold")
                     "faktum.egen-naering-organisasjonsnummer-liste" -> datatyper.getValue("egenNæring")
-                    "faktum.register.barn-liste" -> datatyper.getValue("barn")
-                    "faktum.barn-liste" -> datatyper.getValue("barn")
+                    "faktum.register.barn-liste", "faktum.barn-liste" -> datatyper.getValue("barn")
                     else -> throw IllegalArgumentException("Ukjent generator")
                 }
             } else {
