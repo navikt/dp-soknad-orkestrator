@@ -27,3 +27,5 @@ spec:
         databases:
           - name : soknad-orkestrator
             envVarPrefix: DB
+  secureLogs:
+    enabled: true
