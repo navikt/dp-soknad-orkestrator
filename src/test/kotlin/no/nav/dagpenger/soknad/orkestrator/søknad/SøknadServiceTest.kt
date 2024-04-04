@@ -26,7 +26,7 @@ class SøknadServiceTest {
                             type = Tekst,
                             svar = "NOR",
                             ident = ident,
-                            søknadsId = søknadUUID,
+                            søknadId = søknadUUID,
                         ),
                     ),
             )

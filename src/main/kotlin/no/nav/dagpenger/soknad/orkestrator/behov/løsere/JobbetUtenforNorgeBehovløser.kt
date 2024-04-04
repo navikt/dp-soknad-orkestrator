@@ -19,14 +19,14 @@ class JobbetUtenforNorgeBehovløser(
 
     override fun løs(
         ident: String,
-        søknadsId: UUID,
+        søknadId: UUID,
     ) {
-        val svar = harJobbetUtenforNorge(ident, søknadsId)
+        val svar = harJobbetUtenforNorge(ident, søknadId)
 
         val løsning =
             MeldingOmBehovløsning(
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
                 løsning =
                     mapOf(
                         behov to
@@ -38,16 +38,16 @@ class JobbetUtenforNorgeBehovløser(
 
         rapidsConnection.publish(løsning)
 
-        logger.info { "Løste behov $behov for søknad med id: $søknadsId" }
-        sikkerlogg.info { "Løste behov $behov for søknad med id: $søknadsId og ident: $ident" }
+        logger.info { "Løste behov $behov for søknad med id: $søknadId" }
+        sikkerlogg.info { "Løste behov $behov for søknad med id: $søknadId og ident: $ident" }
     }
 
     internal fun harJobbetUtenforNorge(
         ident: String,
-        søknadsId: UUID,
+        søknadId: UUID,
     ): Boolean {
         val arbeidsforholdSvar =
-            opplysningRepository.hent(beskrivendeId, ident, søknadsId).svar as List<ArbeidsforholdSvar>
+            opplysningRepository.hent(beskrivendeId, ident, søknadId).svar as List<ArbeidsforholdSvar>
 
         return arbeidsforholdSvar.any { it.land != landkodeNorge }
     }

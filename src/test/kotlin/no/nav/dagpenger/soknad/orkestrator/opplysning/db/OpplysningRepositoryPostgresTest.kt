@@ -32,7 +32,7 @@ class OpplysningRepositoryPostgresTest {
     private var opplysningRepository = OpplysningRepositoryPostgres(dataSource)
     private val beskrivendeId = "beskrivendeId"
     private val ident = "12345678901"
-    private val søknadsId = UUID.randomUUID()
+    private val søknadId = UUID.randomUUID()
 
     @Test
     fun `vi kan lagre og hente opplysning av type tekst`() {
@@ -42,7 +42,7 @@ class OpplysningRepositoryPostgresTest {
                 type = Tekst,
                 svar = "svar",
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb {
@@ -51,7 +51,7 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId,
                 ident,
-                søknadsId,
+                søknadId,
             ) shouldBe opplysning
         }
     }
@@ -64,7 +64,7 @@ class OpplysningRepositoryPostgresTest {
                 type = Heltall,
                 svar = 10,
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb {
@@ -73,7 +73,7 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId,
                 ident,
-                søknadsId,
+                søknadId,
             ) shouldBe opplysning
         }
     }
@@ -86,7 +86,7 @@ class OpplysningRepositoryPostgresTest {
                 type = Desimaltall,
                 svar = 10.5,
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb {
@@ -95,7 +95,7 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId,
                 ident,
-                søknadsId,
+                søknadId,
             ) shouldBe opplysning
         }
     }
@@ -108,7 +108,7 @@ class OpplysningRepositoryPostgresTest {
                 type = Boolsk,
                 svar = true,
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb {
@@ -117,7 +117,7 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId,
                 ident,
-                søknadsId,
+                søknadId,
             ) shouldBe opplysning
         }
     }
@@ -130,7 +130,7 @@ class OpplysningRepositoryPostgresTest {
                 type = Dato,
                 svar = LocalDate.now(),
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb {
@@ -139,7 +139,7 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId,
                 ident,
-                søknadsId,
+                søknadId,
             ) shouldBe opplysning
         }
     }
@@ -152,7 +152,7 @@ class OpplysningRepositoryPostgresTest {
                 type = Flervalg,
                 svar = listOf("svar1", "svar2", "svar3"),
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb {
@@ -161,7 +161,7 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId,
                 ident,
-                søknadsId,
+                søknadId,
             ) shouldBe opplysning
         }
     }
@@ -174,7 +174,7 @@ class OpplysningRepositoryPostgresTest {
                 type = Periode,
                 svar = PeriodeSvar(LocalDate.now(), LocalDate.now().plusDays(10)),
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb {
@@ -183,7 +183,7 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId,
                 ident,
-                søknadsId,
+                søknadId,
             ) shouldBe opplysning
         }
     }
@@ -200,7 +200,7 @@ class OpplysningRepositoryPostgresTest {
                         ArbeidsforholdSvar(navn = "navn2", land = "land2"),
                     ),
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb {
@@ -209,7 +209,7 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId,
                 ident,
-                søknadsId,
+                søknadId,
             ) shouldBe opplysning
         }
     }
@@ -236,7 +236,7 @@ class OpplysningRepositoryPostgresTest {
                         ),
                     ),
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb {
@@ -245,7 +245,7 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId,
                 ident,
-                søknadsId,
+                søknadId,
             ) shouldBe opplysning
         }
     }
@@ -258,7 +258,7 @@ class OpplysningRepositoryPostgresTest {
                 type = EgenNæring,
                 svar = listOf(123456789, 987654321),
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb {
@@ -267,7 +267,7 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId,
                 ident,
-                søknadsId,
+                søknadId,
             ) shouldBe opplysning
         }
     }
@@ -298,7 +298,7 @@ class OpplysningRepositoryPostgresTest {
                         ),
                     ),
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb {
@@ -307,15 +307,15 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId,
                 ident,
-                søknadsId,
+                søknadId,
             ) shouldBe opplysning
         }
     }
 
     @Test
     fun `vi lagrer ikke opplysning dersom den allerede er lagret`() {
-        val opplysning1 = opplysning(søknadsId = søknadsId)
-        val opplysning2 = opplysning(søknadsId = søknadsId)
+        val opplysning1 = opplysning(søknadId = søknadId)
+        val opplysning2 = opplysning(søknadId = søknadId)
 
         withMigratedDb {
             opplysningRepository.lagre(opplysning1)
@@ -336,7 +336,7 @@ class OpplysningRepositoryPostgresTest {
                 type = Tekst,
                 svar = "svar",
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         withMigratedDb { opplysningRepository.lagre(opplysning) }
@@ -345,7 +345,7 @@ class OpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId = beskrivendeId,
                 ident = ident,
-                søknadsId = UUID.randomUUID(),
+                søknadId = UUID.randomUUID(),
             )
         }
     }
@@ -354,11 +354,11 @@ class OpplysningRepositoryPostgresTest {
 fun opplysning(
     beskrivendeId: String = "beskrivendeId",
     ident: String = "12345678901",
-    søknadsId: UUID = UUID.randomUUID(),
+    søknadId: UUID = UUID.randomUUID(),
 ) = Opplysning(
     beskrivendeId = beskrivendeId,
     type = Tekst,
     svar = "svar",
     ident = ident,
-    søknadsId = søknadsId,
+    søknadId = søknadId,
 )

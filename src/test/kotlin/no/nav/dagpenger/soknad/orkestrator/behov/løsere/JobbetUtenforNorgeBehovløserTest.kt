@@ -13,13 +13,13 @@ class JobbetUtenforNorgeBehovløserTest {
     val opplysningRepository = InMemoryOpplysningRepository()
     val testRapid = TestRapid()
     private val ident = "12345678910"
-    private val søknadsId = UUID.randomUUID()
+    private val søknadId = UUID.randomUUID()
 
     @Test
     fun `Behovløser publiserer løsning på behov JobbetUtenforNorge`() {
         opplysningRepository.lagre(opplysning())
         val behovløser = JobbetUtenforNorgeBehovløser(testRapid, opplysningRepository)
-        behovløser.løs(ident, søknadsId)
+        behovløser.løs(ident, søknadId)
 
         testRapid.inspektør.message(0)["@løsning"]["JobbetUtenforNorge"]["verdi"].asText() shouldBe "false"
     }
@@ -34,7 +34,7 @@ class JobbetUtenforNorgeBehovløserTest {
 
         opplysningRepository.lagre(opplysning(svar = svarMedArbeidUtenforNorge))
         val behovløser = JobbetUtenforNorgeBehovløser(testRapid, opplysningRepository)
-        behovløser.harJobbetUtenforNorge(ident, søknadsId) shouldBe true
+        behovløser.harJobbetUtenforNorge(ident, søknadId) shouldBe true
     }
 
     @Test
@@ -46,7 +46,7 @@ class JobbetUtenforNorgeBehovløserTest {
 
         opplysningRepository.lagre(opplysning(svar = svarMedArbeidINorge))
         val behovløser = JobbetUtenforNorgeBehovløser(testRapid, opplysningRepository)
-        behovløser.harJobbetUtenforNorge(ident, søknadsId) shouldBe false
+        behovløser.harJobbetUtenforNorge(ident, søknadId) shouldBe false
     }
 
     private fun opplysning(
@@ -64,7 +64,7 @@ class JobbetUtenforNorgeBehovløserTest {
                 type = Arbeidsforhold,
                 svar = svar,
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
         return opplysning
     }

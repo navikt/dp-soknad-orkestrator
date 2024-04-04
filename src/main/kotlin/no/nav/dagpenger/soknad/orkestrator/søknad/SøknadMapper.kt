@@ -32,7 +32,7 @@ class SøknadMapper(private val jsonNode: JsonNode) {
                 type = Tekst,
                 svar = søknadstidspunkt,
                 ident = ident,
-                søknadsId = søknadId,
+                søknadId = søknadId,
             )
 
         opplysninger.add(søknadstidspunktOpplysning)

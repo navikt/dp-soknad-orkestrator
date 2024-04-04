@@ -8,7 +8,7 @@ data class Opplysning<T>(
     val type: Datatype<T>,
     val svar: T,
     val ident: String,
-    val søknadsId: UUID,
+    val søknadId: UUID,
 )
 
 inline fun <reified T> Any?.asListOf(): List<T> {

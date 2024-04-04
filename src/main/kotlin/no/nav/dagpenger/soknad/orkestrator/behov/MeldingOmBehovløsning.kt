@@ -5,7 +5,7 @@ import java.util.UUID
 
 class MeldingOmBehovløsning(
     private val ident: String,
-    private val søknadsId: UUID,
+    private val søknadId: UUID,
     private val løsning: Map<String, Any>,
 ) {
     fun asMessage(): JsonMessage =
@@ -14,7 +14,7 @@ class MeldingOmBehovløsning(
             map =
                 mapOf(
                     "ident" to ident,
-                    "søknad_id" to søknadsId,
+                    "søknad_id" to søknadId,
                     "@behov" to listOf(løsning.keys),
                     "@løsning" to løsning,
                 ),

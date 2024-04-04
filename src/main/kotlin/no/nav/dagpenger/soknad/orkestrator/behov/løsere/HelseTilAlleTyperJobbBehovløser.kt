@@ -17,19 +17,19 @@ class HelseTilAlleTyperJobbBehovløser(
 
     override fun løs(
         ident: String,
-        søknadsId: UUID,
+        søknadId: UUID,
     ) {
         val svar =
             opplysningRepository.hent(
                 beskrivendeId = beskrivendeId,
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             ).svar
 
         val løsning =
             MeldingOmBehovløsning(
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
                 løsning =
                     mapOf(
                         behov to
@@ -41,8 +41,8 @@ class HelseTilAlleTyperJobbBehovløser(
 
         rapidsConnection.publish(løsning)
 
-        logger.info { "Løste behov $behov for søknad med id: $søknadsId" }
-        sikkerlogg.info { "Løste behov $behov for søknad med id: $søknadsId og ident: $ident" }
+        logger.info { "Løste behov $behov for søknad med id: $søknadId" }
+        sikkerlogg.info { "Løste behov $behov for søknad med id: $søknadId og ident: $ident" }
     }
 
     private companion object {

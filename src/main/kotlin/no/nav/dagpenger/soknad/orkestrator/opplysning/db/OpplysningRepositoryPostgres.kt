@@ -84,17 +84,17 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
     override fun hent(
         beskrivendeId: String,
         ident: String,
-        søknadsId: UUID,
+        søknadId: UUID,
     ): Opplysning<*> {
         return transaction {
             OpplysningTabell
                 .selectAll()
-                .somMatcher(beskrivendeId, ident, søknadsId)
+                .somMatcher(beskrivendeId, ident, søknadId)
                 .map(tilOpplysning())
                 .firstOrNull()
                 ?: throw NoSuchElementException(
                     "Ingen opplysning funnet med gitt beskrivendeId:" + " $beskrivendeId," +
-                        "og søknadId: $søknadsId",
+                        "og søknadId: $søknadId",
                 )
         }
     }
@@ -104,7 +104,7 @@ private fun opplysningEksisterer(opplysning: Opplysning<*>): Boolean =
     OpplysningTabell.selectAll().somMatcher(
         opplysning.beskrivendeId,
         opplysning.ident,
-        opplysning.søknadsId,
+        opplysning.søknadId,
     ).any()
 
 fun OpplysningTabell.insertAndGetId(opplysning: Opplysning<*>) =
@@ -112,18 +112,18 @@ fun OpplysningTabell.insertAndGetId(opplysning: Opplysning<*>) =
         it[beskrivendeId] = opplysning.beskrivendeId
         it[type] = opplysning.type::class.java.simpleName
         it[ident] = opplysning.ident
-        it[søknadsId] = opplysning.søknadsId
+        it[søknadId] = opplysning.søknadId
     }.value
 
 fun Query.somMatcher(
     beskrivendeId: String,
     ident: String,
-    søknadsId: UUID,
+    søknadId: UUID,
 ): Query =
     where {
         OpplysningTabell.beskrivendeId eq beskrivendeId and
             (OpplysningTabell.ident eq ident) and
-            (OpplysningTabell.søknadsId eq søknadsId)
+            (OpplysningTabell.søknadId eq søknadId)
     }
 
 private fun tilOpplysning(): (ResultRow) -> Opplysning<*> =
@@ -150,7 +150,7 @@ private fun tilTekstOpplysning(it: ResultRow) =
         type = Tekst,
         svar = hentTekstSvar(it),
         ident = it[OpplysningTabell.ident],
-        søknadsId = it[OpplysningTabell.søknadsId],
+        søknadId = it[OpplysningTabell.søknadId],
     )
 
 private fun lagreTekstSvar(
@@ -174,7 +174,7 @@ private fun tilHeltallOpplysning(it: ResultRow) =
         type = Heltall,
         svar = hentHeltallSvar(it),
         ident = it[OpplysningTabell.ident],
-        søknadsId = it[OpplysningTabell.søknadsId],
+        søknadId = it[OpplysningTabell.søknadId],
     )
 
 private fun lagreHeltallSvar(
@@ -198,7 +198,7 @@ private fun tilDesimaltallOpplysning(it: ResultRow) =
         type = Desimaltall,
         svar = hentDesimaltallSvar(it),
         ident = it[OpplysningTabell.ident],
-        søknadsId = it[OpplysningTabell.søknadsId],
+        søknadId = it[OpplysningTabell.søknadId],
     )
 
 private fun lagreDesimaltallSvar(
@@ -222,7 +222,7 @@ private fun tilBoolskOpplysning(it: ResultRow) =
         type = Boolsk,
         svar = hentBoolskSvar(it),
         ident = it[OpplysningTabell.ident],
-        søknadsId = it[OpplysningTabell.søknadsId],
+        søknadId = it[OpplysningTabell.søknadId],
     )
 
 private fun lagreBoolskSvar(
@@ -246,7 +246,7 @@ private fun tilDatoOpplysning(it: ResultRow) =
         type = Dato,
         svar = hentDatoSvar(it),
         ident = it[OpplysningTabell.ident],
-        søknadsId = it[OpplysningTabell.søknadsId],
+        søknadId = it[OpplysningTabell.søknadId],
     )
 
 private fun lagreDatoSvar(
@@ -270,7 +270,7 @@ private fun tilFlervalgOpplysning(it: ResultRow) =
         type = Flervalg,
         svar = hentFlervalgSvar(it),
         ident = it[OpplysningTabell.ident],
-        søknadsId = it[OpplysningTabell.søknadsId],
+        søknadId = it[OpplysningTabell.søknadId],
     )
 
 private fun lagreFlervalgSvar(
@@ -308,7 +308,7 @@ private fun tilPeriodeOpplysning(it: ResultRow) =
         type = Periode,
         svar = hentPeriodeSvar(it),
         ident = it[OpplysningTabell.ident],
-        søknadsId = it[OpplysningTabell.søknadsId],
+        søknadId = it[OpplysningTabell.søknadId],
     )
 
 private fun lagrePeriodeSvar(
@@ -340,7 +340,7 @@ private fun tilArbeidsforholdOpplysning(it: ResultRow) =
         type = Arbeidsforhold,
         svar = hentArbeidsforholdSvar(it),
         ident = it[OpplysningTabell.ident],
-        søknadsId = it[OpplysningTabell.søknadsId],
+        søknadId = it[OpplysningTabell.søknadId],
     )
 
 private fun lagreArbeidsforholdSvar(
@@ -405,7 +405,7 @@ private fun tilEøsArbeidsforholdOpplysning(it: ResultRow) =
         type = EøsArbeidsforhold,
         svar = hentEøsArbeidsforholdSvar(it),
         ident = it[OpplysningTabell.ident],
-        søknadsId = it[OpplysningTabell.søknadsId],
+        søknadId = it[OpplysningTabell.søknadId],
     )
 
 private fun lagreEøsArbeidsforholdSvar(
@@ -505,7 +505,7 @@ private fun tilEgenNæringOpplysning(it: ResultRow) =
         type = EgenNæring,
         svar = hentEgenNæringSvar(it),
         ident = it[OpplysningTabell.ident],
-        søknadsId = it[OpplysningTabell.søknadsId],
+        søknadId = it[OpplysningTabell.søknadId],
     )
 
 private fun lagreEgenNæringSvar(
@@ -543,7 +543,7 @@ private fun tilBarnOpplysning(it: ResultRow) =
         type = Barn,
         svar = hentBarnSvar(it),
         ident = it[OpplysningTabell.ident],
-        søknadsId = it[OpplysningTabell.søknadsId],
+        søknadId = it[OpplysningTabell.søknadId],
     )
 
 private fun hentBarnSvar(it: ResultRow): List<BarnSvar> {

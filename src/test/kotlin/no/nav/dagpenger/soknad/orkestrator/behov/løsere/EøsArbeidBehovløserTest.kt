@@ -15,7 +15,7 @@ class EøsArbeidBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov EøsArbeid`() {
         val ident = "12345678910"
-        val søknadsId = UUID.randomUUID()
+        val søknadId = UUID.randomUUID()
         val svar = "false"
 
         val opplysning =
@@ -24,12 +24,12 @@ class EøsArbeidBehovløserTest {
                 type = Tekst,
                 svar = svar,
                 ident = ident,
-                søknadsId = søknadsId,
+                søknadId = søknadId,
             )
 
         opplysningRepository.lagre(opplysning)
         val behovløser = EøsArbeidBehovløser(testRapid, opplysningRepository)
-        behovløser.løs(ident, søknadsId)
+        behovløser.løs(ident, søknadId)
 
         testRapid.inspektør.message(0)["@løsning"]["EøsArbeid"]["verdi"].asText() shouldBe svar
     }

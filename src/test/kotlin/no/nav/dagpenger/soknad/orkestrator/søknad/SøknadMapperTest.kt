@@ -41,7 +41,7 @@ class SøknadMapperTest {
                     type = Tekst,
                     svar = "faktum.mottatt-dagpenger-siste-12-mnd.svar.nei",
                     ident = ident,
-                    søknadsId = søknadId,
+                    søknadId = søknadId,
                 ),
                 Opplysning("faktum.dagpenger-soknadsdato", Dato, ønskerDagpengerFra, ident, søknadId),
                 Opplysning("søknadstidspunkt", Tekst, søknadstidspunkt, ident, søknadId),
@@ -84,7 +84,7 @@ class SøknadMapperTest {
         søknad.opplysninger.size shouldBe 2
         søknad.opplysninger.single { it.beskrivendeId == "faktum.arbeidsforhold" }.also { arbeidsforhold ->
             arbeidsforhold.beskrivendeId shouldBe "faktum.arbeidsforhold"
-            arbeidsforhold.søknadsId shouldBe søknadId
+            arbeidsforhold.søknadId shouldBe søknadId
             arbeidsforhold.ident shouldBe ident
             arbeidsforhold.svar is Arbeidsforhold
 
@@ -126,7 +126,7 @@ class SøknadMapperTest {
         søknad.opplysninger.size shouldBe 2
         søknad.opplysninger.single { it.beskrivendeId == "faktum.eos-arbeidsforhold" }.also { eøsArbeidsforhold ->
             eøsArbeidsforhold.beskrivendeId shouldBe "faktum.eos-arbeidsforhold"
-            eøsArbeidsforhold.søknadsId shouldBe søknadId
+            eøsArbeidsforhold.søknadId shouldBe søknadId
             eøsArbeidsforhold.ident shouldBe ident
             eøsArbeidsforhold.svar is EøsArbeidsforhold
 
@@ -151,7 +151,7 @@ class SøknadMapperTest {
         val søknad = SøknadMapper(søknadsDataMedEgenNæring).søknad
         søknad.opplysninger.single { it.beskrivendeId == "faktum.egen-naering-organisasjonsnummer-liste" }
             .also { opplysning ->
-                opplysning.søknadsId shouldBe søknadId
+                opplysning.søknadId shouldBe søknadId
                 opplysning.ident shouldBe ident
                 opplysning.svar shouldBe listOf(123456789, 987654321)
             }
@@ -161,7 +161,7 @@ class SøknadMapperTest {
     fun `kan mappe svar på generatorfaktum - Register barn`() {
         val søknad = SøknadMapper(søknadsDataMedRegisterBarn).søknad
         søknad.opplysninger.single { it.beskrivendeId == "faktum.register.barn-liste" }.also { opplysning ->
-            opplysning.søknadsId shouldBe søknadId
+            opplysning.søknadId shouldBe søknadId
             opplysning.ident shouldBe ident
 
             opplysning.svar.asListOf<BarnSvar>().also {
@@ -188,7 +188,7 @@ class SøknadMapperTest {
     fun `kan mappe svar på generatorfaktum - Barn`() {
         val søknad = SøknadMapper(søknadsDataMedBarn).søknad
         søknad.opplysninger.single { it.beskrivendeId == "faktum.barn-liste" }.also { opplysning ->
-            opplysning.søknadsId shouldBe søknadId
+            opplysning.søknadId shouldBe søknadId
             opplysning.ident shouldBe ident
 
             opplysning.svar.asListOf<BarnSvar>().also {

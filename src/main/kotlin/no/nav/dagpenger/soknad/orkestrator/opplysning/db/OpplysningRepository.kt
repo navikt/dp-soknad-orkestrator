@@ -9,6 +9,6 @@ interface OpplysningRepository {
     fun hent(
         beskrivendeId: String,
         ident: String,
-        søknadsId: UUID,
+        søknadId: UUID,
     ): Opplysning<*>
 }

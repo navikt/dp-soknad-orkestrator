@@ -14,10 +14,10 @@ class InMemoryOpplysningRepository : OpplysningRepository {
     override fun hent(
         beskrivendeId: String,
         ident: String,
-        søknadsId: UUID,
+        søknadId: UUID,
     ): Opplysning<*> {
         return opplysninger.find {
-            it.beskrivendeId == beskrivendeId && it.ident == ident && it.søknadsId == søknadsId
+            it.beskrivendeId == beskrivendeId && it.ident == ident && it.søknadId == søknadId
         }
             ?: throw IllegalArgumentException("Fant ikke opplysning")
     }
