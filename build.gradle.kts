@@ -16,7 +16,7 @@ kotlin {
 }
 
 application {
-    mainClass.set("no.nav.ApplicationKt")
+    mainClass.set("no.nav.dagpenger.soknad.orkestrator.ApplicationKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
