@@ -25,6 +25,7 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
     }
 
     override fun onStartup(rapidsConnection: RapidsConnection) {
+        logger.info { "Starter dp-soknad-orkestrator" }
         Database.connect(datasource = dataSource)
             .also {
                 logger.info { "Koblet til database ${it.name}}" }
