@@ -9,7 +9,9 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.name
 
 internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsConnection.StatusListener {
-    private val logger = KotlinLogging.logger {}
+    private companion object {
+        private val logger = KotlinLogging.logger {}
+    }
 
     private val rapidsConnection =
         RapidApplication.Builder(

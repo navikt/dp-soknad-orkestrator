@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovsløser
 import no.nav.dagpenger.soknad.orkestrator.behov.MeldingOmBehovløsning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
@@ -36,6 +37,9 @@ class JobbetUtenforNorgeBehovløser(
             ).asMessage().toJson()
 
         rapidsConnection.publish(løsning)
+
+        logger.info { "Løste behov $behov for søknad med id: $søknadsId" }
+        sikkerlogg.info { "Løste behov $behov for søknad med id: $søknadsId og ident: $ident" }
     }
 
     internal fun harJobbetUtenforNorge(
@@ -46,5 +50,10 @@ class JobbetUtenforNorgeBehovløser(
             opplysningRepository.hent(beskrivendeId, ident, søknadsId).svar as List<ArbeidsforholdSvar>
 
         return arbeidsforholdSvar.any { it.land != landkodeNorge }
+    }
+
+    private companion object {
+        private val logger = KotlinLogging.logger {}
+        private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadMottak")
     }
 }

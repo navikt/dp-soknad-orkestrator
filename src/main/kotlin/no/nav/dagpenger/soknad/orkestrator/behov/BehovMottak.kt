@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
+import mu.KotlinLogging
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -25,6 +26,8 @@ class BehovMottak(
         context: MessageContext,
     ) {
         with(packet) {
+            logger.info { "Mottok behov: ${mottatteBehov()}" }
+
             mottatteBehov().forEach { behov ->
                 behovsløserFor(behov).løs(ident(), søknadId())
             }
@@ -38,4 +41,8 @@ class BehovMottak(
     private fun JsonMessage.ident(): String = get("ident").asText()
 
     private fun JsonMessage.mottatteBehov() = get("@behov").map { it.asText() }
+
+    private companion object {
+        private val logger = KotlinLogging.logger {}
+    }
 }

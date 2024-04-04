@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovsløser
 import no.nav.dagpenger.soknad.orkestrator.behov.MeldingOmBehovløsning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
@@ -39,5 +40,13 @@ class VilligTilÅBytteYrkeBehovløser(
             ).asMessage().toJson()
 
         rapidsConnection.publish(løsning)
+
+        logger.info { "Løste behov $behov for søknad med id: $søknadsId" }
+        sikkerlogg.info { "Løste behov $behov for søknad med id: $søknadsId og ident: $ident" }
+    }
+
+    private companion object {
+        private val logger = KotlinLogging.logger {}
+        private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadMottak")
     }
 }

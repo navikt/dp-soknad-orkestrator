@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
+import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -25,9 +26,17 @@ class SøknadMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
+        logger.info { "Mottok søknad innsendt hendelse" }
+        sikkerlogg.info { "Mottok søknad innsendt hendelse: ${packet.toJson()}" }
+
         val jsonNode = objectMapper.readTree(packet.toJson())
         SøknadMapper(jsonNode).søknad
             .also { it.opplysninger.forEach(opplysningRepository::lagre) }
             .also(søknadService::publiserMeldingOmNySøknad)
+    }
+
+    private companion object {
+        private val logger = KotlinLogging.logger {}
+        private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadMottak")
     }
 }
