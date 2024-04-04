@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS opplysning
     beskrivende_id VARCHAR(255)             NOT NULL,
     type           TEXT                     NOT NULL,
     ident          VARCHAR(11)              NOT NULL,
-    soknads_id     uuid                     NOT NULL
+    soknad_id     uuid                     NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS tekst
