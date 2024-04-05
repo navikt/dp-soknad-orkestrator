@@ -218,7 +218,7 @@ private val søknad_innsendt_event =
         """
         {
           "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt",
+          "@event_name": "søknad_innsendt_varsel",
           "@opprettet": "2024-02-21T11:00:27.899791748",
           "søknadId": "$søknadId",
           "ident": "$ident",
@@ -254,7 +254,7 @@ private val søknadDataUtenSeksjoner =
         """
         {
           "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt",
+          "@event_name": "søknad_innsendt_varsel",
           "@opprettet": "2024-02-21T11:00:27.899791748",
           "søknadId": "$søknadId",
           "ident": "$ident",
@@ -273,7 +273,7 @@ private val søknaddataUtenFakta =
         """
         {
           "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt",
+          "@event_name": "søknad_innsendt_varsel",
           "@opprettet": "2024-02-21T11:00:27.899791748",
           "søknadId": "$søknadId",
           "ident": "$ident",
@@ -297,7 +297,7 @@ private val søknadsDataMedPeriodeFaktum =
         """
         {
           "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt",
+          "@event_name": "søknad_innsendt_varsel",
           "@opprettet": "2024-02-21T11:00:27.899791748",
           "søknadId": "$søknadId",
           "ident": "$ident",
@@ -332,7 +332,7 @@ private val søknadsDataMedFlervalgFaktum =
         """
         {
           "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt",
+          "@event_name": "søknad_innsendt_varsel",
           "@opprettet": "2024-02-21T11:00:27.899791748",
           "søknadId": "$søknadId",
           "ident": "$ident",
@@ -365,7 +365,7 @@ private val søknadsDataMedGeneratorArbeidsforhold =
         """
         {
           "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt",
+          "@event_name": "søknad_innsendt_varsel",
           "@opprettet": "2024-02-21T11:00:27.899791748",
           "søknadId": "$søknadId",
           "ident": "$ident",
@@ -496,7 +496,7 @@ private val søknadsDataMedEøsArbeidsforhold =
         """
         {
           "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt",
+          "@event_name": "søknad_innsendt_varsel",
           "@opprettet": "2024-02-21T11:00:27.899791748",
           "søknadId": "$søknadId",
           "ident": "$ident",
@@ -577,7 +577,7 @@ private val søknadsDataMedEgenNæring =
         """
         {
           "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt",
+          "@event_name": "søknad_innsendt_varsel",
           "@opprettet": "2024-02-21T11:00:27.899791748",
           "søknadId": "$søknadId",
           "ident": "$ident",
@@ -622,7 +622,7 @@ private val søknadsDataMedRegisterBarn =
         """
         {
           "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt",
+          "@event_name": "søknad_innsendt_varsel",
           "@opprettet": "2024-02-21T11:00:27.899791748",
           "søknadId": "$søknadId",
           "ident": "$ident",
@@ -707,7 +707,7 @@ private val søknadsDataMedBarn =
         """
         {
           "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt",
+          "@event_name": "søknad_innsendt_varsel",
           "@opprettet": "2024-02-21T11:00:27.899791748",
           "søknadId": "$søknadId",
           "ident": "$ident",

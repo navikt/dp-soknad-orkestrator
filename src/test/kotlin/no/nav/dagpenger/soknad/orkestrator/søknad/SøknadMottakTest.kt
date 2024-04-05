@@ -48,7 +48,7 @@ private val søknad_innsendt_event =
     """
     {
       "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-      "@event_name": "søknad_innsendt",
+      "@event_name": "søknad_innsendt_varsel",
       "@opprettet": "2024-02-21T11:00:27.899791748",
       "søknadId": "123e4567-e89b-12d3-a456-426614174000",
       "ident": "12345678903",
@@ -78,7 +78,7 @@ private val søknad_innsendt_event_uten_ident =
     """
     {
       "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-      "@event_name": "søknad_innsendt",
+      "@event_name": "søknad_innsendt_varsel",
       "@opprettet": "2024-02-21T11:00:27.899791748",
       "søknadId": "123e4567-e89b-12d3-a456-426614174000",
       "søknadstidspunkt": "2024-02-21T11:00:27.899791748",
@@ -107,7 +107,7 @@ private val søknad_innsendt_event_uten_søknadId =
     """
     {
       "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-      "@event_name": "søknad_innsendt",
+      "@event_name": "søknad_innsendt_varsel",
       "@opprettet": "2024-02-21T11:00:27.899791748",
       "ident": "12345678903",    
       "søknadstidspunkt": "2024-02-21T11:00:27.899791748",
@@ -136,7 +136,7 @@ private val søknad_innsendt_event_uten_søknadstidspunkt =
     """
     {
       "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-      "@event_name": "søknad_innsendt",
+      "@event_name": "søknad_innsendt_varsel",
       "@opprettet": "2024-02-21T11:00:27.899791748",
       "søknadId": "123e4567-e89b-12d3-a456-426614174000",
       "ident": "12345678903",    
@@ -165,7 +165,7 @@ private val søknad_innsendt_event_uten_søknadData =
     """
     {
       "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-      "@event_name": "søknad_innsendt",
+      "@event_name": "søknad_innsendt_varsel",
       "@opprettet": "2024-02-21T11:00:27.899791748",
       "søknadId": "123e4567-e89b-12d3-a456-426614174000",
       "ident": "12345678903",    

@@ -16,7 +16,7 @@ class SøknadMottak(
     River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "søknad_innsendt") }
+            validate { it.demandValue("@event_name", "søknad_innsendt_varsel") }
             validate { it.requireKey("ident", "søknadId", "søknadstidspunkt", "søknadData") }
             validate { it.interestedIn("@id", "@opprettet") }
         }.register(this)
