@@ -4,8 +4,8 @@ import mu.KotlinLogging
 import no.nav.helse.rapids_rivers.RapidsConnection
 
 class SøknadService(private val rapid: RapidsConnection) {
-    fun publiserMeldingOmNySøknad(søknad: Søknad) {
-        rapid.publish(MeldingOmNySøknad(søknad.id, søknad.ident).asMessage().toJson())
+    fun publiserMeldingOmSøknadInnsendt(søknad: Søknad) {
+        rapid.publish(MeldingOmSøknadInnsendt(søknad.id, søknad.ident).asMessage().toJson())
 
         logger.info { "Publiserte melding om ny søknad med søknadId: ${søknad.id}" }
         sikkerlogg.info { "Publiserte melding om ny søknad med søknadId: ${søknad.id} og ident: ${søknad.ident}" }

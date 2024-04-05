@@ -32,7 +32,7 @@ class SøknadMottak(
         val jsonNode = objectMapper.readTree(packet.toJson())
         SøknadMapper(jsonNode).søknad
             .also { it.opplysninger.forEach(opplysningRepository::lagre) }
-            .also(søknadService::publiserMeldingOmNySøknad)
+            .also(søknadService::publiserMeldingOmSøknadInnsendt)
     }
 
     private companion object {
