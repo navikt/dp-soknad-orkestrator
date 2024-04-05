@@ -10,7 +10,6 @@ import FlervalgSvarTabell
 import HeltallTabell
 import OpplysningTabell
 import TekstTabell
-import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
@@ -43,11 +42,6 @@ import javax.sql.DataSource
 
 class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepository {
     val database = Database.connect(dataSource)
-
-    private companion object {
-        private val logger = KotlinLogging.logger {}
-        private val sikkerlogg = KotlinLogging.logger("tjenestekall.OpplsyningRepositoryPostgres")
-    }
 
     override fun lagre(opplysning: Opplysning<*>) {
         transaction {
