@@ -14,7 +14,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPos
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import kotlin.test.Test
 
-class BehovsløserFactoryTest {
+class BehovløserFactoryTest {
     private val testRapid = TestRapid()
     private val opplysningRepository = mockk<OpplysningRepositoryPostgres>(relaxed = true)
     private val behovløserFactory = BehovløserFactory(testRapid, opplysningRepository)

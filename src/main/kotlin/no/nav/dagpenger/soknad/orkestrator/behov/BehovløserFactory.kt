@@ -15,7 +15,7 @@ class BehovløserFactory(
     rapidsConnection: RapidsConnection,
     opplysningRepository: OpplysningRepositoryPostgres,
 ) {
-    private var behovløsere: Map<String, Behovsløser> =
+    private var behovløsere: Map<String, Behovløser> =
         mapOf(
             "ØnskerDagpengerFraDato" to ØnskerDagpengerFraDatoBehovløser(rapidsConnection, opplysningRepository),
             "EøsArbeid" to EøsArbeidBehovløser(rapidsConnection, opplysningRepository),
@@ -27,7 +27,7 @@ class BehovløserFactory(
             "JobbetUtenforNorge" to JobbetUtenforNorgeBehovløser(rapidsConnection, opplysningRepository),
         )
 
-    fun behovløserFor(behov: String): Behovsløser {
+    fun behovløserFor(behov: String): Behovløser {
         return behovløsere[behov] ?: throw IllegalArgumentException("Fant ikke behovløser for behov: $behov")
     }
 

@@ -1,8 +1,8 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
-import mu.KotlinLogging
-import no.nav.dagpenger.soknad.orkestrator.behov.Behovsløser
+import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.MeldingOmBehovløsning
+import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -10,12 +10,12 @@ import java.util.UUID
 
 class JobbetUtenforNorgeBehovløser(
     rapidsConnection: RapidsConnection,
-    val opplysningRepository: OpplysningRepository,
+    opplysningRepository: OpplysningRepository,
 ) :
-    Behovsløser(rapidsConnection) {
+    Behovløser(rapidsConnection, opplysningRepository) {
     override val behov = "JobbetUtenforNorge"
+    override val beskrivendeId = "faktum.arbeidsforhold"
     private val landkodeNorge = "NOR"
-    private val beskrivendeId = "faktum.arbeidsforhold"
 
     override fun løs(
         ident: String,
@@ -23,20 +23,9 @@ class JobbetUtenforNorgeBehovløser(
     ) {
         val svar = harJobbetUtenforNorge(ident, søknadId)
 
-        val løsning =
-            MeldingOmBehovløsning(
-                ident = ident,
-                søknadId = søknadId,
-                løsning =
-                    mapOf(
-                        behov to
-                            mapOf(
-                                "verdi" to svar,
-                            ),
-                    ),
-            ).asMessage().toJson()
+        val meldingMedLøsning = opprettMeldingMedLøsning(ident, søknadId, svar)
 
-        rapidsConnection.publish(løsning)
+        rapidsConnection.publish(meldingMedLøsning)
 
         logger.info { "Løste behov $behov for søknad med id: $søknadId" }
         sikkerlogg.info { "Løste behov $behov for søknad med id: $søknadId og ident: $ident" }
@@ -47,13 +36,24 @@ class JobbetUtenforNorgeBehovløser(
         søknadId: UUID,
     ): Boolean {
         val arbeidsforholdSvar =
-            opplysningRepository.hent(beskrivendeId, ident, søknadId).svar as List<ArbeidsforholdSvar>
+            opplysningRepository.hent(beskrivendeId, ident, søknadId).svar.asListOf<ArbeidsforholdSvar>()
 
         return arbeidsforholdSvar.any { it.land != landkodeNorge }
     }
 
-    private companion object {
-        private val logger = KotlinLogging.logger {}
-        private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadMottak")
-    }
+    private fun opprettMeldingMedLøsning(
+        ident: String,
+        søknadId: UUID,
+        svar: Boolean,
+    ) = MeldingOmBehovløsning(
+        ident = ident,
+        søknadId = søknadId,
+        løsning =
+            mapOf(
+                behov to
+                    mapOf(
+                        "verdi" to svar,
+                    ),
+            ),
+    ).asMessage().toJson()
 }
