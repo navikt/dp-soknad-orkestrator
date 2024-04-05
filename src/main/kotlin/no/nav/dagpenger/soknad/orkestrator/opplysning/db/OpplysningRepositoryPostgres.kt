@@ -85,17 +85,13 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*> {
+    ): Opplysning<*>? {
         return transaction {
             OpplysningTabell
                 .selectAll()
                 .somMatcher(beskrivendeId, ident, søknadId)
                 .map(tilOpplysning())
                 .firstOrNull()
-                ?: throw NoSuchElementException(
-                    "Ingen opplysning funnet med gitt beskrivendeId:" + " $beskrivendeId," +
-                        "og søknadId: $søknadId",
-                )
         }
     }
 }

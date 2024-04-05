@@ -13,33 +13,39 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
         ident: String,
         søknadId: UUID,
     ) {
-        val meldingMedLøsning = opprettMeldingMedLøsning(ident, søknadId)
-        rapidsConnection.publish(meldingMedLøsning)
+        val svarPåBehov =
+            opplysningRepository.hent(beskrivendeId, ident, søknadId)?.svar
+                ?: throw IllegalStateException(
+                    "Fant ingen opplysning med beskrivendeId: $beskrivendeId " +
+                        "og kan ikke svare på behov $behov for søknad med id: $søknadId",
+                )
 
-        logger.info { "Løste behov $behov for søknad med id: $søknadId" }
-        sikkerlogg.info { "Løste behov $behov for søknad med id: $søknadId og ident: $ident" }
+        publiserLøsning(ident, søknadId, svarPåBehov)
     }
 
-    private fun opprettMeldingMedLøsning(
+    internal fun opprettMeldingMedLøsning(
         ident: String,
         søknadId: UUID,
+        svarPåBehov: Any,
     ) = MeldingOmBehovløsning(
         ident = ident,
         søknadId = søknadId,
         løsning =
             mapOf(
-                behov to mapOf("verdi" to hentSvar(ident, søknadId)),
+                behov to mapOf("verdi" to svarPåBehov),
             ),
     ).asMessage().toJson()
 
-    private fun hentSvar(
+    internal fun publiserLøsning(
         ident: String,
         søknadId: UUID,
-    ) = opplysningRepository.hent(
-        beskrivendeId = beskrivendeId,
-        ident = ident,
-        søknadId = søknadId,
-    ).svar
+        svarPåBehov: Any,
+    ) {
+        rapidsConnection.publish(opprettMeldingMedLøsning(ident, søknadId, svarPåBehov))
+
+        logger.info { "Løste behov $behov for søknad med id: $søknadId" }
+        sikkerlogg.info { "Løste behov $behov for søknad med id: $søknadId og ident: $ident" }
+    }
 
     internal companion object {
         val logger = KotlinLogging.logger {}

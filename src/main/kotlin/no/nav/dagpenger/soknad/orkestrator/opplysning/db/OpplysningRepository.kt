@@ -10,5 +10,5 @@ interface OpplysningRepository {
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*>
+    ): Opplysning<*>?
 }

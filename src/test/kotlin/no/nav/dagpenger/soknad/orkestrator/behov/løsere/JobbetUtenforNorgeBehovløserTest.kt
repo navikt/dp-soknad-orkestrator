@@ -12,20 +12,20 @@ import kotlin.test.Test
 class JobbetUtenforNorgeBehovløserTest {
     val opplysningRepository = InMemoryOpplysningRepository()
     val testRapid = TestRapid()
+    val behovløser = JobbetUtenforNorgeBehovløser(testRapid, opplysningRepository)
     private val ident = "12345678910"
     private val søknadId = UUID.randomUUID()
 
     @Test
     fun `Behovløser publiserer løsning på behov JobbetUtenforNorge`() {
         opplysningRepository.lagre(opplysning())
-        val behovløser = JobbetUtenforNorgeBehovløser(testRapid, opplysningRepository)
         behovløser.løs(ident, søknadId)
 
         testRapid.inspektør.message(0)["@løsning"]["JobbetUtenforNorge"]["verdi"].asText() shouldBe "false"
     }
 
     @Test
-    fun `Finner riktig løsning når det er jobbet utenfor Norge`() {
+    fun `Behovløser setter løsning til true når det er jobbet utenfor Norge`() {
         val svarMedArbeidUtenforNorge =
             listOf(
                 ArbeidsforholdSvar(navn = "arbeidsforhold1", land = "NOR"),
@@ -33,19 +33,22 @@ class JobbetUtenforNorgeBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning(svar = svarMedArbeidUtenforNorge))
-        val behovløser = JobbetUtenforNorgeBehovløser(testRapid, opplysningRepository)
         behovløser.harJobbetUtenforNorge(ident, søknadId) shouldBe true
     }
 
     @Test
-    fun `Finner riktig løsning når det ikke er jobbet utenfor Norge`() {
+    fun `Behovløser setter løsning til false når det ikke er jobbet utenfor Norge`() {
         val svarMedArbeidINorge =
             listOf(
                 ArbeidsforholdSvar(navn = "arbeidsforhold1", land = "NOR"),
             )
 
         opplysningRepository.lagre(opplysning(svar = svarMedArbeidINorge))
-        val behovløser = JobbetUtenforNorgeBehovløser(testRapid, opplysningRepository)
+        behovløser.harJobbetUtenforNorge(ident, søknadId) shouldBe false
+    }
+
+    @Test
+    fun `Behovløser setter løsning til false når det ikke er noen opplysning om arbeidsforhold`() {
         behovløser.harJobbetUtenforNorge(ident, søknadId) shouldBe false
     }
 

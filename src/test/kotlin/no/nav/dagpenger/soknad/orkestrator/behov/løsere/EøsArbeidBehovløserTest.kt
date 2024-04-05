@@ -11,26 +11,64 @@ import kotlin.test.Test
 class EøsArbeidBehovløserTest {
     val opplysningRepository = InMemoryOpplysningRepository()
     val testRapid = TestRapid()
+    val behovløser = EøsArbeidBehovløser(testRapid, opplysningRepository)
+    val ident = "12345678910"
+    val søknadId = UUID.randomUUID()
 
     @Test
     fun `Behovløser publiserer løsning på behov EøsArbeid`() {
-        val ident = "12345678910"
-        val søknadId = UUID.randomUUID()
-        val svar = "false"
-
         val opplysning =
             Opplysning(
                 beskrivendeId = "faktum.eos-arbeid-siste-36-mnd",
                 type = Tekst,
-                svar = svar,
+                svar = "true",
                 ident = ident,
                 søknadId = søknadId,
             )
 
         opplysningRepository.lagre(opplysning)
-        val behovløser = EøsArbeidBehovløser(testRapid, opplysningRepository)
         behovløser.løs(ident, søknadId)
 
-        testRapid.inspektør.message(0)["@løsning"]["EøsArbeid"]["verdi"].asText() shouldBe svar
+        testRapid.inspektør.message(0)["@løsning"]["EøsArbeid"]["verdi"].asText() shouldBe "true"
+    }
+
+    @Test
+    fun `Behovløser setter løsning til true når det er jobbet i eøs siste 36 mnd`() {
+        val opplysning =
+            Opplysning(
+                beskrivendeId = "faktum.eos-arbeid-siste-36-mnd",
+                type = Tekst,
+                svar = "true",
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        opplysningRepository.lagre(opplysning)
+        behovløser.løs(ident, søknadId)
+
+        behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe "true"
+    }
+
+    @Test
+    fun `Behovløser setter løsning til false når det ikke er jobbet i eøs siste 36 mnd`() {
+        val opplysning =
+            Opplysning(
+                beskrivendeId = "faktum.eos-arbeid-siste-36-mnd",
+                type = Tekst,
+                svar = "false",
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        opplysningRepository.lagre(opplysning)
+        behovløser.løs(ident, søknadId)
+
+        behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe "false"
+    }
+
+    @Test
+    fun `Behovløser svarer false dersom opplysning om Eøs arbeid ikke finnes`() {
+        behovløser.løs(ident, søknadId)
+        behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe false
     }
 }

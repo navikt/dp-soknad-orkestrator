@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
-import io.kotest.assertions.throwables.shouldThrow
+import OpplysningTabell
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
@@ -25,7 +25,6 @@ import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
-import java.util.NoSuchElementException
 import java.util.UUID
 
 class OpplysningRepositoryPostgresTest {
@@ -329,24 +328,13 @@ class OpplysningRepositoryPostgresTest {
     }
 
     @Test
-    fun `vi henter ikke opplysning dersom ett av kriteriene ikke stemmer`() {
-        val opplysning =
-            Opplysning(
-                beskrivendeId = beskrivendeId,
-                type = Tekst,
-                svar = "svar",
-                ident = ident,
-                søknadId = søknadId,
-            )
-
-        withMigratedDb { opplysningRepository.lagre(opplysning) }
-
-        shouldThrow<NoSuchElementException> {
+    fun `vi returnerer null dersom det ikke finnes en opplysning med gitte kriterier`() {
+        withMigratedDb {
             opplysningRepository.hent(
-                beskrivendeId = beskrivendeId,
-                ident = ident,
+                beskrivendeId = "random",
+                ident = "123",
                 søknadId = UUID.randomUUID(),
-            )
+            ) shouldBe null
         }
     }
 }

@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
@@ -11,11 +12,12 @@ import kotlin.test.Test
 class HelseTilAlleTyperJobbBehovløserTest {
     val opplysningRepository = InMemoryOpplysningRepository()
     val testRapid = TestRapid()
+    val behovløser = HelseTilAlleTyperJobbBehovløser(testRapid, opplysningRepository)
+    val ident = "12345678910"
+    val søknadId = UUID.randomUUID()
 
     @Test
     fun `Behovløser publiserer løsning på behov HelseTilAlleTyperJobb`() {
-        val ident = "12345678910"
-        val søknadId = UUID.randomUUID()
         val svar = "true"
 
         val opplysning =
@@ -28,9 +30,13 @@ class HelseTilAlleTyperJobbBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        val behovløser = HelseTilAlleTyperJobbBehovløser(testRapid, opplysningRepository)
         behovløser.løs(ident, søknadId)
 
         testRapid.inspektør.message(0)["@løsning"]["HelseTilAlleTyperJobb"]["verdi"].asText() shouldBe svar
+    }
+
+    @Test
+    fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
+        shouldThrow<IllegalStateException> { behovløser.løs(ident, søknadId) }
     }
 }
