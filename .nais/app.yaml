@@ -29,3 +29,5 @@ spec:
             envVarPrefix: DB
   secureLogs:
     enabled: true
+  liveness:
+    path: /isAlive
