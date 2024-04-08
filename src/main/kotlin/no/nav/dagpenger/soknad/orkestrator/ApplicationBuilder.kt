@@ -8,7 +8,12 @@ import io.ktor.server.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import org.jetbrains.exposed.sql.Database
@@ -45,14 +50,14 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
                 runMigration()
             }
 
-        /*SøknadMottak(
+        SøknadMottak(
             rapidsConnection,
             SøknadService(rapidsConnection),
             OpplysningRepositoryPostgres(dataSource),
         )
         BehovMottak(
             rapidsConnection = rapidsConnection,
-            behovLøserFactory = BehovløserFactory(rapidsConnection, OpplysningRepositoryPostgres(dataSource)),
-        )*/
+            behovløserFactory = BehovløserFactory(rapidsConnection, OpplysningRepositoryPostgres(dataSource)),
+        )
     }
 }
