@@ -7,8 +7,7 @@ import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.request.path
 import org.slf4j.event.Level
 
-internal fun Application.konfigurerApi(
-) {
+internal fun Application.konfigurerApi() {
 
     install(CallLogging) {
         disableDefaultColors()
