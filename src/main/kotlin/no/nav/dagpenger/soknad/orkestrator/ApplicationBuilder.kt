@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
+import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
 import org.jetbrains.exposed.sql.Database
@@ -14,9 +15,11 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
     }
 
     private val rapidsConnection =
-        RapidApplication.Builder(
-            RapidApplication.RapidApplicationConfig.fromEnv(configuration),
-        ).build()
+        RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(configuration))
+            .withKtorModule {
+                apiKonfigurasjon()
+            }
+            .build()
 
     init {
         rapidsConnection.register(this)
