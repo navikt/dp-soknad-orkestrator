@@ -1,5 +1,10 @@
 package no.nav.dagpenger.soknad.orkestrator
 
+import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.call
+import io.ktor.server.response.respond
+import io.ktor.server.routing.get
+import io.ktor.server.routing.routing
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
@@ -18,6 +23,9 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
         RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(configuration))
             .withKtorModule {
                 apiKonfigurasjon()
+                routing {
+                    get("/") { call.respond(HttpStatusCode.OK) }
+                }
             }
             .build()
 
