@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.rapids.and.rivers)
     implementation(libs.konfig)
     implementation(libs.bundles.postgres)
+    implementation(libs.bundles.ktor.server)
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-crypt:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
