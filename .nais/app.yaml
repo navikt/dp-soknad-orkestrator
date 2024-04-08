@@ -11,7 +11,6 @@ spec:
     - https://dp-soknad-orkestrator.dev-gcp.nav.cloud.nais.io
   image: {{image}}
   port: 8080
-  ttl: 3h
   replicas:
     max: 1
     min: 1
@@ -29,5 +28,3 @@ spec:
             envVarPrefix: DB
   secureLogs:
     enabled: true
-  liveness:
-    path: /isAlive
