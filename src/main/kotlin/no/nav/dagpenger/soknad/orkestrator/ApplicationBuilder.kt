@@ -29,22 +29,6 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
         rapidsConnection.start()
     }
 
-    override fun onNotReady(rapidsConnection: RapidsConnection) {
-        logger.info { "OnNotReady" }
-    }
-
-    override fun onReady(rapidsConnection: RapidsConnection) {
-        logger.info { "OnReady" }
-    }
-
-    override fun onShutdown(rapidsConnection: RapidsConnection) {
-        logger.info { "OnShutDown" }
-    }
-
-    override fun onShutdownSignal(rapidsConnection: RapidsConnection) {
-        logger.info { "OnShutDownSignal" }
-    }
-
     override fun onStartup(rapidsConnection: RapidsConnection) {
         logger.info { "Starter dp-soknad-orkestrator" }
         Database.connect(datasource = dataSource)
