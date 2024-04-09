@@ -26,7 +26,7 @@ class SøknadMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        logger.info { "Mottok søknad innsendt hendelse" }
+        logger.info { "Mottok søknad innsendt hendelse: ${packet.toJson()}" }
         sikkerlogg.info { "Mottok søknad innsendt hendelse: ${packet.toJson()}" }
 
         val jsonNode = objectMapper.readTree(packet.toJson())
