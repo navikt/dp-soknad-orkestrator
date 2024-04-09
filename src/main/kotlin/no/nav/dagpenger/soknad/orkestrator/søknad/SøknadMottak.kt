@@ -30,6 +30,7 @@ class SøknadMottak(
         sikkerlogg.info { "Mottok søknad innsendt hendelse: ${packet.toJson()}" }
 
         val jsonNode = objectMapper.readTree(packet.toJson())
+        logger.info { "Mottat melding som jsonnode: $jsonNode"}
         SøknadMapper(jsonNode).søknad
             .also { it.opplysninger.forEach(opplysningRepository::lagre) }
             .also(søknadService::publiserMeldingOmSøknadInnsendt)
