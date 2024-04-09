@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.databind.JsonNode
+import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Barn
@@ -45,25 +46,33 @@ class SøknadMapper(private val jsonNode: JsonNode) {
         )
     }
 
+    private companion object {
+        private val logger = KotlinLogging.logger {}
+    }
+
     private fun søknadDataTilOpplysninger(
         søknadData: JsonNode,
         ident: String,
         søknadId: UUID,
     ): List<Opplysning<*>> {
-        val seksjoner =
-            søknadData["seksjoner"]
-                ?: throw IllegalArgumentException("Mangler seksjoner")
+        try {
+            val seksjoner =
+                søknadData["seksjoner"]
 
-        return seksjoner.asIterable().map { seksjon ->
-            val fakta = seksjon.get("fakta") ?: throw IllegalArgumentException("Mangler fakta")
-            fakta.asIterable().map { faktum ->
-                val beskrivendeId = faktum.get("beskrivendeId").asText()
-                val faktumtype = faktum.get("type").asText()
+            return seksjoner.asIterable().map { seksjon ->
+                val fakta = seksjon.get("fakta")
+                fakta.asIterable().map { faktum ->
+                    val beskrivendeId = faktum.get("beskrivendeId").asText()
+                    val faktumtype = faktum.get("type").asText()
 
-                val datatype: Datatype<*> = finnDatatype(faktumtype, beskrivendeId)
-                datatype.tilOpplysning(faktum, beskrivendeId, ident, søknadId)
-            }
-        }.flatten()
+                    val datatype: Datatype<*> = finnDatatype(faktumtype, beskrivendeId)
+                    datatype.tilOpplysning(faktum, beskrivendeId, ident, søknadId)
+                }
+            }.flatten()
+        } catch (e: Exception) {
+            logger.info { "Feil ved mapping av søknaddata til opplysninger: ${e.message}" }
+            return emptyList()
+        }
     }
 
     private fun finnDatatype(

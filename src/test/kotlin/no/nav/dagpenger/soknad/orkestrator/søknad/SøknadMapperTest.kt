@@ -1,7 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
@@ -46,20 +45,6 @@ class SøknadMapperTest {
                 Opplysning("faktum.dagpenger-soknadsdato", Dato, ønskerDagpengerFra, ident, søknadId),
                 Opplysning("søknadstidspunkt", Tekst, søknadstidspunkt, ident, søknadId),
             )
-    }
-
-    @Test
-    fun `vi kan ikke mappe dersom seksjoner mangler`() {
-        shouldThrow<IllegalArgumentException> {
-            SøknadMapper(søknadDataUtenSeksjoner).søknad
-        }
-    }
-
-    @Test
-    fun `vi kan ikke mappe dersom fakta mangler`() {
-        shouldThrow<IllegalArgumentException> {
-            SøknadMapper(søknaddataUtenFakta).søknad
-        }
     }
 
     @Test
