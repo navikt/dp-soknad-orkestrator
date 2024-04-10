@@ -32,9 +32,9 @@ spec:
     logging:
       destinations:
         - id: elastic
-    prometheus:
-      enabled: true
-      path: /metrics
+  prometheus:
+    enabled: true
+    path: /metrics
   env:
     - name: CLEAN_ON_STARTUP
       value: "false"
