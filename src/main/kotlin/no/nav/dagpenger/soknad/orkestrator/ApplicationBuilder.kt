@@ -6,6 +6,7 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
+import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.clean
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
@@ -44,6 +45,7 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
 
     override fun onStartup(rapidsConnection: RapidsConnection) {
         logger.info { "Starter dp-soknad-orkestrator" }
+        clean()
         Database.connect(datasource = dataSource)
             .also {
                 logger.info { "Koblet til database ${it.name}}" }
