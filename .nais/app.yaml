@@ -32,3 +32,6 @@ spec:
     logging:
       destinations:
         - id: elastic
+  env:
+    name: flyway.cleanDisabled
+    value: false
