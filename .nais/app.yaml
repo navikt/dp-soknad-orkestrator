@@ -34,4 +34,4 @@ spec:
         - id: elastic
   env:
     - name: CLEAN_ON_STARTUP
-      value: "true"
+      value: "false"
