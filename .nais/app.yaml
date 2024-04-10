@@ -33,5 +33,5 @@ spec:
       destinations:
         - id: elastic
   env:
-    name: flyway.cleanDisabled
-    value: false
+    - name: CLEAN_ON_STARTUP
+      value: "false"
