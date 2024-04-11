@@ -12,10 +12,10 @@ object Metrikker {
             .help("Indikerer antall søknader som er mottatt")
             .register()
 
-    val varselSoknad: Counter =
+    val soknadVarslet: Counter =
         Counter.build()
             .namespace(NAMESPACE)
-            .name("antall_soknader_varsel")
+            .name("antall_soknader_varslet")
             .help("Indikerer antall sendte varsler om søknader")
             .register()
 }
