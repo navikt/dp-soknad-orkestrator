@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
+import no.nav.dagpenger.soknad.orkestrator.metrikker.Metrikker
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -27,6 +28,7 @@ class SøknadMottak(
         context: MessageContext,
     ) {
         logger.info { "Mottok søknad innsendt hendelse for søknad ${packet["søknadId"]}" }
+        Metrikker.sokaderMottatt.inc()
         sikkerlogg.info { "Mottok søknad innsendt hendelse: ${packet.toJson()}" }
 
         val jsonNode = objectMapper.readTree(packet.toJson())
