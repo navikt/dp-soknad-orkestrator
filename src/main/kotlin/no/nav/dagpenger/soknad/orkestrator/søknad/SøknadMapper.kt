@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
+import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Barn
@@ -24,14 +25,10 @@ class SøknadMapper(private val jsonNode: JsonNode) {
         val søknadId = jsonNode.get("søknadId").asUUID()
         val søknadData = jsonNode.get("søknadData")
 
-        val opplysninger = mutableListOf<Opplysning<*>>()
-
-        opplysninger.addAll(søknadDataTilOpplysninger(søknadData, ident, søknadId))
-
         Søknad(
             id = søknadId,
             ident = ident,
-            opplysninger = opplysninger,
+            opplysninger = søknadDataTilOpplysninger(søknadData, ident, søknadId),
         )
     }
 
@@ -48,18 +45,23 @@ class SøknadMapper(private val jsonNode: JsonNode) {
             val seksjoner =
                 søknadData["seksjoner"]
 
-            return seksjoner.asIterable().map { seksjon ->
-                val fakta = seksjon.get("fakta")
-                fakta.asIterable().map { faktum ->
-                    val beskrivendeId = faktum.get("beskrivendeId").asText()
-                    val faktumtype = faktum.get("type").asText()
+            val opplysninger =
+                seksjoner.asIterable().map { seksjon ->
+                    val fakta = seksjon.get("fakta")
+                    fakta.asIterable().map { faktum ->
+                        val beskrivendeId = faktum.get("beskrivendeId").asText()
+                        val faktumtype = faktum.get("type").asText()
 
-                    val datatype: Datatype<*> = finnDatatype(faktumtype, beskrivendeId)
-                    datatype.tilOpplysning(faktum, beskrivendeId, ident, søknadId)
-                }
-            }.flatten()
+                        val datatype: Datatype<*> = finnDatatype(faktumtype, beskrivendeId)
+                        datatype.tilOpplysning(faktum, beskrivendeId, ident, søknadId)
+                    }
+                }.flatten()
+
+            SøknadMetrikker.dekomponert.inc()
+            return opplysninger
         } catch (e: Exception) {
             logger.info { "Feil ved mapping av søknaddata til opplysninger: ${e.message}" }
+            SøknadMetrikker.dekomponeringFeilet.inc()
             return emptyList()
         }
     }
