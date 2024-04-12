@@ -22,21 +22,10 @@ class SøknadMapper(private val jsonNode: JsonNode) {
     val søknad by lazy {
         val ident = jsonNode.get("ident").asText()
         val søknadId = jsonNode.get("søknadId").asUUID()
-        val søknadstidspunkt = jsonNode.get("søknadstidspunkt").asText()
         val søknadData = jsonNode.get("søknadData")
 
         val opplysninger = mutableListOf<Opplysning<*>>()
 
-        val søknadstidspunktOpplysning =
-            Opplysning(
-                beskrivendeId = "søknadstidspunkt",
-                type = Tekst,
-                svar = søknadstidspunkt,
-                ident = ident,
-                søknadId = søknadId,
-            )
-
-        opplysninger.add(søknadstidspunktOpplysning)
         opplysninger.addAll(søknadDataTilOpplysninger(søknadData, ident, søknadId))
 
         Søknad(
