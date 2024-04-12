@@ -42,9 +42,13 @@ class SøknadMapperTest {
                     ident = ident,
                     søknadId = søknadId,
                 ),
-                Opplysning("faktum.dagpenger-soknadsdato", Dato, ønskerDagpengerFra, ident, søknadId),
-                // TODO: Flytt til egen fil
-                //  Opplysning("søknadstidspunkt", Tekst, søknadstidspunkt, ident, søknadId),
+                Opplysning(
+                    "faktum.dagpenger-soknadsdato",
+                    Dato,
+                    ønskerDagpengerFra,
+                    ident,
+                    søknadId,
+                ),
             )
     }
 

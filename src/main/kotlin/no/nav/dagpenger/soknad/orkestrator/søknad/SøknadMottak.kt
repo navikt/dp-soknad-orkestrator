@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.Metrikker
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -38,12 +36,13 @@ class SøknadMottak(
         val jsonNode = objectMapper.readTree(packet.toJson())
 
         with(jsonNode) {
-            søknadTidspunktMapper()
+            tilSøknadstidspunkt()
                 .also(opplysningRepository::lagre)
 
-            søknadMapper()
-                .also { it.opplysninger.forEach(opplysningRepository::lagre) }
-                .also(søknadService::publiserMeldingOmSøknadInnsendt)
+            tilOpplysninger()
+                .onEach(opplysningRepository::lagre)
+
+            publiserMeldingOmSøknadInnsendt()
         }
     }
 
@@ -52,19 +51,14 @@ class SøknadMottak(
         private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadMottak")
     }
 
-    private fun JsonNode.søknadMapper() = SøknadMapper(this).søknad
+    private fun JsonNode.tilOpplysninger() = SøknadMapper(this).søknad.opplysninger
 
-    private fun JsonNode.søknadTidspunktMapper(): Opplysning<String> {
+    private fun JsonNode.tilSøknadstidspunkt() = SøknadtidspunktMapper(this).tidspunktOpplysning
+
+    private fun JsonNode.publiserMeldingOmSøknadInnsendt() {
         val ident = this.get("ident").asText()
         val søknadId = this.get("søknadId").asUUID()
-        val søknadstidspunkt = this.get("søknadstidspunkt").asText()
 
-        return Opplysning(
-            beskrivendeId = "søknadstidspunkt",
-            type = Tekst,
-            svar = søknadstidspunkt,
-            ident = ident,
-            søknadId = søknadId,
-        )
+        søknadService.publiserMeldingOmSøknadInnsendt(søknadId, ident)
     }
 }
