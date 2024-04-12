@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
 import mu.KotlinLogging
+import no.nav.dagpenger.soknad.orkestrator.metrikker.Metrikker
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -30,6 +31,7 @@ class BehovMottak(
 
             mottatteBehov().forEach { behov ->
                 behovsløserFor(behov).løs(ident(), søknadId())
+                Metrikker.behovMottatt.labels(behov).inc()
             }
         }
     }
