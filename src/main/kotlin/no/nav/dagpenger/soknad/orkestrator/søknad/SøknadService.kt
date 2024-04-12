@@ -1,7 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import mu.KotlinLogging
-import no.nav.dagpenger.soknad.orkestrator.metrikker.Metrikker
+import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
 
@@ -11,7 +11,7 @@ class SøknadService(private val rapid: RapidsConnection) {
         ident: String,
     ) {
         rapid.publish(MeldingOmSøknadInnsendt(søknadId, ident).asMessage().toJson())
-        Metrikker.soknadVarslet.inc()
+        SøknadMetrikker.varslet.inc()
 
         logger.info { "Publiserte melding om ny søknad med søknadId: $søknadId" }
         sikkerlogg.info { "Publiserte melding om ny søknad med søknadId: $søknadId og ident: $ident" }
