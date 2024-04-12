@@ -3,7 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
-import no.nav.dagpenger.soknad.orkestrator.metrikker.Metrikker
+import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
@@ -32,7 +32,7 @@ class SøknadMottak(
         context: MessageContext,
     ) {
         logger.info { "Mottok søknad innsendt hendelse for søknad ${packet["søknadId"]}" }
-        Metrikker.sokaderMottatt.inc()
+        SøknadMetrikker.mottatt.inc()
         sikkerlogg.info { "Mottok søknad innsendt hendelse: ${packet.toJson()}" }
 
         val jsonNode = objectMapper.readTree(packet.toJson())
