@@ -28,10 +28,6 @@ spec:
             envVarPrefix: DB
   secureLogs:
     enabled: true
-  observability:
-    logging:
-      destinations:
-        - id: elastic
   prometheus:
     enabled: true
     path: /metrics
