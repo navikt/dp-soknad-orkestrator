@@ -18,4 +18,20 @@ object Metrikker {
             .name("antall_soknader_varslet")
             .help("Indikerer antall sendte varsler om søknader")
             .register()
+
+    val behovMottatt: Counter =
+        Counter.build()
+            .namespace(NAMESPACE)
+            .name("antall_behov_mottatt")
+            .help("Indikerer antall og type mottatte behov")
+            .labelNames("behov")
+            .register()
+
+    val behovLost: Counter =
+        Counter.build()
+            .namespace(NAMESPACE)
+            .name("antall_behov_lost")
+            .help("Indikerer antall og type behov som er løst")
+            .labelNames("behov")
+            .register()
 }

@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
 import mu.KotlinLogging
+import no.nav.dagpenger.soknad.orkestrator.metrikker.Metrikker
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
@@ -21,6 +22,7 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
                 )
 
         publiserLøsning(ident, søknadId, svarPåBehov)
+        Metrikker.behovLost.labels(behov).inc()
     }
 
     internal fun opprettMeldingMedLøsning(
