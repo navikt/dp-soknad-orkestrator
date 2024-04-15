@@ -63,7 +63,7 @@ class JobbetUtenforNorgeBehovløserTest {
     ): Opplysning<List<ArbeidsforholdSvar>> {
         val opplysning =
             Opplysning(
-                beskrivendeId = "faktum.arbeidsforhold",
+                beskrivendeId = behovløser.beskrivendeId,
                 type = Arbeidsforhold,
                 svar = svar,
                 ident = ident,

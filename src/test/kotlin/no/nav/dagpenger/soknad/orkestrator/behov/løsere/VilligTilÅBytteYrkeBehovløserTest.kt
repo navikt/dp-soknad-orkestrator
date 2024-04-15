@@ -20,7 +20,7 @@ class VilligTilÅBytteYrkeBehovløserTest {
     fun `Behovløser publiserer løsning på behov VilligTilÅBytteYrke`() {
         val opplysning =
             Opplysning(
-                beskrivendeId = "faktum.bytte-yrke-ned-i-lonn",
+                beskrivendeId = behovløser.beskrivendeId,
                 type = Boolsk,
                 svar = true,
                 ident = ident,

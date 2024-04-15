@@ -20,7 +20,7 @@ class HelseTilAlleTyperJobbBehovløserTest {
     fun `Behovløser publiserer løsning på behov HelseTilAlleTyperJobb`() {
         val opplysning =
             Opplysning(
-                beskrivendeId = "faktum.alle-typer-arbeid",
+                beskrivendeId = behovløser.beskrivendeId,
                 type = Boolsk,
                 svar = true,
                 ident = ident,

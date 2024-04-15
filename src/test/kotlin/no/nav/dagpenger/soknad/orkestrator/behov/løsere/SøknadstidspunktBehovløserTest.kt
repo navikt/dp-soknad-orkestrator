@@ -20,7 +20,7 @@ class SøknadstidspunktBehovløserTest {
     fun `Behovløser publiserer løsning på behov Søknadstidspunkt`() {
         val opplysning =
             Opplysning(
-                beskrivendeId = "søknadstidspunkt",
+                beskrivendeId = behovløser.beskrivendeId,
                 type = Tekst,
                 svar = "false",
                 ident = ident,

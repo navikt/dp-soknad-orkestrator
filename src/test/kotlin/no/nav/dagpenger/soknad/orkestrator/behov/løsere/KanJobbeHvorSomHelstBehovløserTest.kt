@@ -20,7 +20,7 @@ class KanJobbeHvorSomHelstBehovløserTest {
     fun `Behovløser publiserer løsning på behov KanJobbeHvorSomHelst`() {
         val opplysning =
             Opplysning(
-                beskrivendeId = "faktum.jobbe-hele-norge",
+                beskrivendeId = behovløser.beskrivendeId,
                 type = Boolsk,
                 svar = true,
                 ident = ident,

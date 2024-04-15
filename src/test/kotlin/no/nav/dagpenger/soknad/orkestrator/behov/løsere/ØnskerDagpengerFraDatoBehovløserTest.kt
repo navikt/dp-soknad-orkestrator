@@ -24,7 +24,7 @@ class ØnskerDagpengerFraDatoBehovløserTest {
 
         val opplysning =
             Opplysning(
-                beskrivendeId = "faktum.dagpenger-soknadsdato",
+                beskrivendeId = behovløser.beskrivendeId,
                 type = Dato,
                 svar = svar,
                 ident = ident,

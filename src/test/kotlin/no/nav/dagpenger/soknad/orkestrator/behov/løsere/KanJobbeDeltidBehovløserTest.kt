@@ -20,7 +20,7 @@ class KanJobbeDeltidBehovløserTest {
     fun `Behovløser publiserer løsning på behov KanJobbeDeltid`() {
         val opplysning =
             Opplysning(
-                beskrivendeId = "faktum.jobbe-hel-deltid",
+                beskrivendeId = behovløser.beskrivendeId,
                 type = Boolsk,
                 svar = true,
                 ident = ident,

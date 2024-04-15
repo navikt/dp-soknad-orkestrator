@@ -20,7 +20,7 @@ class EøsArbeidBehovløserTest {
     fun `Behovløser publiserer løsning på behov EøsArbeid`() {
         val opplysning =
             Opplysning(
-                beskrivendeId = "faktum.eos-arbeid-siste-36-mnd",
+                beskrivendeId = behovløser.beskrivendeId,
                 type = Boolsk,
                 svar = true,
                 ident = ident,
