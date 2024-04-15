@@ -26,6 +26,12 @@ spec:
         databases:
           - name : soknad-orkestrator
             envVarPrefix: DB
+
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+
   secureLogs:
     enabled: true
   prometheus:
