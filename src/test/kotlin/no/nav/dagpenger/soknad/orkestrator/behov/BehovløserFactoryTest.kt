@@ -8,6 +8,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.JobbetUtenforNorgeBehov
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeDeltidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeHvorSomHelstBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadstidspunktBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnskerDagpengerFraDatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
@@ -29,6 +30,7 @@ class BehovløserFactoryTest {
         behovløserFactory.behovløserFor("VilligTilÅBytteYrke") is VilligTilÅBytteYrkeBehovløser
         behovløserFactory.behovløserFor("Søknadstidspunkt") is SøknadstidspunktBehovløser
         behovløserFactory.behovløserFor("JobbetUtenforNorge") is JobbetUtenforNorgeBehovløser
+        behovløserFactory.behovløserFor("Verneplikt") is VernepliktBehovløser
     }
 
     @Test
@@ -43,6 +45,7 @@ class BehovløserFactoryTest {
                 "VilligTilÅBytteYrke",
                 "Søknadstidspunkt",
                 "JobbetUtenforNorge",
+                "Verneplikt",
             )
     }
 }
