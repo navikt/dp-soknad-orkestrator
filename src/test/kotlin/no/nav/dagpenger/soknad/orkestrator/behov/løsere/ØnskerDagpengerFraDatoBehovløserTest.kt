@@ -3,8 +3,10 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.utils.januar
+import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
 import kotlin.test.Test
@@ -18,12 +20,12 @@ class ØnskerDagpengerFraDatoBehovløserTest {
 
     @Test
     fun `Behovløser publiserer løsning på behov ØnskerDagpengerFraDato`() {
-        val svar = "2021-01-01"
+        val svar = 1.januar(2021)
 
         val opplysning =
             Opplysning(
                 beskrivendeId = "faktum.dagpenger-soknadsdato",
-                type = Tekst,
+                type = Dato,
                 svar = svar,
                 ident = ident,
                 søknadId = søknadId,
@@ -32,7 +34,7 @@ class ØnskerDagpengerFraDatoBehovløserTest {
         opplysningRepository.lagre(opplysning)
         behovløser.løs(ident, søknadId)
 
-        testRapid.inspektør.message(0)["@løsning"]["ØnskerDagpengerFraDato"]["verdi"].asText() shouldBe svar
+        testRapid.inspektør.message(0)["@løsning"]["ØnskerDagpengerFraDato"]["verdi"].asLocalDate() shouldBe svar
     }
 
     @Test

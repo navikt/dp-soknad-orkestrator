@@ -3,7 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
@@ -18,13 +18,11 @@ class HelseTilAlleTyperJobbBehovløserTest {
 
     @Test
     fun `Behovløser publiserer løsning på behov HelseTilAlleTyperJobb`() {
-        val svar = "true"
-
         val opplysning =
             Opplysning(
                 beskrivendeId = "faktum.alle-typer-arbeid",
-                type = Tekst,
-                svar = svar,
+                type = Boolsk,
+                svar = true,
                 ident = ident,
                 søknadId = søknadId,
             )
@@ -32,7 +30,7 @@ class HelseTilAlleTyperJobbBehovløserTest {
         opplysningRepository.lagre(opplysning)
         behovløser.løs(ident, søknadId)
 
-        testRapid.inspektør.message(0)["@løsning"]["HelseTilAlleTyperJobb"]["verdi"].asText() shouldBe svar
+        testRapid.inspektør.message(0)["@løsning"]["HelseTilAlleTyperJobb"]["verdi"].asBoolean() shouldBe true
     }
 
     @Test

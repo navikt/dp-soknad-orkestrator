@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -20,8 +21,8 @@ class EøsArbeidBehovløserTest {
         val opplysning =
             Opplysning(
                 beskrivendeId = "faktum.eos-arbeid-siste-36-mnd",
-                type = Tekst,
-                svar = "true",
+                type = Boolsk,
+                svar = true,
                 ident = ident,
                 søknadId = søknadId,
             )
@@ -29,7 +30,7 @@ class EøsArbeidBehovløserTest {
         opplysningRepository.lagre(opplysning)
         behovløser.løs(ident, søknadId)
 
-        testRapid.inspektør.message(0)["@løsning"]["EøsArbeid"]["verdi"].asText() shouldBe "true"
+        testRapid.inspektør.message(0)["@løsning"]["EøsArbeid"]["verdi"].asBoolean() shouldBe true
     }
 
     @Test

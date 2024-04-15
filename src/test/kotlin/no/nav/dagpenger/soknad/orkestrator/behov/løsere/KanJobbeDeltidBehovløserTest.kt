@@ -3,7 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
@@ -21,8 +21,8 @@ class KanJobbeDeltidBehovløserTest {
         val opplysning =
             Opplysning(
                 beskrivendeId = "faktum.jobbe-hel-deltid",
-                type = Tekst,
-                svar = "true",
+                type = Boolsk,
+                svar = true,
                 ident = ident,
                 søknadId = søknadId,
             )
@@ -30,7 +30,7 @@ class KanJobbeDeltidBehovløserTest {
         opplysningRepository.lagre(opplysning)
         behovløser.løs(ident, søknadId)
 
-        testRapid.inspektør.message(0)["@løsning"]["KanJobbeDeltid"]["verdi"].asText() shouldBe "true"
+        testRapid.inspektør.message(0)["@løsning"]["KanJobbeDeltid"]["verdi"].asBoolean() shouldBe true
     }
 
     @Test
