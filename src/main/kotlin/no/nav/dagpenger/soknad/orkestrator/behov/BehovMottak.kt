@@ -30,7 +30,11 @@ class BehovMottak(
             logger.info { "Mottok behov: ${mottatteBehov()}" }
 
             mottatteBehov().forEach { behov ->
-                behovsløserFor(behov).løs(ident(), søknadId())
+                try {
+                    behovsløserFor(behov).løs(ident(), søknadId())
+                } catch (e: Exception) {
+                    logger.error(e) { "Feil ved løsning av behov $behov for søknad med id: ${søknadId()}" }
+                }
                 BehovMetrikker.mottatt.labels(behov).inc()
             }
         }
