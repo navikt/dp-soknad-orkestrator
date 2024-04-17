@@ -26,15 +26,7 @@ class JobbetUtenforNorgeBehovløser(
         ident: String,
         søknadId: UUID,
     ): Boolean {
-        val arbeidsforholdOpplysning = opplysningRepository.hent(beskrivendeId, ident, søknadId)
-
-        if (arbeidsforholdOpplysning == null) {
-            logger.info { "Søknad med id: $søknadId inneholder ingen opplysninger om arbeidsforhold." }
-            return false
-        }
-
-        val arbeidsforholdSvar = arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>()
-
-        return arbeidsforholdSvar.any { it.land != landkodeNorge }
+        val arbeidsforholdOpplysning = opplysningRepository.hent(beskrivendeId, ident, søknadId) ?: return false
+        return arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>().any { it.land != landkodeNorge }
     }
 }
