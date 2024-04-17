@@ -61,6 +61,7 @@ object ArbeidsforholdSvarTabell : IntIdTable("arbeidsforhold_svar") {
     val arbeidsforholdId: Column<Int> = integer("arbeidsforhold_id").references(ArbeidsforholdTabell.id)
     val navnSvarId: Column<Int> = integer("navn_svar_id").references(TekstTabell.id)
     val landSvarId: Column<Int> = integer("land_svar_id").references(TekstTabell.id)
+    val sluttårsakSvarId: Column<Int> = integer("sluttårsak_svar_id").references(TekstTabell.id)
 }
 
 object EøsArbeidsforholdSvarTabell : IntIdTable("eøs_arbeidsforhold_svar") {

@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
+import ArbeidsforholdSvarTabell
 import BarnSvarTabell
 import BoolskTabell
 import DatoTabell
@@ -26,6 +27,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Flervalg
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Heltall
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Periode
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.PeriodeSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Query
@@ -355,10 +357,17 @@ private fun lagreArbeidsforholdSvar(
                 it[TekstTabell.svar] = arbeidsforholdSvar.land
             }.value
 
+        val sluttårsakSvarId =
+            TekstTabell.insertAndGetId {
+                it[TekstTabell.opplysningId] = opplysningId
+                it[TekstTabell.svar] = arbeidsforholdSvar.sluttårsak.name
+            }.value
+
         ArbeidsforholdSvarTabell.insert {
             it[ArbeidsforholdSvarTabell.arbeidsforholdId] = arbeidsforholdId
             it[this.navnSvarId] = navnSvarId
             it[this.landSvarId] = landSvarId
+            it[this.sluttårsakSvarId] = sluttårsakSvarId
         }
     }
 }
@@ -371,7 +380,7 @@ fun hentArbeidsforholdSvar(it: ResultRow): List<ArbeidsforholdSvar> {
             .first()[ArbeidsforholdTabell.id].value
 
     return ArbeidsforholdSvarTabell
-        .select(ArbeidsforholdSvarTabell.navnSvarId, ArbeidsforholdSvarTabell.landSvarId)
+        .select(ArbeidsforholdSvarTabell.navnSvarId, ArbeidsforholdSvarTabell.landSvarId, ArbeidsforholdSvarTabell.sluttårsakSvarId)
         .where { ArbeidsforholdSvarTabell.arbeidsforholdId eq arbeidsforholdId }
         .map {
             ArbeidsforholdSvar(
@@ -385,6 +394,13 @@ fun hentArbeidsforholdSvar(it: ResultRow): List<ArbeidsforholdSvar> {
                         .select(TekstTabell.svar)
                         .where { TekstTabell.id eq it[ArbeidsforholdSvarTabell.landSvarId] }
                         .first()[TekstTabell.svar],
+                sluttårsak =
+                    Sluttårsak.valueOf(
+                        TekstTabell
+                            .select(TekstTabell.svar)
+                            .where { TekstTabell.id eq it[ArbeidsforholdSvarTabell.sluttårsakSvarId] }
+                            .first()[TekstTabell.svar],
+                    ),
             )
         }
 }

@@ -33,11 +33,12 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
                         .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.land" }
                         .get("svar").asText()
 
-                val sluttårsak = finnSluttårsak(arbeidsforhold).name
+                val sluttårsak = finnSluttårsak(arbeidsforhold)
 
                 ArbeidsforholdSvar(
                     navn = navnSvar,
                     land = landFaktum,
+                    sluttårsak = sluttårsak,
                 )
             }
         return Opplysning(beskrivendeId, Arbeidsforhold, arbeidsforholdSvar, ident, søknadId)
@@ -76,6 +77,7 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
 data class ArbeidsforholdSvar(
     val navn: String,
     val land: String,
+    val sluttårsak: Sluttårsak,
 )
 
 enum class Sluttårsak {

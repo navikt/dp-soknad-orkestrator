@@ -19,6 +19,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Flervalg
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Heltall
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Periode
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.PeriodeSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
 import org.jetbrains.exposed.sql.selectAll
@@ -195,8 +196,8 @@ class OpplysningRepositoryPostgresTest {
                 type = Arbeidsforhold,
                 svar =
                     listOf(
-                        ArbeidsforholdSvar(navn = "navn", land = "land"),
-                        ArbeidsforholdSvar(navn = "navn2", land = "land2"),
+                        ArbeidsforholdSvar(navn = "navn", land = "land", sluttårsak = Sluttårsak.PERMITTERT),
+                        ArbeidsforholdSvar(navn = "navn2", land = "land2", sluttårsak = Sluttårsak.AVSKJEDIGET),
                     ),
                 ident = ident,
                 søknadId = søknadId,

@@ -9,19 +9,19 @@ import kotlin.test.Test
 class ArbeidsforholdTest {
     @Test
     fun `Setter riktig sluttårsak ved mapping til opplysning`() {
-        Arbeidsforhold.finnSluttårsak(permittertFraFiskeri) shouldBe Sluttårsak.PERMITTERT_FISKEFOREDLING
-        Arbeidsforhold.finnSluttårsak(permittert) shouldBe Sluttårsak.PERMITTERT
-        Arbeidsforhold.finnSluttårsak(avskjediget) shouldBe Sluttårsak.AVSKJEDIGET
-        Arbeidsforhold.finnSluttårsak(kontraktUtgått) shouldBe Sluttårsak.KONTRAKT_UTGAATT
-        Arbeidsforhold.finnSluttårsak(redusertArbeidstid) shouldBe Sluttårsak.REDUSERT_ARBEIDSTID
-        Arbeidsforhold.finnSluttårsak(sagtOppAvArbeidsgiver) shouldBe Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
-        Arbeidsforhold.finnSluttårsak(sagtOppSelv) shouldBe Sluttårsak.SAGT_OPP_SELV
-        Arbeidsforhold.finnSluttårsak(ikkeEndret) shouldBe Sluttårsak.IKKE_ENDRET
+        Arbeidsforhold.finnSluttårsak(arbeidsforholdPermittertFraFiskeri) shouldBe Sluttårsak.PERMITTERT_FISKEFOREDLING
+        Arbeidsforhold.finnSluttårsak(arbeidsforholdPermittert) shouldBe Sluttårsak.PERMITTERT
+        Arbeidsforhold.finnSluttårsak(arbeidsforholdAvskjediget) shouldBe Sluttårsak.AVSKJEDIGET
+        Arbeidsforhold.finnSluttårsak(arbeidsforholdKontraktUtgått) shouldBe Sluttårsak.KONTRAKT_UTGAATT
+        Arbeidsforhold.finnSluttårsak(arbeidsforholdRedusertArbeidstid) shouldBe Sluttårsak.REDUSERT_ARBEIDSTID
+        Arbeidsforhold.finnSluttårsak(arbeidsforholdSagtOppAvArbeidsgiver) shouldBe Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
+        Arbeidsforhold.finnSluttårsak(arbeidsforholdSagtOppSelv) shouldBe Sluttårsak.SAGT_OPP_SELV
+        Arbeidsforhold.finnSluttårsak(arbeidsforholdIkkeEndret) shouldBe Sluttårsak.IKKE_ENDRET
     }
 }
 
 //language=JSON
-val permittertFraFiskeri =
+val arbeidsforholdPermittertFraFiskeri =
     ObjectMapper().readTree(
         """
         [
@@ -50,7 +50,7 @@ val permittertFraFiskeri =
     )
 
 //language=JSON
-val permittert =
+val arbeidsforholdPermittert =
     ObjectMapper().readTree(
         """
         [
@@ -79,7 +79,7 @@ val permittert =
     )
 
 //language=JSON
-val avskjediget =
+val arbeidsforholdAvskjediget =
     ObjectMapper().readTree(
         """
         [
@@ -103,7 +103,7 @@ val avskjediget =
     )
 
 //language=JSON
-val kontraktUtgått =
+val arbeidsforholdKontraktUtgått =
     ObjectMapper().readTree(
         """
         [
@@ -127,7 +127,7 @@ val kontraktUtgått =
     )
 
 //language=JSON
-val redusertArbeidstid =
+val arbeidsforholdRedusertArbeidstid =
     ObjectMapper().readTree(
         """
         [
@@ -151,7 +151,7 @@ val redusertArbeidstid =
     )
 
 //language=JSON
-val sagtOppAvArbeidsgiver =
+val arbeidsforholdSagtOppAvArbeidsgiver =
     ObjectMapper().readTree(
         """
         [
@@ -180,7 +180,7 @@ val sagtOppAvArbeidsgiver =
     )
 
 //language=JSON
-val sagtOppSelv =
+val arbeidsforholdSagtOppSelv =
     ObjectMapper().readTree(
         """
         [
@@ -209,7 +209,7 @@ val sagtOppSelv =
     )
 
 //language=JSON
-val ikkeEndret =
+val arbeidsforholdIkkeEndret =
     ObjectMapper().readTree(
         """
         [

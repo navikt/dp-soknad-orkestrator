@@ -4,6 +4,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
@@ -28,8 +29,16 @@ class JobbetUtenforNorgeBehovløserTest {
     fun `Behovløser setter løsning til true når det er jobbet utenfor Norge`() {
         val svarMedArbeidUtenforNorge =
             listOf(
-                ArbeidsforholdSvar(navn = "arbeidsforhold1", land = "NOR"),
-                ArbeidsforholdSvar(navn = "arbeidsforhold2", land = "SWE"),
+                ArbeidsforholdSvar(
+                    navn = "arbeidsforhold1",
+                    land = "NOR",
+                    sluttårsak = Sluttårsak.KONTRAKT_UTGAATT,
+                ),
+                ArbeidsforholdSvar(
+                    navn = "arbeidsforhold2",
+                    land = "SWE",
+                    sluttårsak = Sluttårsak.KONTRAKT_UTGAATT,
+                ),
             )
 
         opplysningRepository.lagre(opplysning(svar = svarMedArbeidUtenforNorge))
@@ -40,7 +49,11 @@ class JobbetUtenforNorgeBehovløserTest {
     fun `Behovløser setter løsning til false når det ikke er jobbet utenfor Norge`() {
         val svarMedArbeidINorge =
             listOf(
-                ArbeidsforholdSvar(navn = "arbeidsforhold1", land = "NOR"),
+                ArbeidsforholdSvar(
+                    navn = "arbeidsforhold1",
+                    land = "NOR",
+                    sluttårsak = Sluttårsak.KONTRAKT_UTGAATT,
+                ),
             )
 
         opplysningRepository.lagre(opplysning(svar = svarMedArbeidINorge))
@@ -58,6 +71,7 @@ class JobbetUtenforNorgeBehovløserTest {
                 ArbeidsforholdSvar(
                     navn = "arbeidsforhold1",
                     land = "NOR",
+                    sluttårsak = Sluttårsak.KONTRAKT_UTGAATT,
                 ),
             ),
     ): Opplysning<List<ArbeidsforholdSvar>> {
