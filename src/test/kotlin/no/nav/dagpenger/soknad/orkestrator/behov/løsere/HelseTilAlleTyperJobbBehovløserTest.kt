@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
@@ -28,13 +29,13 @@ class HelseTilAlleTyperJobbBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(ident, søknadId)
+        behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.HelseTilAlleTyperJobb))
 
         testRapid.inspektør.message(0)["@løsning"]["HelseTilAlleTyperJobb"]["verdi"].asBoolean() shouldBe true
     }
 
     @Test
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
-        shouldThrow<IllegalStateException> { behovløser.løs(ident, søknadId) }
+        shouldThrow<IllegalStateException> { behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.HelseTilAlleTyperJobb)) }
     }
 }

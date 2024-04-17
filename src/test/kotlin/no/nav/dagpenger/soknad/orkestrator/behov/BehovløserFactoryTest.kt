@@ -22,15 +22,15 @@ class BehovløserFactoryTest {
 
     @Test
     fun `Skal returnere riktig behovløser basert på gitt behov`() {
-        behovløserFactory.behovløserFor("ØnskerDagpengerFraDato") is ØnskerDagpengerFraDatoBehovløser
-        behovløserFactory.behovløserFor("EøsArbeid") is EøsArbeidBehovløser
-        behovløserFactory.behovløserFor("KanJobbeDeltid") is KanJobbeDeltidBehovløser
-        behovløserFactory.behovløserFor("HelseTilAlleTyperJobb") is HelseTilAlleTyperJobbBehovløser
-        behovløserFactory.behovløserFor("KanJobbeHvorSomHelst") is KanJobbeHvorSomHelstBehovløser
-        behovløserFactory.behovløserFor("VilligTilÅBytteYrke") is VilligTilÅBytteYrkeBehovløser
-        behovløserFactory.behovløserFor("Søknadstidspunkt") is SøknadstidspunktBehovløser
-        behovløserFactory.behovløserFor("JobbetUtenforNorge") is JobbetUtenforNorgeBehovløser
-        behovløserFactory.behovløserFor("Verneplikt") is VernepliktBehovløser
+        behovløserFactory.behovløserFor(BehovløserFactory.Behov.ØnskerDagpengerFraDato) is ØnskerDagpengerFraDatoBehovløser
+        behovløserFactory.behovløserFor(BehovløserFactory.Behov.EøsArbeid) is EøsArbeidBehovløser
+        behovløserFactory.behovløserFor(BehovløserFactory.Behov.KanJobbeDeltid) is KanJobbeDeltidBehovløser
+        behovløserFactory.behovløserFor(BehovløserFactory.Behov.HelseTilAlleTyperJobb) is HelseTilAlleTyperJobbBehovløser
+        behovløserFactory.behovløserFor(BehovløserFactory.Behov.KanJobbeHvorSomHelst) is KanJobbeHvorSomHelstBehovløser
+        behovløserFactory.behovløserFor(BehovløserFactory.Behov.VilligTilÅBytteYrke) is VilligTilÅBytteYrkeBehovløser
+        behovløserFactory.behovløserFor(BehovløserFactory.Behov.Søknadstidspunkt) is SøknadstidspunktBehovløser
+        behovløserFactory.behovløserFor(BehovløserFactory.Behov.JobbetUtenforNorge) is JobbetUtenforNorgeBehovløser
+        behovløserFactory.behovløserFor(BehovløserFactory.Behov.Verneplikt) is VernepliktBehovløser
     }
 
     @Test

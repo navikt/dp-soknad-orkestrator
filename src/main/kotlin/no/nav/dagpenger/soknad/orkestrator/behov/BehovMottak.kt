@@ -6,7 +6,6 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import java.util.UUID
 
 class BehovMottak(
     val rapidsConnection: RapidsConnection,
@@ -29,18 +28,14 @@ class BehovMottak(
         with(packet) {
             logger.info { "Mottok behov: ${mottatteBehov()}" }
 
-            mottatteBehov().forEach { behov ->
-                BehovMetrikker.mottatt.labels(behov).inc()
-                behovsløserFor(behov).løs(ident(), søknadId())
+            mottatteBehov().forEach { behovString ->
+                BehovMetrikker.mottatt.labels(behovString).inc()
+                behovsløserFor(BehovløserFactory.Behov.valueOf(behovString)).løs(packet)
             }
         }
     }
 
-    internal fun behovsløserFor(behov: String) = behovløserFactory.behovløserFor(behov)
-
-    private fun JsonMessage.søknadId(): UUID = UUID.fromString(get("søknad_id").asText())
-
-    private fun JsonMessage.ident(): String = get("ident").asText()
+    internal fun behovsløserFor(behov: BehovløserFactory.Behov) = behovløserFactory.behovløserFor(behov)
 
     private fun JsonMessage.mottatteBehov() = get("@behov").map { it.asText() }
 

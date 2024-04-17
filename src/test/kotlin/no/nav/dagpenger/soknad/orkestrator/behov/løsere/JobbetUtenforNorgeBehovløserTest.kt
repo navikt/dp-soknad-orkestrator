@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
@@ -20,7 +21,7 @@ class JobbetUtenforNorgeBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov JobbetUtenforNorge`() {
         opplysningRepository.lagre(opplysning())
-        behovløser.løs(ident, søknadId)
+        behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.JobbetUtenforNorge))
 
         testRapid.inspektør.message(0)["@løsning"]["JobbetUtenforNorge"]["verdi"].asText() shouldBe "false"
     }

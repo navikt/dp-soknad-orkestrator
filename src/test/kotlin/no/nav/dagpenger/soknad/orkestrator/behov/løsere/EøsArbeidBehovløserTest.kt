@@ -1,10 +1,12 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
+import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
 import kotlin.test.Test
@@ -28,7 +30,7 @@ class EøsArbeidBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(ident, søknadId)
+        behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
 
         testRapid.inspektør.message(0)["@løsning"]["EøsArbeid"]["verdi"].asBoolean() shouldBe true
     }
@@ -45,7 +47,7 @@ class EøsArbeidBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(ident, søknadId)
+        behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
 
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe "true"
     }
@@ -62,14 +64,15 @@ class EøsArbeidBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(ident, søknadId)
+        behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
 
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe "false"
     }
 
     @Test
     fun `Behovløser svarer false dersom opplysning om Eøs arbeid ikke finnes`() {
-        behovløser.løs(ident, søknadId)
+        val packet: JsonMessage = lagPacket(ident, søknadId, BehovløserFactory.Behov.EøsArbeid)
+        behovløser.løs(packet)
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe false
     }
 }
