@@ -39,4 +39,6 @@ spec:
     path: /metrics
   env:
     - name: CLEAN_ON_STARTUP
+      value: "true"
+    - name: flyway.cleanDisabled
       value: "false"
