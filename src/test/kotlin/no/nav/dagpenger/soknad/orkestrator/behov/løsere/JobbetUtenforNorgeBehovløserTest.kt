@@ -23,7 +23,7 @@ class JobbetUtenforNorgeBehovløserTest {
         opplysningRepository.lagre(opplysning())
         behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.JobbetUtenforNorge))
 
-        testRapid.inspektør.message(0)["@løsning"]["JobbetUtenforNorge"]["verdi"].asText() shouldBe "false"
+        testRapid.inspektør.message(0)["@løsning"]["JobbetUtenforNorge"]["verdi"].asBoolean() shouldBe false
     }
 
     @Test
