@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
+import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
 
@@ -12,12 +13,9 @@ class EøsArbeidBehovløser(
     override val behov = "EøsArbeid"
     override val beskrivendeId = "faktum.eos-arbeid-siste-36-mnd"
 
-    override fun løs(
-        ident: String,
-        søknadId: UUID,
-    ) {
-        val svarPåBehov = harJobbetIEøsSiste36mnd(ident, søknadId)
-        publiserLøsning(ident, søknadId, svarPåBehov)
+    override fun løs(packet: JsonMessage) {
+        val svarPåBehov = harJobbetIEøsSiste36mnd(packet.ident(), packet.søknadId())
+        publiserLøsning(packet, svarPåBehov)
     }
 
     internal fun harJobbetIEøsSiste36mnd(

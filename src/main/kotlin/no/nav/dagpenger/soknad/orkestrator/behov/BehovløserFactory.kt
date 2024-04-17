@@ -17,23 +17,36 @@ class BehovløserFactory(
     rapidsConnection: RapidsConnection,
     opplysningRepository: OpplysningRepositoryPostgres,
 ) {
-    private var behovløsere: Map<String, Behovløser> =
+    private val behovløsere: Map<Behov, Behovløser> =
         mapOf(
-            "ØnskerDagpengerFraDato" to ØnskerDagpengerFraDatoBehovløser(rapidsConnection, opplysningRepository),
-            "EøsArbeid" to EøsArbeidBehovløser(rapidsConnection, opplysningRepository),
-            "KanJobbeDeltid" to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository),
-            "HelseTilAlleTyperJobb" to HelseTilAlleTyperJobbBehovløser(rapidsConnection, opplysningRepository),
-            "KanJobbeHvorSomHelst" to KanJobbeHvorSomHelstBehovløser(rapidsConnection, opplysningRepository),
-            "VilligTilÅBytteYrke" to VilligTilÅBytteYrkeBehovløser(rapidsConnection, opplysningRepository),
-            "Søknadstidspunkt" to SøknadstidspunktBehovløser(rapidsConnection, opplysningRepository),
-            "JobbetUtenforNorge" to JobbetUtenforNorgeBehovløser(rapidsConnection, opplysningRepository),
-            "Verneplikt" to VernepliktBehovløser(rapidsConnection, opplysningRepository),
-            "Lønnsgaranti" to LønnsgarantiBehovløser(rapidsConnection, opplysningRepository),
+            Behov.ØnskerDagpengerFraDato to ØnskerDagpengerFraDatoBehovløser(rapidsConnection, opplysningRepository),
+            Behov.EøsArbeid to EøsArbeidBehovløser(rapidsConnection, opplysningRepository),
+            Behov.KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository),
+            Behov.HelseTilAlleTyperJobb to HelseTilAlleTyperJobbBehovløser(rapidsConnection, opplysningRepository),
+            Behov.KanJobbeHvorSomHelst to KanJobbeHvorSomHelstBehovløser(rapidsConnection, opplysningRepository),
+            Behov.VilligTilÅBytteYrke to VilligTilÅBytteYrkeBehovløser(rapidsConnection, opplysningRepository),
+            Behov.Søknadstidspunkt to SøknadstidspunktBehovløser(rapidsConnection, opplysningRepository),
+            Behov.JobbetUtenforNorge to JobbetUtenforNorgeBehovløser(rapidsConnection, opplysningRepository),
+            Behov.Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository),
+            Behov.Lønnsgaranti to LønnsgarantiBehovløser(rapidsConnection, opplysningRepository),
         )
 
-    fun behovløserFor(behov: String): Behovløser {
+    fun behovløserFor(behov: Behov): Behovløser {
         return behovløsere[behov] ?: throw IllegalArgumentException("Fant ikke behovløser for behov: $behov")
     }
 
-    fun behov() = behovløsere.keys.toList()
+    fun behov() = behovløsere.keys.map { it.name }.toList()
+
+    enum class Behov {
+        ØnskerDagpengerFraDato,
+        EøsArbeid,
+        KanJobbeDeltid,
+        HelseTilAlleTyperJobb,
+        KanJobbeHvorSomHelst,
+        VilligTilÅBytteYrke,
+        Søknadstidspunkt,
+        JobbetUtenforNorge,
+        Verneplikt,
+        Lønnsgaranti,
+    }
 }
