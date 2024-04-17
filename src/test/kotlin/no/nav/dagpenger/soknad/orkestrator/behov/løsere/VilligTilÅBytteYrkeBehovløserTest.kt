@@ -29,13 +29,13 @@ class VilligTilÅBytteYrkeBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.VilligTilÅBytteYrke))
+        behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.VilligTilÅBytteYrke))
 
         testRapid.inspektør.message(0)["@løsning"]["VilligTilÅBytteYrke"]["verdi"].asBoolean() shouldBe true
     }
 
     @Test
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
-        shouldThrow<IllegalStateException> { behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.VilligTilÅBytteYrke)) }
+        shouldThrow<IllegalStateException> { behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.VilligTilÅBytteYrke)) }
     }
 }

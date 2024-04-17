@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
 import mu.KotlinLogging
+import no.nav.dagpenger.soknad.orkestrator.meldinger.BehovMelding
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -30,7 +31,7 @@ class BehovMottak(
 
             mottatteBehov().forEach { behovString ->
                 BehovMetrikker.mottatt.labels(behovString).inc()
-                behovsløserFor(BehovløserFactory.Behov.valueOf(behovString)).løs(packet)
+                behovsløserFor(BehovløserFactory.Behov.valueOf(behovString)).løs(BehovMelding(packet))
             }
         }
     }

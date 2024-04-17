@@ -1,6 +1,8 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
 import mu.KotlinLogging
+import no.nav.dagpenger.soknad.orkestrator.meldinger.BehovMelding
+import no.nav.dagpenger.soknad.orkestrator.meldinger.MeldingOmBehovløsning
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -11,33 +13,31 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
     abstract val behov: String
     abstract val beskrivendeId: String
 
-    internal open fun løs(packet: JsonMessage) {
+    internal open fun løs(behovMelding: BehovMelding) {
         val svarPåBehov =
-            opplysningRepository.hent(beskrivendeId, packet.ident(), packet.søknadId())?.svar
+            opplysningRepository.hent(beskrivendeId, behovMelding.ident, behovMelding.søknadId)?.svar
                 ?: throw IllegalStateException(
                     "Fant ingen opplysning med beskrivendeId: $beskrivendeId " +
-                        "og kan ikke svare på behov $behov for søknad med id: ${packet.søknadId()}",
+                        "og kan ikke svare på behov $behov for søknad med id: ${behovMelding.søknadId}",
                 )
 
-        publiserLøsning(packet, svarPåBehov)
+        publiserLøsning(behovMelding, svarPåBehov)
         BehovMetrikker.løst.labels(behov).inc()
     }
 
     internal fun opprettMeldingMedLøsning(
-        packet: JsonMessage,
+        behovMelding: BehovMelding,
         svarPåBehov: Any,
-    ) = packet.apply {
-        this["@løsning"] = mapOf(behov to mapOf("verdi" to svarPåBehov))
-    }.toJson()
+    ) = MeldingOmBehovløsning(behovMelding, mapOf(behov to mapOf("verdi" to svarPåBehov))).asMessage().toJson()
 
     internal fun publiserLøsning(
-        packet: JsonMessage,
+        behovMelding: BehovMelding,
         svarPåBehov: Any,
     ) {
-        rapidsConnection.publish(opprettMeldingMedLøsning(packet, svarPåBehov))
+        rapidsConnection.publish(opprettMeldingMedLøsning(behovMelding, svarPåBehov))
 
-        logger.info { "Løste behov $behov for søknad med id: ${packet.søknadId()}" }
-        sikkerlogg.info { "Løste behov $behov for søknad med id: ${packet.søknadId()} og ident: ${packet.ident()}" }
+        logger.info { "Løste behov $behov for søknad med id: ${behovMelding.søknadId}" }
+        sikkerlogg.info { "Løste behov $behov for søknad med id: ${behovMelding.søknadId} og ident: ${behovMelding.ident}" }
     }
 
     internal companion object {

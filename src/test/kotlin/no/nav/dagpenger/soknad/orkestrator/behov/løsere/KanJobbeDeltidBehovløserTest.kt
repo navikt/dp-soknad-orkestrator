@@ -29,13 +29,13 @@ class KanJobbeDeltidBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.KanJobbeDeltid))
+        behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.KanJobbeDeltid))
 
         testRapid.inspektør.message(0)["@løsning"]["KanJobbeDeltid"]["verdi"].asBoolean() shouldBe true
     }
 
     @Test
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
-        shouldThrow<IllegalStateException> { behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.KanJobbeDeltid)) }
+        shouldThrow<IllegalStateException> { behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.KanJobbeDeltid)) }
     }
 }

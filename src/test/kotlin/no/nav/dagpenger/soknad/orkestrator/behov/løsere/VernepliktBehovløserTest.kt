@@ -29,13 +29,13 @@ class VernepliktBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.Verneplikt))
+        behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.Verneplikt))
 
         testRapid.inspektør.message(0)["@løsning"]["Verneplikt"]["verdi"].asBoolean() shouldBe true
     }
 
     @Test
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
-        shouldThrow<IllegalStateException> { behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.Verneplikt)) }
+        shouldThrow<IllegalStateException> { behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.Verneplikt)) }
     }
 }

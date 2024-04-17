@@ -33,13 +33,17 @@ class ØnskerDagpengerFraDatoBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.ØnskerDagpengerFraDato))
+        behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.ØnskerDagpengerFraDato))
 
         testRapid.inspektør.message(0)["@løsning"]["ØnskerDagpengerFraDato"]["verdi"].asLocalDate() shouldBe svar
     }
 
     @Test
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
-        shouldThrow<IllegalStateException> { behovløser.løs(lagPacket(ident, søknadId, BehovløserFactory.Behov.ØnskerDagpengerFraDato)) }
+        shouldThrow<IllegalStateException> {
+            behovløser.løs(
+                lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.ØnskerDagpengerFraDato),
+            )
+        }
     }
 }

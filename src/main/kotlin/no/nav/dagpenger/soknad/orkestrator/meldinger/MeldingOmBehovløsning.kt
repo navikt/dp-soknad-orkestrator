@@ -1,11 +1,9 @@
-package no.nav.dagpenger.soknad.orkestrator.behov
+package no.nav.dagpenger.soknad.orkestrator.meldinger
 
 import no.nav.helse.rapids_rivers.JsonMessage
-import java.util.UUID
 
 class MeldingOmBehovløsning(
-    private val ident: String,
-    private val søknadId: UUID,
+    private val behovMelding: BehovMelding,
     private val løsning: Map<String, Any>,
 ) {
     fun asMessage(): JsonMessage =
@@ -13,9 +11,10 @@ class MeldingOmBehovløsning(
             eventName = "behov",
             map =
                 mapOf(
-                    "ident" to ident,
-                    "søknad_id" to søknadId,
-                    "@behov" to listOf(løsning.keys),
+                    "id" to behovMelding.id,
+                    "ident" to behovMelding.ident,
+                    "søknad_id" to behovMelding.søknadId,
+                    "@behov" to behovMelding.behov,
                     "@løsning" to løsning,
                 ),
         )
