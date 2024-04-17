@@ -5,6 +5,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HelseTilAlleTyperJobbBe
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.JobbetUtenforNorgeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeDeltidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeHvorSomHelstBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.LønnsgarantiBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadstidspunktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBehovløser
@@ -27,6 +28,7 @@ class BehovløserFactory(
             "Søknadstidspunkt" to SøknadstidspunktBehovløser(rapidsConnection, opplysningRepository),
             "JobbetUtenforNorge" to JobbetUtenforNorgeBehovløser(rapidsConnection, opplysningRepository),
             "Verneplikt" to VernepliktBehovløser(rapidsConnection, opplysningRepository),
+            "Lønnsgaranti" to LønnsgarantiBehovløser(rapidsConnection, opplysningRepository),
         )
 
     fun behovløserFor(behov: String): Behovløser {

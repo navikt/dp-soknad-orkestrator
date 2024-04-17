@@ -7,6 +7,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HelseTilAlleTyperJobbBe
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.JobbetUtenforNorgeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeDeltidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeHvorSomHelstBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.LønnsgarantiBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadstidspunktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBehovløser
@@ -31,6 +32,7 @@ class BehovløserFactoryTest {
         behovløserFactory.behovløserFor("Søknadstidspunkt") is SøknadstidspunktBehovløser
         behovløserFactory.behovløserFor("JobbetUtenforNorge") is JobbetUtenforNorgeBehovløser
         behovløserFactory.behovløserFor("Verneplikt") is VernepliktBehovløser
+        behovløserFactory.behovløserFor("Lønnsgaranti") is LønnsgarantiBehovløser
     }
 
     @Test
@@ -46,6 +48,7 @@ class BehovløserFactoryTest {
                 "Søknadstidspunkt",
                 "JobbetUtenforNorge",
                 "Verneplikt",
+                "Lønnsgaranti",
             )
     }
 }
