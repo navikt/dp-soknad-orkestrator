@@ -25,6 +25,7 @@ class BehovMottakTest {
                     "JobbetUtenforNorge",
                     "Verneplikt",
                     "Lønnsgaranti",
+                    "Permittert",
                     "PermittertFiskeforedling",
                 )
         }
@@ -113,6 +114,14 @@ class BehovMottakTest {
     @Test
     fun `vi kan motta opplysningsbehov Lønnsgaranti`() {
         val behov = BehovløserFactory.Behov.Lønnsgaranti
+        testRapid.sendTestMessage(opplysning_behov_event(listOf(behov.name)))
+
+        verify(exactly = 1) { behovløserFactory.behovløserFor(behov) }
+    }
+
+    @Test
+    fun `vi kan motta opplysningsbehov Permittert`() {
+        val behov = BehovløserFactory.Behov.Permittert
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov.name)))
 
         verify(exactly = 1) { behovløserFactory.behovløserFor(behov) }

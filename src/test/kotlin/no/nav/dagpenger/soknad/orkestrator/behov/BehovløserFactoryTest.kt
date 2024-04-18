@@ -8,6 +8,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.JobbetUtenforNorgeBehov
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeDeltidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeHvorSomHelstBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.LønnsgarantiBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadstidspunktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
@@ -34,6 +35,7 @@ class BehovløserFactoryTest {
         behovløserFactory.behovløserFor(BehovløserFactory.Behov.JobbetUtenforNorge) is JobbetUtenforNorgeBehovløser
         behovløserFactory.behovløserFor(BehovløserFactory.Behov.Verneplikt) is VernepliktBehovløser
         behovløserFactory.behovløserFor(BehovløserFactory.Behov.Lønnsgaranti) is LønnsgarantiBehovløser
+        behovløserFactory.behovløserFor(BehovløserFactory.Behov.Permittert) is PermittertBehovløser
         behovløserFactory.behovløserFor(BehovløserFactory.Behov.PermittertFiskeforedling) is PermittertFiskeforedlingBehovløser
     }
 
@@ -51,6 +53,7 @@ class BehovløserFactoryTest {
                 "JobbetUtenforNorge",
                 "Verneplikt",
                 "Lønnsgaranti",
+                "Permittert",
                 "PermittertFiskeforedling",
             )
     }
