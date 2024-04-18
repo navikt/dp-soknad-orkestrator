@@ -6,7 +6,7 @@ import java.util.UUID
 
 class BehovMelding(packet: JsonMessage) {
     internal val id: UUID = UUID.fromString(packet["@id"].asText())
-    val behov = packet["@behov"].asText().map { it }
+    val behov = packet["@behov"].map { it.asText() }
     val ident = packet["ident"].asText()
     val søknadId = packet["søknad_id"].asUUID()
 }

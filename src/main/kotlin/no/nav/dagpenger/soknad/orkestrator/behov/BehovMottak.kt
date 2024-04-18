@@ -29,9 +29,9 @@ class BehovMottak(
         with(packet) {
             logger.info { "Mottok behov: ${mottatteBehov()}" }
 
-            mottatteBehov().forEach { behovString ->
-                BehovMetrikker.mottatt.labels(behovString).inc()
-                behovsløserFor(BehovløserFactory.Behov.valueOf(behovString)).løs(BehovMelding(packet))
+            mottatteBehov().forEach { behov ->
+                BehovMetrikker.mottatt.labels(behov).inc()
+                behovsløserFor(BehovløserFactory.Behov.valueOf(behov)).løs(BehovMelding(packet))
             }
         }
     }

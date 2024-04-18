@@ -12,7 +12,7 @@ fun lagBehovMelding(
 ): BehovMelding =
     BehovMelding(
         JsonMessage.newMessage(
-            eventName = "@behov",
+            eventName = "behov",
             map =
                 mapOf(
                     "ident" to ident,
