@@ -43,7 +43,7 @@ class PermittertFiskeforedlingBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning(svar = svarMedEttPermittertFiskeforedlingArbeidsforhold))
-        behovløser.rettTilDagpengerEtterPermitteringFraFiskeindustri(ident, søknadId) shouldBe true
+        behovløser.rettTilDagpengerUnderPermitteringFraFiskeindustri(ident, søknadId) shouldBe true
     }
 
     @Test
@@ -58,12 +58,12 @@ class PermittertFiskeforedlingBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning(svar = svarUtenPermittertFiskeforedlingArbeidsforhold))
-        behovløser.rettTilDagpengerEtterPermitteringFraFiskeindustri(ident, søknadId) shouldBe false
+        behovløser.rettTilDagpengerUnderPermitteringFraFiskeindustri(ident, søknadId) shouldBe false
     }
 
     @Test
     fun `Behovløser setter løsning til false når det ikke er noen opplysning om arbeidsforhold`() {
-        behovløser.rettTilDagpengerEtterPermitteringFraFiskeindustri(ident, søknadId) shouldBe false
+        behovløser.rettTilDagpengerUnderPermitteringFraFiskeindustri(ident, søknadId) shouldBe false
     }
 
     private fun opplysning(
