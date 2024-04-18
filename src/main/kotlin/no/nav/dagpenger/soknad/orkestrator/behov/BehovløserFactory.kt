@@ -7,6 +7,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeDeltidBehovløs
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeHvorSomHelstBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.LønnsgarantiBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadstidspunktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBehovløser
@@ -31,6 +32,7 @@ class BehovløserFactory(
             Behov.Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository),
             Behov.Lønnsgaranti to LønnsgarantiBehovløser(rapidsConnection, opplysningRepository),
             Behov.Permittert to PermittertBehovløser(rapidsConnection, opplysningRepository),
+            Behov.PermittertFiskeforedling to PermittertFiskeforedlingBehovløser(rapidsConnection, opplysningRepository),
         )
 
     fun behovløserFor(behov: Behov): Behovløser {
@@ -51,5 +53,6 @@ class BehovløserFactory(
         Verneplikt,
         Lønnsgaranti,
         Permittert,
+        PermittertFiskeforedling,
     }
 }
