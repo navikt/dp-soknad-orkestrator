@@ -17,11 +17,11 @@ class PermittertBehovløser(
     override val beskrivendeId = "faktum.arbeidsforhold"
 
     override fun løs(behovMelding: BehovMelding) {
-        val svarPåBehov = rettTilDagpengerEtterPermittering(behovMelding.ident, behovMelding.søknadId)
+        val svarPåBehov = rettTilDagpengerUnderPermittering(behovMelding.ident, behovMelding.søknadId)
         publiserLøsning(behovMelding, svarPåBehov)
     }
 
-    internal fun rettTilDagpengerEtterPermittering(
+    internal fun rettTilDagpengerUnderPermittering(
         ident: String,
         søknadId: UUID,
     ): Boolean {
