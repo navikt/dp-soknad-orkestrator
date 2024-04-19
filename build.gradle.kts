@@ -64,6 +64,7 @@ dependencies {
     testImplementation(libs.bundles.kotest.assertions)
     testImplementation(libs.mockk)
     testImplementation(libs.bundles.postgres.test)
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.8.2")
 }
 
 tasks.withType<ShadowJar> {
