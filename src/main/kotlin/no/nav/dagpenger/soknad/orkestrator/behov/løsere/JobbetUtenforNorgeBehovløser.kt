@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.JobbetUtenforNorge
 import no.nav.dagpenger.soknad.orkestrator.meldinger.BehovMelding
 import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
@@ -13,7 +14,7 @@ class JobbetUtenforNorgeBehovløser(
     opplysningRepository: OpplysningRepository,
 ) :
     Behovløser(rapidsConnection, opplysningRepository) {
-    override val behov = "JobbetUtenforNorge"
+    override val behov = JobbetUtenforNorge.name
     override val beskrivendeId = "faktum.arbeidsforhold"
     private val landkodeNorge = "NOR"
 
