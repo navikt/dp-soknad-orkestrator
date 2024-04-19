@@ -29,7 +29,7 @@ class KanJobbeHvorSomHelstBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.KanJobbeHvorSomHelst))
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.KanJobbeHvorSomHelst))
 
         testRapid.inspektør.message(0)["@løsning"]["KanJobbeHvorSomHelst"]["verdi"].asBoolean() shouldBe true
     }
@@ -38,7 +38,7 @@ class KanJobbeHvorSomHelstBehovløserTest {
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
         shouldThrow<IllegalStateException> {
             behovløser.løs(
-                lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.KanJobbeHvorSomHelst),
+                lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.KanJobbeHvorSomHelst),
             )
         }
     }

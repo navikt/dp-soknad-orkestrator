@@ -21,7 +21,7 @@ class LønnsgarantiBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov Lønnsgaranti`() {
         opplysningRepository.lagre(opplysning())
-        behovløser.løs(lagBehovMelding(ident, søknadId, Lønnsgaranti))
+        behovløser.løs(lagBehovmelding(ident, søknadId, Lønnsgaranti))
 
         testRapid.inspektør.message(0)["@løsning"]["Lønnsgaranti"]["verdi"].asBoolean() shouldBe true
     }

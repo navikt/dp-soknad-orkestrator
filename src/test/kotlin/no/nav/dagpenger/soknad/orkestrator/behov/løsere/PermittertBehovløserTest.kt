@@ -21,7 +21,7 @@ class PermittertBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov Permittert`() {
         opplysningRepository.lagre(opplysning())
-        behovløser.løs(lagBehovMelding(ident, søknadId, Permittert))
+        behovløser.løs(lagBehovmelding(ident, søknadId, Permittert))
 
         testRapid.inspektør.message(0)["@løsning"]["Permittert"]["verdi"].asBoolean() shouldBe true
     }

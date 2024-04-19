@@ -29,7 +29,7 @@ class EøsArbeidBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
 
         testRapid.inspektør.message(0)["@løsning"]["EøsArbeid"]["verdi"].asBoolean() shouldBe true
     }
@@ -46,7 +46,7 @@ class EøsArbeidBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
 
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe "true"
     }
@@ -63,15 +63,15 @@ class EøsArbeidBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
 
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe "false"
     }
 
     @Test
     fun `Behovløser svarer false dersom opplysning om Eøs arbeid ikke finnes`() {
-        val behovMelding = lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid)
-        behovløser.løs(behovMelding)
+        val behovmelding = lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid)
+        behovløser.løs(behovmelding)
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe false
     }
 }

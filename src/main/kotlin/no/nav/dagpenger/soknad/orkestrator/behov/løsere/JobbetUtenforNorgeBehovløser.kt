@@ -2,7 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.JobbetUtenforNorge
-import no.nav.dagpenger.soknad.orkestrator.meldinger.BehovMelding
+import no.nav.dagpenger.soknad.orkestrator.meldinger.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
@@ -18,9 +18,9 @@ class JobbetUtenforNorgeBehovløser(
     override val beskrivendeId = "faktum.arbeidsforhold"
     private val landkodeNorge = "NOR"
 
-    override fun løs(behovMelding: BehovMelding) {
-        val svarPåBehov = harJobbetUtenforNorge(behovMelding.ident, behovMelding.søknadId)
-        publiserLøsning(behovMelding, svarPåBehov)
+    override fun løs(behovmelding: Behovmelding) {
+        val svarPåBehov = harJobbetUtenforNorge(behovmelding.ident, behovmelding.søknadId)
+        publiserLøsning(behovmelding, svarPåBehov)
     }
 
     internal fun harJobbetUtenforNorge(

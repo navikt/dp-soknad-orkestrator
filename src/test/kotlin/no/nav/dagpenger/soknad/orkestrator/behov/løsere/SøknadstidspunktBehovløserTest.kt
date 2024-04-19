@@ -29,13 +29,13 @@ class SøknadstidspunktBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.Søknadstidspunkt))
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Søknadstidspunkt))
 
         testRapid.inspektør.message(0)["@løsning"]["Søknadstidspunkt"]["verdi"].asText() shouldBe "false"
     }
 
     @Test
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
-        shouldThrow<IllegalStateException> { behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.Søknadstidspunkt)) }
+        shouldThrow<IllegalStateException> { behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Søknadstidspunkt)) }
     }
 }

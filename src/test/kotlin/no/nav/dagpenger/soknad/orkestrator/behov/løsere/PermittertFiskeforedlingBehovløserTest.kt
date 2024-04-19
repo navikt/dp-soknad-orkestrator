@@ -21,7 +21,7 @@ class PermittertFiskeforedlingBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov PermittertFiskeforedling`() {
         opplysningRepository.lagre(opplysning())
-        behovløser.løs(lagBehovMelding(ident, søknadId, PermittertFiskeforedling))
+        behovløser.løs(lagBehovmelding(ident, søknadId, PermittertFiskeforedling))
 
         testRapid.inspektør.message(0)["@løsning"]["PermittertFiskeforedling"]["verdi"].asBoolean() shouldBe true
     }

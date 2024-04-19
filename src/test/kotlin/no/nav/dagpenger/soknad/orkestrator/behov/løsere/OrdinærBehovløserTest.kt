@@ -22,7 +22,7 @@ class OrdinærBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov Ordinær`() {
         opplysningRepository.lagre(opplysning())
-        behovløser.løs(lagBehovMelding(ident, søknadId, Ordinær))
+        behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))
 
         testRapid.inspektør.message(0)["@løsning"]["Ordinær"]["verdi"].asBoolean() shouldBe true
     }

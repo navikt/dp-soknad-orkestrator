@@ -2,7 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EøsArbeid
-import no.nav.dagpenger.soknad.orkestrator.meldinger.BehovMelding
+import no.nav.dagpenger.soknad.orkestrator.meldinger.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
@@ -14,9 +14,9 @@ class EøsArbeidBehovløser(
     override val behov = EøsArbeid.name
     override val beskrivendeId = "faktum.eos-arbeid-siste-36-mnd"
 
-    override fun løs(behovMelding: BehovMelding) {
-        val svarPåBehov = harJobbetIEøsSiste36mnd(behovMelding.ident, behovMelding.søknadId)
-        publiserLøsning(behovMelding, svarPåBehov)
+    override fun løs(behovmelding: Behovmelding) {
+        val svarPåBehov = harJobbetIEøsSiste36mnd(behovmelding.ident, behovmelding.søknadId)
+        publiserLøsning(behovmelding, svarPåBehov)
     }
 
     internal fun harJobbetIEøsSiste36mnd(

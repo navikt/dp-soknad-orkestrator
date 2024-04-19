@@ -29,7 +29,7 @@ class HelseTilAlleTyperJobbBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.HelseTilAlleTyperJobb))
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.HelseTilAlleTyperJobb))
 
         testRapid.inspektør.message(0)["@løsning"]["HelseTilAlleTyperJobb"]["verdi"].asBoolean() shouldBe true
     }
@@ -38,7 +38,7 @@ class HelseTilAlleTyperJobbBehovløserTest {
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
         shouldThrow<IllegalStateException> {
             behovløser.løs(
-                lagBehovMelding(ident, søknadId, BehovløserFactory.Behov.HelseTilAlleTyperJobb),
+                lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.HelseTilAlleTyperJobb),
             )
         }
     }

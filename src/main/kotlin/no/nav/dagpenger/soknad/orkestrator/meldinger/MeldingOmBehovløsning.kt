@@ -3,7 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.meldinger
 import no.nav.helse.rapids_rivers.JsonMessage
 
 class MeldingOmBehovløsning(
-    private val behovMelding: BehovMelding,
+    private val behovmelding: Behovmelding,
     private val løsning: Map<String, Any>,
 ) {
     fun asMessage(): JsonMessage =
@@ -11,10 +11,10 @@ class MeldingOmBehovløsning(
             eventName = "behov",
             map =
                 mapOf(
-                    "id" to behovMelding.id,
-                    "ident" to behovMelding.ident,
-                    "søknad_id" to behovMelding.søknadId,
-                    "@behov" to behovMelding.behov,
+                    "id" to behovmelding.id,
+                    "ident" to behovmelding.ident,
+                    "søknad_id" to behovmelding.søknadId,
+                    "@behov" to behovmelding.behov,
                     "@løsning" to løsning,
                 ),
         )

@@ -2,7 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertFiskeforedling
-import no.nav.dagpenger.soknad.orkestrator.meldinger.BehovMelding
+import no.nav.dagpenger.soknad.orkestrator.meldinger.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak
@@ -17,9 +17,9 @@ class PermittertFiskeforedlingBehovløser(
     override val behov = PermittertFiskeforedling.name
     override val beskrivendeId = "faktum.arbeidsforhold"
 
-    override fun løs(behovMelding: BehovMelding) {
-        val svarPåBehov = rettTilDagpengerUnderPermitteringFraFiskeindustri(behovMelding.ident, behovMelding.søknadId)
-        publiserLøsning(behovMelding, svarPåBehov)
+    override fun løs(behovmelding: Behovmelding) {
+        val svarPåBehov = rettTilDagpengerUnderPermitteringFraFiskeindustri(behovmelding.ident, behovmelding.søknadId)
+        publiserLøsning(behovmelding, svarPåBehov)
     }
 
     internal fun rettTilDagpengerUnderPermitteringFraFiskeindustri(
