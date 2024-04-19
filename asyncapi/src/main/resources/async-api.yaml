@@ -9,11 +9,11 @@ channels:
     publish:
       message:
         oneOf:
-          - $ref: '#/components/messages/melding_om_ny_søknad'
+          - $ref: '#/components/messages/søknad_innsendt'
 
 components:
   messages:
-    melding_om_ny_søknad:
+    søknad_innsendt:
       payload:
         type: object
         properties:
@@ -21,7 +21,7 @@ components:
             type: string
             description: Event som forteller om at en søknad er mottatt
             enum: [
-              "melding_om_ny_søknad"
+              "søknad_innsendt"
             ]
           søknad_id:
             type: string
