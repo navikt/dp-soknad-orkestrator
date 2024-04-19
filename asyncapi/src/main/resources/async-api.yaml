@@ -23,7 +23,7 @@ components:
             enum: [
               "melding_om_ny_søknad"
             ]
-          søknad_uuid:
+          søknad_id:
             type: string
             format: uuid
             description: Søknad id

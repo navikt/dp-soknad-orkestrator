@@ -12,14 +12,14 @@ class SøknadServiceTest {
     @Test
     fun `vi kan sende ut melding om ny søknad på rapiden`() {
         val ident = "12345678901"
-        val søknadUUID = UUID.randomUUID()
+        val søknadId = UUID.randomUUID()
 
-        søknadService.publiserMeldingOmSøknadInnsendt(søknadUUID, ident)
+        søknadService.publiserMeldingOmSøknadInnsendt(søknadId, ident)
 
         with(testRapid.inspektør) {
             size shouldBe 1
             field(0, "@event_name").asText() shouldBe "søknad_innsendt"
-            field(0, "søknad_uuid").asText() shouldBe søknadUUID.toString()
+            field(0, "søknad_id").asText() shouldBe søknadId.toString()
             field(0, "ident").asText() shouldBe ident
         }
     }
