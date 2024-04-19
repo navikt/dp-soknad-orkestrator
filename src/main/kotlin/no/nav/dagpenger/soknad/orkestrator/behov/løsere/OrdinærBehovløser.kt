@@ -1,7 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Ordinær
 import no.nav.dagpenger.soknad.orkestrator.meldinger.BehovMelding
 import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
@@ -12,7 +12,7 @@ import java.util.UUID
 
 class OrdinærBehovløser(rapidsConnection: RapidsConnection, opplysningRepository: OpplysningRepository) :
     Behovløser(rapidsConnection, opplysningRepository) {
-    override val behov = BehovløserFactory.Behov.Ordinær.name
+    override val behov = Ordinær.name
     override val beskrivendeId = "faktum.arbeidsforhold"
 
     override fun løs(behovMelding: BehovMelding) {

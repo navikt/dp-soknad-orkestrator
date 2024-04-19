@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Lønnsgaranti
 import no.nav.dagpenger.soknad.orkestrator.meldinger.BehovMelding
 import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
@@ -13,7 +14,7 @@ class LønnsgarantiBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: OpplysningRepository,
 ) : Behovløser(rapidsConnection, opplysningRepository) {
-    override val behov = "Lønnsgaranti"
+    override val behov = Lønnsgaranti.name
     override val beskrivendeId = "faktum.arbeidsforhold"
 
     override fun løs(behovMelding: BehovMelding) {
