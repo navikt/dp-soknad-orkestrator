@@ -35,6 +35,8 @@ class BehovMottak(
                     behovsløserFor(BehovløserFactory.Behov.valueOf(behov)).løs(Behovmelding(packet))
                 } catch (e: IllegalArgumentException) {
                     logger.error(e) { "Kunne ikke løse behov $behov. Ett eller flere argumenter var feil." }
+                } catch (e: IllegalStateException) {
+                    logger.error(e) { "Kunne ikke løse behov $behov. Opplysningen finnes ikke." }
                 }
             }
         }
