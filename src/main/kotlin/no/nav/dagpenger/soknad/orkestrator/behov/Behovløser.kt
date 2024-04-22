@@ -14,15 +14,18 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
     abstract val beskrivendeId: String
 
     internal open fun løs(behovmelding: Behovmelding) {
-        val svarPåBehov =
-            opplysningRepository.hent(beskrivendeId, behovmelding.ident, behovmelding.søknadId)?.svar
-                ?: throw IllegalStateException(
+        try {
+            val svarPåBehov =
+                opplysningRepository.hent(beskrivendeId, behovmelding.ident, behovmelding.søknadId)?.svar ?: throw IllegalStateException(
                     "Fant ingen opplysning med beskrivendeId: $beskrivendeId " +
                         "og kan ikke svare på behov $behov for søknad med id: ${behovmelding.søknadId}",
                 )
 
-        publiserLøsning(behovmelding, svarPåBehov)
-        BehovMetrikker.løst.labels(behov).inc()
+            publiserLøsning(behovmelding, svarPåBehov)
+            BehovMetrikker.løst.labels(behov).inc()
+        } catch (e: Exception) {
+            logger.error(e) { e.message }
+        }
     }
 
     internal fun opprettMeldingMedLøsning(
