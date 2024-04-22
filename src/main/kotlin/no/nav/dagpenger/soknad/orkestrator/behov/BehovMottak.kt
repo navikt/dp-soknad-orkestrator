@@ -31,7 +31,11 @@ class BehovMottak(
 
             mottatteBehov().forEach { behov ->
                 BehovMetrikker.mottatt.labels(behov).inc()
-                behovsløserFor(BehovløserFactory.Behov.valueOf(behov)).løs(Behovmelding(packet))
+                try {
+                    behovsløserFor(BehovløserFactory.Behov.valueOf(behov)).løs(Behovmelding(packet))
+                } catch (e: IllegalStateException) {
+                    logger.error(e) { "Klarte ikke å løse behov $behov" }
+                }
             }
         }
     }
