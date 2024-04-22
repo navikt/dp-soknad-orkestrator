@@ -31,7 +31,11 @@ class BehovMottak(
 
             mottatteBehov().forEach { behov ->
                 BehovMetrikker.mottatt.labels(behov).inc()
-                behovsløserFor(BehovløserFactory.Behov.valueOf(behov)).løs(Behovmelding(packet))
+                try {
+                    behovsløserFor(BehovløserFactory.Behov.valueOf(behov)).løs(Behovmelding(packet))
+                } catch (e: IllegalArgumentException) {
+                    logger.error(e) { "Kunne ikke løse behov $behov. Ett eller flere argumenter var feil." }
+                }
             }
         }
     }
