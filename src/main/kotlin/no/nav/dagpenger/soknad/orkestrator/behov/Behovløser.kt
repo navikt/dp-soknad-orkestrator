@@ -36,7 +36,9 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
         rapidsConnection.publish(opprettMeldingMedLøsning(behovmelding, svarPåBehov))
 
         logger.info { "Løste behov $behov for søknad med id: ${behovmelding.søknadId}" }
-        sikkerlogg.info { "Løste behov $behov for søknad med id: ${behovmelding.søknadId} og ident: ${behovmelding.ident}" }
+        sikkerlogg.info {
+            "Løste behov $behov med løsning: $svarPåBehov for søknad med id: ${behovmelding.søknadId} og ident: ${behovmelding.ident}"
+        }
     }
 
     internal companion object {
