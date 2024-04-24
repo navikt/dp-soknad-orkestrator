@@ -1,9 +1,10 @@
 asyncapi: 3.0.0
 info:
   title: Søknad Orkestrator
+  description: Async API-specs for Søknadsorkestrering. Her finner du forskjellige behov som kan løses, sammen med formatet for løsningene.
   version: '0.0.1'
 channels:
-  hello:
+  teamdagpenger.rapid.v1:
     address: 'teamdagpenger.rapid.v1'
     messages:
       behov_løst:
@@ -50,4 +51,4 @@ operations:
   publish:
     action: 'send'
     channel:
-      $ref: '#/channels/hello'
+      $ref: '#/channels/teamdagpenger.rapid.v1'

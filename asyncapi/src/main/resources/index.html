@@ -1,21 +1,28 @@
 <!DOCTYPE html>
-<html lang="nb">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API spesifikasjoner for vedtak</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@1.2.25/styles/default.min.css">
+    <title>AsyncAPI spesifikasjon</title>
 </head>
 <body>
-<header>
-    <h1>API spesifikasjoner for Søknad orkestrator</h1>
-</header>
-<nav>
-    <ul>
-        <li><a href="asyncapi.html">AsyncAPI spesifikasjon</a></li>
-    </ul>
-</nav>
-<main>
-    <p></p>
-</main>
+
+<div id="asyncapi"></div>
+
+<script src="https://unpkg.com/@asyncapi/react-component@1.2.25/browser/standalone/index.js"></script>
+<script>
+    AsyncApiStandalone.render({
+        schema: {
+            url: './async-api.yaml',
+        },
+        config: {
+            show: {
+                sidebar: true,
+            }
+        },
+    }, document.getElementById('asyncapi'));
+</script>
+
 </body>
 </html>
