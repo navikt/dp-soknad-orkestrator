@@ -1,32 +1,53 @@
-asyncapi: '2.6.0'
+asyncapi: 3.0.0
 info:
   title: Søknad Orkestrator
-  version: 0.0.1
-  description: Eventformat for søknad orkestrator
-
+  version: '0.0.1'
 channels:
-  teamdagpenger.rapid.v1:
-    publish:
-      message:
-        oneOf:
-          - $ref: '#/components/messages/søknad_innsendt'
+  hello:
+    address: 'teamdagpenger.rapid.v1'
+    messages:
+      behov_løst:
+        payload:
+          type: object
+          additionalProperties: false
+          properties:
+            id:
+              type: string
+              description: Behov id
+            ident:
+                type: string
+                description: Ident til mottaker av vedtaket
+            søknadId:
+                type: string
+                description: Søknad id som førte til behandlingen
+            '@behov':
+              type: string
+              description: Behov som er løst
+              enum: [
+                ØnskerDagpengerFraDato,
+                EøsArbeid,
+                KanJobbeDeltid,
+                HelseTilAlleTyperJobb,
+                KanJobbeHvorSomHelst,
+                VilligTilÅBytteYrke,
+                Søknadstidspunkt,
+                JobbetUtenforNorge,
+                Verneplikt,
+                Lønnsgaranti,
+                Permittert,
+                PermittertFiskeforedling,
+                Ordinær,
+              ]
+            '@løsning':
+              type: object
+              description: Løsning på behov
+              properties:
+                verdi:
+                    type: string
+                    description: Verdi på løsning
 
-components:
-  messages:
-    søknad_innsendt:
-      payload:
-        type: object
-        properties:
-          '@event_type':
-            type: string
-            description: Event som forteller om at en søknad er mottatt
-            enum: [
-              "søknad_innsendt"
-            ]
-          søknad_id:
-            type: string
-            format: uuid
-            description: Søknad id
-          ident:
-            type: string
-            description: Søkeren sin ident.
+operations:
+  publish:
+    action: 'send'
+    channel:
+      $ref: '#/channels/hello'
