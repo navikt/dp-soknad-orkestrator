@@ -7,7 +7,7 @@ channels:
   teamdagpenger.rapid.v1:
     address: 'teamdagpenger.rapid.v1'
     messages:
-      behov_løst:
+      behov:
         payload:
           type: object
           additionalProperties: false
