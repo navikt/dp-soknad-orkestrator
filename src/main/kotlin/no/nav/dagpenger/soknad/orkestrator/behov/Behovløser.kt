@@ -2,7 +2,6 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.meldinger.Behovmelding
-import no.nav.dagpenger.soknad.orkestrator.meldinger.MeldingOmBehovløsning
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -23,23 +22,17 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
         publiserLøsning(behovmelding, svarPåBehov)
     }
 
-    internal fun opprettMeldingMedLøsning(
-        behovmelding: Behovmelding,
-        svarPåBehov: Any,
-    ) = MeldingOmBehovløsning(behovmelding, mapOf(behov to mapOf("verdi" to svarPåBehov))).asMessage().toJson()
-
     internal fun publiserLøsning(
         behovmelding: Behovmelding,
         svarPåBehov: Any,
     ) {
+        behovmelding.innkommendePacket["@løsning"] = mapOf(behov to mapOf("verdi" to svarPåBehov))
         // TODO: Skru på denne igjen når mottaker av løsningen er klar
-        // rapidsConnection.publish(opprettMeldingMedLøsning(behovmelding, svarPåBehov))
+        // rapidsConnection.publish(behovmelding.innkommendePacket.toJson())
 
         BehovMetrikker.løst.labels(behov).inc()
-        logger.info { "Løste behov $behov for søknad med id: ${behovmelding.søknadId}" }
-        sikkerlogg.info {
-            "Løste behov $behov med løsning: $svarPåBehov for søknad med id: ${behovmelding.søknadId} og ident: ${behovmelding.ident}"
-        }
+        logger.info { "Løste behov $behov" }
+        sikkerlogg.info { "Løste behov $behov med løsning: $svarPåBehov" }
     }
 
     internal companion object {
@@ -47,7 +40,7 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
         val sikkerlogg = KotlinLogging.logger("tjenestekall.Behovløser")
     }
 
-    fun JsonMessage.søknadId(): UUID = UUID.fromString(get("søknad_id").asText())
+    fun JsonMessage.søknadId(): UUID = UUID.fromString(get("søknadId").asText())
 
     fun JsonMessage.ident(): String = get("ident").asText()
 }

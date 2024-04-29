@@ -62,8 +62,9 @@ private fun opplysning_behov_event(behov: List<String>): String {
         {
           "@event_name": "behov",
           "ident": "12345678987",
-          "søknad_id": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
-          "behandling_id": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
+          "søknadId": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
+          "behandlingId": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
+          "behovId": "c777cdb5-0518-4cd7-b171-148c8c6401c4",
           "@behov": $behovString
         }
         """.trimIndent()
@@ -74,8 +75,9 @@ private val opplysning_behov_event_mangler_ident =
     """
     {
       "@event_name": "behov",
-      "søknad_id": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
-      "behandling_id": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
+      "søknadId": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
+      "behandlingId": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
+      "behovId": "c777cdb5-0518-4cd7-b171-148c8c6401c4",
       "@behov": [
         "ØnskerDagpengerFraDato"
       ]
@@ -88,8 +90,9 @@ private val opplysning_behov_event_med_løsning =
     {
       "@event_name": "behov",
       "ident": "12345678987",
-      "søknad_id": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
-      "behandling_id": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
+      "søknadId": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
+      "behandlingId": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
+      "behovId": "c777cdb5-0518-4cd7-b171-148c8c6401c4",
       "@behov": [
         "ØnskerDagpengerFraDato"
       ],

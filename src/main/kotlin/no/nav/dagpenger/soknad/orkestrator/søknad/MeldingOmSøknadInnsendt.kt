@@ -9,7 +9,7 @@ class MeldingOmSøknadInnsendt(private val søknadId: UUID, private val ident: S
             eventName = "søknad_innsendt",
             map =
                 mapOf(
-                    "søknad_id" to søknadId.toString(),
+                    "søknadId" to søknadId.toString(),
                     "ident" to ident,
                 ),
         )

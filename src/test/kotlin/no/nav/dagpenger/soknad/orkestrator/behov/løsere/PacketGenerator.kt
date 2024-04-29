@@ -16,8 +16,8 @@ fun lagBehovmelding(
             map =
                 mapOf(
                     "ident" to ident,
-                    "søknad_id" to søknadId,
+                    "søknadId" to søknadId,
                     "@behov" to listOf(behov),
                 ),
-        ).apply { this.requireKey("ident", "søknad_id", "@behov") },
+        ).apply { this.requireKey("ident", "søknadId", "@behov") },
     )

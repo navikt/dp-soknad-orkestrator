@@ -7,6 +7,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.withMDC
 
 class BehovMottak(
     val rapidsConnection: RapidsConnection,
@@ -16,9 +17,8 @@ class BehovMottak(
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
             validate { it.demandAllOrAny("@behov", behovløserFactory.behov()) }
-            validate { it.requireKey("ident", "søknad_id") }
+            validate { it.requireKey("ident", "søknadId", "behandlingId", "behovId") }
             validate { it.rejectKey("@løsning") }
-            validate { it.interestedIn("behandling_id") }
         }.register(this)
     }
 
@@ -26,10 +26,16 @@ class BehovMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        with(packet) {
-            logger.info { "Mottok behov: ${mottatteBehov()}" }
+        withMDC(
+            mapOf(
+                "søknadId" to packet["søknadId"].asText(),
+                "behandlingId" to packet["behandlingId"].asText(),
+                "behovId" to packet["behovId"].asText(),
+            ),
+        ) {
+            logger.info { "Mottok behov: ${packet.mottatteBehov()}" }
 
-            mottatteBehov().forEach { behov ->
+            packet.mottatteBehov().forEach { behov ->
                 BehovMetrikker.mottatt.labels(behov).inc()
                 try {
                     behovsløserFor(BehovløserFactory.Behov.valueOf(behov)).løs(Behovmelding(packet))
