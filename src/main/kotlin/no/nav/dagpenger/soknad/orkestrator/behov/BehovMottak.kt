@@ -17,7 +17,7 @@ class BehovMottak(
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
             validate { it.demandAllOrAny("@behov", behovløserFactory.behov()) }
-            validate { it.requireKey("ident", "søknadId", "behandlingId", "behovId") }
+            validate { it.requireKey("ident", "søknadId", "behandlingId", "@behovId") }
             validate { it.rejectKey("@løsning") }
         }.register(this)
     }
@@ -30,7 +30,7 @@ class BehovMottak(
             mapOf(
                 "søknadId" to packet["søknadId"].asText(),
                 "behandlingId" to packet["behandlingId"].asText(),
-                "behovId" to packet["behovId"].asText(),
+                "behovId" to packet["@behovId"].asText(),
             ),
         ) {
             logger.info { "Mottok behov: ${packet.mottatteBehov()}" }
