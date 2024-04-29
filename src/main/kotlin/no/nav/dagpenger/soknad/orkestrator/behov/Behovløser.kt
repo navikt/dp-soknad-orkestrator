@@ -32,7 +32,8 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
         behovmelding: Behovmelding,
         svarPåBehov: Any,
     ) {
-        rapidsConnection.publish(opprettMeldingMedLøsning(behovmelding, svarPåBehov))
+        // TODO: Skru på denne igjen når mottaker av løsningen er klar
+        // rapidsConnection.publish(opprettMeldingMedLøsning(behovmelding, svarPåBehov))
 
         BehovMetrikker.løst.labels(behov).inc()
         logger.info { "Løste behov $behov for søknad med id: ${behovmelding.søknadId}" }
