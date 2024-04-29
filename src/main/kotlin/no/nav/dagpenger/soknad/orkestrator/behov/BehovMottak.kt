@@ -50,9 +50,12 @@ class BehovMottak(
 
     internal fun behovsløserFor(behov: BehovløserFactory.Behov) = behovløserFactory.behovløserFor(behov)
 
-    private fun JsonMessage.mottatteBehov() = get("@behov").map { it.asText() }
-
     private companion object {
         private val logger = KotlinLogging.logger {}
     }
 }
+
+internal fun JsonMessage.mottatteBehov() =
+    get("@behov").map { it.asText() }.filter { behov ->
+        BehovløserFactory.Behov.entries.any { it.name == behov }
+    }

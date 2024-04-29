@@ -2,14 +2,18 @@
 
 package no.nav.dagpenger.soknad.orkestrator.behov
 
+import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnskerDagpengerFraDato
+import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
+import java.util.UUID
 
 class BehovMottakTest {
     private val testRapid = TestRapid()
@@ -53,7 +57,24 @@ class BehovMottakTest {
 
         verify(exactly = 0) { behovløserFactory.behovløserFor(any()) }
     }
+
+    @Test
+    fun `Vi filtrerer ut mottatte behov som vi ikke skal løse`() {
+        val behov = listOf(ØnskerDagpengerFraDato.name, "UkjentBehov")
+        lagJsonMessage(behov).mottatteBehov() shouldBe listOf(ØnskerDagpengerFraDato.name)
+    }
 }
+
+fun lagJsonMessage(behov: List<String>): JsonMessage =
+    JsonMessage.newMessage(
+        eventName = "behov",
+        map =
+            mapOf(
+                "ident" to "12345678987",
+                "søknadId" to UUID.randomUUID(),
+                "@behov" to behov,
+            ),
+    ).apply { this.requireKey("ident", "søknadId", "@behov") }
 
 private fun opplysning_behov_event(behov: List<String>): String {
     val behovString = behov.joinToString(prefix = "[", postfix = "]") { "\"$it\"" }
