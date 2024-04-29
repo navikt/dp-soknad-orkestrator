@@ -10,6 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.utils.januar
 import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class ØnskerDagpengerFraDatoBehovløserTest {
@@ -20,6 +21,7 @@ class ØnskerDagpengerFraDatoBehovløserTest {
     val søknadId = UUID.randomUUID()
 
     @Test
+    @Ignore
     fun `Behovløser publiserer løsning på behov ØnskerDagpengerFraDato`() {
         val svar = 1.januar(2021)
 

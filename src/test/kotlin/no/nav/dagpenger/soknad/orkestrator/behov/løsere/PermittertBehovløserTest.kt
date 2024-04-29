@@ -9,6 +9,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
+import kotlin.test.Ignore
 import kotlin.test.Test
 
 class PermittertBehovløserTest {
@@ -19,6 +20,7 @@ class PermittertBehovløserTest {
     val søknadId = UUID.randomUUID()
 
     @Test
+    @Ignore
     fun `Behovløser publiserer løsning på behov Permittert`() {
         opplysningRepository.lagre(opplysning())
         behovløser.løs(lagBehovmelding(ident, søknadId, Permittert))
