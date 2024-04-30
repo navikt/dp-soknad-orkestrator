@@ -29,8 +29,8 @@ class OrdinærBehovløser(rapidsConnection: RapidsConnection, opplysningReposito
         val ikkeOrdinæreRettighetstyper =
             setOf(Sluttårsak.PERMITTERT, Sluttårsak.PERMITTERT_FISKEFOREDLING, Sluttårsak.ARBEIDSGIVER_KONKURS)
 
-        return arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>().none {
-            it.sluttårsak in ikkeOrdinæreRettighetstyper
+        return arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>().any {
+            it.sluttårsak !in ikkeOrdinæreRettighetstyper
         }
     }
 }

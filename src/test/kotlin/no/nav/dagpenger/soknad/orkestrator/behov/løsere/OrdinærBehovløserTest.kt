@@ -30,28 +30,33 @@ class OrdinærBehovløserTest {
     }
 
     @Test
-    fun `Behovløser setter løsning til true når ingen arbeidsforhold har en ikke-ordinær sluttårsak PERMITTERT, PERMITTERT_FISKEFOREDLING eller ARBEIDSGIVER_KONKURS`() {
-        val svarMedOrdinærRettighetstype =
-            listOf(
-                ArbeidsforholdSvar(
-                    navn = "arbeidsforhold1",
-                    land = "NOR",
-                    sluttårsak = Sluttårsak.KONTRAKT_UTGAATT,
-                ),
-            )
-
-        opplysningRepository.lagre(opplysning(svar = svarMedOrdinærRettighetstype))
-        behovløser.rettTilOrdinæreDagpenger(ident, søknadId) shouldBe true
-    }
-
-    @Test
-    fun `Behovløser setter løsning til false når minst ett arbeidsforhold har en ikke-ordinær sluttårsak PERMITTERT, PERMITTERT_FISKEFOREDLING eller ARBEIDSGIVER_KONKURS`() {
+    fun `Behovløser setter løsning til true når minst ett arbeidsforhold har en ordinær sluttårsak`() {
         val svarMedIkkeOrdinærRettighetstype =
             listOf(
                 ArbeidsforholdSvar(
                     navn = "arbeidsforhold",
                     land = "NOR",
                     sluttårsak = Sluttårsak.KONTRAKT_UTGAATT,
+                ),
+                ArbeidsforholdSvar(
+                    navn = "arbeidsforhold",
+                    land = "NOR",
+                    sluttårsak = Sluttårsak.PERMITTERT,
+                ),
+            )
+
+        opplysningRepository.lagre(opplysning(svar = svarMedIkkeOrdinærRettighetstype))
+        behovløser.rettTilOrdinæreDagpenger(ident, søknadId) shouldBe true
+    }
+
+    @Test
+    fun `Behovløser setter løsning til false når ingen arbeidsforhold har en ordinær sluttårsak`() {
+        val svarMedIkkeOrdinærRettighetstype =
+            listOf(
+                ArbeidsforholdSvar(
+                    navn = "arbeidsforhold",
+                    land = "NOR",
+                    sluttårsak = Sluttårsak.ARBEIDSGIVER_KONKURS,
                 ),
                 ArbeidsforholdSvar(
                     navn = "arbeidsforhold",
