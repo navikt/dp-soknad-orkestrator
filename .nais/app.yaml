@@ -17,7 +17,7 @@ spec:
       cpu: 50m
       memory: 32Mi
   kafka:
-    pool: {{kafka_pool}}
+    pool: {{ kafka.pool }}
   gcp:
     sqlInstances:
       - type: POSTGRES_15
