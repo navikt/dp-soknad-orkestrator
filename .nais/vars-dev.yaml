@@ -1,4 +1,2 @@
 kafka:
   pool: nav-dev
-ingresses:
-  - https://dp-soknad-orkestrator.intern.dev.nav.no
