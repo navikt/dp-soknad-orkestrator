@@ -7,8 +7,6 @@ metadata:
   name: dp-soknad-orkestrator
   namespace: teamdagpenger
 spec:
-  ingresses:
-    - https://dp-soknad-orkestrator.dev-gcp.nav.cloud.nais.io
   image: {{image}}
   port: 8080
   replicas:
@@ -19,19 +17,17 @@ spec:
       cpu: 50m
       memory: 32Mi
   kafka:
-    pool: nav-dev
+    pool: {{kafka_pool}}
   gcp:
     sqlInstances:
       - type: POSTGRES_15
         databases:
           - name : soknad-orkestrator
             envVarPrefix: DB
-
   observability:
     autoInstrumentation:
       enabled: true
       runtime: java
-
   secureLogs:
     enabled: true
   prometheus:
