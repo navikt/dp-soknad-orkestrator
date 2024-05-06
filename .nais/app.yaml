@@ -18,12 +18,6 @@ spec:
       memory: 32Mi
   kafka:
     pool: {{kafka_pool}}
-  {{#if ingresses}}
-  ingresses:
-    {{#each ingresses as |url|}}
-     - {{url}}
-    {{/each }}
-  {{/if}}
   gcp:
     sqlInstances:
       - type: POSTGRES_15
