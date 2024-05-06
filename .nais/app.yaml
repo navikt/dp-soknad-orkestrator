@@ -21,6 +21,8 @@ spec:
   gcp:
     sqlInstances:
       - type: POSTGRES_15
+        highAvailability: true
+        diskAutoresize: true
         databases:
           - name : soknad-orkestrator
             envVarPrefix: DB
