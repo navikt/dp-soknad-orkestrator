@@ -6,7 +6,7 @@ val exposedVersion: String by project
 plugins {
     kotlin("jvm") version "1.9.23"
     id("com.diffplug.spotless") version "6.25.0"
-    id("io.ktor.plugin") version "2.3.10"
+    id("io.ktor.plugin") version "2.3.11"
     id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
