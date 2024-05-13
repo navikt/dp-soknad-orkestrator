@@ -10,6 +10,7 @@ import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
+import no.nav.helse.rapids_rivers.withMDC
 
 class SøknadMottak(
     rapidsConnection: RapidsConnection,
@@ -29,20 +30,24 @@ class SøknadMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        logger.info { "Mottok søknad innsendt hendelse for søknad ${packet["søknadId"]}" }
-        SøknadMetrikker.mottatt.inc()
-        sikkerlogg.info { "Mottok søknad innsendt hendelse: ${packet.toJson()}" }
+        withMDC(
+            mapOf("søknadId" to packet["søknadId"].asText()),
+        ) {
+            logger.info { "Mottok søknad innsendt hendelse for søknad ${packet["søknadId"]}" }
+            SøknadMetrikker.mottatt.inc()
+            sikkerlogg.info { "Mottok søknad innsendt hendelse: ${packet.toJson()}" }
 
-        val jsonNode = objectMapper.readTree(packet.toJson())
+            val jsonNode = objectMapper.readTree(packet.toJson())
 
-        with(jsonNode) {
-            tilSøknadstidspunkt()
-                .also(opplysningRepository::lagre)
+            with(jsonNode) {
+                tilSøknadstidspunkt()
+                    .also(opplysningRepository::lagre)
 
-            tilOpplysninger()
-                .onEach(opplysningRepository::lagre)
+                tilOpplysninger()
+                    .onEach(opplysningRepository::lagre)
 
-            publiserMeldingOmSøknadInnsendt()
+                publiserMeldingOmSøknadInnsendt()
+            }
         }
     }
 
