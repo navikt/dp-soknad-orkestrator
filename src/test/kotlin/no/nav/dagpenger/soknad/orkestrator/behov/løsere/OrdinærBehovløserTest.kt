@@ -9,7 +9,6 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 @Suppress("ktlint:standard:max-line-length")
@@ -21,7 +20,6 @@ class OrdinærBehovløserTest {
     val søknadId = UUID.randomUUID()
 
     @Test
-    @Ignore
     fun `Behovløser publiserer løsning på behov Ordinær`() {
         opplysningRepository.lagre(opplysning())
         behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))

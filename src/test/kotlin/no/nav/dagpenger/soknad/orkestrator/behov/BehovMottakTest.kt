@@ -82,7 +82,7 @@ private fun opplysning_behov_event(behov: List<String>): String {
     return """
         {
           "@event_name": "behov",
-          "bruk-soknad-orkestrator": true,
+          "bruk-søknad-orkestrator": true,
           "ident": "12345678987",
           "søknadId": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
           "behandlingId": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
@@ -97,7 +97,7 @@ private val opplysning_behov_event_mangler_ident =
     """
     {
       "@event_name": "behov",
-      "bruk-soknad-orkestrator": true,
+      "bruk-søknad-orkestrator": true,
       "søknadId": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
       "behandlingId": "c777cdb5-0518-4cd7-b171-148c8c6401c3",
       "@behovId": "c777cdb5-0518-4cd7-b171-148c8c6401c4",
@@ -112,7 +112,7 @@ private val opplysning_behov_event_med_løsning =
     """
     {
       "@event_name": "behov",
-      "bruk-soknad-orkestrator": true,
+      "bruk-søknad-orkestrator": true,
       "ident": "12345678987",
       "søknadId": "87bad9ca-3165-4892-ab8f-a37ee9c22298",
       "behandlingId": "c777cdb5-0518-4cd7-b171-148c8c6401c3",

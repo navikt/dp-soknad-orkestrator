@@ -10,7 +10,6 @@ import no.nav.helse.rapids_rivers.asLocalDate
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.time.LocalDate
 import java.util.UUID
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 class SøknadsdatoBehovløserTest {
@@ -21,7 +20,6 @@ class SøknadsdatoBehovløserTest {
     val søknadId = UUID.randomUUID()
 
     @Test
-    @Ignore
     fun `Behovløser publiserer løsning på behov Søknadsdato`() {
         val opplysning =
             Opplysning(
