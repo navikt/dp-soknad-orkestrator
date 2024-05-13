@@ -16,6 +16,7 @@ class BehovMottak(
     init {
         River(rapidsConnection).apply {
             validate { it.demandValue("@event_name", "behov") }
+            validate { it.demandValue("bruk-soknad-orkestrator", true) }
             validate { it.demandAllOrAny("@behov", behovløserFactory.behov()) }
             validate { it.requireKey("ident", "søknadId", "behandlingId", "@behovId") }
             validate { it.rejectKey("@løsning") }
