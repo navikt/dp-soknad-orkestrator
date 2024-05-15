@@ -64,9 +64,9 @@ class SøknadMapper(private val jsonNode: JsonNode) {
             SøknadMetrikker.dekomponert.inc()
             return opplysninger
         } catch (e: Exception) {
-            logger.info { "Feil ved mapping av søknaddata til opplysninger: ${e.message}" }
+            logger.warn { "Feil ved mapping av søknaddata til opplysninger: ${e.message}" }
             SøknadMetrikker.dekomponeringFeilet.inc()
-            return emptyList()
+            throw IllegalArgumentException("Feil ved mapping av søknaddata til opplysninger", e)
         }
     }
 
