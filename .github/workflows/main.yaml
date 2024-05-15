@@ -2,9 +2,10 @@ name: Build and Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches-ignore:
+      - 'dependabot/**'
     paths-ignore:
-      - '.github/workflows/reviewdog.yaml'
+      -  '.github/workflows/reviewdog.yaml'
 
 permissions:
   contents: "read"
