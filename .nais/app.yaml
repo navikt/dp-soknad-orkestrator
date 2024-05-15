@@ -35,6 +35,22 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
+  tokenx:
+    enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+        - application: dp-soknadsdialog-ny-frontend
+        {{#if wonderwalled}}
+        - application: tokenx-token-generator
+          namespace: aura
+        {{/if}}
   env:
     - name: CLEAN_ON_STARTUP
       value: "false"
+  {{#if ingresses}}
+  ingresses:
+    {{#each ingresses as |url|}}
+     - {{url}}
+    {{/each}}
+  {{/if}}

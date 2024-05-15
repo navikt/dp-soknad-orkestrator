@@ -52,6 +52,7 @@ dependencies {
     implementation(libs.konfig)
     implementation(libs.bundles.postgres)
     implementation(libs.bundles.ktor.server)
+    implementation(libs.bundles.ktor.client)
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-crypt:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
@@ -60,11 +61,16 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("de.slub-dresden:urnlib:2.0.1")
 
+    implementation("io.ktor:ktor-server-netty:${libs.versions.ktor.get()}")
+    implementation("io.ktor:ktor-server-config-yaml:${libs.versions.ktor.get()}")
+
     testImplementation(kotlin("test"))
     testImplementation(libs.bundles.kotest.assertions)
     testImplementation(libs.mockk)
+    testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.bundles.postgres.test)
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
+    testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
 }
 
 tasks.withType<ShadowJar> {

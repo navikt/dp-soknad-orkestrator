@@ -1,2 +1,6 @@
 kafka:
   pool: nav-dev
+
+wonderwalled: true
+ingresses:
+  - https://dp-soknad-orkestrator.intern.dev.nav.no
