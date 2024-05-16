@@ -48,21 +48,25 @@ class SøknadMapper(private val jsonNode: JsonNode) {
             val opplysninger =
                 seksjoner.asIterable().map { seksjon ->
                     val fakta = seksjon.get("fakta")
-                    fakta.asIterable().map { faktum ->
+                    fakta.asIterable().mapNotNull { faktum ->
                         val beskrivendeId = faktum.get("beskrivendeId").asText()
                         val faktumtype = faktum.get("type").asText()
 
-                        val datatype: Datatype<*> = finnDatatype(faktumtype, beskrivendeId)
-                        datatype.tilOpplysning(faktum, beskrivendeId, ident, søknadId)
+                        if (faktumtype == "dokument") {
+                            null
+                        } else {
+                            val datatype: Datatype<*> = finnDatatype(faktumtype, beskrivendeId)
+                            datatype.tilOpplysning(faktum, beskrivendeId, ident, søknadId)
+                        }
                     }
                 }.flatten()
 
             SøknadMetrikker.dekomponert.inc()
             return opplysninger
         } catch (e: Exception) {
-            logger.info { "Feil ved mapping av søknaddata til opplysninger: ${e.message}" }
+            logger.warn { "Feil ved mapping av søknaddata til opplysninger: ${e.message}" }
             SøknadMetrikker.dekomponeringFeilet.inc()
-            return emptyList()
+            throw IllegalArgumentException("Kunne ikke mappe søknaddata til opplysninger", e)
         }
     }
 
