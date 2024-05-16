@@ -52,12 +52,12 @@ class SøknadMapper(private val jsonNode: JsonNode) {
                         val beskrivendeId = faktum.get("beskrivendeId").asText()
                         val faktumtype = faktum.get("type").asText()
 
-//                        if (faktumtype == "dokument") {
-//                            null
-//                        } else {
-                        val datatype: Datatype<*> = finnDatatype(faktumtype, beskrivendeId)
-                        datatype.tilOpplysning(faktum, beskrivendeId, ident, søknadId)
-//                        }
+                        if (faktumtype == "dokument") {
+                            null
+                        } else {
+                            val datatype: Datatype<*> = finnDatatype(faktumtype, beskrivendeId)
+                            datatype.tilOpplysning(faktum, beskrivendeId, ident, søknadId)
+                        }
                     }
                 }.flatten()
 
