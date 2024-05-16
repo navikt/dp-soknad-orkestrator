@@ -40,11 +40,11 @@ class SøknadMottak(
             val jsonNode = objectMapper.readTree(packet.toJson())
 
             with(jsonNode) {
-                tilSøknadstidspunkt()
-                    .also(opplysningRepository::lagre)
-
                 tilOpplysninger()
                     .onEach(opplysningRepository::lagre)
+
+                tilSøknadstidspunkt()
+                    .also(opplysningRepository::lagre)
 
                 publiserMeldingOmSøknadInnsendt()
             }
