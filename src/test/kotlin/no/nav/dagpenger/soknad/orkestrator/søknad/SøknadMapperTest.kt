@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
@@ -63,7 +64,8 @@ class SøknadMapperTest {
     @Test
     fun `kan mappe svar på flervalg faktum`() {
         val søknad = SøknadMapper(søknadsDataMedFlervalgFaktum).søknad
-        val flervalgSvar = søknad.opplysninger.find { it.beskrivendeId == "faktum.eget-gaardsbruk-type-gaardsbruk" }?.svar
+        val flervalgSvar =
+            søknad.opplysninger.find { it.beskrivendeId == "faktum.eget-gaardsbruk-type-gaardsbruk" }?.svar
 
         flervalgSvar shouldBe listOf("svar.dyr", "svar.jord")
     }
@@ -200,6 +202,11 @@ class SøknadMapperTest {
             }
         }
     }
+
+    @Test
+    fun `Kan mappe søknad uten arbeidsforhold`() {
+        shouldNotThrow<IllegalArgumentException> { SøknadMapper(søknadsDataUtenArbeidsforhold).søknad }
+    }
 }
 
 private val søknad_innsendt_event =
@@ -238,49 +245,6 @@ private val søknad_innsendt_event =
         """.trimIndent(),
     )
 
-private val søknadDataUtenSeksjoner =
-    ObjectMapper().readTree(
-        //language=json
-        """
-        {
-          "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt_varsel",
-          "@opprettet": "2024-02-21T11:00:27.899791748",
-          "søknadId": "$søknadId",
-          "ident": "$ident",
-          "søknadstidspunkt": "$søknadstidspunkt",
-          "søknadData": {
-            "søknad_uuid": "$søknadId",
-            "@opprettet": "2024-02-21T11:00:27.899791748"
-          }
-        }
-        """.trimIndent(),
-    )
-
-private val søknaddataUtenFakta =
-    ObjectMapper().readTree(
-        //language=json
-        """
-        {
-          "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
-          "@event_name": "søknad_innsendt_varsel",
-          "@opprettet": "2024-02-21T11:00:27.899791748",
-          "søknadId": "$søknadId",
-          "ident": "$ident",
-          "søknadstidspunkt": "$søknadstidspunkt",
-          "søknadData": {
-            "søknad_uuid": "$søknadId",
-            "@opprettet": "2024-02-21T11:00:27.899791748",
-            "seksjoner": [
-              {
-                "beskrivendeId": "bostedsland"
-              }
-            ]
-          }
-        }
-        """.trimIndent(),
-    )
-
 private val søknadsDataMedPeriodeFaktum =
     ObjectMapper().readTree(
         //language=json
@@ -306,6 +270,61 @@ private val søknadsDataMedPeriodeFaktum =
                     },
                     "type": "periode",
                     "beskrivendeId": "faktum.arbeidsforhold.varighet"
+                  }
+                ],
+                "beskrivendeId": "din-situasjon"
+              }
+            ]
+          }
+        }
+        """.trimIndent(),
+    )
+
+private val søknadsDataUtenArbeidsforhold =
+    ObjectMapper().readTree(
+        //language=json
+        """
+        {
+          "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+          "@event_name": "søknad_innsendt_varsel",
+          "@opprettet": "2024-02-21T11:00:27.899791748",
+          "søknadId": "$søknadId",
+          "ident": "$ident",
+          "søknadstidspunkt": "$søknadstidspunkt",
+          "søknadData": {
+            "søknad_uuid": "$søknadId",
+            "@opprettet": "2024-02-21T11:00:27.899791748",
+            "seksjoner": [
+              {
+                "fakta": [
+                  {
+                    "id": "107",
+                    "svar": "faktum.type-arbeidstid.svar.ingen-passer",
+                    "type": "envalg",
+                    "roller": [
+                      "søker"
+                    ],
+                    "readOnly": false,
+                    "gyldigeValg": [
+                      "faktum.type-arbeidstid.svar.fast",
+                      "faktum.type-arbeidstid.svar.varierende",
+                      "faktum.type-arbeidstid.svar.kombinasjon",
+                      "faktum.type-arbeidstid.svar.ingen-passer"
+                    ],
+                    "beskrivendeId": "faktum.type-arbeidstid",
+                    "sannsynliggjoresAv": []
+                  },
+                  {
+                    "id": "109",
+                    "svar": [
+                      []
+                    ],
+                    "type": "generator",
+                    "roller": [
+                      "søker"
+                    ],
+                    "readOnly": false,
+                    "beskrivendeId": "faktum.arbeidsforhold"
                   }
                 ],
                 "beskrivendeId": "din-situasjon"

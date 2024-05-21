@@ -42,24 +42,15 @@ class SøknadMapper(private val jsonNode: JsonNode) {
         søknadId: UUID,
     ): List<Opplysning<*>> {
         try {
-            val seksjoner =
-                søknadData["seksjoner"]
+            val seksjoner = søknadData["seksjoner"]
 
             val opplysninger =
-                seksjoner.asIterable().map { seksjon ->
+                seksjoner.asIterable().flatMap { seksjon ->
                     val fakta = seksjon.get("fakta")
                     fakta.asIterable().mapNotNull { faktum ->
-                        val beskrivendeId = faktum.get("beskrivendeId").asText()
-                        val faktumtype = faktum.get("type").asText()
-
-                        if (faktumtype == "dokument") {
-                            null
-                        } else {
-                            val datatype: Datatype<*> = finnDatatype(faktumtype, beskrivendeId)
-                            datatype.tilOpplysning(faktum, beskrivendeId, ident, søknadId)
-                        }
+                        opprettOpplysning(faktum, ident, søknadId)
                     }
-                }.flatten()
+                }
 
             SøknadMetrikker.dekomponert.inc()
             return opplysninger
@@ -68,6 +59,29 @@ class SøknadMapper(private val jsonNode: JsonNode) {
             SøknadMetrikker.dekomponeringFeilet.inc()
             throw IllegalArgumentException("Kunne ikke mappe søknad $søknadId til opplysninger", e)
         }
+    }
+
+    private fun opprettOpplysning(
+        faktum: JsonNode,
+        ident: String,
+        søknadId: UUID,
+    ): Opplysning<*>? {
+        val beskrivendeId = faktum.get("beskrivendeId").asText()
+        val faktumtype = faktum.get("type").asText()
+
+        if (faktumtype == "dokument") {
+            return null
+        }
+
+        if (beskrivendeId == "faktum.arbeidsforhold") {
+            val arbeidsforhold = faktum.get("svar")
+            if (arbeidsforhold.isArray && arbeidsforhold.all { it.isEmpty }) {
+                return null
+            }
+        }
+
+        val datatype: Datatype<*> = finnDatatype(faktumtype, beskrivendeId)
+        return datatype.tilOpplysning(faktum, beskrivendeId, ident, søknadId)
     }
 
     private fun finnDatatype(
