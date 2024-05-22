@@ -20,29 +20,49 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*> {
-        val arbeidsforholdSvar: List<ArbeidsforholdSvar> =
-            faktum.get("svar").map { arbeidsforhold ->
-                val navnSvar =
-                    arbeidsforhold
-                        .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.navn-bedrift" }
-                        .get("svar").asText()
+    ): Opplysning<*>? {
+        if (!harAllePåkrevdeFelt(faktum)) return null
 
-                val landFaktum =
-                    arbeidsforhold
-                        .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.land" }
-                        .get("svar").asText()
+        val arbeidsforholdSvar: List<ArbeidsforholdSvar> = hentArbeidsforholdSvar(faktum)
 
-                val sluttårsak = finnSluttårsak(arbeidsforhold)
-
-                ArbeidsforholdSvar(
-                    navn = navnSvar,
-                    land = landFaktum,
-                    sluttårsak = sluttårsak,
-                )
-            }
         return Opplysning(beskrivendeId, Arbeidsforhold, arbeidsforholdSvar, ident, søknadId)
     }
+
+    private fun harAllePåkrevdeFelt(faktum: JsonNode): Boolean {
+        val påkrevdeFelter =
+            listOf(
+                "faktum.arbeidsforhold.navn-bedrift",
+                "faktum.arbeidsforhold.land",
+                "faktum.arbeidsforhold.endret",
+            )
+
+        return påkrevdeFelter.all { påkrevdFelt -> faktum.harPåkrevdFelt(påkrevdFelt) }
+    }
+
+    private fun JsonNode.harPåkrevdFelt(påkrevdFelt: String): Boolean {
+        return this["svar"].any { it.any { it["beskrivendeId"].asText() == påkrevdFelt } }
+    }
+
+    private fun hentArbeidsforholdSvar(faktum: JsonNode) =
+        faktum.get("svar").map { arbeidsforhold ->
+            val navnSvar =
+                arbeidsforhold
+                    .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.navn-bedrift" }
+                    .get("svar").asText()
+
+            val landFaktum =
+                arbeidsforhold
+                    .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.land" }
+                    .get("svar").asText()
+
+            val sluttårsak = finnSluttårsak(arbeidsforhold)
+
+            ArbeidsforholdSvar(
+                navn = navnSvar,
+                land = landFaktum,
+                sluttårsak = sluttårsak,
+            )
+        }
 
     internal fun finnSluttårsak(arbeidsforhold: JsonNode): Sluttårsak {
         return arbeidsforhold.single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.endret" }

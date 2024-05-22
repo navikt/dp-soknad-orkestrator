@@ -10,5 +10,5 @@ sealed class Datatype<T>(val klasse: Class<T>) {
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*>
+    ): Opplysning<*>?
 }

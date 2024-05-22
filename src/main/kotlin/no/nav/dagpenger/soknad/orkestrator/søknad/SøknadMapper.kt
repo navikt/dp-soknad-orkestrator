@@ -73,13 +73,6 @@ class SøknadMapper(private val jsonNode: JsonNode) {
             return null
         }
 
-        if (beskrivendeId == "faktum.arbeidsforhold") {
-            val arbeidsforhold = faktum.get("svar")
-            if (arbeidsforhold.isArray && arbeidsforhold.all { it.isEmpty }) {
-                return null
-            }
-        }
-
         val datatype: Datatype<*> = finnDatatype(faktumtype, beskrivendeId)
         return datatype.tilOpplysning(faktum, beskrivendeId, ident, søknadId)
     }

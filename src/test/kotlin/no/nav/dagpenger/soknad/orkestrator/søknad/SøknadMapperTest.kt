@@ -204,8 +204,9 @@ class SøknadMapperTest {
     }
 
     @Test
-    fun `Kan mappe søknad uten arbeidsforhold`() {
+    fun `Kan mappe søknader med ukomplette arbeidsforhold`() {
         shouldNotThrow<IllegalArgumentException> { SøknadMapper(søknadsDataUtenArbeidsforhold).søknad }
+        shouldNotThrow<IllegalArgumentException> { SøknadMapper(søknadsDataIkkeKomplettArbeidsforhold).søknad }
     }
 }
 
@@ -327,6 +328,56 @@ private val søknadsDataUtenArbeidsforhold =
                     "beskrivendeId": "faktum.arbeidsforhold"
                   }
                 ],
+                "beskrivendeId": "din-situasjon"
+              }
+            ]
+          }
+        }
+        """.trimIndent(),
+    )
+
+private val søknadsDataIkkeKomplettArbeidsforhold =
+    ObjectMapper().readTree(
+        //language=json
+        """
+        {
+          "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+          "@event_name": "søknad_innsendt_varsel",
+          "@opprettet": "2024-02-21T11:00:27.899791748",
+          "søknadId": "$søknadId",
+          "ident": "$ident",
+          "søknadstidspunkt": "$søknadstidspunkt",
+          "søknadData": {
+            "søknad_uuid": "$søknadId",
+            "@opprettet": "2024-02-21T11:00:27.899791748",
+            "seksjoner": [
+              {
+                "fakta": [
+                  {
+                    "svar": "faktum.type-arbeidstid.svar.ingen-passer",
+                    "type": "envalg",
+                    "beskrivendeId": "faktum.type-arbeidstid"
+                  },
+                  {
+                    "svar": [
+                      [
+                        {
+                          "svar": "NOR",
+                          "type": "land",
+                          "beskrivendeId": "faktum.arbeidsforhold.land"
+                        },
+                         {
+                          "svar": "Elektrikersjappa",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.arbeidsforhold.navn-bedrift"
+                        }
+                      ]
+                    ],
+                    "type": "generator",
+                    "beskrivendeId": "faktum.arbeidsforhold"
+                  }
+                ],
+                "ferdig": true,
                 "beskrivendeId": "din-situasjon"
               }
             ]
