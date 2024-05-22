@@ -30,7 +30,7 @@ class SøknadMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        if (packet["søknadId"].asText() == "bd8e546f-3a30-448e-a3f7-8cb91e08c7a3") {
+        if (packet["søknadId"].asText() == "587f7e60-fa00-4880-9c1e-1abaf042d909") {
             logger.info { "Skipper søknad ${packet["søknadId"]}, poison pill." }
             return
         }
