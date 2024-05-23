@@ -40,7 +40,7 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: dp-soknadsdialog-ny-frontend
+        - application: dp-soknad-frontend
         {{#if wonderwalled}}
         - application: tokenx-token-generator
           namespace: aura
