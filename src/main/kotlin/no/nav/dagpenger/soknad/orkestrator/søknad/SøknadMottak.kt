@@ -2,15 +2,12 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
-import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
-import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
 import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.withMDC
 
 class SøknadMottak(
     rapidsConnection: RapidsConnection,
@@ -30,7 +27,8 @@ class SøknadMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        withMDC(
+        return
+        /*withMDC(
             mapOf("søknadId" to packet["søknadId"].asText()),
         ) {
             logger.info { "Mottok søknad innsendt hendelse for søknad ${packet["søknadId"]}" }
@@ -48,7 +46,7 @@ class SøknadMottak(
 
                 publiserMeldingOmSøknadInnsendt()
             }
-        }
+        }*/
     }
 
     private companion object {

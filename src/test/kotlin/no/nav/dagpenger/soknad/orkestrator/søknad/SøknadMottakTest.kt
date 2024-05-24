@@ -5,6 +5,7 @@ import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class SøknadMottakTest {
@@ -21,6 +22,7 @@ class SøknadMottakTest {
         testRapid.reset()
     }
 
+    @Disabled("Ignorerer midlertidig menst mottaket ikke gjør noe")
     @Test
     fun `vi kan motta søknader`() {
         testRapid.sendTestMessage(søknad_innsendt_event)
