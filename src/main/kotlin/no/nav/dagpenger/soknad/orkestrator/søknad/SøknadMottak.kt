@@ -30,11 +30,6 @@ class SøknadMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        if (packet["søknadId"].asText() == "44c2a588-213e-4644-9ad8-3636875b9655") {
-            logger.info { "Skipper søknad ${packet["søknadId"]}, poison pill." }
-            return
-        }
-
         withMDC(
             mapOf("søknadId" to packet["søknadId"].asText()),
         ) {
