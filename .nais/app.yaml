@@ -47,7 +47,7 @@ spec:
         {{/if}}
   env:
     - name: CLEAN_ON_STARTUP
-      value: "false"
+      value: "true"
   {{#if ingresses}}
   ingresses:
     {{#each ingresses as |url|}}
