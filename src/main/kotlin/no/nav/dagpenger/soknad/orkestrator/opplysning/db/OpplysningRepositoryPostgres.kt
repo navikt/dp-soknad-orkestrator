@@ -365,9 +365,9 @@ private fun lagreArbeidsforholdSvar(
 
         ArbeidsforholdSvarTabell.insert {
             it[ArbeidsforholdSvarTabell.arbeidsforholdId] = arbeidsforholdId
-            it[this.navnSvarId] = navnSvarId
-            it[this.landSvarId] = landSvarId
-            it[this.sluttårsakSvarId] = sluttårsakSvarId
+            it[this.navn] = arbeidsforholdSvar.navn
+            it[this.land] = arbeidsforholdSvar.land
+            it[this.sluttårsak] = arbeidsforholdSvar.sluttårsak.name
         }
     }
 }
@@ -380,27 +380,13 @@ fun hentArbeidsforholdSvar(it: ResultRow): List<ArbeidsforholdSvar> {
             .first()[ArbeidsforholdTabell.id].value
 
     return ArbeidsforholdSvarTabell
-        .select(ArbeidsforholdSvarTabell.navnSvarId, ArbeidsforholdSvarTabell.landSvarId, ArbeidsforholdSvarTabell.sluttårsakSvarId)
+        .select(ArbeidsforholdSvarTabell.navn, ArbeidsforholdSvarTabell.land, ArbeidsforholdSvarTabell.sluttårsak)
         .where { ArbeidsforholdSvarTabell.arbeidsforholdId eq arbeidsforholdId }
         .map {
             ArbeidsforholdSvar(
-                navn =
-                    TekstTabell
-                        .select(TekstTabell.svar)
-                        .where { TekstTabell.id eq it[ArbeidsforholdSvarTabell.navnSvarId] }
-                        .first()[TekstTabell.svar],
-                land =
-                    TekstTabell
-                        .select(TekstTabell.svar)
-                        .where { TekstTabell.id eq it[ArbeidsforholdSvarTabell.landSvarId] }
-                        .first()[TekstTabell.svar],
-                sluttårsak =
-                    Sluttårsak.valueOf(
-                        TekstTabell
-                            .select(TekstTabell.svar)
-                            .where { TekstTabell.id eq it[ArbeidsforholdSvarTabell.sluttårsakSvarId] }
-                            .first()[TekstTabell.svar],
-                    ),
+                navn = it[ArbeidsforholdSvarTabell.navn],
+                land = it[ArbeidsforholdSvarTabell.land],
+                sluttårsak = Sluttårsak.valueOf(it[ArbeidsforholdSvarTabell.sluttårsak]),
             )
         }
 }
@@ -424,37 +410,13 @@ private fun lagreEøsArbeidsforholdSvar(
         }.value
 
     svar.forEach { eøsArbeidsforholdSvar ->
-        val bedriftnavnSvarId =
-            TekstTabell.insertAndGetId {
-                it[TekstTabell.opplysningId] = opplysningId
-                it[TekstTabell.svar] = eøsArbeidsforholdSvar.bedriftnavn
-            }.value
-
-        val landSvarId =
-            TekstTabell.insertAndGetId {
-                it[TekstTabell.opplysningId] = opplysningId
-                it[TekstTabell.svar] = eøsArbeidsforholdSvar.land
-            }.value
-
-        val personnummerSvarId =
-            TekstTabell.insertAndGetId {
-                it[TekstTabell.opplysningId] = opplysningId
-                it[TekstTabell.svar] = eøsArbeidsforholdSvar.personnummerIArbeidsland
-            }.value
-
-        val varighetSvarId =
-            PeriodeTabell.insertAndGetId {
-                it[PeriodeTabell.opplysningId] = opplysningId
-                it[fom] = eøsArbeidsforholdSvar.varighet.fom
-                it[tom] = eøsArbeidsforholdSvar.varighet.tom
-            }.value
-
         EøsArbeidsforholdSvarTabell.insert {
             it[EøsArbeidsforholdSvarTabell.arbeidsforholdId] = arbeidsforholdId
-            it[this.bedriftnavnSvarId] = bedriftnavnSvarId
-            it[this.landSvarId] = landSvarId
-            it[this.personnummerSvarId] = personnummerSvarId
-            it[this.varighetSvarId] = varighetSvarId
+            it[this.bedriftsnavn] = eøsArbeidsforholdSvar.bedriftnavn
+            it[this.land] = eøsArbeidsforholdSvar.land
+            it[this.personnummer] = eøsArbeidsforholdSvar.personnummerIArbeidsland
+            it[this.fom] = eøsArbeidsforholdSvar.varighet.fom
+            it[this.tom] = eøsArbeidsforholdSvar.varighet.tom
         }
     }
 }
