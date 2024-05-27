@@ -52,6 +52,7 @@ data object EøsArbeidsforhold : Datatype<List<EøsArbeidsforholdSvar>>(
 }
 
 data class EøsArbeidsforholdSvar(
+    // TODO: Endre navn på denne?
     val bedriftnavn: String,
     val land: String,
     val personnummerIArbeidsland: String,
