@@ -11,4 +11,6 @@ interface OpplysningRepository {
         ident: String,
         søknadId: UUID,
     ): Opplysning<*>?
+
+    fun hentAlle(søknadId: UUID): List<Opplysning<*>>
 }

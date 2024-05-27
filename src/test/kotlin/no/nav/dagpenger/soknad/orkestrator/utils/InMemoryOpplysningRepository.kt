@@ -20,4 +20,8 @@ class InMemoryOpplysningRepository : OpplysningRepository {
             it.beskrivendeId == beskrivendeId && it.ident == ident && it.søknadId == søknadId
         }
     }
+
+    override fun hentAlle(søknadId: UUID): List<Opplysning<*>> {
+        return opplysninger.filter { it.søknadId == søknadId }
+    }
 }

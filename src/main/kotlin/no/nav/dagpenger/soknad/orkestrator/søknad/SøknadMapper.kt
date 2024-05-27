@@ -26,7 +26,7 @@ class SøknadMapper(private val jsonNode: JsonNode) {
         val søknadData = jsonNode.get("søknadData")
 
         Søknad(
-            id = søknadId,
+            søknadId = søknadId,
             ident = ident,
             opplysninger = søknadDataTilOpplysninger(søknadData, ident, søknadId),
         )

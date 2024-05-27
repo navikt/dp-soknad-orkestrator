@@ -6,12 +6,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-object SøknadTabell : IntIdTable("soknad") {
-    val opprettet: Column<LocalDateTime> = datetime("opprettet").default(LocalDateTime.now())
-    val søknadId: Column<UUID> = uuid("soknad_id")
-    val ident: Column<String> = varchar("ident", 11)
-}
-
 object OpplysningTabell : IntIdTable("opplysning") {
     val opprettet: Column<LocalDateTime> = datetime("opprettet").default(LocalDateTime.now())
     val beskrivendeId: Column<String> = varchar("beskrivende_id", 255)

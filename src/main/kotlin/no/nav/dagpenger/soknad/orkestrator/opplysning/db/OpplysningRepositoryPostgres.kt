@@ -91,6 +91,15 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
                 .firstOrNull()
         }
     }
+
+    override fun hentAlle(søknadId: UUID): List<Opplysning<*>> {
+        return transaction {
+            OpplysningTabell
+                .selectAll()
+                .where { OpplysningTabell.søknadId eq søknadId }
+                .map(tilOpplysning())
+        }
+    }
 }
 
 private fun opplysningEksisterer(opplysning: Opplysning<*>): Boolean =
@@ -346,24 +355,6 @@ private fun lagreArbeidsforholdSvar(
         }.value
 
     svar.forEach { arbeidsforholdSvar ->
-        val navnSvarId =
-            TekstTabell.insertAndGetId {
-                it[TekstTabell.opplysningId] = opplysningId
-                it[TekstTabell.svar] = arbeidsforholdSvar.navn
-            }.value
-
-        val landSvarId =
-            TekstTabell.insertAndGetId {
-                it[TekstTabell.opplysningId] = opplysningId
-                it[TekstTabell.svar] = arbeidsforholdSvar.land
-            }.value
-
-        val sluttårsakSvarId =
-            TekstTabell.insertAndGetId {
-                it[TekstTabell.opplysningId] = opplysningId
-                it[TekstTabell.svar] = arbeidsforholdSvar.sluttårsak.name
-            }.value
-
         ArbeidsforholdSvarTabell.insert {
             it[ArbeidsforholdSvarTabell.arbeidsforholdId] = arbeidsforholdId
             it[this.navn] = arbeidsforholdSvar.navn
@@ -413,7 +404,7 @@ private fun lagreEøsArbeidsforholdSvar(
     svar.forEach { eøsArbeidsforholdSvar ->
         EøsArbeidsforholdSvarTabell.insert {
             it[EøsArbeidsforholdSvarTabell.arbeidsforholdId] = arbeidsforholdId
-            it[this.bedriftsnavn] = eøsArbeidsforholdSvar.bedriftnavn
+            it[this.bedriftsnavn] = eøsArbeidsforholdSvar.bedriftsnavn
             it[this.land] = eøsArbeidsforholdSvar.land
             it[this.personnummer] = eøsArbeidsforholdSvar.personnummerIArbeidsland
             it[this.fom] = eøsArbeidsforholdSvar.varighet.fom
@@ -440,7 +431,7 @@ fun hentEøsArbeidsforholdSvar(it: ResultRow): List<EøsArbeidsforholdSvar> {
         .where { EøsArbeidsforholdSvarTabell.arbeidsforholdId eq arbeidsforholdId }
         .map {
             EøsArbeidsforholdSvar(
-                bedriftnavn = it[EøsArbeidsforholdSvarTabell.bedriftsnavn],
+                bedriftsnavn = it[EøsArbeidsforholdSvarTabell.bedriftsnavn],
                 land = it[EøsArbeidsforholdSvarTabell.land],
                 personnummerIArbeidsland = it[EøsArbeidsforholdSvarTabell.personnummer],
                 varighet =
@@ -538,43 +529,13 @@ private fun lagreBarnSvar(
         }.value
 
     svar.forEach { barn ->
-        val fornavnMellomnavnId =
-            TekstTabell.insertAndGetId {
-                it[TekstTabell.opplysningId] = opplysningId
-                it[TekstTabell.svar] = barn.fornavnOgMellomnavn
-            }.value
-
-        val etternavnId =
-            TekstTabell.insertAndGetId {
-                it[TekstTabell.opplysningId] = opplysningId
-                it[TekstTabell.svar] = barn.etternavn
-            }.value
-
-        val fødselsdatoId =
-            DatoTabell.insertAndGetId {
-                it[DatoTabell.opplysningId] = opplysningId
-                it[DatoTabell.svar] = barn.fødselsdato
-            }.value
-
-        val statsborgerskapId =
-            TekstTabell.insertAndGetId {
-                it[TekstTabell.opplysningId] = opplysningId
-                it[TekstTabell.svar] = barn.statsborgerskap
-            }.value
-
-        val forsørgerId =
-            BoolskTabell.insertAndGetId {
-                it[BoolskTabell.opplysningId] = opplysningId
-                it[BoolskTabell.svar] = barn.forsørgerBarnet
-            }.value
-
         BarnSvarTabell.insert {
             it[BarnSvarTabell.barnId] = barnId
-            it[BarnSvarTabell.fornavnMellomnavn] = barn.fornavnOgMellomnavn
-            it[BarnSvarTabell.etternavn] = barn.etternavn
-            it[BarnSvarTabell.fødselsdato] = barn.fødselsdato
-            it[BarnSvarTabell.statsborgerskap] = barn.statsborgerskap
-            it[BarnSvarTabell.forsørgerBarnet] = barn.forsørgerBarnet
+            it[fornavnMellomnavn] = barn.fornavnOgMellomnavn
+            it[etternavn] = barn.etternavn
+            it[fødselsdato] = barn.fødselsdato
+            it[statsborgerskap] = barn.statsborgerskap
+            it[forsørgerBarnet] = barn.forsørgerBarnet
             it[fraRegister] = barn.fraRegister
         }
     }
