@@ -30,7 +30,7 @@ class SøknadMapperTest {
     @Test
     fun `vi kan mappe søknad_innsendt event riktig`() {
         val søknad = SøknadMapper(søknad_innsendt_event).søknad
-        søknad.id shouldBe søknadId
+        søknad.søknadId shouldBe søknadId
         søknad.ident shouldBe ident
         søknad.opplysninger.size shouldBe 2
 
@@ -125,12 +125,12 @@ class SøknadMapperTest {
             eøsArbeidsforhold.svar.asListOf<EøsArbeidsforholdSvar>().let {
                 it.size shouldBe 2
 
-                it[0].bedriftnavn shouldBe "Utlandet AS"
+                it[0].bedriftsnavn shouldBe "Utlandet AS"
                 it[0].land shouldBe "NLD"
                 it[0].personnummerIArbeidsland shouldBe "123567890"
                 it[0].varighet shouldBe PeriodeSvar(11.mars(2024), 24.mars(2024))
 
-                it[1].bedriftnavn shouldBe "Utlandet 2 AS"
+                it[1].bedriftsnavn shouldBe "Utlandet 2 AS"
                 it[1].land shouldBe "FRA"
                 it[1].personnummerIArbeidsland shouldBe "23456789"
                 it[1].varighet shouldBe PeriodeSvar(6.februar(2024), null)

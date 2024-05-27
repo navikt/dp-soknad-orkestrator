@@ -223,13 +223,13 @@ class OpplysningRepositoryPostgresTest {
                 svar =
                     listOf(
                         EøsArbeidsforholdSvar(
-                            bedriftnavn = "arbeidsgivernavn",
+                            bedriftsnavn = "arbeidsgivernavn",
                             land = "land",
                             personnummerIArbeidsland = "personnummer",
                             varighet = PeriodeSvar(LocalDate.now(), LocalDate.now().plusDays(10)),
                         ),
                         EøsArbeidsforholdSvar(
-                            bedriftnavn = "arbeidsgivernavn2",
+                            bedriftsnavn = "arbeidsgivernavn2",
                             land = "land2",
                             personnummerIArbeidsland = "personnummer2",
                             varighet = PeriodeSvar(LocalDate.now(), LocalDate.now().plusDays(10)),

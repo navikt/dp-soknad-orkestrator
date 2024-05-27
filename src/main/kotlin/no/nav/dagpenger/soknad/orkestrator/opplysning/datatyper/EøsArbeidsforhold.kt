@@ -41,7 +41,7 @@ data object EøsArbeidsforhold : Datatype<List<EøsArbeidsforholdSvar>>(
                 val tom = varighet.get("tom")?.asLocalDate()
 
                 EøsArbeidsforholdSvar(
-                    bedriftnavn = arbeidsgivernavnSvar,
+                    bedriftsnavn = arbeidsgivernavnSvar,
                     land = landSvar,
                     personnummerIArbeidsland = personnummerSvar,
                     varighet = PeriodeSvar(fom, tom),
@@ -52,7 +52,7 @@ data object EøsArbeidsforhold : Datatype<List<EøsArbeidsforholdSvar>>(
 }
 
 data class EøsArbeidsforholdSvar(
-    val bedriftnavn: String,
+    val bedriftsnavn: String,
     val land: String,
     val personnummerIArbeidsland: String,
     val varighet: PeriodeSvar,
