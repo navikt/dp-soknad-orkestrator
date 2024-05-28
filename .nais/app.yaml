@@ -35,8 +35,6 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
-  tokenx:
-    enabled: true
   accessPolicy:
     inbound:
       rules:
@@ -45,9 +43,8 @@ spec:
         - application: tokenx-token-generator
           namespace: aura
         {{/if}}
-  env:
-    - name: CLEAN_ON_STARTUP
-      value: "true"
+  tokenx:
+    enabled: true
   {{#if ingresses}}
   ingresses:
     {{#each ingresses as |url|}}
