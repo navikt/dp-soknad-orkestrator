@@ -16,10 +16,10 @@ class SøknadServiceTest {
             rapid = testRapid,
             søknadRepository = søknadRepository,
         )
+    private val ident = "12345678901"
 
     @Test
     fun `vi kan sende ut melding om ny søknad på rapiden`() {
-        val ident = "12345678901"
         val søknadId = UUID.randomUUID()
 
         søknadService.publiserMeldingOmSøknadInnsendt(søknadId, ident)
@@ -34,8 +34,6 @@ class SøknadServiceTest {
 
     @Test
     fun `vi kan opprette en søknad`() {
-        val ident = "12345678901"
-
         val søknad = søknadService.opprettSøknad(ident)
 
         verify(exactly = 1) { søknadRepository.lagre(søknad) }

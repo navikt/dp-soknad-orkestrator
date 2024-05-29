@@ -19,10 +19,7 @@ class SøknadService(private val rapid: RapidsConnection, private val søknadRep
     }
 
     fun opprettSøknad(ident: String): Søknad {
-        val søknad =
-            Søknad(
-                ident = ident,
-            )
+        val søknad = Søknad(ident = ident)
 
         søknadRepository.lagre(søknad)
 
