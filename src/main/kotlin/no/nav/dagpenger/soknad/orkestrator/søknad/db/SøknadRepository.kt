@@ -13,7 +13,10 @@ import java.time.LocalDateTime
 import java.util.UUID
 import javax.sql.DataSource
 
-class SøknadRepository(dataSource: DataSource, private val opplysningRepository: OpplysningRepository) {
+class SøknadRepository(
+    dataSource: DataSource,
+    private val opplysningRepository: OpplysningRepository,
+) {
     val database = Database.connect(dataSource)
 
     fun lagre(søknad: Søknad) {
@@ -22,6 +25,8 @@ class SøknadRepository(dataSource: DataSource, private val opplysningRepository
                 it[søknadId] = søknad.søknadId
                 it[ident] = søknad.ident
             }
+
+            søknad.opplysninger.forEach { opplysningRepository.lagre(it) }
         }
     }
 
