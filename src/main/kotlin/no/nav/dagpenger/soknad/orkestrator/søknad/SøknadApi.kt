@@ -17,7 +17,7 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
                 post {
                     val søknad = søknadService.opprettSøknad(call.ident())
 
-                    call.respond(HttpStatusCode.OK, søknad.søknadId)
+                    call.respond(HttpStatusCode.Created, søknad.søknadId)
                 }
             }
         }

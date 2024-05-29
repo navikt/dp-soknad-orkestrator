@@ -26,7 +26,7 @@ class SøknadApiTest {
                 endepunkt = endepunkt,
                 httpMethod = HttpMethod.Post,
             ).let { respons ->
-                respons.status shouldBe HttpStatusCode.OK
+                respons.status shouldBe HttpStatusCode.Created
                 shouldNotThrow<Exception> { jacksonMapper.readValue(respons.bodyAsText(), UUID::class.java) }
             }
         }
