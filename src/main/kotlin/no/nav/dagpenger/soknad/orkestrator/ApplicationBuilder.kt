@@ -10,6 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.søknadApi
 import no.nav.helse.rapids_rivers.RapidApplication
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -26,9 +27,20 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
             .withKtorModule {
                 apiKonfigurasjon()
                 internalApi()
-                søknadApi()
+                søknadApi(
+                    søknadService = søknadService(),
+                )
             }
             .build()
+
+    private val opplysningRepositoryPostgres = OpplysningRepositoryPostgres(dataSource)
+    private val søknadRepository =
+        SøknadRepository(
+            dataSource = dataSource,
+            opplysningRepository = opplysningRepositoryPostgres,
+        )
+
+    private val søknadService: SøknadService = SøknadService(rapid = rapidsConnection, søknadRepository = søknadRepository)
 
     init {
         rapidsConnection.register(this)
@@ -48,7 +60,7 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
 
         SøknadMottak(
             rapidsConnection,
-            SøknadService(rapidsConnection),
+            søknadService(),
             OpplysningRepositoryPostgres(dataSource),
         )
         BehovMottak(
@@ -56,4 +68,6 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
             behovløserFactory = BehovløserFactory(rapidsConnection, OpplysningRepositoryPostgres(dataSource)),
         )
     }
+
+    private fun søknadService(): SøknadService = søknadService
 }
