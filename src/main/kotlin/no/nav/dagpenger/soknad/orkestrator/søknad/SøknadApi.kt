@@ -8,13 +8,17 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import java.util.UUID
+import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
 
-internal fun Application.søknadApi() {
+internal fun Application.søknadApi(søknadService: SøknadService) {
     routing {
         authenticate("tokenX") {
             route("/start-soknad") {
-                post { call.respond(HttpStatusCode.OK, UUID.randomUUID()) }
+                post {
+                    val søknad = søknadService.opprettSøknad(call.ident())
+
+                    call.respond(HttpStatusCode.OK, søknad.søknadId)
+                }
             }
         }
     }
