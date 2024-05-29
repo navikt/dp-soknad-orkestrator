@@ -52,4 +52,11 @@ class SøknadRepositoryTest {
         hentetSøknad?.søknadId shouldBe søknad.søknadId
         hentetSøknad?.opplysninger?.size shouldBe 1
     }
+
+    @Test
+    fun `vi returnerer null dersom det ikke finnes en søknad med gitt id`() {
+        withMigratedDb {
+            søknadRepository.hent(UUID.randomUUID()) shouldBe null
+        }
+    }
 }
