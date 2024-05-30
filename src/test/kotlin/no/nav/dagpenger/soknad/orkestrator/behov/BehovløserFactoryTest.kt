@@ -13,6 +13,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadstidspunktBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.UtdanningEllerOpplæringBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnskerDagpengerFraDatoBehovløser
@@ -41,6 +42,7 @@ class BehovløserFactoryTest {
         behovløserFactory.behovløserFor(BehovløserFactory.Behov.PermittertFiskeforedling) is PermittertFiskeforedlingBehovløser
         behovløserFactory.behovløserFor(BehovløserFactory.Behov.Ordinær) is OrdinærBehovløser
         behovløserFactory.behovløserFor(BehovløserFactory.Behov.Søknadsdato) is SøknadsdatoBehovløser
+        behovløserFactory.behovløserFor(BehovløserFactory.Behov.TarUtdanningEllerOpplæring) is UtdanningEllerOpplæringBehovløser
     }
 
     @Test
@@ -61,6 +63,7 @@ class BehovløserFactoryTest {
                 "PermittertFiskeforedling",
                 "Ordinær",
                 "Søknadsdato",
+                "TarUtdanningEllerOpplæring",
             )
     }
 }
