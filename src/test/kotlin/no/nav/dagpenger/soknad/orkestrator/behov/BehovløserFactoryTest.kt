@@ -2,23 +2,10 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EøsArbeidBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HelseTilAlleTyperJobbBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.JobbetUtenforNorgeBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeDeltidBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeHvorSomHelstBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.LønnsgarantiBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.OrdinærBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdatoBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadstidspunktBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.UtdanningEllerOpplæringBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnskerDagpengerFraDatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import kotlin.test.Test
 
 class BehovløserFactoryTest {
@@ -26,23 +13,15 @@ class BehovløserFactoryTest {
     private val opplysningRepository = mockk<OpplysningRepositoryPostgres>(relaxed = true)
     private val behovløserFactory = BehovløserFactory(testRapid, opplysningRepository)
 
-    @Test
-    fun `Skal returnere riktig behovløser basert på gitt behov`() {
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.ØnskerDagpengerFraDato) is ØnskerDagpengerFraDatoBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.EøsArbeid) is EøsArbeidBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.KanJobbeDeltid) is KanJobbeDeltidBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.HelseTilAlleTyperJobb) is HelseTilAlleTyperJobbBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.KanJobbeHvorSomHelst) is KanJobbeHvorSomHelstBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.VilligTilÅBytteYrke) is VilligTilÅBytteYrkeBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.Søknadstidspunkt) is SøknadstidspunktBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.JobbetUtenforNorge) is JobbetUtenforNorgeBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.Verneplikt) is VernepliktBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.Lønnsgaranti) is LønnsgarantiBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.Permittert) is PermittertBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.PermittertFiskeforedling) is PermittertFiskeforedlingBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.Ordinær) is OrdinærBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.Søknadsdato) is SøknadsdatoBehovløser
-        behovløserFactory.behovløserFor(BehovløserFactory.Behov.TarUtdanningEllerOpplæring) is UtdanningEllerOpplæringBehovløser
+    companion object {
+        @JvmStatic
+        fun behovProvider() = BehovløserFactory.Behov.entries.map { arrayOf(it) }
+    }
+
+    @ParameterizedTest
+    @MethodSource("behovProvider")
+    fun `Skal returnere riktig behovløser basert på gitt behov`(behov: BehovløserFactory.Behov) {
+        behovløserFactory.behovløserFor(behov).behov shouldBe behov.name
     }
 
     @Test
