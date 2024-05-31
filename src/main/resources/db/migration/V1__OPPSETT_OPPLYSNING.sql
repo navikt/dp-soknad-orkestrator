@@ -33,9 +33,9 @@ CREATE TABLE IF NOT EXISTS heltall
 
 CREATE TABLE IF NOT EXISTS desimaltall
 (
-    id            BIGSERIAL        NOT NULL PRIMARY KEY,
-    opplysning_id BIGINT           NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE,
-    svar          DOUBLE PRECISION NOT NULL
+    id            BIGSERIAL NOT NULL PRIMARY KEY,
+    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE,
+    svar          DECIMAL   NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS boolsk
