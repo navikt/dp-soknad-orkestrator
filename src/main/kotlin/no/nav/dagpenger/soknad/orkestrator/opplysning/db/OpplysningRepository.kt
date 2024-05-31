@@ -13,4 +13,6 @@ interface OpplysningRepository {
     ): Opplysning<*>?
 
     fun hentAlle(søknadId: UUID): List<Opplysning<*>>
+
+    fun slett(søknadId: UUID)
 }

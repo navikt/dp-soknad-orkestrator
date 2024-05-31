@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
 import OpplysningTabell
+import TekstTabell
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
@@ -336,6 +337,25 @@ class OpplysningRepositoryPostgresTest {
                 ident = "123",
                 søknadId = UUID.randomUUID(),
             ) shouldBe null
+        }
+    }
+
+    @Test
+    fun `vi kan slette en opplysning og tilhørende svar`() {
+        val opplysning = opplysning(søknadId = søknadId)
+
+        withMigratedDb {
+            opplysningRepository.lagre(opplysning)
+            val antallOpplysningerEtterLagring = transaction { OpplysningTabell.selectAll().count() }
+            val antallTekstsvarEtterLagring = transaction { TekstTabell.selectAll().count() }
+
+            antallOpplysningerEtterLagring shouldBe 1
+            antallTekstsvarEtterLagring shouldBe 1
+            opplysningRepository.slett(søknadId)
+            val antallOpplysningerEtterSletting = transaction { OpplysningTabell.selectAll().count() }
+            val antallTekstsvarEtterSletting = transaction { TekstTabell.selectAll().count() }
+            antallOpplysningerEtterSletting shouldBe 0
+            antallTekstsvarEtterSletting shouldBe 0
         }
     }
 }

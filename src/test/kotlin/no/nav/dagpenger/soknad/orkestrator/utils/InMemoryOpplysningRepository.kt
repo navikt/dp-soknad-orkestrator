@@ -24,4 +24,8 @@ class InMemoryOpplysningRepository : OpplysningRepository {
     override fun hentAlle(søknadId: UUID): List<Opplysning<*>> {
         return opplysninger.filter { it.søknadId == søknadId }
     }
+
+    override fun slett(søknadId: UUID) {
+        opplysninger.removeIf { it.søknadId == søknadId }
+    }
 }

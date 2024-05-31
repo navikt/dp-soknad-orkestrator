@@ -35,6 +35,7 @@ import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
@@ -98,6 +99,12 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
                 .selectAll()
                 .where { OpplysningTabell.søknadId eq søknadId }
                 .map(tilOpplysning())
+        }
+    }
+
+    override fun slett(søknadId: UUID) {
+        transaction {
+            OpplysningTabell.deleteWhere { OpplysningTabell.søknadId eq søknadId }
         }
     }
 }
