@@ -20,55 +20,55 @@ CREATE TABLE IF NOT EXISTS opplysning
 CREATE TABLE IF NOT EXISTS tekst
 (
     id            BIGSERIAL NOT NULL PRIMARY KEY,
-    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id),
+    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE,
     svar          TEXT      NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS heltall
 (
     id            BIGSERIAL NOT NULL PRIMARY KEY,
-    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id),
+    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE,
     svar          INTEGER   NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS desimaltall
 (
     id            BIGSERIAL        NOT NULL PRIMARY KEY,
-    opplysning_id BIGINT           NOT NULL REFERENCES opplysning (id),
+    opplysning_id BIGINT           NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE,
     svar          DOUBLE PRECISION NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS boolsk
 (
     id            BIGSERIAL NOT NULL PRIMARY KEY,
-    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id),
+    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE,
     svar          BOOLEAN   NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS dato
 (
     id            BIGSERIAL NOT NULL PRIMARY KEY,
-    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id),
+    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE,
     svar          DATE      NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS flervalg
 (
     id            BIGSERIAL NOT NULL PRIMARY KEY,
-    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id)
+    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS flervalg_svar
 (
     id          BIGSERIAL NOT NULL PRIMARY KEY,
-    flervalg_id BIGINT    NOT NULL REFERENCES flervalg (id),
+    flervalg_id BIGINT    NOT NULL REFERENCES flervalg (id) ON DELETE CASCADE,
     svar        TEXT      NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS periode
 (
     id            BIGSERIAL NOT NULL PRIMARY KEY,
-    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id),
+    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE,
     fom           DATE      NOT NULL,
     tom           DATE
 );
@@ -76,13 +76,13 @@ CREATE TABLE IF NOT EXISTS periode
 CREATE TABLE IF NOT EXISTS arbeidsforhold
 (
     id            BIGSERIAL NOT NULL PRIMARY KEY,
-    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id)
+    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS arbeidsforhold_svar
 (
     id                BIGSERIAL NOT NULL PRIMARY KEY,
-    arbeidsforhold_id BIGINT    NOT NULL REFERENCES arbeidsforhold (id),
+    arbeidsforhold_id BIGINT    NOT NULL REFERENCES arbeidsforhold (id) ON DELETE CASCADE,
     navn              TEXT      NOT NULL,
     land              TEXT      NOT NULL,
     sluttårsak        TEXT      NOT NULL
@@ -91,7 +91,7 @@ CREATE TABLE IF NOT EXISTS arbeidsforhold_svar
 CREATE TABLE IF NOT EXISTS eøs_arbeidsforhold_svar
 (
     id                BIGSERIAL NOT NULL PRIMARY KEY,
-    arbeidsforhold_id BIGINT    NOT NULL REFERENCES arbeidsforhold (id),
+    arbeidsforhold_id BIGINT    NOT NULL REFERENCES arbeidsforhold (id) ON DELETE CASCADE,
     bedriftsnavn      TEXT      NOT NULL,
     land              TEXT      NOT NULL,
     personnummer      TEXT      NOT NULL,
@@ -102,26 +102,26 @@ CREATE TABLE IF NOT EXISTS eøs_arbeidsforhold_svar
 CREATE TABLE IF NOT EXISTS egen_næring
 (
     id            BIGSERIAL NOT NULL PRIMARY KEY,
-    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id)
+    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS egen_næring_svar
 (
     id                  BIGSERIAL NOT NULL PRIMARY KEY,
-    egen_næring_id      BIGINT    NOT NULL REFERENCES egen_næring (id),
+    egen_næring_id      BIGINT    NOT NULL REFERENCES egen_næring (id) ON DELETE CASCADE,
     organisasjonsnummer BIGINT    NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS barn
 (
     id            BIGSERIAL NOT NULL PRIMARY KEY,
-    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id)
+    opplysning_id BIGINT    NOT NULL REFERENCES opplysning (id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS barn_svar
 (
     id                 BIGSERIAL NOT NULL PRIMARY KEY,
-    barn_id            BIGINT    NOT NULL REFERENCES barn (id),
+    barn_id            BIGINT    NOT NULL REFERENCES barn (id) ON DELETE CASCADE,
     fornavn_mellomnavn TEXT      NOT NULL,
     etternavn          TEXT      NOT NULL,
     fødselsdato        DATE      NOT NULL,
