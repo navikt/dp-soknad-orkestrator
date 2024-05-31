@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS flervalg
 CREATE TABLE IF NOT EXISTS flervalg_svar
 (
     id          BIGSERIAL NOT NULL PRIMARY KEY,
-    flervalg_id BIGINT    NOT NULL,
+    flervalg_id BIGINT    NOT NULL REFERENCES flervalg (id),
     svar        TEXT      NOT NULL
 );
 
