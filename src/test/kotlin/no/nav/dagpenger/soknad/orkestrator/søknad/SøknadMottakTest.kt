@@ -24,6 +24,7 @@ class SøknadMottakTest {
             rapidsConnection = testRapid,
             søknadService = søknadService,
             opplysningRepository = opplysningRepository,
+            søknadRepository = søknadRepository,
         )
     }
 

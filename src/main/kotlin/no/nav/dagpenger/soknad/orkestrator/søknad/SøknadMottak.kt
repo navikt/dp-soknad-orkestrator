@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
@@ -13,6 +14,7 @@ class SøknadMottak(
     rapidsConnection: RapidsConnection,
     private val søknadService: SøknadService,
     private val opplysningRepository: OpplysningRepository,
+    private val søknadRepository: SøknadRepository,
 ) :
     River.PacketListener {
     init {
@@ -38,8 +40,8 @@ class SøknadMottak(
             val jsonNode = objectMapper.readTree(packet.toJson())
 
             with(jsonNode) {
-                tilOpplysninger()
-                    .onEach(opplysningRepository::lagre)
+                tilSøknad()
+                    .also(søknadRepository::lagre)
 
                 tilSøknadstidspunkt()
                     .also(opplysningRepository::lagre)
@@ -54,7 +56,7 @@ class SøknadMottak(
         private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadMottak")
     }
 
-    private fun JsonNode.tilOpplysninger() = SøknadMapper(this).søknad.opplysninger
+    private fun JsonNode.tilSøknad() = SøknadMapper(this).søknad
 
     private fun JsonNode.tilSøknadstidspunkt() = SøknadtidspunktMapper(this).tidspunktOpplysning
 

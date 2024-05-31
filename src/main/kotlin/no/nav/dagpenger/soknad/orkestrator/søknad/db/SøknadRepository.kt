@@ -7,7 +7,7 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
-import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -23,7 +23,7 @@ class SøknadRepository(
 
     fun lagre(søknad: Søknad) {
         transaction {
-            SøknadTabell.insert {
+            SøknadTabell.insertIgnore {
                 it[søknadId] = søknad.søknadId
                 it[ident] = søknad.ident
             }
