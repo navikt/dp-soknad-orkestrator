@@ -35,9 +35,6 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
-  env:
-    - name: CLEAN_ON_STARTUP
-      value: "true"
   accessPolicy:
     inbound:
       rules:
