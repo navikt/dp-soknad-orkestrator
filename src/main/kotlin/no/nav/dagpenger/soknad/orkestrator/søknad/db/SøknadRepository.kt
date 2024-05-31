@@ -5,6 +5,8 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.selectAll
@@ -43,6 +45,13 @@ class SøknadRepository(
                     )
                 }
                 .firstOrNull()
+        }
+    }
+
+    fun slett(søknadId: UUID) {
+        transaction {
+            SøknadTabell.deleteWhere { SøknadTabell.søknadId eq søknadId }
+            opplysningRepository.slett(søknadId)
         }
     }
 }
