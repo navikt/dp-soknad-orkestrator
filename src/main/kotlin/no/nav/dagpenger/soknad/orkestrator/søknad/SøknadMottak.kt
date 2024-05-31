@@ -41,10 +41,7 @@ class SøknadMottak(
 
             with(jsonNode) {
                 tilSøknad()
-                    .also(søknadRepository::lagreSøknadId)
-
-                tilOpplysninger()
-                    .onEach(opplysningRepository::lagre)
+                    .also(søknadRepository::lagre)
 
                 tilSøknadstidspunkt()
                     .also(opplysningRepository::lagre)
@@ -60,8 +57,6 @@ class SøknadMottak(
     }
 
     private fun JsonNode.tilSøknad() = SøknadMapper(this).søknad
-
-    private fun JsonNode.tilOpplysninger() = tilSøknad().opplysninger
 
     private fun JsonNode.tilSøknadstidspunkt() = SøknadtidspunktMapper(this).tidspunktOpplysning
 
