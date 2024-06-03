@@ -1,13 +1,11 @@
 package no.nav.dagpenger.soknad.orkestrator
 
 import mu.KotlinLogging
-import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.clean
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.soknad.orkestrator.api.internalApi
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
-import no.nav.dagpenger.soknad.orkestrator.config.Configuration.config
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
