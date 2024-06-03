@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.meldinger
+package no.nav.dagpenger.soknad.orkestrator.behov
 
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.helse.rapids_rivers.JsonMessage
