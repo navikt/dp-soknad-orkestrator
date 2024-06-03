@@ -24,11 +24,12 @@ class SøknadMapper(private val jsonNode: JsonNode) {
         val ident = jsonNode.get("ident").asText()
         val søknadId = jsonNode.get("søknadId").asUUID()
         val søknadData = jsonNode.get("søknadData")
+        val søknadstidspunkt = jsonNode.get("søknadstidspunkt").asText()
 
         Søknad(
             søknadId = søknadId,
             ident = ident,
-            opplysninger = søknadDataTilOpplysninger(søknadData, ident, søknadId),
+            opplysninger = søknadDataTilOpplysninger(søknadData, ident, søknadId, søknadstidspunkt),
         )
     }
 
@@ -40,9 +41,19 @@ class SøknadMapper(private val jsonNode: JsonNode) {
         søknadData: JsonNode,
         ident: String,
         søknadId: UUID,
+        søknadstidspunkt: String,
     ): List<Opplysning<*>> {
         try {
             val seksjoner = søknadData["seksjoner"]
+
+            val søknadstidspunktOpplysning =
+                Opplysning(
+                    beskrivendeId = "søknadstidspunkt",
+                    type = Tekst,
+                    svar = søknadstidspunkt,
+                    ident = ident,
+                    søknadId = søknadId,
+                )
 
             val opplysninger =
                 seksjoner.asIterable().flatMap { seksjon ->
@@ -50,7 +61,7 @@ class SøknadMapper(private val jsonNode: JsonNode) {
                     fakta.asIterable().mapNotNull { faktum ->
                         opprettOpplysning(faktum, ident, søknadId)
                     }
-                }
+                } + søknadstidspunktOpplysning
 
             SøknadMetrikker.dekomponert.inc()
             return opplysninger

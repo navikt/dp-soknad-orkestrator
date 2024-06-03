@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.helse.rapids_rivers.JsonMessage
@@ -16,7 +15,6 @@ import no.nav.helse.rapids_rivers.withMDC
 class SøknadMottak(
     rapidsConnection: RapidsConnection,
     private val søknadService: SøknadService,
-    private val opplysningRepository: OpplysningRepository,
     private val søknadRepository: SøknadRepository,
 ) :
     River.PacketListener {
@@ -45,9 +43,6 @@ class SøknadMottak(
                 tilSøknad()
                     .also(søknadRepository::lagre)
 
-                tilSøknadstidspunkt()
-                    .also(opplysningRepository::lagre)
-
                 publiserMeldingOmSøknadInnsendt()
             }
         }
@@ -59,8 +54,6 @@ class SøknadMottak(
     }
 
     private fun JsonNode.tilSøknad() = SøknadMapper(this).søknad
-
-    private fun JsonNode.tilSøknadstidspunkt() = SøknadtidspunktMapper(this).tidspunktOpplysning
 
     private fun JsonNode.publiserMeldingOmSøknadInnsendt() {
         val ident = this.get("ident").asText()

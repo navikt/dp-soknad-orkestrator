@@ -32,7 +32,7 @@ class SøknadMapperTest {
         val søknad = SøknadMapper(søknad_innsendt_event).søknad
         søknad.søknadId shouldBe søknadId
         søknad.ident shouldBe ident
-        søknad.opplysninger.size shouldBe 2
+        søknad.opplysninger.size shouldBe 3
 
         søknad.opplysninger shouldContainAll
             listOf(
@@ -44,11 +44,18 @@ class SøknadMapperTest {
                     søknadId = søknadId,
                 ),
                 Opplysning(
-                    "faktum.dagpenger-soknadsdato",
-                    Dato,
-                    ønskerDagpengerFra,
-                    ident,
-                    søknadId,
+                    beskrivendeId = "faktum.dagpenger-soknadsdato",
+                    type = Dato,
+                    svar = ønskerDagpengerFra,
+                    ident = ident,
+                    søknadId = søknadId,
+                ),
+                Opplysning(
+                    beskrivendeId = "søknadstidspunkt",
+                    type = Tekst,
+                    svar = søknadstidspunkt,
+                    ident = ident,
+                    søknadId = søknadId,
                 ),
             )
     }
@@ -73,7 +80,7 @@ class SøknadMapperTest {
     @Test
     fun `kan mappe svar på generatorfaktum - Arbeidsforhold`() {
         val søknad = SøknadMapper(søknadsDataMedGeneratorArbeidsforhold).søknad
-        søknad.opplysninger.size shouldBe 1
+        søknad.opplysninger.size shouldBe 2
         søknad.opplysninger.single { it.beskrivendeId == "faktum.arbeidsforhold" }.also { arbeidsforhold ->
             arbeidsforhold.beskrivendeId shouldBe "faktum.arbeidsforhold"
             arbeidsforhold.søknadId shouldBe søknadId
@@ -115,7 +122,7 @@ class SøknadMapperTest {
     @Test
     fun `kan mappe svar på generatorfaktum - Eøs Arbeidsforhold`() {
         val søknad = SøknadMapper(søknadsDataMedEøsArbeidsforhold).søknad
-        søknad.opplysninger.size shouldBe 1
+        søknad.opplysninger.size shouldBe 2
         søknad.opplysninger.single { it.beskrivendeId == "faktum.eos-arbeidsforhold" }.also { eøsArbeidsforhold ->
             eøsArbeidsforhold.beskrivendeId shouldBe "faktum.eos-arbeidsforhold"
             eøsArbeidsforhold.søknadId shouldBe søknadId

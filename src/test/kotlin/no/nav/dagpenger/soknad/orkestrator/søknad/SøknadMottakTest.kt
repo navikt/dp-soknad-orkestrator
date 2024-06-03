@@ -2,7 +2,6 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
@@ -10,7 +9,6 @@ import org.junit.jupiter.api.Test
 
 class SøknadMottakTest {
     private val testRapid = TestRapid()
-    private val opplysningRepository = mockk<OpplysningRepository>(relaxed = true)
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     private val søknadService =
         SøknadService(
@@ -22,7 +20,6 @@ class SøknadMottakTest {
         SøknadMottak(
             rapidsConnection = testRapid,
             søknadService = søknadService,
-            opplysningRepository = opplysningRepository,
             søknadRepository = søknadRepository,
         )
     }
