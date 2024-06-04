@@ -10,7 +10,7 @@ import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
 import kotlin.test.Test
 
-class EøsArbeidBehovløserTest {
+class EØSArbeidBehovløserTest {
     val opplysningRepository = InMemoryOpplysningRepository()
     val testRapid = TestRapid()
     val behovløser = EøsArbeidBehovløser(testRapid, opplysningRepository)
@@ -29,9 +29,9 @@ class EøsArbeidBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EØSArbeid))
 
-        testRapid.inspektør.message(0)["@løsning"]["EøsArbeid"]["verdi"].asBoolean() shouldBe true
+        testRapid.inspektør.message(0)["@løsning"]["EØSArbeid"]["verdi"].asBoolean() shouldBe true
     }
 
     @Test
@@ -46,7 +46,7 @@ class EøsArbeidBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EØSArbeid))
 
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe "true"
     }
@@ -63,14 +63,14 @@ class EøsArbeidBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning)
-        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid))
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EØSArbeid))
 
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe "false"
     }
 
     @Test
     fun `Behovløser svarer false dersom opplysning om Eøs arbeid ikke finnes`() {
-        val behovmelding = lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EøsArbeid)
+        val behovmelding = lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EØSArbeid)
         behovløser.løs(behovmelding)
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe false
     }

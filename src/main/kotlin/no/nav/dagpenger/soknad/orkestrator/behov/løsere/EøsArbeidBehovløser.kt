@@ -1,7 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EøsArbeid
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EØSArbeid
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -11,7 +11,7 @@ class EøsArbeidBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: OpplysningRepository,
 ) : Behovløser(rapidsConnection, opplysningRepository) {
-    override val behov = EøsArbeid.name
+    override val behov = EØSArbeid.name
     override val beskrivendeId = "faktum.eos-arbeid-siste-36-mnd"
 
     override fun løs(behovmelding: Behovmelding) {

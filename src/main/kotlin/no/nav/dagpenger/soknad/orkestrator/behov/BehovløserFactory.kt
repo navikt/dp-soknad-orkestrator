@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EøsArbeid
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EØSArbeid
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.HelseTilAlleTyperJobb
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.JobbetUtenforNorge
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.KanJobbeDeltid
@@ -40,7 +40,7 @@ class BehovløserFactory(
     private val behovløsere: Map<Behov, Behovløser> =
         mapOf(
             ØnskerDagpengerFraDato to ØnskerDagpengerFraDatoBehovløser(rapidsConnection, opplysningRepository),
-            EøsArbeid to EøsArbeidBehovløser(rapidsConnection, opplysningRepository),
+            EØSArbeid to EøsArbeidBehovløser(rapidsConnection, opplysningRepository),
             KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository),
             HelseTilAlleTyperJobb to HelseTilAlleTyperJobbBehovløser(rapidsConnection, opplysningRepository),
             KanJobbeHvorSomHelst to KanJobbeHvorSomHelstBehovløser(rapidsConnection, opplysningRepository),
@@ -64,7 +64,7 @@ class BehovløserFactory(
 
     enum class Behov {
         ØnskerDagpengerFraDato,
-        EøsArbeid,
+        EØSArbeid,
         KanJobbeDeltid,
         HelseTilAlleTyperJobb,
         KanJobbeHvorSomHelst,
