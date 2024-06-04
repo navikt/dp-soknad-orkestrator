@@ -23,7 +23,6 @@ class SøknadService(
 
     fun opprettSøknad(ident: String): Søknad {
         val søknad = Søknad(ident = ident)
-
         søknadRepository.lagre(søknad)
 
         logger.info { "Opprettet søknad med søknadId: ${søknad.søknadId}" }
