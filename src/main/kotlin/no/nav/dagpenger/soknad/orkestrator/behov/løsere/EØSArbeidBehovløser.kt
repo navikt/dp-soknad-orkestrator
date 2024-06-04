@@ -7,7 +7,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
 
-class EøsArbeidBehovløser(
+class EØSArbeidBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: OpplysningRepository,
 ) : Behovløser(rapidsConnection, opplysningRepository) {

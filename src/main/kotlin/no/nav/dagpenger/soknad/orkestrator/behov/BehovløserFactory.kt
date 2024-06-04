@@ -15,7 +15,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.TarUtd
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Verneplikt
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.VilligTilÅBytteYrke
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnskerDagpengerFraDato
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EøsArbeidBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EØSArbeidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HelseTilAlleTyperJobbBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.JobbetUtenforNorgeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeDeltidBehovløser
@@ -40,7 +40,7 @@ class BehovløserFactory(
     private val behovløsere: Map<Behov, Behovløser> =
         mapOf(
             ØnskerDagpengerFraDato to ØnskerDagpengerFraDatoBehovløser(rapidsConnection, opplysningRepository),
-            EØSArbeid to EøsArbeidBehovløser(rapidsConnection, opplysningRepository),
+            EØSArbeid to EØSArbeidBehovløser(rapidsConnection, opplysningRepository),
             KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository),
             HelseTilAlleTyperJobb to HelseTilAlleTyperJobbBehovløser(rapidsConnection, opplysningRepository),
             KanJobbeHvorSomHelst to KanJobbeHvorSomHelstBehovløser(rapidsConnection, opplysningRepository),

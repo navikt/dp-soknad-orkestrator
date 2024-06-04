@@ -13,7 +13,7 @@ import kotlin.test.Test
 class EØSArbeidBehovløserTest {
     val opplysningRepository = InMemoryOpplysningRepository()
     val testRapid = TestRapid()
-    val behovløser = EøsArbeidBehovløser(testRapid, opplysningRepository)
+    val behovløser = EØSArbeidBehovløser(testRapid, opplysningRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 
