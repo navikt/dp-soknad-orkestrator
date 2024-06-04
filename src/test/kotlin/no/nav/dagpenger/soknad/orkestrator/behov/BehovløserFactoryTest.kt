@@ -34,7 +34,6 @@ class BehovløserFactoryTest {
                 "HelseTilAlleTyperJobb",
                 "KanJobbeHvorSomHelst",
                 "VilligTilÅBytteYrke",
-                "Søknadstidspunkt",
                 "JobbetUtenforNorge",
                 "Verneplikt",
                 "Lønnsgaranti",

@@ -10,7 +10,6 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Ordin�
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Permittert
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertFiskeforedling
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdato
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadstidspunkt
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.TarUtdanningEllerOpplæring
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Verneplikt
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.VilligTilÅBytteYrke
@@ -25,7 +24,6 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.OrdinærBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdatoBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadstidspunktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.UtdanningEllerOpplæringBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBehovløser
@@ -45,7 +43,6 @@ class BehovløserFactory(
             HelseTilAlleTyperJobb to HelseTilAlleTyperJobbBehovløser(rapidsConnection, opplysningRepository),
             KanJobbeHvorSomHelst to KanJobbeHvorSomHelstBehovløser(rapidsConnection, opplysningRepository),
             VilligTilÅBytteYrke to VilligTilÅBytteYrkeBehovløser(rapidsConnection, opplysningRepository),
-            Søknadstidspunkt to SøknadstidspunktBehovløser(rapidsConnection, opplysningRepository),
             JobbetUtenforNorge to JobbetUtenforNorgeBehovløser(rapidsConnection, opplysningRepository),
             Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository),
             Lønnsgaranti to LønnsgarantiBehovløser(rapidsConnection, opplysningRepository),
@@ -69,7 +66,6 @@ class BehovløserFactory(
         HelseTilAlleTyperJobb,
         KanJobbeHvorSomHelst,
         VilligTilÅBytteYrke,
-        Søknadstidspunkt,
         JobbetUtenforNorge,
         Verneplikt,
         Lønnsgaranti,
