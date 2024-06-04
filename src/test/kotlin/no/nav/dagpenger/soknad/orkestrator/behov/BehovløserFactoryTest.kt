@@ -29,7 +29,7 @@ class BehovløserFactoryTest {
         behovløserFactory.behov() shouldBe
             listOf(
                 "ØnskerDagpengerFraDato",
-                "EøsArbeid",
+                "EØSArbeid",
                 "KanJobbeDeltid",
                 "HelseTilAlleTyperJobb",
                 "KanJobbeHvorSomHelst",
