@@ -30,14 +30,21 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
 
     private fun harAllePåkrevdeFelt(faktum: JsonNode): Boolean {
         val påkrevdeFelter =
-            listOf(
+            mutableListOf(
                 "faktum.arbeidsforhold.navn-bedrift",
                 "faktum.arbeidsforhold.land",
                 "faktum.arbeidsforhold.endret",
             )
 
+        if (erPermittering(faktum)) {
+            påkrevdeFelter += "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering"
+        }
+
         return påkrevdeFelter.all { påkrevdFelt -> faktum.harPåkrevdFelt(påkrevdFelt) }
     }
+
+    private fun erPermittering(faktum: JsonNode) =
+        faktum["svar"].any { it.any { it["svar"].asText() == "faktum.arbeidsforhold.endret.svar.permittert" } }
 
     private fun JsonNode.harPåkrevdFelt(påkrevdFelt: String): Boolean {
         return this["svar"].any { it.any { it["beskrivendeId"].asText() == påkrevdFelt } }

@@ -373,10 +373,15 @@ private val søknadsDataIkkeKomplettArbeidsforhold =
                           "type": "land",
                           "beskrivendeId": "faktum.arbeidsforhold.land"
                         },
-                         {
+                        {
                           "svar": "Elektrikersjappa",
                           "type": "tekst",
                           "beskrivendeId": "faktum.arbeidsforhold.navn-bedrift"
+                        },
+                        {
+                          "svar": "faktum.arbeidsforhold.endret.svar.permittert",
+                          "type": "envalg",
+                          "beskrivendeId": "faktum.arbeidsforhold.endret"
                         }
                       ]
                     ],
