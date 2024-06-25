@@ -19,7 +19,9 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import java.util.UUID
 
-class SøknadMapper(private val jsonNode: JsonNode) {
+class SøknadMapper(
+    private val jsonNode: JsonNode,
+) {
     val søknad by lazy {
         val ident = jsonNode.get("ident").asText()
         val søknadId = jsonNode.get("søknadId").asUUID()

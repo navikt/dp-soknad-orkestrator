@@ -6,7 +6,10 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
 
-class SøknadService(private val rapid: RapidsConnection, private val søknadRepository: SøknadRepository) {
+class SøknadService(
+    private val rapid: RapidsConnection,
+    private val søknadRepository: SøknadRepository,
+) {
     fun publiserMeldingOmSøknadInnsendt(
         søknadId: UUID,
         ident: String,
