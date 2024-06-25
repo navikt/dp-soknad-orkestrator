@@ -13,13 +13,13 @@ class BehovMottak(
     private val behovløserFactory: BehovløserFactory,
 ) : River.PacketListener {
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "behov") }
-            validate { it.demandValue("bruk-søknad-orkestrator", true) }
-            validate { it.demandAllOrAny("@behov", behovløserFactory.behov()) }
-            validate { it.requireKey("ident", "søknadId", "behandlingId", "@behovId") }
-            validate { it.rejectKey("@løsning") }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandValue("@event_name", "behov") }
+                validate { it.demandAllOrAny("@behov", behovløserFactory.behov()) }
+                validate { it.requireKey("ident", "søknadId", "behandlingId", "@behovId") }
+                validate { it.rejectKey("@løsning") }
+            }.register(this)
     }
 
     override fun onPacket(
