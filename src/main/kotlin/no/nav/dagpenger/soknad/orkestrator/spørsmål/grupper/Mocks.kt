@@ -47,10 +47,10 @@ val mock3: SpørsmålgruppeDTO =
         id = 1,
         navn = Spørsmålgruppe.BOSTEDSLAND,
         nesteSpørsmål =
-            SpørsmålDTO<LocalDate>(
+            SpørsmålDTO<PeriodeSvar>(
                 id = UUID.randomUUID(),
                 tekstnøkkel = "bostedsland.dato-for-avreise",
-                type = SpørsmålType.DATO,
+                type = SpørsmålType.PERIODE,
             ),
         besvarteSpørsmål =
             listOf(

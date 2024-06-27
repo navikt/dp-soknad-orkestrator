@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.config
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -9,7 +10,6 @@ import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.path
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
-import no.nav.dagpenger.soknad.orkestrator.config.Configuration.config
 import org.slf4j.event.Level
 
 internal fun Application.apiKonfigurasjon() {
@@ -26,6 +26,8 @@ internal fun Application.apiKonfigurasjon() {
     }
 
     install(ContentNegotiation) {
-        jackson()
+        jackson {
+            registerModules(JavaTimeModule())
+        }
     }
 }

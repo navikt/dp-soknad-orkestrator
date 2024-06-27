@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.post
@@ -10,6 +9,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålDTO
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.SpørsmålgruppeDTO
@@ -21,7 +21,6 @@ import kotlin.test.Test
 
 class SøknadApiTest {
     val søknadEndepunkt = "/soknad"
-    val jacksonMapper = jacksonObjectMapper()
     val søknadId = UUID.randomUUID()
     val ident = "12345678901"
 
@@ -35,7 +34,7 @@ class SøknadApiTest {
                 httpMethod = HttpMethod.Post,
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.Created
-                shouldNotThrow<Exception> { jacksonMapper.readValue(respons.bodyAsText(), UUID::class.java) }
+                shouldNotThrow<Exception> { objectMapper.readValue(respons.bodyAsText(), UUID::class.java) }
             }
         }
     }
@@ -55,7 +54,7 @@ class SøknadApiTest {
                 httpMethod = HttpMethod.Get,
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
-                shouldNotThrow<Exception> { jacksonMapper.readValue(respons.bodyAsText(), SpørsmålgruppeDTO::class.java) }
+                shouldNotThrow<Exception> { objectMapper.readValue(respons.bodyAsText(), SpørsmålgruppeDTO::class.java) }
             }
         }
     }
@@ -80,7 +79,7 @@ class SøknadApiTest {
                 endepunkt = "$søknadEndepunkt/$søknadId/svar",
                 httpMethod = HttpMethod.Post,
                 body =
-                    jacksonMapper.writeValueAsString(
+                    objectMapper.writeValueAsString(
                         SpørsmålDTO(
                             id = UUID.randomUUID(),
                             tekstnøkkel = "tekstnøkkel.test",
