@@ -33,7 +33,7 @@ class SøknadServiceTest {
     }
 
     @Test
-    fun `vi kan opprette en søknad`() {
+    fun `oppretting av søknad oppretter også første spørsmål i søknaden`() {
         val søknad = søknadService.opprettSøknad(ident)
 
         verify(exactly = 1) { søknadRepository.lagre(søknad) }
