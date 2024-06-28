@@ -69,7 +69,7 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.bundles.postgres.test)
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.3")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
 }
 
