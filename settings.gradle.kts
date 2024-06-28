@@ -13,3 +13,4 @@ dependencyResolutionManagement {
     }
 }
 include("asyncapi")
+include("openapi")

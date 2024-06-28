@@ -48,6 +48,8 @@ repositories {
 }
 
 dependencies {
+    implementation(project(path = ":openapi"))
+
     implementation(libs.rapids.and.rivers)
     implementation(libs.konfig)
     implementation(libs.bundles.postgres)
