@@ -1,4 +1,4 @@
-name: Publiser API docs
+name: Publiser AsyncAPI docs
 
 on:
   push:
