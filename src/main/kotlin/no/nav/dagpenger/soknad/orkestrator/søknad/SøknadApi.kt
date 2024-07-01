@@ -13,8 +13,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.pipeline.PipelineContext
 import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.Spørsmål
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.mockSpørsmålgrupper
 import java.util.UUID
 
@@ -43,7 +42,7 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
 
                 post("/{søknadId}/svar") {
                     val søknadId = søknadId()
-                    val svar = call.receive<SpørsmålDTO<*>>()
+                    val svar = call.receive<SporsmalDTO>()
 
                     call.respond(HttpStatusCode.OK)
 
@@ -53,16 +52,6 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
             }
         }
     }
-}
-
-fun Spørsmål<*>.toDTO(): SpørsmålDTO<*> {
-    return SpørsmålDTO(
-        tekstnøkkel = tekstnøkkel,
-        id = id,
-        type = type,
-        svar = svar,
-        gyldigeSvar = gyldigeSvar,
-    )
 }
 
 internal fun PipelineContext<Unit, ApplicationCall>.søknadId() =

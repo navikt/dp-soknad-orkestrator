@@ -1,240 +1,242 @@
 package no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper
 
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.PeriodeSvar
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålDTO
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
 import java.time.LocalDate
 import java.util.UUID
 
-val mock1: SpørsmålgruppeDTO =
-    SpørsmålgruppeDTO(
+val mock1: SporsmalgruppeDTO =
+    SporsmalgruppeDTO(
         id = 1,
-        navn = Spørsmålgruppe.BOSTEDSLAND,
+        navn = SporsmaalgruppeNavnDTO.BOSTEDSLAND,
         nesteSpørsmål =
-            SpørsmålDTO<String>(
+            SporsmalDTO(
                 id = UUID.randomUUID(),
                 tekstnøkkel = "bostedsland.hvilket-land-bor-du-i",
-                type = SpørsmålType.LAND,
+                type = SporsmalTypeDTO.LAND,
                 gyldigeSvar = listOf("NOR", "SWE", "FIN", "NLD"),
             ),
         besvarteSpørsmål = emptyList(),
     )
 
-val mock2: SpørsmålgruppeDTO =
-    SpørsmålgruppeDTO(
+val mock2: SporsmalgruppeDTO =
+    SporsmalgruppeDTO(
         id = 1,
-        navn = Spørsmålgruppe.BOSTEDSLAND,
+        navn = SporsmaalgruppeNavnDTO.BOSTEDSLAND,
         nesteSpørsmål =
-            SpørsmålDTO<Boolean>(
+            SporsmalDTO(
                 id = UUID.randomUUID(),
                 tekstnøkkel = "bostedsland.reist-tilbake-til-norge",
-                type = SpørsmålType.BOOLEAN,
+                type = SporsmalTypeDTO.BOOLEAN,
             ),
         besvarteSpørsmål =
             listOf(
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.hvilket-land-bor-du-i",
-                    type = SpørsmålType.LAND,
+                    type = SporsmalTypeDTO.LAND,
                     svar = "NLD",
                     gyldigeSvar = listOf("NOR", "SWE", "FIN", "NLD"),
                 ),
             ),
     )
 
-val mock3: SpørsmålgruppeDTO =
-    SpørsmålgruppeDTO(
+val mock3: SporsmalgruppeDTO =
+    SporsmalgruppeDTO(
         id = 1,
-        navn = Spørsmålgruppe.BOSTEDSLAND,
+        navn = SporsmaalgruppeNavnDTO.BOSTEDSLAND,
         nesteSpørsmål =
-            SpørsmålDTO<PeriodeSvar>(
+            SporsmalDTO(
                 id = UUID.randomUUID(),
                 tekstnøkkel = "bostedsland.dato-for-avreise",
-                type = SpørsmålType.PERIODE,
+                type = SporsmalTypeDTO.PERIODE,
             ),
         besvarteSpørsmål =
             listOf(
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.hvilket-land-bor-du-i",
-                    type = SpørsmålType.LAND,
+                    type = SporsmalTypeDTO.LAND,
                     svar = "NLD",
                     gyldigeSvar = listOf("NOR", "SWE", "FIN", "NLD"),
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.reist-tilbake-til-norge",
-                    type = SpørsmålType.BOOLEAN,
-                    svar = true,
+                    type = SporsmalTypeDTO.BOOLEAN,
+                    svar = "true",
                 ),
             ),
     )
 
-val mock4: SpørsmålgruppeDTO =
-    SpørsmålgruppeDTO(
+val mock4: SporsmalgruppeDTO =
+    SporsmalgruppeDTO(
         id = 1,
-        navn = Spørsmålgruppe.BOSTEDSLAND,
+        navn = SporsmaalgruppeNavnDTO.BOSTEDSLAND,
         nesteSpørsmål =
-            SpørsmålDTO<String>(
+            SporsmalDTO(
                 id = UUID.randomUUID(),
                 tekstnøkkel = "bostedsland.hvorfor",
-                type = SpørsmålType.TEKST,
+                type = SporsmalTypeDTO.TEKST,
             ),
         besvarteSpørsmål =
             listOf(
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.hvilket-land-bor-du-i",
-                    type = SpørsmålType.LAND,
+                    type = SporsmalTypeDTO.LAND,
                     svar = "NLD",
                     gyldigeSvar = listOf("NOR", "SWE", "FIN", "NLD"),
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.reist-tilbake-til-norge",
-                    type = SpørsmålType.BOOLEAN,
-                    svar = true,
+                    type = SporsmalTypeDTO.BOOLEAN,
+                    svar = "true",
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.dato-for-avreise",
-                    type = SpørsmålType.PERIODE,
-                    svar = PeriodeSvar(LocalDate.now().minusDays(14), LocalDate.now()),
+                    type = SporsmalTypeDTO.PERIODE,
+                    svar = PeriodeSvar(LocalDate.now().minusDays(14), LocalDate.now()).toString(),
                 ),
             ),
     )
 
-val mock5: SpørsmålgruppeDTO =
-    SpørsmålgruppeDTO(
+val mock5: SporsmalgruppeDTO =
+    SporsmalgruppeDTO(
         id = 1,
-        navn = Spørsmålgruppe.BOSTEDSLAND,
+        navn = SporsmaalgruppeNavnDTO.BOSTEDSLAND,
         nesteSpørsmål =
-            SpørsmålDTO<Boolean>(
+            SporsmalDTO(
                 id = UUID.randomUUID(),
                 tekstnøkkel = "bostedsland.en-gang-i-uken",
-                type = SpørsmålType.BOOLEAN,
+                type = SporsmalTypeDTO.BOOLEAN,
             ),
         besvarteSpørsmål =
             listOf(
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.hvilket-land-bor-du-i",
-                    type = SpørsmålType.LAND,
+                    type = SporsmalTypeDTO.LAND,
                     svar = "NLD",
                     gyldigeSvar = listOf("NOR", "SWE", "FIN", "NLD"),
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.reist-tilbake-til-norge",
-                    type = SpørsmålType.BOOLEAN,
-                    svar = true,
+                    type = SporsmalTypeDTO.BOOLEAN,
+                    svar = "true",
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.dato-for-avreise",
-                    type = SpørsmålType.PERIODE,
-                    svar = PeriodeSvar(LocalDate.now().minusDays(14), LocalDate.now()),
+                    type = SporsmalTypeDTO.PERIODE,
+                    svar = PeriodeSvar(LocalDate.now().minusDays(14), LocalDate.now()).toString(),
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.hvorfor",
-                    type = SpørsmålType.TEKST,
+                    type = SporsmalTypeDTO.TEKST,
                     svar = "Derfor",
                 ),
             ),
     )
 
-val mock6: SpørsmålgruppeDTO =
-    SpørsmålgruppeDTO(
+val mock6: SporsmalgruppeDTO =
+    SporsmalgruppeDTO(
         id = 1,
-        navn = Spørsmålgruppe.BOSTEDSLAND,
+        navn = SporsmaalgruppeNavnDTO.BOSTEDSLAND,
         nesteSpørsmål =
-            SpørsmålDTO<Boolean>(
+            SporsmalDTO(
                 id = UUID.randomUUID(),
                 tekstnøkkel = "bostedsland.rotasjon",
-                type = SpørsmålType.BOOLEAN,
+                type = SporsmalTypeDTO.BOOLEAN,
             ),
         besvarteSpørsmål =
             listOf(
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.hvilket-land-bor-du-i",
-                    type = SpørsmålType.LAND,
+                    type = SporsmalTypeDTO.LAND,
                     svar = "NLD",
                     gyldigeSvar = listOf("NOR", "SWE", "FIN", "NLD"),
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.reist-tilbake-til-norge",
-                    type = SpørsmålType.BOOLEAN,
-                    svar = true,
+                    type = SporsmalTypeDTO.BOOLEAN,
+                    svar = "true",
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.dato-for-avreise",
-                    type = SpørsmålType.PERIODE,
-                    svar = PeriodeSvar(LocalDate.now().minusDays(14), LocalDate.now()),
+                    type = SporsmalTypeDTO.PERIODE,
+                    svar = PeriodeSvar(LocalDate.now().minusDays(14), LocalDate.now()).toString(),
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.hvorfor",
-                    type = SpørsmålType.TEKST,
+                    type = SporsmalTypeDTO.TEKST,
                     svar = "Derfor",
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.en-gang-i-uken",
-                    type = SpørsmålType.BOOLEAN,
-                    svar = true,
+                    type = SporsmalTypeDTO.BOOLEAN,
+                    svar = "true",
                 ),
             ),
     )
 
-val mock7: SpørsmålgruppeDTO =
-    SpørsmålgruppeDTO(
+val mock7: SporsmalgruppeDTO =
+    SporsmalgruppeDTO(
         id = 1,
-        navn = Spørsmålgruppe.BOSTEDSLAND,
+        navn = SporsmaalgruppeNavnDTO.BOSTEDSLAND,
         nesteSpørsmål = null,
         besvarteSpørsmål =
             listOf(
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.hvilket-land-bor-du-i",
-                    type = SpørsmålType.LAND,
+                    type = SporsmalTypeDTO.LAND,
                     svar = "NLD",
                     gyldigeSvar = listOf("NOR", "SWE", "FIN", "NLD"),
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.reist-tilbake-til-norge",
-                    type = SpørsmålType.BOOLEAN,
-                    svar = true,
+                    type = SporsmalTypeDTO.BOOLEAN,
+                    svar = "true",
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.dato-for-avreise",
-                    type = SpørsmålType.PERIODE,
-                    svar = PeriodeSvar(LocalDate.now().minusDays(14), LocalDate.now()),
+                    type = SporsmalTypeDTO.PERIODE,
+                    svar = PeriodeSvar(LocalDate.now().minusDays(14), LocalDate.now()).toString(),
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.hvorfor",
-                    type = SpørsmålType.TEKST,
+                    type = SporsmalTypeDTO.TEKST,
                     svar = "Derfor",
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.en-gang-i-uken",
-                    type = SpørsmålType.BOOLEAN,
-                    svar = true,
+                    type = SporsmalTypeDTO.BOOLEAN,
+                    svar = "true",
                 ),
-                SpørsmålDTO(
+                SporsmalDTO(
                     id = UUID.randomUUID(),
                     tekstnøkkel = "bostedsland.rotasjon",
-                    type = SpørsmålType.BOOLEAN,
-                    svar = false,
+                    type = SporsmalTypeDTO.BOOLEAN,
+                    svar = "false",
                 ),
             ),
     )
 
-val mockSpørsmålgrupper: List<SpørsmålgruppeDTO> = listOf(mock1, mock2, mock3, mock4, mock5, mock6, mock7)
+val mockSpørsmålgrupper: List<SporsmalgruppeDTO> = listOf(mock1, mock2, mock3, mock4, mock5, mock6, mock7)

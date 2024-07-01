@@ -104,7 +104,7 @@ components:
         besvarteSpørsmål:
           type: array
           items:
-            $ref: '#/components/schemas/Sporsmalgruppe'
+            $ref: '#/components/schemas/Sporsmal'
       required:
         - id
         - navn

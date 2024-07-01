@@ -8,11 +8,11 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.mockk
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålDTO
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.SpørsmålgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.autentisert
 import org.junit.jupiter.api.Disabled
@@ -54,7 +54,7 @@ class SøknadApiTest {
                 httpMethod = HttpMethod.Get,
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
-                shouldNotThrow<Exception> { objectMapper.readValue(respons.bodyAsText(), SpørsmålgruppeDTO::class.java) }
+                shouldNotThrow<Exception> { objectMapper.readValue(respons.bodyAsText(), SporsmalgruppeDTO::class.java) }
             }
         }
     }
@@ -80,11 +80,11 @@ class SøknadApiTest {
                 httpMethod = HttpMethod.Post,
                 body =
                     objectMapper.writeValueAsString(
-                        SpørsmålDTO(
+                        SporsmalDTO(
                             id = UUID.randomUUID(),
                             tekstnøkkel = "tekstnøkkel.test",
-                            type = SpørsmålType.BOOLEAN,
-                            svar = true,
+                            type = SporsmalTypeDTO.BOOLEAN,
+                            svar = true.toString(),
                         ),
                     ),
             ).let { respons ->
