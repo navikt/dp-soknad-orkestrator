@@ -211,9 +211,33 @@ class SøknadMapperTest {
     }
 
     @Test
-    fun `Kan mappe søknader med ukomplette arbeidsforhold`() {
-        shouldNotThrow<IllegalArgumentException> { SøknadMapper(søknadsDataUtenArbeidsforhold).søknad }
-        shouldNotThrow<IllegalArgumentException> { SøknadMapper(søknadsDataIkkeKomplettArbeidsforhold).søknad }
+    fun `Kan mappe søknader som har tomt arbeidsforhold`() {
+        shouldNotThrow<IllegalArgumentException> {
+            val søknad = SøknadMapper(søknadsDataUtenArbeidsforhold).søknad
+            søknad.opplysninger.none { it.type is Arbeidsforhold }
+        }
+    }
+
+    @Test
+    fun `Kan mappe søknader med arbeidsforhold som ikke er komplett`() {
+        shouldNotThrow<IllegalArgumentException> {
+            val søknad = SøknadMapper(søknadsDataIkkeKomplettArbeidsforhold).søknad
+            søknad.opplysninger.none { it.type is Arbeidsforhold }
+        }
+    }
+
+    @Test
+    fun `Kan mappe søknader som har både komplette og ukomplette arbeidsforhold`() {
+        shouldNotThrow<IllegalArgumentException> {
+            val søknad = SøknadMapper(søknadsDataMedBådeKomplettOgUkomplettArbeidsforhold).søknad
+            val arbeidsforhold = søknad.opplysninger.filter { it.type is Arbeidsforhold }
+
+            arbeidsforhold.size shouldBe 1
+            arbeidsforhold.first().svar.asListOf<ArbeidsforholdSvar>().also {
+                it.size shouldBe 1
+                it.first().navn shouldBe "Bank AS"
+            }
+        }
     }
 }
 
@@ -460,6 +484,131 @@ private val søknadsDataMedGeneratorArbeidsforhold =
                           "svar": "NOR",
                           "type": "land",
                           "beskrivendeId": "faktum.arbeidsforhold.land"
+                        },
+                        {
+                          "svar": "faktum.arbeidsforhold.endret.svar.sagt-opp-av-arbeidsgiver",
+                          "type": "envalg",
+                          "beskrivendeId": "faktum.arbeidsforhold.endret"
+                        },
+                        {
+                          "svar": {
+                            "fom": "2024-01-01",
+                            "tom": "2024-03-31"
+                          },
+                          "type": "periode",
+                          "beskrivendeId": "faktum.arbeidsforhold.varighet"
+                        },
+                        {
+                          "svar": true,
+                          "beskrivendeId": "faktum.arbeidsforhold.vet-du-antall-timer-foer-mistet-jobb"
+                        },
+                        {
+                          "svar": 37.0,
+                          "type": "double",
+                          "beskrivendeId": "faktum.arbeidsforhold.antall-timer-dette-arbeidsforhold"
+                        },
+                        {
+                          "svar": "Fordi",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.arbeidsforhold.vet-du-aarsak-til-sagt-opp-av-arbeidsgiver"
+                        },
+                        {
+                          "svar": false,
+                          "type": "boolean",
+                          "beskrivendeId": "faktum.arbeidsforhold.tilbud-om-annen-stilling-eller-annet-sted-i-norge"
+                        },
+                        {
+                          "svar": false,
+                          "type": "boolean",
+                          "beskrivendeId": "faktum.arbeidsforhold.skift-eller-turnus"
+                        },
+                        {
+                          "svar": false,
+                          "type": "boolean",
+                          "beskrivendeId": "faktum.arbeidsforhold.rotasjon"
+                        }
+                      ],
+                      [
+                        {
+                          "svar": "Bank AS",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.arbeidsforhold.navn-bedrift"
+                        },
+                        {
+                          "svar": "NOR",
+                          "type": "land",
+                          "beskrivendeId": "faktum.arbeidsforhold.land"
+                        },
+                        {
+                          "svar": "faktum.arbeidsforhold.endret.svar.kontrakt-utgaatt",
+                          "type": "envalg",
+                          "beskrivendeId": "faktum.arbeidsforhold.endret"
+                        },
+                        {
+                          "svar": {
+                            "fom": "2023-01-01",
+                            "tom": "2024-03-31"
+                          },
+                          "type": "periode",
+                          "beskrivendeId": "faktum.arbeidsforhold.varighet"
+                        },
+                        {
+                          "svar": false,
+                          "type": "boolean",
+                          "beskrivendeId": "faktum.arbeidsforhold.vet-du-antall-timer-foer-kontrakt-utgikk"
+                        },
+                        {
+                          "svar": false,
+                          "type": "boolean",
+                          "beskrivendeId": "faktum.arbeidsforhold.tilbud-om-forlengelse-eller-annen-stilling"
+                        },
+                        {
+                          "svar": false,
+                          "type": "boolean",
+                          "beskrivendeId": "faktum.arbeidsforhold.skift-eller-turnus"
+                        },
+                        {
+                          "svar": false,
+                          "type": "boolean",
+                          "beskrivendeId": "faktum.arbeidsforhold.rotasjon"
+                        }
+                      ]
+                    ],
+                    "type": "generator",
+                    "beskrivendeId": "faktum.arbeidsforhold"
+                  }
+                ],
+                "beskrivendeId": "din-situasjon"
+              }
+            ]
+          }
+        }
+        """.trimIndent(),
+    )
+private val søknadsDataMedBådeKomplettOgUkomplettArbeidsforhold =
+    ObjectMapper().readTree(
+        //language=json
+        """
+        {
+          "@id": "675eb2c2-bfba-4939-926c-cf5aac73d163",
+          "@event_name": "søknad_innsendt_varsel",
+          "@opprettet": "2024-02-21T11:00:27.899791748",
+          "søknadId": "$søknadId",
+          "ident": "$ident",
+          "søknadstidspunkt": "$søknadstidspunkt",
+          "søknadData": {
+            "søknad_uuid": "$søknadId",
+            "@opprettet": "2024-02-21T11:00:27.899791748",
+            "seksjoner": [
+              {
+                "fakta": [
+                  {
+                    "svar": [
+                      [
+                        {
+                          "svar": "Elektrikersjappa",
+                          "type": "tekst",
+                          "beskrivendeId": "faktum.arbeidsforhold.navn-bedrift"
                         },
                         {
                           "svar": "faktum.arbeidsforhold.endret.svar.sagt-opp-av-arbeidsgiver",

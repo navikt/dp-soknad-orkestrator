@@ -21,14 +21,16 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
         ident: String,
         søknadId: UUID,
     ): Opplysning<*>? {
-        if (!harAllePåkrevdeFelt(faktum)) return null
+        val kompletteArbeidsforhold = faktum["svar"].filter { harAllePåkrevdeFelt(it) }
 
-        val arbeidsforholdSvar: List<ArbeidsforholdSvar> = hentArbeidsforholdSvar(faktum)
+        if (kompletteArbeidsforhold.isEmpty()) return null
+
+        val arbeidsforholdSvar: List<ArbeidsforholdSvar> = hentArbeidsforholdSvar(kompletteArbeidsforhold)
 
         return Opplysning(beskrivendeId, Arbeidsforhold, arbeidsforholdSvar, ident, søknadId)
     }
 
-    private fun harAllePåkrevdeFelt(faktum: JsonNode): Boolean {
+    private fun harAllePåkrevdeFelt(arbeidsforhold: JsonNode): Boolean {
         val påkrevdeFelter =
             mutableListOf(
                 "faktum.arbeidsforhold.navn-bedrift",
@@ -36,22 +38,22 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
                 "faktum.arbeidsforhold.endret",
             )
 
-        if (erPermittering(faktum)) {
+        if (erPermittering(arbeidsforhold)) {
             påkrevdeFelter += "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering"
         }
 
-        return påkrevdeFelter.all { påkrevdFelt -> faktum.harPåkrevdFelt(påkrevdFelt) }
+        return påkrevdeFelter.all { påkrevdFelt -> arbeidsforhold.harPåkrevdFelt(påkrevdFelt) }
     }
 
-    private fun erPermittering(faktum: JsonNode) =
-        faktum["svar"].any { it.any { it["svar"].asText() == "faktum.arbeidsforhold.endret.svar.permittert" } }
+    private fun erPermittering(arbeidsforhold: JsonNode) =
+        arbeidsforhold.any { it["svar"].asText() == "faktum.arbeidsforhold.endret.svar.permittert" }
 
     private fun JsonNode.harPåkrevdFelt(påkrevdFelt: String): Boolean {
-        return this["svar"].any { it.any { it["beskrivendeId"].asText() == påkrevdFelt } }
+        return this.any { it["beskrivendeId"].asText() == påkrevdFelt }
     }
 
-    private fun hentArbeidsforholdSvar(faktum: JsonNode) =
-        faktum.get("svar").map { arbeidsforhold ->
+    private fun hentArbeidsforholdSvar(kompletteArbeidsforhold: List<JsonNode>) =
+        kompletteArbeidsforhold.map { arbeidsforhold ->
             val navnSvar =
                 arbeidsforhold
                     .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.navn-bedrift" }
