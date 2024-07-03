@@ -30,6 +30,11 @@ class SøknadMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
+        if (packet["søknadId"].asText() == "e232c851-f7ce-46da-bc3c-8d2482c09002") {
+            logger.info { "Skipper feilende søknad med id ${packet["søknadId"].asText()}" }
+            return
+        }
+
         withMDC(
             mapOf("søknadId" to packet["søknadId"].asText()),
         ) {
