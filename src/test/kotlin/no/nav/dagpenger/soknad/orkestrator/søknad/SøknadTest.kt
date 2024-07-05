@@ -8,8 +8,6 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.mockk
 import io.mockk.verify
-import java.util.UUID
-import kotlin.test.Test
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
@@ -18,6 +16,8 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.autentisert
 import no.nav.helse.rapids_rivers.RapidsConnection
+import java.util.UUID
+import kotlin.test.Test
 
 class SøknadTest {
     val søknadEndepunkt = "/soknad"
@@ -68,11 +68,11 @@ class SøknadTest {
                 endepunkt = "$søknadEndepunkt/$gjeldendeSøknadId/svar",
                 httpMethod = HttpMethod.Post,
                 body =
-                objectMapper.writeValueAsString(
-                    gjeldendeSpørsmål.copy(
-                        svar = "NOR",
+                    objectMapper.writeValueAsString(
+                        gjeldendeSpørsmål.copy(
+                            svar = "NOR",
+                        ),
                     ),
-                ),
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
             }
