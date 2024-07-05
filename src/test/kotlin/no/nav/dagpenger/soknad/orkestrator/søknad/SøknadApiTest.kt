@@ -15,7 +15,6 @@ import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.autentisert
-import org.junit.jupiter.api.Disabled
 import java.util.UUID
 import kotlin.test.Test
 
@@ -55,19 +54,6 @@ class SøknadApiTest {
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
                 shouldNotThrow<Exception> { objectMapper.readValue(respons.bodyAsText(), SporsmalgruppeDTO::class.java) }
-            }
-        }
-    }
-
-    @Disabled
-    @Test
-    fun `Returnerer NoContent hvis ingen nye spørsmål for gitt søknadId`() {
-        withSøknadApi {
-            autentisert(
-                endepunkt = "$søknadEndepunkt/$søknadId/neste",
-                httpMethod = HttpMethod.Get,
-            ).let { respons ->
-                respons.status shouldBe HttpStatusCode.NoContent
             }
         }
     }

@@ -14,7 +14,6 @@ import io.ktor.server.routing.routing
 import io.ktor.util.pipeline.PipelineContext
 import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.mockSpørsmålgrupper
 import java.util.UUID
 
 internal fun Application.søknadApi(søknadService: SøknadService) {
@@ -30,24 +29,18 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
                 get("/{søknadId}/neste") {
                     val søknadId = søknadId()
 
-                    call.respond(HttpStatusCode.OK, mockSpørsmålgrupper.random())
-                    /*val nesteSpørsmål = søknadService.nesteSpørsmål(søknadId)
+                    val nesteSpørsmålgruppe = søknadService.nesteSpørsmålgruppe(søknadId)
 
-                    if (nesteSpørsmål == null) {
-                        call.respond(HttpStatusCode.NoContent)
-                    } else {
-                        call.respond(HttpStatusCode.OK, nesteSpørsmål.toDTO())
-                    }*/
+                    call.respond(HttpStatusCode.OK, nesteSpørsmålgruppe)
                 }
 
                 post("/{søknadId}/svar") {
                     val søknadId = søknadId()
-                    val svar = call.receive<SporsmalDTO>()
+                    val besvartSpørsmål = call.receive<SporsmalDTO>()
+
+                    søknadService.lagreBesvartSpørsmål(søknadId = søknadId, besvartSpørsmål = besvartSpørsmål)
 
                     call.respond(HttpStatusCode.OK)
-
-                    /*søknadService.besvarSpørsmål(søknadId, svar)
-                    call.respond(HttpStatusCode.OK)*/
                 }
             }
         }
