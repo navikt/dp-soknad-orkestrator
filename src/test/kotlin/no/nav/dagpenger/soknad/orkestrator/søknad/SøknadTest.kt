@@ -11,6 +11,8 @@ import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getGruppe
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.toSporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
@@ -43,8 +45,6 @@ class SøknadTest {
                 val søknadId = objectMapper.readValue(respons.bodyAsText(), UUID::class.java)
                 verify { søknadRepository.lagre(any<Søknad>()) }
                 inMemorySøknadRepository.hentAlle(søknadId).size shouldBe 1
-                inMemorySøknadRepository.hentAlle(søknadId)
-                    .first().tekstnøkkel shouldBe "bostedsland.hvilket-land-bor-du-i"
             }
         }
 
@@ -62,14 +62,16 @@ class SøknadTest {
             }
         }
 
-        val gjeldendeSpørsmål = inMemorySøknadRepository.hentAlle(gjeldendeSøknadId).first()
+        val gjeldendeSpørsmålInfo = inMemorySøknadRepository.hentAlle(gjeldendeSøknadId).first()
+        val gjeldendeSpørsmål = getGruppe(gjeldendeSpørsmålInfo.gruppeId).getSpørsmålMedId(gjeldendeSpørsmålInfo.idIGruppe)
         withSøknadApi {
             autentisert(
                 endepunkt = "$søknadEndepunkt/$gjeldendeSøknadId/svar",
                 httpMethod = HttpMethod.Post,
                 body =
                     objectMapper.writeValueAsString(
-                        gjeldendeSpørsmål.copy(
+                        gjeldendeSpørsmål.toSporsmalDTO(
+                            spørsmålId = gjeldendeSpørsmålInfo.spørsmålId,
                             svar = "NOR",
                         ),
                     ),

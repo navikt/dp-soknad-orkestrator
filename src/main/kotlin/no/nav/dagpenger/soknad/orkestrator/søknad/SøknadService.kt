@@ -5,7 +5,9 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.BostedslandDTO
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.BostedslandDTOV1
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getGruppe
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.toSporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -31,8 +33,14 @@ class SøknadService(
         val søknad = Søknad(ident = ident)
         søknadRepository.lagre(søknad)
 
-        val bostedsland = BostedslandDTO()
-        inMemorySøknadRepository.lagre(søknad.søknadId, bostedsland.hvilketLandBorDuI)
+        val bostedsland = BostedslandDTOV1
+        inMemorySøknadRepository.lagre(
+            spørsmålId = UUID.randomUUID(),
+            søknadId = søknad.søknadId,
+            gruppeId = bostedsland.versjon,
+            idIGruppe = bostedsland.førsteSpørsmål().idIGruppe,
+            svar = null,
+        )
 
         logger.info { "Opprettet søknad med søknadId: ${søknad.søknadId}" }
         sikkerlogg.info { "Opprettet søknad med søknadId: ${søknad.søknadId} og ident: $ident" }
@@ -44,23 +52,53 @@ class SøknadService(
         søknadId: UUID,
         besvartSpørsmål: SporsmalDTO,
     ) {
-        inMemorySøknadRepository.lagre(søknadId, besvartSpørsmål)
+        val lagretInfo =
+            inMemorySøknadRepository.hent(
+                søknadId = søknadId,
+                spørsmålId = besvartSpørsmål.id,
+            ) ?: throw IllegalArgumentException("Fant ikke spørsmål med id ${besvartSpørsmål.id}")
 
-        val nesteSpørsmål = BostedslandDTO().nesteSpørsmål(besvartSpørsmål)
-        if (nesteSpørsmål != null) {
-            inMemorySøknadRepository.lagre(søknadId, nesteSpørsmål)
+        inMemorySøknadRepository.lagre(
+            spørsmålId = besvartSpørsmål.id,
+            søknadId = søknadId,
+            gruppeId = lagretInfo.gruppeId,
+            idIGruppe = lagretInfo.idIGruppe,
+            svar = besvartSpørsmål.svar,
+        )
+
+        val gruppe = getGruppe(lagretInfo.gruppeId)
+
+        gruppe.nesteSpørsmål(besvartSpørsmål)?.let {
+            inMemorySøknadRepository.lagre(
+                spørsmålId = UUID.randomUUID(),
+                søknadId = søknadId,
+                gruppeId = lagretInfo.gruppeId,
+                idIGruppe = it.idIGruppe,
+                svar = null,
+            )
         }
     }
 
     fun nesteSpørsmålgruppe(søknadId: UUID): SporsmalgruppeDTO {
         val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
         val ubesvartSpørsmål = alleSpørsmål.find { it.svar == null }
+        val besvarteSpørsmål = alleSpørsmål.filter { it.svar != null }
+        val gruppe = getGruppe(ubesvartSpørsmål?.gruppeId ?: BostedslandDTOV1.versjon)
+
+        val nesteSpørsmålDTO =
+            ubesvartSpørsmål?.let {
+                gruppe.getSpørsmålMedId(it.idIGruppe).toSporsmalDTO(it.spørsmålId, null)
+            }
+        val besvarteSpørsmålDTO =
+            besvarteSpørsmål.map {
+                gruppe.getSpørsmålMedId(it.idIGruppe).toSporsmalDTO(it.spørsmålId, it.svar!!)
+            }
 
         return SporsmalgruppeDTO(
-            id = 1,
-            navn = SporsmaalgruppeNavnDTO.BOSTEDSLAND,
-            nesteSpørsmål = ubesvartSpørsmål,
-            besvarteSpørsmål = alleSpørsmål.filter { it.svar != null },
+            id = gruppe.versjon,
+            navn = SporsmaalgruppeNavnDTO.valueOf(gruppe.navn.name),
+            besvarteSpørsmål = besvarteSpørsmålDTO,
+            nesteSpørsmål = nesteSpørsmålDTO,
         )
     }
 
