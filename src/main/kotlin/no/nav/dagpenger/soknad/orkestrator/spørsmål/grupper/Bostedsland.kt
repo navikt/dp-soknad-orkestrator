@@ -1,54 +1,120 @@
 package no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper
 
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.BooleanSpørsmål
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.LandSpørsmål
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.PeriodeSpørsmål
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.Spørsmål
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.TekstSpørsmål
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
+import java.util.UUID
 
-class Bostedsland {
-    internal val navn = Spørsmålgruppe.BOSTEDSLAND
+data class GrunnleggendeSpørsmål(
+    val idIGruppe: Int,
+    val tekstnøkkel: String,
+    val type: SpørsmålType,
+    val gyldigeSvar: List<String>,
+)
 
-    internal val hvilketLandBorDuI =
-        LandSpørsmål(
+fun GrunnleggendeSpørsmål.toSporsmalDTO(
+    spørsmålId: UUID,
+    svar: String?,
+): SporsmalDTO =
+    SporsmalDTO(
+        id = spørsmålId,
+        tekstnøkkel = tekstnøkkel,
+        type = SporsmalTypeDTO.valueOf(type.name),
+        svar = svar,
+        gyldigeSvar = gyldigeSvar,
+    )
+
+abstract class Bostedsland {
+    abstract val versjon: Int
+    abstract val navn: Spørsmålgruppe
+
+    abstract fun førsteSpørsmål(): GrunnleggendeSpørsmål
+
+    abstract fun nesteSpørsmål(aktivtSpørsmål: SporsmalDTO): GrunnleggendeSpørsmål?
+
+    abstract fun getSpørsmålMedId(id: Int): GrunnleggendeSpørsmål
+}
+
+object BostedslandDTOV1 : Bostedsland() {
+    override val versjon = 1
+    override val navn = Spørsmålgruppe.BOSTEDSLAND
+
+    val hvilketLandBorDuI =
+        GrunnleggendeSpørsmål(
+            idIGruppe = 1,
             tekstnøkkel = "bostedsland.hvilket-land-bor-du-i",
+            type = SpørsmålType.LAND,
             gyldigeSvar = listOf("NOR", "SWE", "FIN"),
         )
 
-    internal val reistTilbakeTilNorge =
-        BooleanSpørsmål(
+    val reistTilbakeTilNorge =
+        GrunnleggendeSpørsmål(
+            idIGruppe = 2,
             tekstnøkkel = "bostedsland.reist-tilbake-til-norge",
+            type = SpørsmålType.BOOLEAN,
+            gyldigeSvar = emptyList(),
         )
 
-    internal val datoForAvreise =
-        PeriodeSpørsmål(
+    val datoForAvreise =
+        GrunnleggendeSpørsmål(
+            idIGruppe = 3,
             tekstnøkkel = "bostedsland.dato-for-avreise",
+            type = SpørsmålType.PERIODE,
+            gyldigeSvar = emptyList(),
         )
 
-    internal val hvorforReisteFraNorge =
-        TekstSpørsmål(
+    val hvorforReisteFraNorge =
+        GrunnleggendeSpørsmål(
+            idIGruppe = 4,
             tekstnøkkel = "bostedsland.hvorfor",
+            type = SpørsmålType.TEKST,
+            gyldigeSvar = emptyList(),
         )
 
-    internal val enGangIUken =
-        BooleanSpørsmål(
+    val enGangIUken =
+        GrunnleggendeSpørsmål(
+            idIGruppe = 5,
             tekstnøkkel = "bostedsland.en-gang-i-uken",
+            type = SpørsmålType.BOOLEAN,
+            gyldigeSvar = emptyList(),
         )
 
-    internal val rotasjon =
-        BooleanSpørsmål(
+    val rotasjon =
+        GrunnleggendeSpørsmål(
+            idIGruppe = 6,
             tekstnøkkel = "bostedsland.rotasjon",
+            type = SpørsmålType.BOOLEAN,
+            gyldigeSvar = emptyList(),
         )
 
-    fun opprettNesteSpørsmål(aktivtSpørsmål: Spørsmål<*>): Spørsmål<*>? {
-        return when (aktivtSpørsmål) {
-            hvilketLandBorDuI -> if (aktivtSpørsmål.svar != "NOR") reistTilbakeTilNorge else null
-            reistTilbakeTilNorge -> if (aktivtSpørsmål.svar == true) datoForAvreise else enGangIUken
-            datoForAvreise -> hvorforReisteFraNorge
-            hvorforReisteFraNorge -> enGangIUken
-            enGangIUken -> if (aktivtSpørsmål.svar == true) null else rotasjon
-            rotasjon -> null
+    override fun førsteSpørsmål(): GrunnleggendeSpørsmål = hvilketLandBorDuI
+
+    override fun nesteSpørsmål(aktivtSpørsmål: SporsmalDTO): GrunnleggendeSpørsmål? =
+        when (aktivtSpørsmål.tekstnøkkel) {
+            hvilketLandBorDuI.tekstnøkkel -> if (aktivtSpørsmål.svar != "NOR") reistTilbakeTilNorge else null
+            reistTilbakeTilNorge.tekstnøkkel -> if (aktivtSpørsmål.svar == "true") datoForAvreise else enGangIUken
+            datoForAvreise.tekstnøkkel -> hvorforReisteFraNorge
+            hvorforReisteFraNorge.tekstnøkkel -> enGangIUken
+            enGangIUken.tekstnøkkel -> if (aktivtSpørsmål.svar == "true") null else rotasjon
+            rotasjon.tekstnøkkel -> null
             else -> null
         }
+
+    override fun getSpørsmålMedId(id: Int): GrunnleggendeSpørsmål =
+        when (id) {
+            hvilketLandBorDuI.idIGruppe -> hvilketLandBorDuI
+            reistTilbakeTilNorge.idIGruppe -> reistTilbakeTilNorge
+            datoForAvreise.idIGruppe -> datoForAvreise
+            hvorforReisteFraNorge.idIGruppe -> hvorforReisteFraNorge
+            enGangIUken.idIGruppe -> enGangIUken
+            rotasjon.idIGruppe -> rotasjon
+            else -> throw IllegalArgumentException("Ukjent spørsmål med id: $id")
+        }
+}
+
+fun getGruppe(id: Int): Bostedsland {
+    when (id) {
+        BostedslandDTOV1.versjon -> return BostedslandDTOV1
+        else -> throw IllegalArgumentException("Ukjent gruppe med id: $id")
     }
 }

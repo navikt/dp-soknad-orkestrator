@@ -5,7 +5,7 @@ on:
     branches-ignore:
       - 'dependabot/**'
     paths-ignore:
-      -  '.github/workflows/reviewdog.yaml'
+      - '.github/workflows/reviewdog.yaml'
 
 permissions:
   contents: "read"
