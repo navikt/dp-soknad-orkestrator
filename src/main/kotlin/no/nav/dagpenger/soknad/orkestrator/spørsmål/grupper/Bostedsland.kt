@@ -33,6 +33,8 @@ abstract class Bostedsland {
     abstract fun nesteSpørsmål(aktivtSpørsmål: SporsmalDTO): GrunnleggendeSpørsmål?
 
     abstract fun getSpørsmålMedId(id: Int): GrunnleggendeSpørsmål
+
+    abstract fun avhengigheter(id: Int): List<Int>
 }
 
 object BostedslandDTOV1 : Bostedsland() {
@@ -108,6 +110,24 @@ object BostedslandDTOV1 : Bostedsland() {
             hvorforReisteFraNorge.idIGruppe -> hvorforReisteFraNorge
             enGangIUken.idIGruppe -> enGangIUken
             rotasjon.idIGruppe -> rotasjon
+            else -> throw IllegalArgumentException("Ukjent spørsmål med id: $id")
+        }
+
+    override fun avhengigheter(id: Int): List<Int> =
+        when (id) {
+            hvilketLandBorDuI.idIGruppe ->
+                listOf(
+                    reistTilbakeTilNorge.idIGruppe,
+                    datoForAvreise.idIGruppe,
+                    hvorforReisteFraNorge.idIGruppe,
+                    enGangIUken.idIGruppe,
+                    rotasjon.idIGruppe,
+                )
+            reistTilbakeTilNorge.idIGruppe -> listOf(datoForAvreise.idIGruppe, hvorforReisteFraNorge.idIGruppe)
+            datoForAvreise.idIGruppe -> listOf(hvorforReisteFraNorge.idIGruppe)
+            hvorforReisteFraNorge.idIGruppe -> emptyList()
+            enGangIUken.idIGruppe -> listOf(rotasjon.idIGruppe)
+            rotasjon.idIGruppe -> emptyList()
             else -> throw IllegalArgumentException("Ukjent spørsmål med id: $id")
         }
 }

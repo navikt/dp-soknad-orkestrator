@@ -21,15 +21,27 @@ class InMemorySøknadRepository {
             )
         tabell[søknadId] = tabell[søknadId]
             ?.filter {
-                it.idIGruppe != idIGruppe
+                it.gruppeId != gruppeId || it.idIGruppe != idIGruppe
             }?.plus(dbRad) ?: listOf(dbRad)
+    }
+
+    fun slett(
+        søknadId: UUID,
+        gruppeId: Int,
+        spørsmålIdIGruppe: Int,
+    ) {
+        tabell[søknadId] =
+            tabell[søknadId]
+                ?.filter {
+                    it.gruppeId != gruppeId || it.idIGruppe != spørsmålIdIGruppe
+                }.orEmpty()
     }
 
     fun hent(
         søknadId: UUID,
         gruppeId: Int,
-        spørsmålId: UUID,
-    ): LagretInfo? = tabell[søknadId]?.find { it.spørsmålId == spørsmålId && it.gruppeId == gruppeId }
+        spørsmålIdIGruppe: Int,
+    ): LagretInfo? = tabell[søknadId]?.find { it.gruppeId == gruppeId && it.idIGruppe == spørsmålIdIGruppe }
 
     fun hent(
         søknadId: UUID,
