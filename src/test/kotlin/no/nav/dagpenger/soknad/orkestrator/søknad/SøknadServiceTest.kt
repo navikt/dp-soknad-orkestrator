@@ -49,7 +49,7 @@ class SøknadServiceTest {
     }
 
     @Test
-    fun `lagreBesvartSpørsmål should store answered question and fetch next question if available`() {
+    fun `lagreBesvartSpørsmål lagrer besvart spørsmål og neste spørsmål`() {
         val søknadId = UUID.randomUUID()
         val spørsmålId = UUID.randomUUID()
         val bostedslandgruppe = BostedslandDTOV1
@@ -72,5 +72,48 @@ class SøknadServiceTest {
         inMemorySøknadRepository.hentAlle(søknadId).find { it.spørsmålId == spørsmålId } shouldNotBe null
         inMemorySøknadRepository.hentAlle(søknadId).find { it.idIGruppe == bostedslandgruppe.reistTilbakeTilNorge.idIGruppe } shouldNotBe
             null
+    }
+
+    @Test
+    fun `lagreBesvartSpørsmål lagrer besvartSpørsmål og nullstiller avhengigheter`() {
+        val søknadId = UUID.randomUUID()
+        val spørsmålId1 = UUID.randomUUID()
+        val bostedslandgruppe = BostedslandDTOV1
+        inMemorySøknadRepository.lagre(
+            spørsmålId = spørsmålId1,
+            søknadId = søknadId,
+            gruppeId = bostedslandgruppe.versjon,
+            idIGruppe = bostedslandgruppe.hvilketLandBorDuI.idIGruppe,
+            svar = "SWE",
+        )
+        inMemorySøknadRepository.lagre(
+            spørsmålId = UUID.randomUUID(),
+            søknadId = søknadId,
+            gruppeId = bostedslandgruppe.versjon,
+            idIGruppe = bostedslandgruppe.reistTilbakeTilNorge.idIGruppe,
+            svar = "true",
+        )
+        inMemorySøknadRepository.lagre(
+            spørsmålId = UUID.randomUUID(),
+            søknadId = søknadId,
+            gruppeId = bostedslandgruppe.versjon,
+            idIGruppe = bostedslandgruppe.datoForAvreise.idIGruppe,
+            svar = null,
+        )
+
+        val besvartSpørsmål =
+            bostedslandgruppe.hvilketLandBorDuI.toSporsmalDTO(
+                spørsmålId = spørsmålId1,
+                svar = "FIN",
+            )
+        søknadService.lagreBesvartSpørsmål(søknadId, besvartSpørsmål)
+
+        val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
+        alleSpørsmål.size shouldBe 2
+        alleSpørsmål.find { it.spørsmålId == spørsmålId1 } shouldNotBe null
+        alleSpørsmål.find { it.spørsmålId == spørsmålId1 }!!.svar shouldBe "FIN"
+        alleSpørsmål.find { it.idIGruppe == bostedslandgruppe.reistTilbakeTilNorge.idIGruppe } shouldNotBe null
+        alleSpørsmål.find { it.idIGruppe == bostedslandgruppe.reistTilbakeTilNorge.idIGruppe }!!.svar shouldBe null
+        alleSpørsmål.find { it.idIGruppe == bostedslandgruppe.datoForAvreise.idIGruppe } shouldBe null
     }
 }

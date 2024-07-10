@@ -5,6 +5,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.BostedslandDTOV1
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getGruppe
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.toSporsmalDTO
@@ -68,6 +69,12 @@ class SøknadService(
 
         val gruppe = getGruppe(lagretInfo.gruppeId)
 
+        nullstillAvhengigheter(
+            søknadId = søknadId,
+            gruppe = gruppe,
+            idIGruppe = lagretInfo.idIGruppe,
+        )
+
         gruppe.nesteSpørsmål(besvartSpørsmål)?.let {
             inMemorySøknadRepository.lagre(
                 spørsmålId = UUID.randomUUID(),
@@ -75,6 +82,22 @@ class SøknadService(
                 gruppeId = lagretInfo.gruppeId,
                 idIGruppe = it.idIGruppe,
                 svar = null,
+            )
+        }
+    }
+
+    fun nullstillAvhengigheter(
+        søknadId: UUID,
+        gruppe: Bostedsland,
+        idIGruppe: Int,
+    ) {
+        val avhengigheter = gruppe.avhengigheter(idIGruppe)
+
+        avhengigheter.forEach {
+            inMemorySøknadRepository.slett(
+                søknadId = søknadId,
+                gruppeId = gruppe.versjon,
+                spørsmålIdIGruppe = it,
             )
         }
     }
