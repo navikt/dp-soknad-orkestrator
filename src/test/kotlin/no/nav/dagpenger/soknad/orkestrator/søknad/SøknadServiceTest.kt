@@ -74,13 +74,14 @@ class SøknadServiceTest {
             null
     }
 
+    // TODO: Godta generisk gruppe, så denne testen ikke er avhengig av Bostedsland sin logikk
     @Test
     fun `lagreBesvartSpørsmål lagrer besvartSpørsmål og nullstiller avhengigheter`() {
         val søknadId = UUID.randomUUID()
-        val spørsmålId1 = UUID.randomUUID()
+        val spørsmålId = UUID.randomUUID()
         val bostedslandgruppe = BostedslandDTOV1
         inMemorySøknadRepository.lagre(
-            spørsmålId = spørsmålId1,
+            spørsmålId = spørsmålId,
             søknadId = søknadId,
             gruppeId = bostedslandgruppe.versjon,
             idIGruppe = bostedslandgruppe.hvilketLandBorDuI.idIGruppe,
@@ -103,17 +104,52 @@ class SøknadServiceTest {
 
         val besvartSpørsmål =
             bostedslandgruppe.hvilketLandBorDuI.toSporsmalDTO(
-                spørsmålId = spørsmålId1,
+                spørsmålId = spørsmålId,
                 svar = "FIN",
             )
         søknadService.lagreBesvartSpørsmål(søknadId, besvartSpørsmål)
 
         val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
         alleSpørsmål.size shouldBe 2
-        alleSpørsmål.find { it.spørsmålId == spørsmålId1 } shouldNotBe null
-        alleSpørsmål.find { it.spørsmålId == spørsmålId1 }!!.svar shouldBe "FIN"
+        alleSpørsmål.find { it.spørsmålId == spørsmålId } shouldNotBe null
+        alleSpørsmål.find { it.spørsmålId == spørsmålId }!!.svar shouldBe "FIN"
         alleSpørsmål.find { it.idIGruppe == bostedslandgruppe.reistTilbakeTilNorge.idIGruppe } shouldNotBe null
         alleSpørsmål.find { it.idIGruppe == bostedslandgruppe.reistTilbakeTilNorge.idIGruppe }!!.svar shouldBe null
         alleSpørsmål.find { it.idIGruppe == bostedslandgruppe.datoForAvreise.idIGruppe } shouldBe null
+    }
+
+    @Test
+    fun `nesteSpørsmålgruppe henter kun besvarte spørsmål som kommer før det ubesvarte spørsmålet`() {
+        val søknadId = UUID.randomUUID()
+        val spørsmålId1 = UUID.randomUUID()
+        val bostedslandgruppe = BostedslandDTOV1
+        inMemorySøknadRepository.lagre(
+            spørsmålId = spørsmålId1,
+            søknadId = søknadId,
+            gruppeId = bostedslandgruppe.versjon,
+            idIGruppe = bostedslandgruppe.hvilketLandBorDuI.idIGruppe,
+            svar = "SWE",
+        )
+        inMemorySøknadRepository.lagre(
+            spørsmålId = UUID.randomUUID(),
+            søknadId = søknadId,
+            gruppeId = bostedslandgruppe.versjon,
+            idIGruppe = bostedslandgruppe.reistTilbakeTilNorge.idIGruppe,
+            svar = null,
+        )
+        inMemorySøknadRepository.lagre(
+            spørsmålId = UUID.randomUUID(),
+            søknadId = søknadId,
+            gruppeId = bostedslandgruppe.versjon,
+            idIGruppe = bostedslandgruppe.enGangIUken.idIGruppe,
+            svar = "true",
+        )
+
+        val nesteSpørsmålgruppe = søknadService.nesteSpørsmålgruppe(søknadId)
+
+        val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
+        alleSpørsmål.filter { it.svar != null }.size shouldBe 2
+        nesteSpørsmålgruppe.besvarteSpørsmål.size shouldBe 1
+        nesteSpørsmålgruppe.besvarteSpørsmål.first().id shouldBe spørsmålId1
     }
 }

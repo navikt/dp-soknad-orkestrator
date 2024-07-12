@@ -76,13 +76,22 @@ class SøknadService(
         )
 
         gruppe.nesteSpørsmål(besvartSpørsmål)?.let {
-            inMemorySøknadRepository.lagre(
-                spørsmålId = UUID.randomUUID(),
-                søknadId = søknadId,
-                gruppeId = lagretInfo.gruppeId,
-                idIGruppe = it.idIGruppe,
-                svar = null,
-            )
+            val nesteSpørsmålFinnesAllerede =
+                inMemorySøknadRepository.hent(
+                    søknadId = søknadId,
+                    gruppeId = gruppe.versjon,
+                    spørsmålIdIGruppe = it.idIGruppe,
+                ) != null
+
+            if (!nesteSpørsmålFinnesAllerede) {
+                inMemorySøknadRepository.lagre(
+                    spørsmålId = UUID.randomUUID(),
+                    søknadId = søknadId,
+                    gruppeId = lagretInfo.gruppeId,
+                    idIGruppe = it.idIGruppe,
+                    svar = null,
+                )
+            }
         }
     }
 
@@ -103,13 +112,14 @@ class SøknadService(
     }
 
     fun nesteSpørsmålgruppe(søknadId: UUID): SporsmalgruppeDTO {
-        val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
-        val ubesvartSpørsmål = alleSpørsmål.find { it.svar == null }
-        val besvarteSpørsmål = alleSpørsmål.filter { it.svar != null }
-        val gruppe = getGruppe(ubesvartSpørsmål?.gruppeId ?: BostedslandDTOV1.versjon)
+        val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId).sortedBy { it.idIGruppe }
+        val førsteUbesvartSpørsmål = alleSpørsmål.find { it.svar == null }
+        val besvarteSpørsmål =
+            if (førsteUbesvartSpørsmål == null) alleSpørsmål else alleSpørsmål.filter { it.idIGruppe < førsteUbesvartSpørsmål.idIGruppe }
+        val gruppe = getGruppe(førsteUbesvartSpørsmål?.gruppeId ?: BostedslandDTOV1.versjon)
 
         val nesteSpørsmålDTO =
-            ubesvartSpørsmål?.let {
+            førsteUbesvartSpørsmål?.let {
                 gruppe.getSpørsmålMedId(it.idIGruppe).toSporsmalDTO(it.spørsmålId, null)
             }
         val besvarteSpørsmålDTO =
