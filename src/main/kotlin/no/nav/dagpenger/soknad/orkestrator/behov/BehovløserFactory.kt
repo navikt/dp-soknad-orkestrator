@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.AndreYtelser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EØSArbeid
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.HelseTilAlleTyperJobb
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.JobbetUtenforNorge
@@ -14,6 +15,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.TarUtd
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Verneplikt
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.VilligTilÅBytteYrke
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnskerDagpengerFraDato
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.AndreYtelserBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EØSArbeidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HelseTilAlleTyperJobbBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.JobbetUtenforNorgeBehovløser
@@ -37,6 +39,7 @@ class BehovløserFactory(
 ) {
     private val behovløsere: Map<Behov, Behovløser> =
         mapOf(
+            AndreYtelser to AndreYtelserBehovløser(rapidsConnection, opplysningRepository),
             ØnskerDagpengerFraDato to ØnskerDagpengerFraDatoBehovløser(rapidsConnection, opplysningRepository),
             EØSArbeid to EØSArbeidBehovløser(rapidsConnection, opplysningRepository),
             KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository),
@@ -53,13 +56,13 @@ class BehovløserFactory(
             TarUtdanningEllerOpplæring to UtdanningEllerOpplæringBehovløser(rapidsConnection, opplysningRepository),
         )
 
-    fun behovløserFor(behov: Behov): Behovløser {
-        return behovløsere[behov] ?: throw IllegalArgumentException("Fant ikke behovløser for behov: $behov")
-    }
+    fun behovløserFor(behov: Behov): Behovløser =
+        behovløsere[behov] ?: throw IllegalArgumentException("Fant ikke behovløser for behov: $behov")
 
     fun behov() = behovløsere.keys.map { it.name }.toList()
 
     enum class Behov {
+        AndreYtelser,
         ØnskerDagpengerFraDato,
         EØSArbeid,
         KanJobbeDeltid,
