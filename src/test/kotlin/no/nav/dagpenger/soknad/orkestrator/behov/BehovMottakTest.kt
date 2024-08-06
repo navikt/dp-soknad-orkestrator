@@ -3,10 +3,12 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
 import io.kotest.matchers.shouldBe
+import io.mockk.clearMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnskerDagpengerFraDato
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
@@ -21,9 +23,10 @@ class BehovMottakTest {
         mockk<BehovløserFactory>(relaxed = true).also {
             every { it.behov() } returns BehovløserFactory.Behov.entries.map { it.name }
         }
+    private var søknadService = mockk<SøknadService>(relaxed = true)
 
     init {
-        BehovMottak(rapidsConnection = testRapid, behovløserFactory = behovløserFactory)
+        BehovMottak(rapidsConnection = testRapid, behovløserFactory = behovløserFactory, søknadService)
     }
 
     companion object {
@@ -34,11 +37,14 @@ class BehovMottakTest {
     @BeforeEach
     fun reset() {
         testRapid.reset()
+        clearMocks(søknadService)
     }
 
     @ParameterizedTest
     @MethodSource("behovProvider")
     fun `vi kan motta opplysningsbehov`(behov: BehovløserFactory.Behov) {
+        every { søknadService.søknadFinnes(any()) } returns true
+
         testRapid.sendTestMessage(opplysning_behov_event(listOf(behov.name)))
 
         verify(exactly = 1) { behovløserFactory.behovløserFor(behov) }
@@ -62,6 +68,15 @@ class BehovMottakTest {
     fun `Vi filtrerer ut mottatte behov som vi ikke skal løse`() {
         val behov = listOf(ØnskerDagpengerFraDato.name, "UkjentBehov")
         lagJsonMessage(behov).mottatteBehov() shouldBe listOf(ØnskerDagpengerFraDato.name)
+    }
+
+    @Test
+    fun `Vi løser ikke behov når vi mottar behov for en søknad som ikke finnes i databasen`() {
+        every { søknadService.søknadFinnes(any()) } returns false
+
+        testRapid.sendTestMessage(opplysning_behov_event(listOf(ØnskerDagpengerFraDato.name)))
+
+        verify(exactly = 0) { behovløserFactory.behovløserFor(any()) }
     }
 }
 

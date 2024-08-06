@@ -2,6 +2,8 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
+import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.MessageContext
 import no.nav.helse.rapids_rivers.RapidsConnection
@@ -11,6 +13,7 @@ import no.nav.helse.rapids_rivers.withMDC
 class BehovMottak(
     val rapidsConnection: RapidsConnection,
     private val behovløserFactory: BehovløserFactory,
+    private val søknadService: SøknadService,
 ) : River.PacketListener {
     init {
         River(rapidsConnection)
@@ -35,15 +38,23 @@ class BehovMottak(
         ) {
             logger.info { "Mottok behov: ${packet.mottatteBehov()}" }
 
-            packet.mottatteBehov().forEach { behov ->
-                BehovMetrikker.mottatt.labels(behov).inc()
-                try {
-                    behovsløserFor(BehovløserFactory.Behov.valueOf(behov)).løs(Behovmelding(packet))
-                } catch (e: IllegalArgumentException) {
-                    logger.error(e) { "Kunne ikke løse behov $behov. Ett eller flere argumenter var feil." }
-                } catch (e: IllegalStateException) {
-                    logger.error(e) { "Kunne ikke løse behov $behov. Opplysningen finnes ikke." }
-                }
+            if (!søknadService.søknadFinnes(packet["søknadId"].asUUID())) {
+                logger.warn { "Søknad med søknadId: ${packet["søknadId"].asText()} finnes ikke, kan ikke løse behov" }
+            } else {
+                packet.løsBehov()
+            }
+        }
+    }
+
+    private fun JsonMessage.løsBehov() {
+        this.mottatteBehov().forEach { behov ->
+            BehovMetrikker.mottatt.labels(behov).inc()
+            try {
+                behovsløserFor(BehovløserFactory.Behov.valueOf(behov)).løs(Behovmelding(this))
+            } catch (e: IllegalArgumentException) {
+                logger.error(e) { "Kunne ikke løse behov $behov. Ett eller flere argumenter var feil." }
+            } catch (e: IllegalStateException) {
+                logger.error(e) { "Kunne ikke løse behov $behov. Opplysningen finnes ikke." }
             }
         }
     }

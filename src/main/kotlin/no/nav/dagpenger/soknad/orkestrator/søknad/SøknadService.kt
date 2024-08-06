@@ -19,6 +19,8 @@ class SøknadService(
     private val søknadRepository: SøknadRepository,
     private val inMemorySøknadRepository: InMemorySøknadRepository = InMemorySøknadRepository(),
 ) {
+    fun søknadFinnes(søknadId: UUID) = søknadRepository.hent(søknadId) != null
+
     fun publiserMeldingOmSøknadInnsendt(
         søknadId: UUID,
         ident: String,

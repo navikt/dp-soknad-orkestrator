@@ -2,6 +2,8 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.clearAllMocks
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.BostedslandDTOV1
@@ -9,6 +11,7 @@ import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.toSporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -23,6 +26,31 @@ class SøknadServiceTest {
             inMemorySøknadRepository = inMemorySøknadRepository,
         )
     private val ident = "12345678901"
+
+    @BeforeEach
+    fun reset() {
+        clearAllMocks()
+    }
+
+    @Test
+    fun `SøknadFinnes returnerer true når søknad finnes i databasen`() {
+        val søknad = Søknad(ident = ident)
+
+        every {
+            søknadRepository.hent(søknad.søknadId)
+        } returns søknad
+
+        søknadService.søknadFinnes(UUID.randomUUID()) shouldBe true
+    }
+
+    @Test
+    fun `SøknadFinnes returnerer false når søknaden ikke finnes i databasen`() {
+        every {
+            søknadRepository.hent(any())
+        } returns null
+
+        søknadService.søknadFinnes(UUID.randomUUID()) shouldBe false
+    }
 
     @Test
     fun `vi kan sende ut melding om ny søknad på rapiden`() {
@@ -70,7 +98,8 @@ class SøknadServiceTest {
 
         inMemorySøknadRepository.hentAlle(søknadId).size shouldBe 2
         inMemorySøknadRepository.hentAlle(søknadId).find { it.spørsmålId == spørsmålId } shouldNotBe null
-        inMemorySøknadRepository.hentAlle(søknadId).find { it.idIGruppe == bostedslandgruppe.reistTilbakeTilNorge.idIGruppe } shouldNotBe
+        inMemorySøknadRepository.hentAlle(søknadId)
+            .find { it.idIGruppe == bostedslandgruppe.reistTilbakeTilNorge.idIGruppe } shouldNotBe
             null
     }
 

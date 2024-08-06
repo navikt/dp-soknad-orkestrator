@@ -66,6 +66,7 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
         BehovMottak(
             rapidsConnection = rapidsConnection,
             behovløserFactory = BehovløserFactory(rapidsConnection, OpplysningRepositoryPostgres(dataSource)),
+            søknadService = søknadService(),
         )
     }
 
