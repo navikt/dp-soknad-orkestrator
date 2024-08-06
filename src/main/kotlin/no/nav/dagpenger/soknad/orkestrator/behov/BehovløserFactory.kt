@@ -1,12 +1,12 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.AndreYtelser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EØSArbeid
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.HelseTilAlleTyperJobb
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.JobbetUtenforNorge
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.KanJobbeDeltid
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.KanJobbeHvorSomHelst
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Lønnsgaranti
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.OppgittAndreYtelserUtenforNav
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Ordinær
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Permittert
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertFiskeforedling
@@ -15,13 +15,13 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.TarUtd
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Verneplikt
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.VilligTilÅBytteYrke
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnskerDagpengerFraDato
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.AndreYtelserBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EØSArbeidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HelseTilAlleTyperJobbBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.JobbetUtenforNorgeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeDeltidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.KanJobbeHvorSomHelstBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.LønnsgarantiBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.OppgittAndreYtelserUtenforNavBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.OrdinærBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
@@ -39,7 +39,7 @@ class BehovløserFactory(
 ) {
     private val behovløsere: Map<Behov, Behovløser> =
         mapOf(
-            AndreYtelser to AndreYtelserBehovløser(rapidsConnection, opplysningRepository),
+            OppgittAndreYtelserUtenforNav to OppgittAndreYtelserUtenforNavBehovløser(rapidsConnection, opplysningRepository),
             ØnskerDagpengerFraDato to ØnskerDagpengerFraDatoBehovløser(rapidsConnection, opplysningRepository),
             EØSArbeid to EØSArbeidBehovløser(rapidsConnection, opplysningRepository),
             KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository),
@@ -62,7 +62,7 @@ class BehovløserFactory(
     fun behov() = behovløsere.keys.map { it.name }.toList()
 
     enum class Behov {
-        AndreYtelser,
+        OppgittAndreYtelserUtenforNav,
         ØnskerDagpengerFraDato,
         EØSArbeid,
         KanJobbeDeltid,

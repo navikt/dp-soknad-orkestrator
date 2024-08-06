@@ -28,7 +28,7 @@ class BehovløserFactoryTest {
     fun `Kan hente ut alle behov`() {
         behovløserFactory.behov() shouldBe
             listOf(
-                "AndreYtelser",
+                "OppgittAndreYtelserUtenforNav",
                 "ØnskerDagpengerFraDato",
                 "EØSArbeid",
                 "KanJobbeDeltid",
