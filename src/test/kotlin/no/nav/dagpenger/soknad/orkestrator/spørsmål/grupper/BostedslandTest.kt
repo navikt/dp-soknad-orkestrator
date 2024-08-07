@@ -1,8 +1,12 @@
 package no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper
 
+import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.PeriodeSvar
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.BooleanSvar
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.DatoSvar
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.LandSvar
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.TekstSvar
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.Test
@@ -12,128 +16,158 @@ class BostedslandTest {
 
     @Test
     fun `neste spørsmål er null når hvilketLandBorDuI er Norge`() {
-        val besvartSpørsmål =
-            bostedsland.hvilketLandBorDuI.toSporsmalDTO(
+        val svar =
+            LandSvar(
                 spørsmålId = UUID.randomUUID(),
-                svar = "NOR",
+                verdi = "NOR",
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(besvartSpørsmål)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.hvilketLandBorDuI.idIGruppe, svar)
 
         nesteSpørsmål shouldBe null
     }
 
-    // TODO: Oppdater test når vi har implementert riktig logikk for dette spørsmålet
     @Test
     fun `neste spørsmål er reistTilbakeTilNorge når hvilketLandBorDuI ikke er Norge`() {
-        val besvartSpørsmål =
-            bostedsland.hvilketLandBorDuI.toSporsmalDTO(
+        val svar =
+            LandSvar(
                 spørsmålId = UUID.randomUUID(),
-                svar = "SWE",
+                verdi = "SWE",
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(besvartSpørsmål)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.hvilketLandBorDuI.idIGruppe, svar)
 
         nesteSpørsmål shouldBe bostedsland.reistTilbakeTilNorge
     }
 
     @Test
     fun `neste spørsmål er datoForAvreise når reistTilbakeTilNorge er true`() {
-        val besvartSpørsmål =
-            bostedsland.reistTilbakeTilNorge.toSporsmalDTO(
+        val svar =
+            BooleanSvar(
                 spørsmålId = UUID.randomUUID(),
-                svar = "true",
+                verdi = true,
             )
-
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(besvartSpørsmål)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.reistTilbakeTilNorge.idIGruppe, svar)
 
         nesteSpørsmål shouldBe bostedsland.datoForAvreise
     }
 
     @Test
     fun `neste spørsmål er enGangIUken når reistTilbakeTilNorge er false`() {
-        val besvartSpørsmål =
-            bostedsland.reistTilbakeTilNorge.toSporsmalDTO(
+        val svar =
+            BooleanSvar(
                 spørsmålId = UUID.randomUUID(),
-                svar = "false",
+                verdi = false,
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(besvartSpørsmål)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.reistTilbakeTilNorge.idIGruppe, svar)
 
         nesteSpørsmål shouldBe bostedsland.enGangIUken
     }
 
     @Test
     fun `neste spørsmål er hvorforReisteFraNorge når datoForAvreise er besvart`() {
-        val besvartSpørsmål =
-            bostedsland.datoForAvreise.toSporsmalDTO(
+        val svar =
+            DatoSvar(
                 spørsmålId = UUID.randomUUID(),
-                svar = objectMapper.writeValueAsString(PeriodeSvar(LocalDate.now(), LocalDate.now())),
+                verdi = LocalDate.now(),
             )
-
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(besvartSpørsmål)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.datoForAvreise.idIGruppe, svar)
 
         nesteSpørsmål shouldBe bostedsland.hvorforReisteFraNorge
     }
 
     @Test
-    fun `neste spørsmål er enGangIUken når hvorforReisteFraNorger er besvart`() {
-        val besvartSpørsmål =
-            bostedsland.hvorforReisteFraNorge.toSporsmalDTO(
+    fun `neste spørsmål er enGangIUken når hvorforReisteFraNorge er besvart`() {
+        val svar =
+            TekstSvar(
                 spørsmålId = UUID.randomUUID(),
-                svar = "Derfor",
+                verdi = "Derfor",
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(besvartSpørsmål)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.hvorforReisteFraNorge.idIGruppe, svar)
 
         nesteSpørsmål shouldBe bostedsland.enGangIUken
     }
 
     @Test
     fun `neste spørsmål er null når enGangIUken er true`() {
-        val besvartSpørsmål =
-            bostedsland.enGangIUken.toSporsmalDTO(
+        val svar =
+            BooleanSvar(
                 spørsmålId = UUID.randomUUID(),
-                svar = "true",
+                verdi = true,
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(besvartSpørsmål)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.enGangIUken.idIGruppe, svar)
 
         nesteSpørsmål shouldBe null
     }
 
     @Test
     fun `neste spørsmål er rotasjon når enGangIUken er false`() {
-        val besvartSpørsmål =
-            bostedsland.enGangIUken.toSporsmalDTO(
+        val svar =
+            BooleanSvar(
                 spørsmålId = UUID.randomUUID(),
-                svar = "false",
+                verdi = false,
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(besvartSpørsmål)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.enGangIUken.idIGruppe, svar)
 
         nesteSpørsmål shouldBe bostedsland.rotasjon
     }
 
     @Test
     fun `neste spørsmål er null når rotasjon er besvart med true`() {
-        val besvartSpørsmål =
-            bostedsland.rotasjon.toSporsmalDTO(
+        val svar =
+            BooleanSvar(
                 spørsmålId = UUID.randomUUID(),
-                svar = "true",
+                verdi = true,
             )
 
-        bostedsland.nesteSpørsmål(besvartSpørsmål) shouldBe null
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.rotasjon.idIGruppe, svar)
+
+        nesteSpørsmål shouldBe null
     }
 
     @Test
     fun `neste spørsmål er null når rotasjon er besvart med false`() {
-        val besvartSpørsmål =
-            bostedsland.rotasjon.toSporsmalDTO(
+        val svar =
+            BooleanSvar(
                 spørsmålId = UUID.randomUUID(),
-                svar = "false",
+                verdi = false,
             )
 
-        bostedsland.nesteSpørsmål(besvartSpørsmål) shouldBe null
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.rotasjon.idIGruppe, svar)
+
+        nesteSpørsmål shouldBe null
+    }
+
+    @Test
+    fun `validering kaster ikke feil når svar på hvilketLandBorDuI er gyldig`() {
+        val svar =
+            LandSvar(
+                spørsmålId = UUID.randomUUID(),
+                verdi = bostedsland.hvilketLandBorDuI.gyldigeSvar.random(),
+            )
+
+        shouldNotThrow<IllegalArgumentException> {
+            bostedsland.valider(
+                bostedsland.hvilketLandBorDuI.idIGruppe,
+                svar,
+            )
+        }
+    }
+
+    @Test
+    fun `validering kaster feil når svar på hvilketLandBorDuI er ugyldig`() {
+        val svar =
+            LandSvar(
+                spørsmålId = UUID.randomUUID(),
+                verdi = "UGYLDIG",
+            )
+
+        shouldThrow<IllegalArgumentException> {
+            BostedslandDTOV1.valider(BostedslandDTOV1.hvilketLandBorDuI.idIGruppe, svar)
+        }
     }
 }

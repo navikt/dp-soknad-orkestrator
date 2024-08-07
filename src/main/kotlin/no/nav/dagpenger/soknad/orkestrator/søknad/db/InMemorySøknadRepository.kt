@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
 import java.util.UUID
 
 class InMemorySøknadRepository {
@@ -10,6 +11,7 @@ class InMemorySøknadRepository {
         søknadId: UUID,
         gruppeId: Int,
         idIGruppe: Int,
+        type: SpørsmålType,
         svar: String?,
     ) {
         val dbRad =
@@ -17,6 +19,7 @@ class InMemorySøknadRepository {
                 spørsmålId = spørsmålId,
                 gruppeId = gruppeId,
                 idIGruppe = idIGruppe,
+                type = type,
                 svar = svar,
             )
         tabell[søknadId] = tabell[søknadId]
@@ -57,5 +60,6 @@ data class LagretInfo(
     val spørsmålId: UUID,
     val gruppeId: Int,
     val idIGruppe: Int,
+    val type: SpørsmålType,
     val svar: String?,
 )

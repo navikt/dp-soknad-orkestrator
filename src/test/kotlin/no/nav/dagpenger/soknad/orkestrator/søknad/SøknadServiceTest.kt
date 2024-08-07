@@ -6,8 +6,8 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.LandSvar
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.BostedslandDTOV1
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.toSporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
@@ -77,7 +77,7 @@ class SøknadServiceTest {
     }
 
     @Test
-    fun `lagreBesvartSpørsmål lagrer besvart spørsmål og neste spørsmål`() {
+    fun `lagreSvar lagrer besvart spørsmål og neste spørsmål`() {
         val søknadId = UUID.randomUUID()
         val spørsmålId = UUID.randomUUID()
         val bostedslandgruppe = BostedslandDTOV1
@@ -86,15 +86,13 @@ class SøknadServiceTest {
             søknadId = søknadId,
             gruppeId = bostedslandgruppe.versjon,
             idIGruppe = bostedslandgruppe.hvilketLandBorDuI.idIGruppe,
+            type = bostedslandgruppe.hvilketLandBorDuI.type,
             svar = null,
         )
-        val besvartSpørsmål =
-            bostedslandgruppe.hvilketLandBorDuI.toSporsmalDTO(
-                spørsmålId = spørsmålId,
-                svar = "SWE",
-            )
 
-        søknadService.lagreBesvartSpørsmål(søknadId, besvartSpørsmål)
+        val svar = LandSvar(spørsmålId = spørsmålId, verdi = "SWE")
+
+        søknadService.lagreSvar(søknadId, svar)
 
         inMemorySøknadRepository.hentAlle(søknadId).size shouldBe 2
         inMemorySøknadRepository.hentAlle(søknadId).find { it.spørsmålId == spørsmålId } shouldNotBe null
@@ -114,6 +112,7 @@ class SøknadServiceTest {
             søknadId = søknadId,
             gruppeId = bostedslandgruppe.versjon,
             idIGruppe = bostedslandgruppe.hvilketLandBorDuI.idIGruppe,
+            type = bostedslandgruppe.hvilketLandBorDuI.type,
             svar = "SWE",
         )
         inMemorySøknadRepository.lagre(
@@ -121,6 +120,7 @@ class SøknadServiceTest {
             søknadId = søknadId,
             gruppeId = bostedslandgruppe.versjon,
             idIGruppe = bostedslandgruppe.reistTilbakeTilNorge.idIGruppe,
+            type = bostedslandgruppe.reistTilbakeTilNorge.type,
             svar = "true",
         )
         inMemorySøknadRepository.lagre(
@@ -128,15 +128,17 @@ class SøknadServiceTest {
             søknadId = søknadId,
             gruppeId = bostedslandgruppe.versjon,
             idIGruppe = bostedslandgruppe.datoForAvreise.idIGruppe,
+            type = bostedslandgruppe.datoForAvreise.type,
             svar = null,
         )
 
-        val besvartSpørsmål =
-            bostedslandgruppe.hvilketLandBorDuI.toSporsmalDTO(
+        val svar =
+            LandSvar(
                 spørsmålId = spørsmålId,
-                svar = "FIN",
+                verdi = "FIN",
             )
-        søknadService.lagreBesvartSpørsmål(søknadId, besvartSpørsmål)
+
+        søknadService.lagreSvar(søknadId, svar)
 
         val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
         alleSpørsmål.size shouldBe 2
@@ -157,6 +159,7 @@ class SøknadServiceTest {
             søknadId = søknadId,
             gruppeId = bostedslandgruppe.versjon,
             idIGruppe = bostedslandgruppe.hvilketLandBorDuI.idIGruppe,
+            type = bostedslandgruppe.hvilketLandBorDuI.type,
             svar = "SWE",
         )
         inMemorySøknadRepository.lagre(
@@ -164,6 +167,7 @@ class SøknadServiceTest {
             søknadId = søknadId,
             gruppeId = bostedslandgruppe.versjon,
             idIGruppe = bostedslandgruppe.reistTilbakeTilNorge.idIGruppe,
+            type = bostedslandgruppe.reistTilbakeTilNorge.type,
             svar = null,
         )
         inMemorySøknadRepository.lagre(
@@ -171,6 +175,7 @@ class SøknadServiceTest {
             søknadId = søknadId,
             gruppeId = bostedslandgruppe.versjon,
             idIGruppe = bostedslandgruppe.enGangIUken.idIGruppe,
+            type = bostedslandgruppe.enGangIUken.type,
             svar = "true",
         )
 

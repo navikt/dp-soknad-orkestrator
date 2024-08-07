@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
 import java.util.UUID
 
 data class GrunnleggendeSpørsmål(
@@ -30,11 +31,19 @@ abstract class Bostedsland {
 
     abstract fun førsteSpørsmål(): GrunnleggendeSpørsmål
 
-    abstract fun nesteSpørsmål(aktivtSpørsmål: SporsmalDTO): GrunnleggendeSpørsmål?
+    abstract fun nesteSpørsmål(
+        spørsmålId: Int,
+        svar: Svar<*>,
+    ): GrunnleggendeSpørsmål?
 
     abstract fun getSpørsmålMedId(id: Int): GrunnleggendeSpørsmål
 
     abstract fun avhengigheter(id: Int): List<Int>
+
+    abstract fun valider(
+        spørsmålId: Int,
+        svar: Svar<*>,
+    )
 }
 
 object BostedslandDTOV1 : Bostedsland() {
@@ -91,14 +100,17 @@ object BostedslandDTOV1 : Bostedsland() {
 
     override fun førsteSpørsmål(): GrunnleggendeSpørsmål = hvilketLandBorDuI
 
-    override fun nesteSpørsmål(aktivtSpørsmål: SporsmalDTO): GrunnleggendeSpørsmål? =
-        when (aktivtSpørsmål.tekstnøkkel) {
-            hvilketLandBorDuI.tekstnøkkel -> if (aktivtSpørsmål.svar != "NOR") reistTilbakeTilNorge else null
-            reistTilbakeTilNorge.tekstnøkkel -> if (aktivtSpørsmål.svar == "true") datoForAvreise else enGangIUken
-            datoForAvreise.tekstnøkkel -> hvorforReisteFraNorge
-            hvorforReisteFraNorge.tekstnøkkel -> enGangIUken
-            enGangIUken.tekstnøkkel -> if (aktivtSpørsmål.svar == "true") null else rotasjon
-            rotasjon.tekstnøkkel -> null
+    override fun nesteSpørsmål(
+        spørsmålId: Int,
+        svar: Svar<*>,
+    ): GrunnleggendeSpørsmål? =
+        when (spørsmålId) {
+            hvilketLandBorDuI.idIGruppe -> if (svar.verdi != "NOR") reistTilbakeTilNorge else null
+            reistTilbakeTilNorge.idIGruppe -> if (svar.verdi == true) datoForAvreise else enGangIUken
+            datoForAvreise.idIGruppe -> hvorforReisteFraNorge
+            hvorforReisteFraNorge.idIGruppe -> enGangIUken
+            enGangIUken.idIGruppe -> if (svar.verdi == true) null else rotasjon
+            rotasjon.idIGruppe -> null
             else -> null
         }
 
@@ -130,6 +142,17 @@ object BostedslandDTOV1 : Bostedsland() {
             rotasjon.idIGruppe -> emptyList()
             else -> throw IllegalArgumentException("Ukjent spørsmål med id: $id")
         }
+
+    override fun valider(
+        spørsmålId: Int,
+        svar: Svar<*>,
+    ) {
+        if (spørsmålId == hvilketLandBorDuI.idIGruppe) {
+            if (svar.verdi !in hvilketLandBorDuI.gyldigeSvar) {
+                throw IllegalArgumentException("$svar er ikke et gyldig svar")
+            }
+        }
+    }
 }
 
 fun getGruppe(id: Int): Bostedsland {

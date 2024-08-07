@@ -15,9 +15,18 @@ import io.ktor.server.routing.routing
 import io.ktor.util.pipeline.PipelineContext
 import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO.BOOLEAN
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO.DATO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO.LAND
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO.PERIODE
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO.TEKST
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.PeriodeSvar
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.BooleanSvar
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.DatoSvar
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.LandSvar
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.PeriodesvarSvar
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.TekstSvar
 import java.time.LocalDate
 import java.util.UUID
 
@@ -45,7 +54,40 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
 
                     besvartSpørsmål.validerSvar()
 
-                    søknadService.lagreBesvartSpørsmål(søknadId = søknadId, besvartSpørsmål = besvartSpørsmål)
+                    val svar =
+                        when (besvartSpørsmål.type) {
+                            LAND ->
+                                LandSvar(
+                                    verdi = besvartSpørsmål.svar!!,
+                                    spørsmålId = besvartSpørsmål.id,
+                                )
+
+                            DATO ->
+                                DatoSvar(
+                                    verdi = LocalDate.parse(besvartSpørsmål.svar),
+                                    spørsmålId = besvartSpørsmål.id,
+                                )
+
+                            TEKST ->
+                                TekstSvar(
+                                    verdi = besvartSpørsmål.svar!!,
+                                    spørsmålId = besvartSpørsmål.id,
+                                )
+
+                            BOOLEAN ->
+                                BooleanSvar(
+                                    verdi = besvartSpørsmål.svar.toBoolean(),
+                                    spørsmålId = besvartSpørsmål.id,
+                                )
+
+                            PERIODE ->
+                                PeriodesvarSvar(
+                                    verdi = objectMapper.readValue<PeriodeSvar>(besvartSpørsmål.svar!!),
+                                    spørsmålId = besvartSpørsmål.id,
+                                )
+                        }
+
+                    søknadService.lagreSvar(søknadId = søknadId, svar = svar)
 
                     call.respond(HttpStatusCode.OK)
                 }
@@ -64,11 +106,11 @@ fun SporsmalDTO.validerSvar() {
     }
 
     when (type) {
-        SporsmalTypeDTO.LAND -> {
+        LAND -> {
             require(svar!!.length == 3) { "Landkode må være tre bokstaver" }
         }
 
-        SporsmalTypeDTO.PERIODE -> {
+        PERIODE -> {
             try {
                 objectMapper.readValue<PeriodeSvar>(svar!!)
             } catch (e: Exception) {
@@ -76,7 +118,7 @@ fun SporsmalDTO.validerSvar() {
             }
         }
 
-        SporsmalTypeDTO.DATO -> {
+        DATO -> {
             try {
                 LocalDate.parse(svar)
             } catch (e: Exception) {
@@ -84,10 +126,11 @@ fun SporsmalDTO.validerSvar() {
             }
         }
 
-        SporsmalTypeDTO.BOOLEAN -> {
+        BOOLEAN -> {
             require(svar == "true" || svar == "false") { "Svar må være true eller false" }
         }
 
-        SporsmalTypeDTO.TEKST -> { /* Trenger ikke validering */ }
+        TEKST -> { // Trenger ikke validering
+        }
     }
 }

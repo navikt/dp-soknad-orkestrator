@@ -2,9 +2,11 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.BostedslandDTOV1
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getGruppe
@@ -42,6 +44,7 @@ class SøknadService(
             søknadId = søknad.søknadId,
             gruppeId = bostedsland.versjon,
             idIGruppe = bostedsland.førsteSpørsmål().idIGruppe,
+            type = bostedsland.førsteSpørsmål().type,
             svar = null,
         )
 
@@ -51,25 +54,27 @@ class SøknadService(
         return søknad
     }
 
-    fun lagreBesvartSpørsmål(
+    fun lagreSvar(
         søknadId: UUID,
-        besvartSpørsmål: SporsmalDTO,
+        svar: Svar<*>,
     ) {
         val lagretInfo =
             inMemorySøknadRepository.hent(
                 søknadId = søknadId,
-                spørsmålId = besvartSpørsmål.id,
-            ) ?: throw IllegalArgumentException("Fant ikke spørsmål med id ${besvartSpørsmål.id}")
+                spørsmålId = svar.spørsmålId,
+            ) ?: throw IllegalArgumentException("Fant ikke spørsmål med id ${svar.id}")
+
+        val gruppe = getGruppe(lagretInfo.gruppeId)
+        gruppe.valider(lagretInfo.idIGruppe, svar)
 
         inMemorySøknadRepository.lagre(
-            spørsmålId = besvartSpørsmål.id,
+            spørsmålId = svar.spørsmålId,
             søknadId = søknadId,
             gruppeId = lagretInfo.gruppeId,
             idIGruppe = lagretInfo.idIGruppe,
-            svar = besvartSpørsmål.svar,
+            type = svar.type,
+            svar = toJson(svar),
         )
-
-        val gruppe = getGruppe(lagretInfo.gruppeId)
 
         nullstillAvhengigheter(
             søknadId = søknadId,
@@ -77,7 +82,7 @@ class SøknadService(
             idIGruppe = lagretInfo.idIGruppe,
         )
 
-        gruppe.nesteSpørsmål(besvartSpørsmål)?.let {
+        gruppe.nesteSpørsmål(lagretInfo.idIGruppe, svar)?.let {
             val nesteSpørsmålFinnesAllerede =
                 inMemorySøknadRepository.hent(
                     søknadId = søknadId,
@@ -91,13 +96,21 @@ class SøknadService(
                     søknadId = søknadId,
                     gruppeId = lagretInfo.gruppeId,
                     idIGruppe = it.idIGruppe,
+                    type = it.type,
                     svar = null,
                 )
             }
         }
     }
 
-    fun nullstillAvhengigheter(
+    private fun toJson(svar: Svar<*>): String? {
+        return when (svar.type) {
+            SpørsmålType.LAND, SpørsmålType.TEKST -> svar.verdi.toString()
+            else -> objectMapper.writeValueAsString(svar.verdi)
+        }
+    }
+
+    private fun nullstillAvhengigheter(
         søknadId: UUID,
         gruppe: Bostedsland,
         idIGruppe: Int,
