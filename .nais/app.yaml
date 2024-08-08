@@ -15,7 +15,7 @@ spec:
   resources:
     requests:
       cpu: 50m
-      memory: 32Mi
+      memory: 384Mi
   kafka:
     pool: {{ kafka.pool }}
   gcp:
