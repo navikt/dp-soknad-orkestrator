@@ -11,7 +11,7 @@ object OpplysningTabell : IntIdTable("opplysning") {
     val beskrivendeId: Column<String> = varchar("beskrivende_id", 255)
     val type: Column<String> = text("type")
     val ident: Column<String> = varchar("ident", 11)
-    val søknadId: Column<UUID> = uuid("soknad_id")
+    val søknadId: Column<UUID> = uuid("soknad_id").index()
 }
 
 object TekstTabell : IntIdTable("tekst") {
