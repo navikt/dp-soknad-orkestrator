@@ -1,0 +1,1 @@
+CREATE INDEX idx_opplysning_soknad ON opplysning (soknad_id);
