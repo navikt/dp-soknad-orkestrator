@@ -87,7 +87,7 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
                                 )
                         }
 
-                    søknadService.lagreSvar(søknadId = søknadId, svar = svar)
+                    søknadService.håndterSvar(søknadId = søknadId, svar = svar)
 
                     call.respond(HttpStatusCode.OK)
                 }

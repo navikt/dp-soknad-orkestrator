@@ -12,7 +12,7 @@ import java.util.UUID
 import kotlin.test.Test
 
 class BostedslandTest {
-    private val bostedsland = BostedslandDTOV1
+    private val bostedsland = Bostedsland
 
     @Test
     fun `neste spørsmål er null når hvilketLandBorDuI er Norge`() {
@@ -22,7 +22,7 @@ class BostedslandTest {
                 verdi = "NOR",
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.hvilketLandBorDuI.idIGruppe, svar)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.hvilketLandBorDuI.id, svar)
 
         nesteSpørsmål shouldBe null
     }
@@ -35,7 +35,7 @@ class BostedslandTest {
                 verdi = "SWE",
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.hvilketLandBorDuI.idIGruppe, svar)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.hvilketLandBorDuI.id, svar)
 
         nesteSpørsmål shouldBe bostedsland.reistTilbakeTilNorge
     }
@@ -47,7 +47,7 @@ class BostedslandTest {
                 spørsmålId = UUID.randomUUID(),
                 verdi = true,
             )
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.reistTilbakeTilNorge.idIGruppe, svar)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.reistTilbakeTilNorge.id, svar)
 
         nesteSpørsmål shouldBe bostedsland.datoForAvreise
     }
@@ -60,7 +60,7 @@ class BostedslandTest {
                 verdi = false,
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.reistTilbakeTilNorge.idIGruppe, svar)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.reistTilbakeTilNorge.id, svar)
 
         nesteSpørsmål shouldBe bostedsland.enGangIUken
     }
@@ -72,7 +72,7 @@ class BostedslandTest {
                 spørsmålId = UUID.randomUUID(),
                 verdi = LocalDate.now(),
             )
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.datoForAvreise.idIGruppe, svar)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.datoForAvreise.id, svar)
 
         nesteSpørsmål shouldBe bostedsland.hvorforReisteFraNorge
     }
@@ -85,7 +85,7 @@ class BostedslandTest {
                 verdi = "Derfor",
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.hvorforReisteFraNorge.idIGruppe, svar)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.hvorforReisteFraNorge.id, svar)
 
         nesteSpørsmål shouldBe bostedsland.enGangIUken
     }
@@ -98,7 +98,7 @@ class BostedslandTest {
                 verdi = true,
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.enGangIUken.idIGruppe, svar)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.enGangIUken.id, svar)
 
         nesteSpørsmål shouldBe null
     }
@@ -111,7 +111,7 @@ class BostedslandTest {
                 verdi = false,
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.enGangIUken.idIGruppe, svar)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.enGangIUken.id, svar)
 
         nesteSpørsmål shouldBe bostedsland.rotasjon
     }
@@ -124,7 +124,7 @@ class BostedslandTest {
                 verdi = true,
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.rotasjon.idIGruppe, svar)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.rotasjon.id, svar)
 
         nesteSpørsmål shouldBe null
     }
@@ -137,7 +137,7 @@ class BostedslandTest {
                 verdi = false,
             )
 
-        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.rotasjon.idIGruppe, svar)
+        val nesteSpørsmål = bostedsland.nesteSpørsmål(bostedsland.rotasjon.id, svar)
 
         nesteSpørsmål shouldBe null
     }
@@ -151,8 +151,8 @@ class BostedslandTest {
             )
 
         shouldNotThrow<IllegalArgumentException> {
-            bostedsland.valider(
-                bostedsland.hvilketLandBorDuI.idIGruppe,
+            bostedsland.validerSvar(
+                bostedsland.hvilketLandBorDuI.id,
                 svar,
             )
         }
@@ -167,7 +167,7 @@ class BostedslandTest {
             )
 
         shouldThrow<IllegalArgumentException> {
-            BostedslandDTOV1.valider(BostedslandDTOV1.hvilketLandBorDuI.idIGruppe, svar)
+            Bostedsland.validerSvar(Bostedsland.hvilketLandBorDuI.id, svar)
         }
     }
 }

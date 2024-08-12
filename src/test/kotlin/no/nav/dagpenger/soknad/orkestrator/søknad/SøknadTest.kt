@@ -8,10 +8,11 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getGruppe
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getSpørsmålgruppe
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.toSporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -56,14 +57,14 @@ class SøknadTest {
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
                 val spørsmalgruppe = objectMapper.readValue(respons.bodyAsText(), SporsmalgruppeDTO::class.java)
-                spørsmalgruppe.id shouldBe 1
+                spørsmalgruppe.navn shouldBe SporsmaalgruppeNavnDTO.BOSTEDSLAND
                 spørsmalgruppe.nesteSpørsmål shouldNotBe null
                 spørsmalgruppe.nesteSpørsmål!!.tekstnøkkel shouldBe "bostedsland.hvilket-land-bor-du-i"
             }
         }
 
         val gjeldendeSpørsmålInfo = inMemorySøknadRepository.hentAlle(gjeldendeSøknadId).first()
-        val gjeldendeSpørsmål = getGruppe(gjeldendeSpørsmålInfo.gruppeId).getSpørsmålMedId(gjeldendeSpørsmålInfo.idIGruppe)
+        val gjeldendeSpørsmål = getSpørsmålgruppe(gjeldendeSpørsmålInfo.gruppenavn).getSpørsmål(gjeldendeSpørsmålInfo.gruppespørsmålId)
         withSøknadApi {
             autentisert(
                 endepunkt = "$søknadEndepunkt/$gjeldendeSøknadId/svar",
@@ -87,7 +88,7 @@ class SøknadTest {
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
                 val spørsmalgruppe = objectMapper.readValue(respons.bodyAsText(), SporsmalgruppeDTO::class.java)
-                spørsmalgruppe.id shouldBe 1
+                spørsmalgruppe.navn shouldBe SporsmaalgruppeNavnDTO.BOSTEDSLAND
                 spørsmalgruppe.nesteSpørsmål shouldBe null
                 spørsmalgruppe.besvarteSpørsmål.size shouldBe 1
                 spørsmalgruppe.besvarteSpørsmål.first().svar shouldBe "NOR"

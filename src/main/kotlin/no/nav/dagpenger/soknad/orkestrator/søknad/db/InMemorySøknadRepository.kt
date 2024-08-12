@@ -1,65 +1,55 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Spørsmålgruppenavn
 import java.util.UUID
 
 class InMemorySøknadRepository {
-    private val tabell = HashMap<UUID, List<LagretInfo>>()
+    private val tabell = HashMap<UUID, List<Spørsmål>>()
 
     fun lagre(
-        spørsmålId: UUID,
         søknadId: UUID,
-        gruppeId: Int,
-        idIGruppe: Int,
-        type: SpørsmålType,
-        svar: String?,
+        spørsmål: Spørsmål,
     ) {
-        val dbRad =
-            LagretInfo(
-                spørsmålId = spørsmålId,
-                gruppeId = gruppeId,
-                idIGruppe = idIGruppe,
-                type = type,
-                svar = svar,
-            )
+        val dbRad = spørsmål
         tabell[søknadId] = tabell[søknadId]
             ?.filter {
-                it.gruppeId != gruppeId || it.idIGruppe != idIGruppe
+                it.gruppenavn != spørsmål.gruppenavn || it.gruppespørsmålId != spørsmål.gruppespørsmålId
             }?.plus(dbRad) ?: listOf(dbRad)
     }
 
     fun slett(
         søknadId: UUID,
-        gruppeId: Int,
-        spørsmålIdIGruppe: Int,
+        gruppenavn: Spørsmålgruppenavn,
+        gruppespørsmålId: Int,
     ) {
         tabell[søknadId] =
             tabell[søknadId]
                 ?.filter {
-                    it.gruppeId != gruppeId || it.idIGruppe != spørsmålIdIGruppe
+                    it.gruppenavn != gruppenavn || it.gruppespørsmålId != gruppespørsmålId
                 }.orEmpty()
     }
 
     fun hent(
         søknadId: UUID,
-        gruppeId: Int,
-        spørsmålIdIGruppe: Int,
-    ): LagretInfo? = tabell[søknadId]?.find { it.gruppeId == gruppeId && it.idIGruppe == spørsmålIdIGruppe }
+        gruppenavn: Spørsmålgruppenavn,
+        gruppespørsmålId: Int,
+    ): Spørsmål? = tabell[søknadId]?.find { it.gruppenavn == gruppenavn && it.gruppespørsmålId == gruppespørsmålId }
 
     fun hent(
         søknadId: UUID,
         spørsmålId: UUID,
-    ): LagretInfo? = tabell[søknadId]?.find { it.spørsmålId == spørsmålId }
+    ): Spørsmål? = tabell[søknadId]?.find { it.spørsmålId == spørsmålId }
 
-    fun hentAlle(søknadId: UUID): List<LagretInfo> = tabell[søknadId] ?: emptyList()
+    fun hentAlle(søknadId: UUID): List<Spørsmål> = tabell[søknadId] ?: emptyList()
 
     fun hentAlleKeys(): Set<UUID> = tabell.keys
 }
 
-data class LagretInfo(
+data class Spørsmål(
     val spørsmålId: UUID,
-    val gruppeId: Int,
-    val idIGruppe: Int,
+    val gruppenavn: Spørsmålgruppenavn,
+    val gruppespørsmålId: Int,
     val type: SpørsmålType,
     val svar: String?,
 )

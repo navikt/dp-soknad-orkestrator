@@ -95,8 +95,6 @@ components:
     Sporsmalgruppe: # Spørsmålgruppe
       type: object
       properties:
-        id:
-          type: integer
         navn:
           $ref: '#/components/schemas/SporsmaalgruppeNavn'
         nesteSpørsmål:
@@ -106,7 +104,6 @@ components:
           items:
             $ref: '#/components/schemas/Sporsmal'
       required:
-        - id
         - navn
         - besvarteSpørsmål
     SporsmaalgruppeNavn: # SpørsmålgruppeNavn
