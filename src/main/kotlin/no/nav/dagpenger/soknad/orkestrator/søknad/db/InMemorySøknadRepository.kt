@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Spørsmålgruppenavn
 import java.util.UUID
 
@@ -51,5 +52,5 @@ data class Spørsmål(
     val gruppenavn: Spørsmålgruppenavn,
     val gruppespørsmålId: Int,
     val type: SpørsmålType,
-    val svar: String?,
+    val svar: Svar<*>?,
 )

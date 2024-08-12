@@ -39,15 +39,15 @@ class SøknadService(
         val søknad = Søknad(ident = ident)
         søknadRepository.lagre(søknad)
 
-        val bostedsland = Bostedsland
         val spørsmål =
             Spørsmål(
                 spørsmålId = UUID.randomUUID(),
-                gruppenavn = bostedsland.navn,
-                gruppespørsmålId = bostedsland.førsteSpørsmål().id,
-                type = bostedsland.førsteSpørsmål().type,
+                gruppenavn = Bostedsland.navn,
+                gruppespørsmålId = Bostedsland.førsteSpørsmål().id,
+                type = Bostedsland.førsteSpørsmål().type,
                 svar = null,
             )
+
         inMemorySøknadRepository.lagre(
             søknadId = søknad.søknadId,
             spørsmål = spørsmål,
@@ -61,25 +61,19 @@ class SøknadService(
 
     fun håndterSvar(
         søknadId: UUID,
+        spørsmålId: UUID,
         svar: Svar<*>,
     ) {
         val spørsmålSomSkalBesvares =
             inMemorySøknadRepository.hent(
                 søknadId = søknadId,
-                spørsmålId = svar.spørsmålId,
-            ) ?: throw IllegalArgumentException("Fant ikke spørsmål med id ${svar.spørsmålId}")
+                spørsmålId = spørsmålId,
+            ) ?: throw IllegalArgumentException("Fant ikke spørsmål med id $spørsmålId")
 
         val spørsmålgruppe = getSpørsmålgruppe(spørsmålSomSkalBesvares.gruppenavn)
         spørsmålgruppe.validerSvar(spørsmålSomSkalBesvares.gruppespørsmålId, svar)
 
-        val besvartSpørsmål =
-            Spørsmål(
-                spørsmålId = svar.spørsmålId,
-                gruppenavn = spørsmålSomSkalBesvares.gruppenavn,
-                gruppespørsmålId = spørsmålSomSkalBesvares.gruppespørsmålId,
-                type = svar.type,
-                svar = toJson(svar),
-            )
+        val besvartSpørsmål = spørsmålSomSkalBesvares.copy(svar = svar)
 
         inMemorySøknadRepository.lagre(
             søknadId = søknadId,
@@ -89,19 +83,18 @@ class SøknadService(
         nullstillAvhengigheter(
             søknadId = søknadId,
             gruppe = spørsmålgruppe,
-            idIGruppe = spørsmålSomSkalBesvares.gruppespørsmålId,
+            idIGruppe = besvartSpørsmål.gruppespørsmålId,
         )
 
-        håndterNesteSpørsmål(spørsmålgruppe, spørsmålSomSkalBesvares, svar, søknadId)
+        håndterNesteSpørsmål(besvartSpørsmål, søknadId)
     }
 
     private fun håndterNesteSpørsmål(
-        gruppe: Spørsmålgruppe,
-        spørsmålSomSkalBesvares: Spørsmål,
-        svar: Svar<*>,
+        besvartSpørsmål: Spørsmål,
         søknadId: UUID,
     ) {
-        gruppe.nesteSpørsmål(spørsmålSomSkalBesvares.gruppespørsmålId, svar)?.let { nesteSpørsmål ->
+        val gruppe = getSpørsmålgruppe(besvartSpørsmål.gruppenavn)
+        gruppe.nesteSpørsmål(besvartSpørsmål)?.let { nesteSpørsmål ->
             val erLagretIDB =
                 inMemorySøknadRepository.hent(
                     søknadId = søknadId,
@@ -167,7 +160,7 @@ class SøknadService(
             }
         val besvarteSpørsmålDTO =
             besvarteSpørsmål.map {
-                gruppe.getSpørsmål(it.gruppespørsmålId).toSporsmalDTO(it.spørsmålId, it.svar!!)
+                gruppe.getSpørsmål(it.gruppespørsmålId).toSporsmalDTO(it.spørsmålId, toJson(it.svar!!))
             }
 
         return SporsmalgruppeDTO(

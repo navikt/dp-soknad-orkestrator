@@ -6,6 +6,7 @@ import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.BooleanSvar
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.LandSvar
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
@@ -95,9 +96,9 @@ class SøknadServiceTest {
             spørsmål = hvilketLandBorDuISpørsmål,
         )
 
-        val svar = LandSvar(spørsmålId = spørsmålId, verdi = "SWE")
+        val svar = LandSvar(verdi = "SWE")
 
-        søknadService.håndterSvar(søknadId, svar)
+        søknadService.håndterSvar(søknadId, spørsmålId, svar)
 
         inMemorySøknadRepository.hentAlle(søknadId).size shouldBe 2
         inMemorySøknadRepository.hentAlle(søknadId).find { it.spørsmålId == spørsmålId } shouldNotBe null
@@ -119,7 +120,7 @@ class SøknadServiceTest {
                 gruppenavn = bostedslandgruppe.navn,
                 gruppespørsmålId = bostedslandgruppe.hvilketLandBorDuI.id,
                 type = bostedslandgruppe.hvilketLandBorDuI.type,
-                svar = "SWE",
+                svar = LandSvar(verdi = "SWE"),
             )
         inMemorySøknadRepository.lagre(
             søknadId = søknadId,
@@ -150,20 +151,16 @@ class SøknadServiceTest {
             spørsmål = datoForAvreiseSpørsmål,
         )
 
-        val svar =
-            LandSvar(
-                spørsmålId = spørsmålId,
-                verdi = "FIN",
-            )
+        val svar = LandSvar(verdi = "FIN")
 
-        søknadService.håndterSvar(søknadId, svar)
+        søknadService.håndterSvar(søknadId, spørsmålId, svar)
 
         val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
         alleSpørsmål.size shouldBe 2
         alleSpørsmål.find { it.spørsmålId == spørsmålId } shouldNotBe null
-        alleSpørsmål.find { it.spørsmålId == spørsmålId }!!.svar shouldBe "FIN"
+        alleSpørsmål.find { it.spørsmålId == spørsmålId }?.svar?.verdi shouldBe "FIN"
         alleSpørsmål.find { it.gruppespørsmålId == bostedslandgruppe.reistTilbakeTilNorge.id } shouldNotBe null
-        alleSpørsmål.find { it.gruppespørsmålId == bostedslandgruppe.reistTilbakeTilNorge.id }!!.svar shouldBe null
+        alleSpørsmål.find { it.gruppespørsmålId == bostedslandgruppe.reistTilbakeTilNorge.id }?.svar shouldBe null
         alleSpørsmål.find { it.gruppespørsmålId == bostedslandgruppe.datoForAvreise.id } shouldBe null
     }
 
@@ -178,7 +175,7 @@ class SøknadServiceTest {
                 gruppenavn = bostedslandgruppe.navn,
                 gruppespørsmålId = bostedslandgruppe.hvilketLandBorDuI.id,
                 type = bostedslandgruppe.hvilketLandBorDuI.type,
-                svar = "SWE",
+                svar = LandSvar(verdi = "SWE"),
             )
         inMemorySøknadRepository.lagre(
             søknadId = søknadId,
@@ -196,13 +193,14 @@ class SøknadServiceTest {
             søknadId = søknadId,
             spørsmål = reistTilbakeTilNorgeSpørsmål,
         )
+        val spørsmålId = UUID.randomUUID()
         val enGangIUkenSpørsmål =
             Spørsmål(
-                spørsmålId = UUID.randomUUID(),
+                spørsmålId = spørsmålId,
                 gruppenavn = bostedslandgruppe.navn,
                 gruppespørsmålId = bostedslandgruppe.enGangIUken.id,
                 type = bostedslandgruppe.enGangIUken.type,
-                svar = "true",
+                svar = BooleanSvar(verdi = true),
             )
         inMemorySøknadRepository.lagre(
             søknadId = søknadId,

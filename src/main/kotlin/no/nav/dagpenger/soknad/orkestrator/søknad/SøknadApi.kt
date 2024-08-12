@@ -56,38 +56,19 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
 
                     val svar =
                         when (besvartSpørsmål.type) {
-                            LAND ->
-                                LandSvar(
-                                    verdi = besvartSpørsmål.svar!!,
-                                    spørsmålId = besvartSpørsmål.id,
-                                )
+                            LAND -> LandSvar(verdi = besvartSpørsmål.svar!!)
 
-                            DATO ->
-                                DatoSvar(
-                                    verdi = LocalDate.parse(besvartSpørsmål.svar),
-                                    spørsmålId = besvartSpørsmål.id,
-                                )
+                            DATO -> DatoSvar(verdi = LocalDate.parse(besvartSpørsmål.svar))
 
-                            TEKST ->
-                                TekstSvar(
-                                    verdi = besvartSpørsmål.svar!!,
-                                    spørsmålId = besvartSpørsmål.id,
-                                )
+                            TEKST -> TekstSvar(verdi = besvartSpørsmål.svar!!)
 
-                            BOOLEAN ->
-                                BooleanSvar(
-                                    verdi = besvartSpørsmål.svar.toBoolean(),
-                                    spørsmålId = besvartSpørsmål.id,
-                                )
+                            BOOLEAN -> BooleanSvar(verdi = besvartSpørsmål.svar.toBoolean())
 
                             PERIODE ->
-                                PeriodesvarSvar(
-                                    verdi = objectMapper.readValue<PeriodeSvar>(besvartSpørsmål.svar!!),
-                                    spørsmålId = besvartSpørsmål.id,
-                                )
+                                PeriodesvarSvar(verdi = objectMapper.readValue<PeriodeSvar>(besvartSpørsmål.svar!!))
                         }
 
-                    søknadService.håndterSvar(søknadId = søknadId, svar = svar)
+                    søknadService.håndterSvar(søknadId = søknadId, spørsmålId = besvartSpørsmål.id, svar = svar)
 
                     call.respond(HttpStatusCode.OK)
                 }
