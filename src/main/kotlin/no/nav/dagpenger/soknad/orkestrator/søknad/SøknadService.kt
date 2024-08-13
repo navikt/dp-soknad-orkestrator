@@ -10,7 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Spørsmålgruppe
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getSpørsmålgruppe
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.toSporsmalDTO
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.toSporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.Spørsmål
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository

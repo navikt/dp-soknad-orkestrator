@@ -13,7 +13,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getSpørsmålgruppe
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.toSporsmalDTO
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.toSporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
