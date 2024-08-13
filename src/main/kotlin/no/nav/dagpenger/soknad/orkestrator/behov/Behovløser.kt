@@ -26,7 +26,7 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
         svarPåBehov: Any,
     ) {
         behovmelding.innkommendePacket["@løsning"] = mapOf(behov to mapOf("verdi" to svarPåBehov))
-        rapidsConnection.publish(behovmelding.innkommendePacket.toJson())
+        rapidsConnection.publish(behovmelding.ident, behovmelding.innkommendePacket.toJson())
 
         BehovMetrikker.løst.labels(behov).inc()
         logger.info { "Løste behov $behov" }

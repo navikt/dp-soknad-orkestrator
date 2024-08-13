@@ -28,7 +28,7 @@ class SøknadService(
         søknadId: UUID,
         ident: String,
     ) {
-        rapid.publish(MeldingOmSøknadInnsendt(søknadId, ident).asMessage().toJson())
+        rapid.publish(ident, MeldingOmSøknadInnsendt(søknadId, ident).asMessage().toJson())
         SøknadMetrikker.varslet.inc()
 
         logger.info { "Publiserte melding om ny søknad med søknadId: $søknadId" }
