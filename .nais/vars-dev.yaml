@@ -1,6 +1,10 @@
 kafka:
   pool: nav-dev
 
+replicas:
+  max: 1
+  min: 1
+
 wonderwalled: true
 ingresses:
   - https://dp-soknad-orkestrator.intern.dev.nav.no

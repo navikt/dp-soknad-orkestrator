@@ -1,2 +1,6 @@
 kafka:
   pool: nav-prod
+
+replicas:
+  max: 2
+  min: 2
