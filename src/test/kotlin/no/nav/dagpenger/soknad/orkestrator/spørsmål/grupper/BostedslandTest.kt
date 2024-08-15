@@ -209,4 +209,60 @@ class BostedslandTest {
             Bostedsland.validerSvar(Bostedsland.hvilketLandBorDuI.id, svar)
         }
     }
+
+    @Test
+    fun `avhengigheter returnerer riktige avhengigheter for hvilketLandBorDuI`() {
+        val avhengigheter = Bostedsland.avhengigheter(Bostedsland.hvilketLandBorDuI.id)
+
+        avhengigheter shouldBe
+            listOf(
+                Bostedsland.reistTilbakeTilNorge.id,
+                Bostedsland.datoForAvreise.id,
+                Bostedsland.hvorforReisteFraNorge.id,
+                Bostedsland.enGangIUken.id,
+                Bostedsland.rotasjon.id,
+            )
+    }
+
+    @Test
+    fun `avhengigheter returnerer riktige avhengigheter for reistTilbakeTilNorge`() {
+        val avhengigheter = Bostedsland.avhengigheter(Bostedsland.reistTilbakeTilNorge.id)
+
+        avhengigheter shouldBe listOf(Bostedsland.datoForAvreise.id, Bostedsland.hvorforReisteFraNorge.id)
+    }
+
+    @Test
+    fun `avhengigheter returnerer riktige avhengigheter for datoForAvreise`() {
+        val avhengigheter = Bostedsland.avhengigheter(Bostedsland.datoForAvreise.id)
+
+        avhengigheter shouldBe listOf(Bostedsland.hvorforReisteFraNorge.id)
+    }
+
+    @Test
+    fun `avhengigheter returnerer tom liste for hvorforReisteFraNorge`() {
+        val avhengigheter = Bostedsland.avhengigheter(Bostedsland.hvorforReisteFraNorge.id)
+
+        avhengigheter shouldBe emptyList()
+    }
+
+    @Test
+    fun `avhengigheter returnerer riktige avhengigheter for enGangIUken`() {
+        val avhengigheter = Bostedsland.avhengigheter(Bostedsland.enGangIUken.id)
+
+        avhengigheter shouldBe listOf(Bostedsland.rotasjon.id)
+    }
+
+    @Test
+    fun `avhengigheter returnerer tom liste for rotasjon`() {
+        val avhengigheter = Bostedsland.avhengigheter(Bostedsland.rotasjon.id)
+
+        avhengigheter shouldBe emptyList()
+    }
+
+    @Test
+    fun `avhengigheter kaster IllegalArgumentException for ukjent spørsmålId`() {
+        shouldThrow<IllegalArgumentException> {
+            Bostedsland.avhengigheter(-1)
+        }
+    }
 }
