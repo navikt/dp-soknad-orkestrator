@@ -12,6 +12,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getSpørsmålgruppe
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.toSporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
@@ -59,7 +60,7 @@ class SøknadTest {
                 val spørsmalgruppe = objectMapper.readValue(respons.bodyAsText(), SporsmalgruppeDTO::class.java)
                 spørsmalgruppe.navn shouldBe SporsmaalgruppeNavnDTO.BOSTEDSLAND
                 spørsmalgruppe.nesteSpørsmål shouldNotBe null
-                spørsmalgruppe.nesteSpørsmål!!.tekstnøkkel shouldBe "bostedsland.hvilket-land-bor-du-i"
+                spørsmalgruppe.nesteSpørsmål!!.tekstnøkkel shouldBe Bostedsland.hvilketLandBorDuI.tekstnøkkel
             }
         }
 

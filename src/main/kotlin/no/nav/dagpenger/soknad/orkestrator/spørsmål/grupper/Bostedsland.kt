@@ -11,7 +11,7 @@ object Bostedsland : Spørsmålgruppe() {
     val hvilketLandBorDuI =
         GrunnleggendeSpørsmål(
             id = 1,
-            tekstnøkkel = "bostedsland.hvilket-land-bor-du-i",
+            tekstnøkkel = "faktum.hvilket-land-bor-du-i",
             type = SpørsmålType.LAND,
             gyldigeSvar = listOf("NOR", "SWE", "FIN"),
         )
@@ -19,7 +19,7 @@ object Bostedsland : Spørsmålgruppe() {
     val reistTilbakeTilNorge =
         GrunnleggendeSpørsmål(
             id = 2,
-            tekstnøkkel = "bostedsland.reist-tilbake-til-norge",
+            tekstnøkkel = "faktum.reist-tilbake-etter-arbeidsledig",
             type = SpørsmålType.BOOLEAN,
             gyldigeSvar = emptyList(),
         )
@@ -27,7 +27,7 @@ object Bostedsland : Spørsmålgruppe() {
     val datoForAvreise =
         GrunnleggendeSpørsmål(
             id = 3,
-            tekstnøkkel = "bostedsland.dato-for-avreise",
+            tekstnøkkel = "faktum.reist-tilbake-periode",
             type = SpørsmålType.PERIODE,
             gyldigeSvar = emptyList(),
         )
@@ -35,7 +35,7 @@ object Bostedsland : Spørsmålgruppe() {
     val hvorforReisteFraNorge =
         GrunnleggendeSpørsmål(
             id = 4,
-            tekstnøkkel = "bostedsland.hvorfor",
+            tekstnøkkel = "faktum.reist-tilbake-aarsak",
             type = SpørsmålType.TEKST,
             gyldigeSvar = emptyList(),
         )
@@ -43,7 +43,7 @@ object Bostedsland : Spørsmålgruppe() {
     val enGangIUken =
         GrunnleggendeSpørsmål(
             id = 5,
-            tekstnøkkel = "bostedsland.en-gang-i-uken",
+            tekstnøkkel = "faktum.reist-tilbake-en-gang-eller-mer",
             type = SpørsmålType.BOOLEAN,
             gyldigeSvar = emptyList(),
         )
@@ -51,7 +51,7 @@ object Bostedsland : Spørsmålgruppe() {
     val rotasjon =
         GrunnleggendeSpørsmål(
             id = 6,
-            tekstnøkkel = "bostedsland.rotasjon",
+            tekstnøkkel = "faktum.reist-i-takt-med-rotasjon",
             type = SpørsmålType.BOOLEAN,
             gyldigeSvar = emptyList(),
         )
