@@ -3,7 +3,6 @@ package no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.GrunnleggendeSpørsmål
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
-import no.nav.dagpenger.soknad.orkestrator.søknad.db.Spørsmål
 
 object Bostedsland : Spørsmålgruppe() {
     override val navn = Spørsmålgruppenavn.BOSTEDSLAND
@@ -58,19 +57,16 @@ object Bostedsland : Spørsmålgruppe() {
 
     override fun førsteSpørsmål(): GrunnleggendeSpørsmål = hvilketLandBorDuI
 
-    override fun nesteSpørsmål(spørsmål: Spørsmål): GrunnleggendeSpørsmål? {
-        if (spørsmål.svar == null) {
-            throw IllegalArgumentException(
-                "Spørsmål med id: ${spørsmål.spørsmålId} har ikke svar, trenger et svar for å finne neste spørsmål",
-            )
-        }
-
-        return when (spørsmål.gruppespørsmålId) {
-            hvilketLandBorDuI.id -> if (spørsmål.svar.verdi != "NOR") reistTilbakeTilNorge else null
-            reistTilbakeTilNorge.id -> if (spørsmål.svar.verdi == true) datoForAvreise else enGangIUken
+    override fun nesteSpørsmål(
+        svar: Svar<*>,
+        gruppespørsmålId: Int,
+    ): GrunnleggendeSpørsmål? {
+        return when (gruppespørsmålId) {
+            hvilketLandBorDuI.id -> if (svar.verdi != "NOR") reistTilbakeTilNorge else null
+            reistTilbakeTilNorge.id -> if (svar.verdi == true) datoForAvreise else enGangIUken
             datoForAvreise.id -> hvorforReisteFraNorge
             hvorforReisteFraNorge.id -> enGangIUken
-            enGangIUken.id -> if (spørsmål.svar.verdi == true) null else rotasjon
+            enGangIUken.id -> if (svar.verdi == true) null else rotasjon
             rotasjon.id -> null
             else -> null
         }

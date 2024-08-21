@@ -2,14 +2,16 @@ package no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper
 
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.GrunnleggendeSpørsmål
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
-import no.nav.dagpenger.soknad.orkestrator.søknad.db.Spørsmål
 
 abstract class Spørsmålgruppe {
     abstract val navn: Spørsmålgruppenavn
 
     abstract fun førsteSpørsmål(): GrunnleggendeSpørsmål
 
-    abstract fun nesteSpørsmål(spørsmål: Spørsmål): GrunnleggendeSpørsmål?
+    abstract fun nesteSpørsmål(
+        svar: Svar<*>,
+        gruppespørsmålId: Int,
+    ): GrunnleggendeSpørsmål?
 
     abstract fun getSpørsmål(spørsmålId: Int): GrunnleggendeSpørsmål
 

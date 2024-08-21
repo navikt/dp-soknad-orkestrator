@@ -100,7 +100,7 @@ class SøknadServiceTest {
     fun `lagreSvar lagrer besvart spørsmål og neste spørsmål`() {
         val søknadId = UUID.randomUUID()
         val spørsmålId = UUID.randomUUID()
-        every { spørsmålgruppe.nesteSpørsmål(any<Spørsmål>()) } returns
+        every { spørsmålgruppe.nesteSpørsmål(any<Svar<*>>(), any<Int>()) } returns
             GrunnleggendeSpørsmål(
                 id = 2,
                 tekstnøkkel = "spm2",
@@ -112,8 +112,8 @@ class SøknadServiceTest {
             spørsmålId = spørsmålId,
         )
 
-        val svar = BooleanSvar(true)
-        søknadService.håndterSvar(søknadId, spørsmålId, svar)
+        val svar = BooleanSvar(spørsmålId = spørsmålId, verdi = true)
+        søknadService.håndterSvar(søknadId, svar)
 
         inMemorySøknadRepository.hentAlle(søknadId).size shouldBe 2
         inMemorySøknadRepository.hentAlle(søknadId).find { it.spørsmålId == spørsmålId } shouldNotBe null
@@ -129,22 +129,22 @@ class SøknadServiceTest {
         val gruppespørsmålId1 = 1
         val gruppespørsmålId2 = 2
         every { spørsmålgruppe.avhengigheter(gruppespørsmålId1) } returns listOf(gruppespørsmålId2)
-        every { spørsmålgruppe.nesteSpørsmål(any<Spørsmål>()) } returns null
+        every { spørsmålgruppe.nesteSpørsmål(any<Svar<*>>(), any<Int>()) } returns null
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
             spørsmålId = spørsmålId1,
             gruppespørsmålId = gruppespørsmålId1,
             type = SpørsmålType.LAND,
-            svar = LandSvar(verdi = "NED"),
+            svar = LandSvar(spørsmålId = spørsmålId1, verdi = "NED"),
         )
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
             gruppespørsmålId = gruppespørsmålId2,
-            svar = BooleanSvar(verdi = true),
+            svar = BooleanSvar(spørsmålId = spørsmålId1, verdi = true),
         )
 
-        val svar = LandSvar(verdi = "OPP")
-        søknadService.håndterSvar(søknadId, spørsmålId1, svar)
+        val svar = LandSvar(spørsmålId = spørsmålId1, verdi = "OPP")
+        søknadService.håndterSvar(søknadId, svar)
 
         val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
         alleSpørsmål.size shouldBe 1
@@ -160,22 +160,22 @@ class SøknadServiceTest {
         val gruppespørsmålId1 = 1
         val gruppespørsmålId2 = 2
         every { spørsmålgruppe.avhengigheter(gruppespørsmålId1) } returns emptyList()
-        every { spørsmålgruppe.nesteSpørsmål(any<Spørsmål>()) } returns null
+        every { spørsmålgruppe.nesteSpørsmål(any<Svar<*>>(), any<Int>()) } returns null
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
             spørsmålId = spørsmålId1,
             gruppespørsmålId = gruppespørsmålId1,
             type = SpørsmålType.LAND,
-            svar = LandSvar(verdi = "NED"),
+            svar = LandSvar(spørsmålId = spørsmålId1, verdi = "NED"),
         )
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
             gruppespørsmålId = gruppespørsmålId2,
-            svar = BooleanSvar(verdi = true),
+            svar = BooleanSvar(spørsmålId = spørsmålId1, verdi = true),
         )
 
-        val svar = LandSvar(verdi = "OPP")
-        søknadService.håndterSvar(søknadId, spørsmålId1, svar)
+        val svar = LandSvar(spørsmålId = spørsmålId1, verdi = "OPP")
+        søknadService.håndterSvar(søknadId, svar)
 
         val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
         alleSpørsmål.size shouldBe 2
@@ -200,7 +200,7 @@ class SøknadServiceTest {
             søknadId = søknadId,
             spørsmålId = spørsmålId1,
             gruppespørsmålId = 1,
-            svar = BooleanSvar(verdi = true),
+            svar = BooleanSvar(spørsmålId = spørsmålId1, verdi = true),
         )
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
@@ -211,7 +211,7 @@ class SøknadServiceTest {
             søknadId = søknadId,
             spørsmålId = spørsmålId3,
             gruppespørsmålId = 3,
-            svar = BooleanSvar(verdi = false),
+            svar = BooleanSvar(spørsmålId = spørsmålId1, verdi = false),
         )
 
         val nesteSpørsmålgruppe = søknadService.nesteSpørsmålgruppe(søknadId)

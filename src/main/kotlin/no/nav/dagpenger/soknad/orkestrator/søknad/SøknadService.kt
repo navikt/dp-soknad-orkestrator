@@ -9,6 +9,7 @@ import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Spørsmålgruppe
+import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Spørsmålgruppenavn
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getSpørsmålgruppe
 import no.nav.dagpenger.soknad.orkestrator.spørsmål.toSporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
@@ -61,40 +62,31 @@ class SøknadService(
 
     fun håndterSvar(
         søknadId: UUID,
-        spørsmålId: UUID,
         svar: Svar<*>,
     ) {
-        val spørsmålSomSkalBesvares =
-            inMemorySøknadRepository.hent(
-                søknadId = søknadId,
-                spørsmålId = spørsmålId,
-            ) ?: throw IllegalArgumentException("Fant ikke spørsmål med id $spørsmålId")
+        val(gruppespørsmålId, gruppenavn) = inMemorySøknadRepository.hentGruppeinfo(søknadId, svar.spørsmålId)
+        val spørsmålgruppe = getSpørsmålgruppe(gruppenavn!!)
 
-        val spørsmålgruppe = getSpørsmålgruppe(spørsmålSomSkalBesvares.gruppenavn)
-        spørsmålgruppe.validerSvar(spørsmålSomSkalBesvares.gruppespørsmålId, svar)
-
-        val besvartSpørsmål = spørsmålSomSkalBesvares.copy(svar = svar)
-
-        inMemorySøknadRepository.lagre(
-            søknadId = søknadId,
-            spørsmål = besvartSpørsmål,
-        )
+        spørsmålgruppe.validerSvar(gruppespørsmålId!!, svar)
+        inMemorySøknadRepository.lagreSvar(søknadId, svar)
 
         nullstillAvhengigheter(
             søknadId = søknadId,
             gruppe = spørsmålgruppe,
-            idIGruppe = besvartSpørsmål.gruppespørsmålId,
+            idIGruppe = gruppespørsmålId,
         )
 
-        håndterNesteSpørsmål(besvartSpørsmål, søknadId)
+        håndterNesteSpørsmål(søknadId, svar, gruppenavn, gruppespørsmålId)
     }
 
     private fun håndterNesteSpørsmål(
-        besvartSpørsmål: Spørsmål,
         søknadId: UUID,
+        svar: Svar<*>,
+        gruppenavn: Spørsmålgruppenavn,
+        gruppespørsmålId: Int,
     ) {
-        val gruppe = getSpørsmålgruppe(besvartSpørsmål.gruppenavn)
-        gruppe.nesteSpørsmål(besvartSpørsmål)?.let { nesteSpørsmål ->
+        val gruppe = getSpørsmålgruppe(gruppenavn)
+        gruppe.nesteSpørsmål(svar, gruppespørsmålId)?.let { nesteSpørsmål ->
             val erLagretIDB =
                 inMemorySøknadRepository.hent(
                     søknadId = søknadId,

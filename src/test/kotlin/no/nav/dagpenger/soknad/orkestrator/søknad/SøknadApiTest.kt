@@ -8,13 +8,13 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.mockk
-import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.autentisert
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.MethodSource
 import java.util.UUID
 import kotlin.test.Test
 
@@ -46,33 +46,32 @@ class SøknadApiTest {
     }
 
     @Test
-    fun `Returnerer neste spørsmål for en gitt søknadId`() {
+    fun `Returnerer neste spørsmålgruppe for en gitt søknadId`() {
         withSøknadApi {
             autentisert(
                 endepunkt = "$søknadEndepunkt/$søknadId/neste",
                 httpMethod = HttpMethod.Get,
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
-                shouldNotThrow<Exception> { objectMapper.readValue(respons.bodyAsText(), SporsmalgruppeDTO::class.java) }
+                shouldNotThrow<Exception> {
+                    objectMapper.readValue(
+                        respons.bodyAsText(),
+                        SporsmalgruppeDTO::class.java,
+                    )
+                }
             }
         }
     }
 
-    @Test
-    fun `Kan besvare spørsmål`() {
+    @ParameterizedTest
+    @MethodSource("alleSvartyperSomJson")
+    fun `Kan besvare spørsmål`(jsonSvar: String) {
         withSøknadApi {
             autentisert(
                 endepunkt = "$søknadEndepunkt/$søknadId/svar",
                 httpMethod = HttpMethod.Post,
-                body =
-                    objectMapper.writeValueAsString(
-                        SporsmalDTO(
-                            id = UUID.randomUUID(),
-                            tekstnøkkel = "tekstnøkkel.test",
-                            type = SporsmalTypeDTO.BOOLEAN,
-                            svar = true.toString(),
-                        ),
-                    ),
+                //language=JSON
+                body = jsonSvar,
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
             }
@@ -87,5 +86,51 @@ class SøknadApiTest {
             },
             test = test,
         )
+    }
+
+    companion object {
+        //language=JSON
+        @JvmStatic
+        fun alleSvartyperSomJson() =
+            listOf(
+                """
+                {
+                  "spørsmålId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "type": "BOOLEAN",
+                  "verdi": true
+                }
+                """.trimIndent(),
+                """
+                {
+                  "spørsmålId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "type": "PERIODE",
+                  "verdi": {
+                    "fom": "2022-01-01",
+                    "tom": "2022-12-31"
+                  }
+                }
+                """.trimIndent(),
+                """
+                {
+                  "spørsmålId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "type": "LAND",
+                  "verdi": "NOR"
+                }
+                """.trimIndent(),
+                """
+                {
+                  "spørsmålId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "type": "TEKST",
+                  "verdi": "Tekst svar"
+                }
+                """.trimIndent(),
+                """
+                {
+                  "spørsmålId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "type": "DATO",
+                  "verdi": "2022-12-31"
+                }
+                """.trimIndent(),
+            )
     }
 }

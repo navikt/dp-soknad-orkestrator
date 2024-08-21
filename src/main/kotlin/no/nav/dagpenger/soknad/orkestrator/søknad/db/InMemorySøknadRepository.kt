@@ -19,6 +19,16 @@ class InMemorySøknadRepository {
             }?.plus(dbRad) ?: listOf(dbRad)
     }
 
+    fun lagreSvar(
+        søknadId: UUID,
+        svar: Svar<*>,
+    ) {
+        val spørsmål = hent(søknadId, svar.spørsmålId)
+        val besvartSpørsmål = spørsmål.copy(svar = svar)
+
+        lagre(søknadId, besvartSpørsmål)
+    }
+
     fun slett(
         søknadId: UUID,
         gruppenavn: Spørsmålgruppenavn,
@@ -40,7 +50,19 @@ class InMemorySøknadRepository {
     fun hent(
         søknadId: UUID,
         spørsmålId: UUID,
-    ): Spørsmål? = tabell[søknadId]?.find { it.spørsmålId == spørsmålId }
+    ): Spørsmål =
+        tabell[søknadId]?.find { it.spørsmålId == spørsmålId }
+            ?: throw IllegalArgumentException("Fant ikke spørsmål med id: $spørsmålId")
+
+    fun hentGruppeinfo(
+        søknadId: UUID,
+        spørsmålId: UUID,
+    ): Pair<Int?, Spørsmålgruppenavn?> {
+        val gruppespørsmålId = tabell[søknadId]?.find { it.spørsmålId == spørsmålId }?.gruppespørsmålId
+        val gruppenavn = tabell[søknadId]?.find { it.spørsmålId == spørsmålId }?.gruppenavn
+
+        return Pair(gruppespørsmålId, gruppenavn)
+    }
 
     fun hentAlle(søknadId: UUID): List<Spørsmål> = tabell[søknadId] ?: emptyList()
 
