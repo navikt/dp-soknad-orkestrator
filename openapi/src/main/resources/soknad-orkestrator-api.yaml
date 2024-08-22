@@ -41,7 +41,7 @@ paths:
                 $ref: '#/components/schemas/Sporsmalgruppe'
   /soknad/{søknadId}/svar:
     post:
-      summary: Post spørsmål med et svar
+      summary: Post et svar på et spørsmål
       parameters:
         - in: path
           name: søknadId
@@ -54,10 +54,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Sporsmal'
+              $ref: '#/components/schemas/Svar'
       responses:
         '201':
-          description: Besvart spørsmål ble lagret
+          description: Svar ble lagret
 
 components:
   schemas:
@@ -84,6 +84,21 @@ components:
         - id
         - tekstnøkkel
         - type
+    Svar: # Svar
+     type: object
+     properties:
+       spørsmålId:
+         type: string
+         format: uuid
+       type:
+         $ref: '#/components/schemas/SporsmalType'
+       verdi:
+         type: string
+         description: Svarverdien må være enten en string, boolean, dato eller periode (se Periodesvar) avhengig av hvilken type spørsmål det besvarer.
+     required:
+       - spørsmålId
+       - type
+       - verdi
     SporsmalType: # SpørsmålType
       type: string
       enum:
