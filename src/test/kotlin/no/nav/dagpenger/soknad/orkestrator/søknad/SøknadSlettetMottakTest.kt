@@ -29,12 +29,14 @@ class SøknadSlettetMottakTest {
     @Test
     fun `Tar ikke i mot søknad_slettet event når påkrevd felt ident mangler`() {
         testRapid.sendTestMessage(søknadSlettetEventUtenIdent)
+
         verify(exactly = 0) { søknadService.slett(any(), any()) }
     }
 
     @Test
     fun `Tar ikke i mot søknad_slettet event når påkrevd felt søknadId mangler`() {
         testRapid.sendTestMessage(søknadSlettetEventUtenSøknadId)
+
         verify(exactly = 0) { søknadService.slett(any(), any()) }
     }
 
