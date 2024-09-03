@@ -29,7 +29,7 @@ class InMemorySøknadRepository {
         lagre(søknadId, besvartSpørsmål)
     }
 
-    fun slett(
+    fun slettSpørsmål(
         søknadId: UUID,
         gruppenavn: Spørsmålgruppenavn,
         gruppespørsmålId: Int,
@@ -39,6 +39,10 @@ class InMemorySøknadRepository {
                 ?.filter {
                     it.gruppenavn != gruppenavn || it.gruppespørsmålId != gruppespørsmålId
                 }.orEmpty()
+    }
+
+    fun slettSøknad(søknadId: UUID) {
+        tabell.remove(søknadId)
     }
 
     fun hent(
