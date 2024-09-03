@@ -12,6 +12,13 @@ object SøknadMetrikker {
             .help("Indikerer antall søknader som er mottatt")
             .register()
 
+    val slettet: Counter =
+        Counter.build()
+            .namespace(NAMESPACE)
+            .name("antall_soknader_slettet")
+            .help("Indikerer antall søknader som er slettet")
+            .register()
+
     val varslet: Counter =
         Counter.build()
             .namespace(NAMESPACE)

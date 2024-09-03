@@ -118,6 +118,7 @@ class SøknadService(
         søknadRepository.slett(søknadId)
         inMemorySøknadRepository.slettSøknad(søknadId)
 
+        SøknadMetrikker.slettet.inc()
         logger.info { "Slettet søknad med søknadId: $søknadId" }
         sikkerlogg.info { "Slettet søknad med søknadId: $søknadId og ident: $ident" }
     }
