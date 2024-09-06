@@ -111,6 +111,18 @@ class SøknadService(
         }
     }
 
+    internal fun slett(
+        søknadId: UUID,
+        ident: String,
+    ) {
+        søknadRepository.slett(søknadId)
+        inMemorySøknadRepository.slettSøknad(søknadId)
+
+        SøknadMetrikker.slettet.inc()
+        logger.info { "Slettet søknad med søknadId: $søknadId" }
+        sikkerlogg.info { "Slettet søknad med søknadId: $søknadId og ident: $ident" }
+    }
+
     private fun toJson(svar: Svar<*>): String? =
         when (svar.type) {
             SpørsmålType.LAND, SpørsmålType.TEKST -> svar.verdi.toString()
@@ -125,7 +137,7 @@ class SøknadService(
         val avhengigheter = gruppe.avhengigheter(idIGruppe)
 
         avhengigheter.forEach {
-            inMemorySøknadRepository.slett(
+            inMemorySøknadRepository.slettSpørsmål(
                 søknadId = søknadId,
                 gruppenavn = gruppe.navn,
                 gruppespørsmålId = it,
