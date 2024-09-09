@@ -64,7 +64,7 @@ class SøknadService(
         søknadId: UUID,
         svar: Svar<*>,
     ) {
-        val(gruppespørsmålId, gruppenavn) = inMemorySøknadRepository.hentGruppeinfo(søknadId, svar.spørsmålId)
+        val (gruppespørsmålId, gruppenavn) = inMemorySøknadRepository.hentGruppeinfo(søknadId, svar.spørsmålId)
         val spørsmålgruppe = getSpørsmålgruppe(gruppenavn!!)
 
         spørsmålgruppe.validerSvar(gruppespørsmålId!!, svar)
@@ -147,19 +147,17 @@ class SøknadService(
 
     fun nesteSpørsmålgruppe(søknadId: UUID): SporsmalgruppeDTO {
         val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId).sortedBy { it.gruppespørsmålId }
-        val førsteUbesvartSpørsmål = alleSpørsmål.find { it.svar == null }
+        val nesteUbesvartSpørsmål = alleSpørsmål.find { it.svar == null }
         val besvarteSpørsmål =
-            if (førsteUbesvartSpørsmål ==
-                null
-            ) {
+            if (nesteUbesvartSpørsmål == null) {
                 alleSpørsmål
             } else {
-                alleSpørsmål.filter { it.gruppespørsmålId < førsteUbesvartSpørsmål.gruppespørsmålId }
+                alleSpørsmål.filter { it.gruppespørsmålId < nesteUbesvartSpørsmål.gruppespørsmålId }
             }
-        val gruppe = getSpørsmålgruppe(førsteUbesvartSpørsmål?.gruppenavn ?: Bostedsland.navn) // TODO: Teit med default
+        val gruppe = getSpørsmålgruppe(nesteUbesvartSpørsmål?.gruppenavn ?: Bostedsland.navn) // TODO: Teit med default
 
         val nesteSpørsmålDTO =
-            førsteUbesvartSpørsmål?.let {
+            nesteUbesvartSpørsmål?.let {
                 gruppe.getSpørsmål(it.gruppespørsmålId).toSporsmalDTO(it.spørsmålId, null)
             }
         val besvarteSpørsmålDTO =
@@ -170,6 +168,7 @@ class SøknadService(
         return SporsmalgruppeDTO(
             navn = SporsmaalgruppeNavnDTO.valueOf(gruppe.navn.name),
             besvarteSpørsmål = besvarteSpørsmålDTO,
+            erFullført = nesteUbesvartSpørsmål == null,
             nesteSpørsmål = nesteSpørsmålDTO,
         )
     }

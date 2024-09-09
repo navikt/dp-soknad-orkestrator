@@ -60,6 +60,7 @@ class SøknadTest {
                 spørsmalgruppe.navn shouldBe SporsmaalgruppeNavnDTO.BOSTEDSLAND
                 spørsmalgruppe.nesteSpørsmål shouldNotBe null
                 spørsmalgruppe.nesteSpørsmål!!.tekstnøkkel shouldBe Bostedsland.hvilketLandBorDuI.tekstnøkkel
+                spørsmalgruppe.erFullført shouldBe false
             }
         }
 
@@ -91,6 +92,7 @@ class SøknadTest {
                 spørsmalgruppe.nesteSpørsmål shouldBe null
                 spørsmalgruppe.besvarteSpørsmål.size shouldBe 1
                 spørsmalgruppe.besvarteSpørsmål.first().svar shouldBe "NOR"
+                spørsmalgruppe.erFullført shouldBe true
             }
         }
     }

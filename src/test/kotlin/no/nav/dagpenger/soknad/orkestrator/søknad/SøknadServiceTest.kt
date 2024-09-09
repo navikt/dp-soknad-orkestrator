@@ -221,6 +221,32 @@ class SøknadServiceTest {
         nesteSpørsmålgruppe.besvarteSpørsmål.size shouldBe 1
         nesteSpørsmålgruppe.besvarteSpørsmål.first().id shouldBe spørsmålId1
     }
+
+    @Test
+    fun `erFullført blir true når det ikke er flere ubesvarte spørsmål i en spørsmålsgruppe`() {
+        val søknadId = UUID.randomUUID()
+        val spørsmålId = UUID.randomUUID()
+        every { spørsmålgruppe.getSpørsmål(any()) } returns
+            GrunnleggendeSpørsmål(
+                id = 99,
+                tekstnøkkel = "spm",
+                type = SpørsmålType.BOOLEAN,
+                gyldigeSvar = emptyList(),
+            )
+
+        inMemorySøknadRepository.lagreTestSpørsmål(
+            søknadId = søknadId,
+            spørsmålId = spørsmålId,
+            gruppespørsmålId = 1,
+            svar = null,
+        )
+
+        søknadService.nesteSpørsmålgruppe(søknadId).erFullført shouldBe false
+
+        inMemorySøknadRepository.lagreSvar(søknadId, BooleanSvar(spørsmålId = spørsmålId, verdi = true))
+
+        søknadService.nesteSpørsmålgruppe(søknadId).erFullført shouldBe true
+    }
 }
 
 fun InMemorySøknadRepository.lagreTestSpørsmål(

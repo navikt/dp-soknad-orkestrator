@@ -118,9 +118,12 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Sporsmal'
+        erFullført:
+          type: boolean
       required:
         - navn
         - besvarteSpørsmål
+        - erFullført
     SporsmaalgruppeNavn: # SpørsmålgruppeNavn
       type: string
       enum:
