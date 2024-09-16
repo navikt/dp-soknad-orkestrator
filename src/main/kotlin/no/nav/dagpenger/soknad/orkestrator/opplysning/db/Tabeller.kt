@@ -6,7 +6,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-object OpplysningTabell : IntIdTable("opplysning") {
+object QuizOpplysningTabell : IntIdTable("quiz_opplysning") {
     val opprettet: Column<LocalDateTime> = datetime("opprettet").default(LocalDateTime.now())
     val beskrivendeId: Column<String> = varchar("beskrivende_id", 255)
     val type: Column<String> = text("type")
@@ -15,32 +15,32 @@ object OpplysningTabell : IntIdTable("opplysning") {
 }
 
 object TekstTabell : IntIdTable("tekst") {
-    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val quizOpplysningId: Column<Int> = integer("quiz_opplysning_id").references(QuizOpplysningTabell.id)
     val svar: Column<String> = text("svar")
 }
 
 object HeltallTabell : IntIdTable("heltall") {
-    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val quizOpplysningId: Column<Int> = integer("quiz_opplysning_id").references(QuizOpplysningTabell.id)
     val svar: Column<Int> = integer("svar")
 }
 
 object DesimaltallTabell : IntIdTable("desimaltall") {
-    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val quizOpplysningId: Column<Int> = integer("quiz_opplysning_id").references(QuizOpplysningTabell.id)
     val svar: Column<Double> = double("svar")
 }
 
 object BoolskTabell : IntIdTable("boolsk") {
-    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val quizOpplysningId: Column<Int> = integer("quiz_opplysning_id").references(QuizOpplysningTabell.id)
     val svar: Column<Boolean> = bool("svar")
 }
 
 object DatoTabell : IntIdTable("dato") {
-    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val quizOpplysningId: Column<Int> = integer("quiz_opplysning_id").references(QuizOpplysningTabell.id)
     val svar: Column<LocalDate> = date("svar")
 }
 
 object FlervalgTabell : IntIdTable("flervalg") {
-    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val quizOpplysningId: Column<Int> = integer("quiz_opplysning_id").references(QuizOpplysningTabell.id)
 }
 
 object FlervalgSvarTabell : IntIdTable("flervalg_svar") {
@@ -49,13 +49,13 @@ object FlervalgSvarTabell : IntIdTable("flervalg_svar") {
 }
 
 object PeriodeTabell : IntIdTable("periode") {
-    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val quizOpplysningId: Column<Int> = integer("quiz_opplysning_id").references(QuizOpplysningTabell.id)
     val fom: Column<LocalDate> = date("fom")
     val tom: Column<LocalDate?> = date("tom").nullable()
 }
 
 object ArbeidsforholdTabell : IntIdTable("arbeidsforhold") {
-    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val quizOpplysningId: Column<Int> = integer("quiz_opplysning_id").references(QuizOpplysningTabell.id)
 }
 
 object ArbeidsforholdSvarTabell : IntIdTable("arbeidsforhold_svar") {
@@ -75,7 +75,7 @@ object EøsArbeidsforholdSvarTabell : IntIdTable("eøs_arbeidsforhold_svar") {
 }
 
 object EgenNæringTabell : IntIdTable("egen_næring") {
-    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val quizOpplysningId: Column<Int> = integer("quiz_opplysning_id").references(QuizOpplysningTabell.id)
 }
 
 object EgenNæringSvarTabell : IntIdTable("egen_næring_svar") {
@@ -84,7 +84,7 @@ object EgenNæringSvarTabell : IntIdTable("egen_næring_svar") {
 }
 
 object BarnTabell : IntIdTable("barn") {
-    val opplysningId: Column<Int> = integer("opplysning_id").references(OpplysningTabell.id)
+    val quizOpplysningId: Column<Int> = integer("quiz_opplysning_id").references(QuizOpplysningTabell.id)
 }
 
 object BarnSvarTabell : IntIdTable("barn_svar") {

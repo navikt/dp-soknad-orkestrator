@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
-import OpplysningTabell
+import QuizOpplysningTabell
 import TekstTabell
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
@@ -320,11 +320,11 @@ class OpplysningRepositoryPostgresTest {
 
         withMigratedDb {
             opplysningRepository.lagre(opplysning1)
-            val antallEtterFørsteLagring = transaction { OpplysningTabell.selectAll().count() }
+            val antallEtterFørsteLagring = transaction { QuizOpplysningTabell.selectAll().count() }
             antallEtterFørsteLagring shouldBe 1
 
             opplysningRepository.lagre(opplysning2)
-            val antallEtterAndreLagring = transaction { OpplysningTabell.selectAll().count() }
+            val antallEtterAndreLagring = transaction { QuizOpplysningTabell.selectAll().count() }
             antallEtterAndreLagring shouldBe 1
         }
     }
@@ -346,13 +346,13 @@ class OpplysningRepositoryPostgresTest {
 
         withMigratedDb {
             opplysningRepository.lagre(opplysning)
-            val antallOpplysningerEtterLagring = transaction { OpplysningTabell.selectAll().count() }
+            val antallOpplysningerEtterLagring = transaction { QuizOpplysningTabell.selectAll().count() }
             val antallTekstsvarEtterLagring = transaction { TekstTabell.selectAll().count() }
 
             antallOpplysningerEtterLagring shouldBe 1
             antallTekstsvarEtterLagring shouldBe 1
             opplysningRepository.slett(søknadId)
-            val antallOpplysningerEtterSletting = transaction { OpplysningTabell.selectAll().count() }
+            val antallOpplysningerEtterSletting = transaction { QuizOpplysningTabell.selectAll().count() }
             val antallTekstsvarEtterSletting = transaction { TekstTabell.selectAll().count() }
             antallOpplysningerEtterSletting shouldBe 0
             antallTekstsvarEtterSletting shouldBe 0
