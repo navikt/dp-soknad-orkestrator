@@ -10,7 +10,7 @@ import EgenNæringTabell
 import EøsArbeidsforholdSvarTabell
 import FlervalgSvarTabell
 import HeltallTabell
-import OpplysningTabell
+import QuizOpplysningTabell
 import TekstTabell
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
@@ -44,13 +44,15 @@ import java.time.LocalDate
 import java.util.UUID
 import javax.sql.DataSource
 
-class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepository {
+class OpplysningRepositoryPostgres(
+    dataSource: DataSource,
+) : OpplysningRepository {
     val database = Database.connect(dataSource)
 
     override fun lagre(opplysning: Opplysning<*>) {
         transaction {
             if (!opplysningEksisterer(opplysning)) {
-                val opplysningId = OpplysningTabell.insertAndGetId(opplysning)
+                val opplysningId = QuizOpplysningTabell.insertAndGetId(opplysning)
 
                 when (opplysning.type) {
                     Tekst -> lagreTekstSvar(opplysningId, opplysning.svar as String)
@@ -83,40 +85,40 @@ class OpplysningRepositoryPostgres(dataSource: DataSource) : OpplysningRepositor
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*>? {
-        return transaction {
-            OpplysningTabell
+    ): Opplysning<*>? =
+        transaction {
+            QuizOpplysningTabell
                 .selectAll()
                 .somMatcher(beskrivendeId, ident, søknadId)
                 .map(tilOpplysning())
                 .firstOrNull()
         }
-    }
 
-    override fun hentAlle(søknadId: UUID): List<Opplysning<*>> {
-        return transaction {
-            OpplysningTabell
+    override fun hentAlle(søknadId: UUID): List<Opplysning<*>> =
+        transaction {
+            QuizOpplysningTabell
                 .selectAll()
-                .where { OpplysningTabell.søknadId eq søknadId }
+                .where { QuizOpplysningTabell.søknadId eq søknadId }
                 .map(tilOpplysning())
         }
-    }
 
     override fun slett(søknadId: UUID) {
         transaction {
-            OpplysningTabell.deleteWhere { OpplysningTabell.søknadId eq søknadId }
+            QuizOpplysningTabell.deleteWhere { QuizOpplysningTabell.søknadId eq søknadId }
         }
     }
 }
 
 private fun opplysningEksisterer(opplysning: Opplysning<*>): Boolean =
-    OpplysningTabell.selectAll().somMatcher(
-        opplysning.beskrivendeId,
-        opplysning.ident,
-        opplysning.søknadId,
-    ).any()
+    QuizOpplysningTabell
+        .selectAll()
+        .somMatcher(
+            opplysning.beskrivendeId,
+            opplysning.ident,
+            opplysning.søknadId,
+        ).any()
 
-fun OpplysningTabell.insertAndGetId(opplysning: Opplysning<*>) =
+fun QuizOpplysningTabell.insertAndGetId(opplysning: Opplysning<*>) =
     insertAndGetId {
         it[beskrivendeId] = opplysning.beskrivendeId
         it[type] = opplysning.type::class.java.simpleName
@@ -130,14 +132,14 @@ fun Query.somMatcher(
     søknadId: UUID,
 ): Query =
     where {
-        OpplysningTabell.beskrivendeId eq beskrivendeId and
-            (OpplysningTabell.ident eq ident) and
-            (OpplysningTabell.søknadId eq søknadId)
+        QuizOpplysningTabell.beskrivendeId eq beskrivendeId and
+            (QuizOpplysningTabell.ident eq ident) and
+            (QuizOpplysningTabell.søknadId eq søknadId)
     }
 
 private fun tilOpplysning(): (ResultRow) -> Opplysning<*> =
     {
-        when (it[OpplysningTabell.type]) {
+        when (it[QuizOpplysningTabell.type]) {
             "Tekst" -> tilTekstOpplysning(it)
             "Heltall" -> tilHeltallOpplysning(it)
             "Desimaltall" -> tilDesimaltallOpplysning(it)
@@ -149,17 +151,17 @@ private fun tilOpplysning(): (ResultRow) -> Opplysning<*> =
             "EøsArbeidsforhold" -> tilEøsArbeidsforholdOpplysning(it)
             "EgenNæring" -> tilEgenNæringOpplysning(it)
             "Barn" -> tilBarnOpplysning(it)
-            else -> throw IllegalArgumentException("Ukjent datatype: ${it[OpplysningTabell.type]}")
+            else -> throw IllegalArgumentException("Ukjent datatype: ${it[QuizOpplysningTabell.type]}")
         }
     }
 
 private fun tilTekstOpplysning(it: ResultRow) =
     Opplysning(
-        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Tekst,
         svar = hentTekstSvar(it),
-        ident = it[OpplysningTabell.ident],
-        søknadId = it[OpplysningTabell.søknadId],
+        ident = it[QuizOpplysningTabell.ident],
+        søknadId = it[QuizOpplysningTabell.søknadId],
     )
 
 private fun lagreTekstSvar(
@@ -167,7 +169,7 @@ private fun lagreTekstSvar(
     svar: String,
 ) {
     TekstTabell.insert {
-        it[TekstTabell.opplysningId] = opplysningId
+        it[TekstTabell.quizOpplysningId] = opplysningId
         it[TekstTabell.svar] = svar
     }
 }
@@ -175,15 +177,16 @@ private fun lagreTekstSvar(
 private fun hentTekstSvar(it: ResultRow): String =
     TekstTabell
         .select(TekstTabell.svar)
-        .where { TekstTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[TekstTabell.svar]
+        .where { TekstTabell.quizOpplysningId eq it[QuizOpplysningTabell.id].value }
+        .first()[TekstTabell.svar]
 
 private fun tilHeltallOpplysning(it: ResultRow) =
     Opplysning(
-        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Heltall,
         svar = hentHeltallSvar(it),
-        ident = it[OpplysningTabell.ident],
-        søknadId = it[OpplysningTabell.søknadId],
+        ident = it[QuizOpplysningTabell.ident],
+        søknadId = it[QuizOpplysningTabell.søknadId],
     )
 
 private fun lagreHeltallSvar(
@@ -191,7 +194,7 @@ private fun lagreHeltallSvar(
     svar: Int,
 ) {
     HeltallTabell.insert {
-        it[HeltallTabell.opplysningId] = opplysningId
+        it[HeltallTabell.quizOpplysningId] = opplysningId
         it[HeltallTabell.svar] = svar
     }
 }
@@ -199,15 +202,16 @@ private fun lagreHeltallSvar(
 private fun hentHeltallSvar(it: ResultRow): Int =
     HeltallTabell
         .select(HeltallTabell.svar)
-        .where { HeltallTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[HeltallTabell.svar]
+        .where { HeltallTabell.quizOpplysningId eq it[QuizOpplysningTabell.id].value }
+        .first()[HeltallTabell.svar]
 
 private fun tilDesimaltallOpplysning(it: ResultRow) =
     Opplysning(
-        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Desimaltall,
         svar = hentDesimaltallSvar(it),
-        ident = it[OpplysningTabell.ident],
-        søknadId = it[OpplysningTabell.søknadId],
+        ident = it[QuizOpplysningTabell.ident],
+        søknadId = it[QuizOpplysningTabell.søknadId],
     )
 
 private fun lagreDesimaltallSvar(
@@ -215,7 +219,7 @@ private fun lagreDesimaltallSvar(
     svar: Double,
 ) {
     DesimaltallTabell.insert {
-        it[DesimaltallTabell.opplysningId] = opplysningId
+        it[DesimaltallTabell.quizOpplysningId] = opplysningId
         it[DesimaltallTabell.svar] = svar
     }
 }
@@ -223,15 +227,16 @@ private fun lagreDesimaltallSvar(
 private fun hentDesimaltallSvar(it: ResultRow): Double =
     DesimaltallTabell
         .select(DesimaltallTabell.svar)
-        .where { DesimaltallTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[DesimaltallTabell.svar]
+        .where { DesimaltallTabell.quizOpplysningId eq it[QuizOpplysningTabell.id].value }
+        .first()[DesimaltallTabell.svar]
 
 private fun tilBoolskOpplysning(it: ResultRow) =
     Opplysning(
-        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Boolsk,
         svar = hentBoolskSvar(it),
-        ident = it[OpplysningTabell.ident],
-        søknadId = it[OpplysningTabell.søknadId],
+        ident = it[QuizOpplysningTabell.ident],
+        søknadId = it[QuizOpplysningTabell.søknadId],
     )
 
 private fun lagreBoolskSvar(
@@ -239,7 +244,7 @@ private fun lagreBoolskSvar(
     svar: Boolean,
 ) {
     BoolskTabell.insert {
-        it[BoolskTabell.opplysningId] = opplysningId
+        it[BoolskTabell.quizOpplysningId] = opplysningId
         it[BoolskTabell.svar] = svar
     }
 }
@@ -247,15 +252,16 @@ private fun lagreBoolskSvar(
 private fun hentBoolskSvar(it: ResultRow): Boolean =
     BoolskTabell
         .select(BoolskTabell.svar)
-        .where { BoolskTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[BoolskTabell.svar]
+        .where { BoolskTabell.quizOpplysningId eq it[QuizOpplysningTabell.id].value }
+        .first()[BoolskTabell.svar]
 
 private fun tilDatoOpplysning(it: ResultRow) =
     Opplysning(
-        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Dato,
         svar = hentDatoSvar(it),
-        ident = it[OpplysningTabell.ident],
-        søknadId = it[OpplysningTabell.søknadId],
+        ident = it[QuizOpplysningTabell.ident],
+        søknadId = it[QuizOpplysningTabell.søknadId],
     )
 
 private fun lagreDatoSvar(
@@ -263,7 +269,7 @@ private fun lagreDatoSvar(
     svar: LocalDate,
 ) {
     DatoTabell.insert {
-        it[DatoTabell.opplysningId] = opplysningId
+        it[DatoTabell.quizOpplysningId] = opplysningId
         it[DatoTabell.svar] = svar
     }
 }
@@ -271,15 +277,16 @@ private fun lagreDatoSvar(
 private fun hentDatoSvar(it: ResultRow): LocalDate =
     DatoTabell
         .select(DatoTabell.svar)
-        .where { DatoTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[DatoTabell.svar]
+        .where { DatoTabell.quizOpplysningId eq it[QuizOpplysningTabell.id].value }
+        .first()[DatoTabell.svar]
 
 private fun tilFlervalgOpplysning(it: ResultRow) =
     Opplysning(
-        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Flervalg,
         svar = hentFlervalgSvar(it),
-        ident = it[OpplysningTabell.ident],
-        søknadId = it[OpplysningTabell.søknadId],
+        ident = it[QuizOpplysningTabell.ident],
+        søknadId = it[QuizOpplysningTabell.søknadId],
     )
 
 private fun lagreFlervalgSvar(
@@ -287,9 +294,10 @@ private fun lagreFlervalgSvar(
     svar: List<String>,
 ) {
     val flervalgId =
-        FlervalgTabell.insertAndGetId {
-            it[FlervalgTabell.opplysningId] = opplysningId
-        }.value
+        FlervalgTabell
+            .insertAndGetId {
+                it[FlervalgTabell.quizOpplysningId] = opplysningId
+            }.value
 
     svar.asListOf<String>().forEach { flervalgSvar ->
         FlervalgSvarTabell.insert {
@@ -303,7 +311,9 @@ private fun hentFlervalgSvar(it: ResultRow): List<String> {
     val flervalgId =
         FlervalgTabell
             .select(FlervalgTabell.id)
-            .where { FlervalgTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[FlervalgTabell.id].value
+            .where { FlervalgTabell.quizOpplysningId eq it[QuizOpplysningTabell.id].value }
+            .first()[FlervalgTabell.id]
+            .value
 
     return FlervalgSvarTabell
         .select(FlervalgSvarTabell.svar)
@@ -313,11 +323,11 @@ private fun hentFlervalgSvar(it: ResultRow): List<String> {
 
 private fun tilPeriodeOpplysning(it: ResultRow) =
     Opplysning(
-        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Periode,
         svar = hentPeriodeSvar(it),
-        ident = it[OpplysningTabell.ident],
-        søknadId = it[OpplysningTabell.søknadId],
+        ident = it[QuizOpplysningTabell.ident],
+        søknadId = it[QuizOpplysningTabell.søknadId],
     )
 
 private fun lagrePeriodeSvar(
@@ -325,31 +335,30 @@ private fun lagrePeriodeSvar(
     svar: PeriodeSvar,
 ) {
     PeriodeTabell.insert {
-        it[PeriodeTabell.opplysningId] = opplysningId
+        it[PeriodeTabell.quizOpplysningId] = opplysningId
         it[fom] = svar.fom
         it[tom] = svar.tom
     }
 }
 
-private fun hentPeriodeSvar(it: ResultRow): PeriodeSvar {
-    return PeriodeTabell
+private fun hentPeriodeSvar(it: ResultRow): PeriodeSvar =
+    PeriodeTabell
         .select(PeriodeTabell.fom, PeriodeTabell.tom)
-        .where(PeriodeTabell.opplysningId eq it[OpplysningTabell.id].value)
+        .where(PeriodeTabell.quizOpplysningId eq it[QuizOpplysningTabell.id].value)
         .map {
             PeriodeSvar(
                 fom = it[PeriodeTabell.fom],
                 tom = it[PeriodeTabell.tom],
             )
         }.first()
-}
 
 private fun tilArbeidsforholdOpplysning(it: ResultRow) =
     Opplysning(
-        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Arbeidsforhold,
         svar = hentArbeidsforholdSvar(it),
-        ident = it[OpplysningTabell.ident],
-        søknadId = it[OpplysningTabell.søknadId],
+        ident = it[QuizOpplysningTabell.ident],
+        søknadId = it[QuizOpplysningTabell.søknadId],
     )
 
 private fun lagreArbeidsforholdSvar(
@@ -357,9 +366,10 @@ private fun lagreArbeidsforholdSvar(
     svar: List<ArbeidsforholdSvar>,
 ) {
     val arbeidsforholdId =
-        ArbeidsforholdTabell.insertAndGetId {
-            it[ArbeidsforholdTabell.opplysningId] = opplysningId
-        }.value
+        ArbeidsforholdTabell
+            .insertAndGetId {
+                it[ArbeidsforholdTabell.quizOpplysningId] = opplysningId
+            }.value
 
     svar.forEach { arbeidsforholdSvar ->
         ArbeidsforholdSvarTabell.insert {
@@ -375,8 +385,9 @@ fun hentArbeidsforholdSvar(it: ResultRow): List<ArbeidsforholdSvar> {
     val arbeidsforholdId =
         ArbeidsforholdTabell
             .select(ArbeidsforholdTabell.id)
-            .where { ArbeidsforholdTabell.opplysningId eq it[OpplysningTabell.id].value }
-            .first()[ArbeidsforholdTabell.id].value
+            .where { ArbeidsforholdTabell.quizOpplysningId eq it[QuizOpplysningTabell.id].value }
+            .first()[ArbeidsforholdTabell.id]
+            .value
 
     return ArbeidsforholdSvarTabell
         .select(ArbeidsforholdSvarTabell.navn, ArbeidsforholdSvarTabell.land, ArbeidsforholdSvarTabell.sluttårsak)
@@ -392,11 +403,11 @@ fun hentArbeidsforholdSvar(it: ResultRow): List<ArbeidsforholdSvar> {
 
 private fun tilEøsArbeidsforholdOpplysning(it: ResultRow) =
     Opplysning(
-        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = EøsArbeidsforhold,
         svar = hentEøsArbeidsforholdSvar(it),
-        ident = it[OpplysningTabell.ident],
-        søknadId = it[OpplysningTabell.søknadId],
+        ident = it[QuizOpplysningTabell.ident],
+        søknadId = it[QuizOpplysningTabell.søknadId],
     )
 
 private fun lagreEøsArbeidsforholdSvar(
@@ -404,9 +415,10 @@ private fun lagreEøsArbeidsforholdSvar(
     svar: List<EøsArbeidsforholdSvar>,
 ) {
     val arbeidsforholdId =
-        ArbeidsforholdTabell.insertAndGetId {
-            it[ArbeidsforholdTabell.opplysningId] = opplysningId
-        }.value
+        ArbeidsforholdTabell
+            .insertAndGetId {
+                it[ArbeidsforholdTabell.quizOpplysningId] = opplysningId
+            }.value
 
     svar.forEach { eøsArbeidsforholdSvar ->
         EøsArbeidsforholdSvarTabell.insert {
@@ -424,8 +436,9 @@ fun hentEøsArbeidsforholdSvar(it: ResultRow): List<EøsArbeidsforholdSvar> {
     val arbeidsforholdId =
         ArbeidsforholdTabell
             .select(ArbeidsforholdTabell.id)
-            .where { ArbeidsforholdTabell.opplysningId eq it[OpplysningTabell.id].value }
-            .first()[ArbeidsforholdTabell.id].value
+            .where { ArbeidsforholdTabell.quizOpplysningId eq it[QuizOpplysningTabell.id].value }
+            .first()[ArbeidsforholdTabell.id]
+            .value
 
     return EøsArbeidsforholdSvarTabell
         .select(
@@ -434,8 +447,7 @@ fun hentEøsArbeidsforholdSvar(it: ResultRow): List<EøsArbeidsforholdSvar> {
             EøsArbeidsforholdSvarTabell.personnummer,
             EøsArbeidsforholdSvarTabell.fom,
             EøsArbeidsforholdSvarTabell.tom,
-        )
-        .where { EøsArbeidsforholdSvarTabell.arbeidsforholdId eq arbeidsforholdId }
+        ).where { EøsArbeidsforholdSvarTabell.arbeidsforholdId eq arbeidsforholdId }
         .map {
             EøsArbeidsforholdSvar(
                 bedriftsnavn = it[EøsArbeidsforholdSvarTabell.bedriftsnavn],
@@ -452,11 +464,11 @@ fun hentEøsArbeidsforholdSvar(it: ResultRow): List<EøsArbeidsforholdSvar> {
 
 private fun tilEgenNæringOpplysning(it: ResultRow) =
     Opplysning(
-        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = EgenNæring,
         svar = hentEgenNæringSvar(it),
-        ident = it[OpplysningTabell.ident],
-        søknadId = it[OpplysningTabell.søknadId],
+        ident = it[QuizOpplysningTabell.ident],
+        søknadId = it[QuizOpplysningTabell.søknadId],
     )
 
 private fun lagreEgenNæringSvar(
@@ -464,9 +476,10 @@ private fun lagreEgenNæringSvar(
     svar: List<Int>,
 ) {
     val egenNæringId =
-        EgenNæringTabell.insertAndGetId {
-            it[EgenNæringTabell.opplysningId] = opplysningId
-        }.value
+        EgenNæringTabell
+            .insertAndGetId {
+                it[EgenNæringTabell.quizOpplysningId] = opplysningId
+            }.value
 
     svar.forEach { organisasjonsnummer ->
         EgenNæringSvarTabell.insert {
@@ -480,7 +493,9 @@ private fun hentEgenNæringSvar(it: ResultRow): List<Int> {
     val egenNæringId =
         EgenNæringTabell
             .select(EgenNæringTabell.id)
-            .where { EgenNæringTabell.opplysningId eq it[OpplysningTabell.id].value }.first()[EgenNæringTabell.id].value
+            .where { EgenNæringTabell.quizOpplysningId eq it[QuizOpplysningTabell.id].value }
+            .first()[EgenNæringTabell.id]
+            .value
 
     return EgenNæringSvarTabell
         .select(EgenNæringSvarTabell.organisasjonsnummer)
@@ -490,19 +505,20 @@ private fun hentEgenNæringSvar(it: ResultRow): List<Int> {
 
 private fun tilBarnOpplysning(it: ResultRow) =
     Opplysning(
-        beskrivendeId = it[OpplysningTabell.beskrivendeId],
+        beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Barn,
         svar = hentBarnSvar(it),
-        ident = it[OpplysningTabell.ident],
-        søknadId = it[OpplysningTabell.søknadId],
+        ident = it[QuizOpplysningTabell.ident],
+        søknadId = it[QuizOpplysningTabell.søknadId],
     )
 
 private fun hentBarnSvar(it: ResultRow): List<BarnSvar> {
     val barnId =
         BarnTabell
             .select(BarnTabell.id)
-            .where { BarnTabell.opplysningId eq it[OpplysningTabell.id].value }
-            .first()[BarnTabell.id].value
+            .where { BarnTabell.quizOpplysningId eq it[QuizOpplysningTabell.id].value }
+            .first()[BarnTabell.id]
+            .value
 
     return BarnSvarTabell
         .select(
@@ -512,8 +528,7 @@ private fun hentBarnSvar(it: ResultRow): List<BarnSvar> {
             BarnSvarTabell.statsborgerskap,
             BarnSvarTabell.forsørgerBarnet,
             BarnSvarTabell.fraRegister,
-        )
-        .where { BarnSvarTabell.barnId eq barnId }
+        ).where { BarnSvarTabell.barnId eq barnId }
         .map {
             BarnSvar(
                 fornavnOgMellomnavn = it[BarnSvarTabell.fornavnMellomnavn],
@@ -531,9 +546,10 @@ private fun lagreBarnSvar(
     svar: List<BarnSvar>,
 ) {
     val barnId =
-        BarnTabell.insertAndGetId {
-            it[BarnTabell.opplysningId] = opplysningId
-        }.value
+        BarnTabell
+            .insertAndGetId {
+                it[BarnTabell.quizOpplysningId] = opplysningId
+            }.value
 
     svar.forEach { barn ->
         BarnSvarTabell.insert {
