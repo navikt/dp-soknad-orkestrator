@@ -4,11 +4,11 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import java.util.UUID
 import kotlin.test.BeforeTest
@@ -16,13 +16,13 @@ import kotlin.test.Test
 
 class SøknadRepositoryTest {
     private lateinit var søknadRepository: SøknadRepository
-    private lateinit var opplysningRepository: OpplysningRepository
+    private lateinit var opplysningRepository: QuizOpplysningRepository
     private val ident = "1234567890"
 
     @BeforeTest
     fun setup() {
         withMigratedDb {
-            opplysningRepository = OpplysningRepositoryPostgres(dataSource)
+            opplysningRepository = QuizOpplysningRepositoryPostgres(dataSource)
             søknadRepository =
                 SøknadRepository(
                     dataSource,
@@ -40,7 +40,7 @@ class SøknadRepositoryTest {
                 ident = ident,
                 opplysninger =
                     listOf(
-                        Opplysning(
+                        QuizOpplysning(
                             beskrivendeId = "beskrivendeId",
                             type = Tekst,
                             svar = "Svar",
@@ -67,7 +67,7 @@ class SøknadRepositoryTest {
                 ident = ident,
                 opplysninger =
                     listOf(
-                        Opplysning(
+                        QuizOpplysning(
                             beskrivendeId = "beskrivendeId",
                             type = Tekst,
                             svar = "Svar",
@@ -93,14 +93,14 @@ class SøknadRepositoryTest {
                 ident = ident,
                 opplysninger =
                     listOf(
-                        Opplysning(
+                        QuizOpplysning(
                             beskrivendeId = "beskrivendeId",
                             type = Tekst,
                             svar = "Svar",
                             ident = ident,
                             søknadId = søknadId,
                         ),
-                        Opplysning(
+                        QuizOpplysning(
                             beskrivendeId = "beskrivendeId2",
                             type = Boolsk,
                             svar = true,

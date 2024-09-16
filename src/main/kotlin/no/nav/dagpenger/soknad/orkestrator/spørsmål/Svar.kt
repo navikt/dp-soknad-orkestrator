@@ -2,7 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.spørsmål
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.PeriodeSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.PeriodeSvar
 import java.time.LocalDate
 import java.util.UUID
 

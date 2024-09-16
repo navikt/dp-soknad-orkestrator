@@ -1,9 +1,9 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.datatype
+package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatype
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.matchers.shouldBe
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import kotlin.test.Test
 
 class ArbeidsforholdTest {

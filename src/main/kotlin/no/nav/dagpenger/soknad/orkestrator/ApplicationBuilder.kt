@@ -7,7 +7,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.internalApi
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -33,11 +33,11 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
             }
             .build()
 
-    private val opplysningRepositoryPostgres = OpplysningRepositoryPostgres(dataSource)
+    private val quizOpplysningRepositoryPostgres = QuizOpplysningRepositoryPostgres(dataSource)
     private val søknadRepository =
         SøknadRepository(
             dataSource = dataSource,
-            opplysningRepository = opplysningRepositoryPostgres,
+            quizOpplysningRepository = quizOpplysningRepositoryPostgres,
         )
 
     private val søknadService: SøknadService = SøknadService(rapid = rapidsConnection, søknadRepository = søknadRepository)
@@ -65,7 +65,7 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
         )
         BehovMottak(
             rapidsConnection = rapidsConnection,
-            behovløserFactory = BehovløserFactory(rapidsConnection, OpplysningRepositoryPostgres(dataSource)),
+            behovløserFactory = BehovløserFactory(rapidsConnection, QuizOpplysningRepositoryPostgres(dataSource)),
             søknadService = søknadService(),
         )
     }

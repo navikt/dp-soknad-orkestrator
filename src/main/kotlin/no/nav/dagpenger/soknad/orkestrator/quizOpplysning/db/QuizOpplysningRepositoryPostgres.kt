@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.db
+package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db
 
 import ArbeidsforholdSvarTabell
 import BarnSvarTabell
@@ -12,24 +12,24 @@ import FlervalgSvarTabell
 import HeltallTabell
 import QuizOpplysningTabell
 import TekstTabell
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Barn
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.BarnSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Desimaltall
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EgenNæring
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforholdSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Flervalg
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Heltall
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Periode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.PeriodeSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Dato
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Desimaltall
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EgenNæring
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EøsArbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EøsArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Flervalg
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Heltall
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Periode
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.PeriodeSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.Query
 import org.jetbrains.exposed.sql.ResultRow
@@ -44,12 +44,12 @@ import java.time.LocalDate
 import java.util.UUID
 import javax.sql.DataSource
 
-class OpplysningRepositoryPostgres(
+class QuizOpplysningRepositoryPostgres(
     dataSource: DataSource,
-) : OpplysningRepository {
+) : QuizOpplysningRepository {
     val database = Database.connect(dataSource)
 
-    override fun lagre(opplysning: Opplysning<*>) {
+    override fun lagre(opplysning: QuizOpplysning<*>) {
         transaction {
             if (!opplysningEksisterer(opplysning)) {
                 val opplysningId = QuizOpplysningTabell.insertAndGetId(opplysning)
@@ -85,7 +85,7 @@ class OpplysningRepositoryPostgres(
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*>? =
+    ): QuizOpplysning<*>? =
         transaction {
             QuizOpplysningTabell
                 .selectAll()
@@ -94,7 +94,7 @@ class OpplysningRepositoryPostgres(
                 .firstOrNull()
         }
 
-    override fun hentAlle(søknadId: UUID): List<Opplysning<*>> =
+    override fun hentAlle(søknadId: UUID): List<QuizOpplysning<*>> =
         transaction {
             QuizOpplysningTabell
                 .selectAll()
@@ -109,7 +109,7 @@ class OpplysningRepositoryPostgres(
     }
 }
 
-private fun opplysningEksisterer(opplysning: Opplysning<*>): Boolean =
+private fun opplysningEksisterer(opplysning: QuizOpplysning<*>): Boolean =
     QuizOpplysningTabell
         .selectAll()
         .somMatcher(
@@ -118,7 +118,7 @@ private fun opplysningEksisterer(opplysning: Opplysning<*>): Boolean =
             opplysning.søknadId,
         ).any()
 
-fun QuizOpplysningTabell.insertAndGetId(opplysning: Opplysning<*>) =
+fun QuizOpplysningTabell.insertAndGetId(opplysning: QuizOpplysning<*>) =
     insertAndGetId {
         it[beskrivendeId] = opplysning.beskrivendeId
         it[type] = opplysning.type::class.java.simpleName
@@ -137,7 +137,7 @@ fun Query.somMatcher(
             (QuizOpplysningTabell.søknadId eq søknadId)
     }
 
-private fun tilOpplysning(): (ResultRow) -> Opplysning<*> =
+private fun tilOpplysning(): (ResultRow) -> QuizOpplysning<*> =
     {
         when (it[QuizOpplysningTabell.type]) {
             "Tekst" -> tilTekstOpplysning(it)
@@ -156,7 +156,7 @@ private fun tilOpplysning(): (ResultRow) -> Opplysning<*> =
     }
 
 private fun tilTekstOpplysning(it: ResultRow) =
-    Opplysning(
+    QuizOpplysning(
         beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Tekst,
         svar = hentTekstSvar(it),
@@ -181,7 +181,7 @@ private fun hentTekstSvar(it: ResultRow): String =
         .first()[TekstTabell.svar]
 
 private fun tilHeltallOpplysning(it: ResultRow) =
-    Opplysning(
+    QuizOpplysning(
         beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Heltall,
         svar = hentHeltallSvar(it),
@@ -206,7 +206,7 @@ private fun hentHeltallSvar(it: ResultRow): Int =
         .first()[HeltallTabell.svar]
 
 private fun tilDesimaltallOpplysning(it: ResultRow) =
-    Opplysning(
+    QuizOpplysning(
         beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Desimaltall,
         svar = hentDesimaltallSvar(it),
@@ -231,7 +231,7 @@ private fun hentDesimaltallSvar(it: ResultRow): Double =
         .first()[DesimaltallTabell.svar]
 
 private fun tilBoolskOpplysning(it: ResultRow) =
-    Opplysning(
+    QuizOpplysning(
         beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Boolsk,
         svar = hentBoolskSvar(it),
@@ -256,7 +256,7 @@ private fun hentBoolskSvar(it: ResultRow): Boolean =
         .first()[BoolskTabell.svar]
 
 private fun tilDatoOpplysning(it: ResultRow) =
-    Opplysning(
+    QuizOpplysning(
         beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Dato,
         svar = hentDatoSvar(it),
@@ -281,7 +281,7 @@ private fun hentDatoSvar(it: ResultRow): LocalDate =
         .first()[DatoTabell.svar]
 
 private fun tilFlervalgOpplysning(it: ResultRow) =
-    Opplysning(
+    QuizOpplysning(
         beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Flervalg,
         svar = hentFlervalgSvar(it),
@@ -322,7 +322,7 @@ private fun hentFlervalgSvar(it: ResultRow): List<String> {
 }
 
 private fun tilPeriodeOpplysning(it: ResultRow) =
-    Opplysning(
+    QuizOpplysning(
         beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Periode,
         svar = hentPeriodeSvar(it),
@@ -353,7 +353,7 @@ private fun hentPeriodeSvar(it: ResultRow): PeriodeSvar =
         }.first()
 
 private fun tilArbeidsforholdOpplysning(it: ResultRow) =
-    Opplysning(
+    QuizOpplysning(
         beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Arbeidsforhold,
         svar = hentArbeidsforholdSvar(it),
@@ -402,7 +402,7 @@ fun hentArbeidsforholdSvar(it: ResultRow): List<ArbeidsforholdSvar> {
 }
 
 private fun tilEøsArbeidsforholdOpplysning(it: ResultRow) =
-    Opplysning(
+    QuizOpplysning(
         beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = EøsArbeidsforhold,
         svar = hentEøsArbeidsforholdSvar(it),
@@ -463,7 +463,7 @@ fun hentEøsArbeidsforholdSvar(it: ResultRow): List<EøsArbeidsforholdSvar> {
 }
 
 private fun tilEgenNæringOpplysning(it: ResultRow) =
-    Opplysning(
+    QuizOpplysning(
         beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = EgenNæring,
         svar = hentEgenNæringSvar(it),
@@ -504,7 +504,7 @@ private fun hentEgenNæringSvar(it: ResultRow): List<Int> {
 }
 
 private fun tilBarnOpplysning(it: ResultRow) =
-    Opplysning(
+    QuizOpplysning(
         beskrivendeId = it[QuizOpplysningTabell.beskrivendeId],
         type = Barn,
         svar = hentBarnSvar(it),

@@ -1,7 +1,7 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper
+package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import java.util.UUID
 
 @Suppress("UNCHECKED_CAST")
@@ -11,8 +11,8 @@ data object EgenNæring : Datatype<List<Int>>(Int::class.java as Class<List<Int>
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*> {
+    ): QuizOpplysning<*> {
         val svar = faktum.get("svar").flatten().map { it["svar"].asInt() }
-        return Opplysning(beskrivendeId, EgenNæring, svar, ident, søknadId)
+        return QuizOpplysning(beskrivendeId, EgenNæring, svar, ident, søknadId)
     }
 }

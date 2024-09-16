@@ -2,12 +2,12 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.helse.rapids_rivers.JsonMessage
 import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
 
-abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysningRepository: OpplysningRepository) {
+abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysningRepository: QuizOpplysningRepository) {
     abstract val behov: String
     abstract val beskrivendeId: String
 

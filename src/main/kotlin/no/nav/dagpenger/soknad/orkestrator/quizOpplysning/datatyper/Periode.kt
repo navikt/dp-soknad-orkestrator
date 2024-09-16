@@ -1,7 +1,7 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper
+package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.helse.rapids_rivers.asLocalDate
 import java.time.LocalDate
 import java.util.UUID
@@ -12,13 +12,13 @@ data object Periode : Datatype<PeriodeSvar>(PeriodeSvar::class.java) {
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*> {
+    ): QuizOpplysning<*> {
         val svar =
             PeriodeSvar(
                 fom = faktum.get("svar").get("fom").asLocalDate(),
                 tom = faktum.get("svar").get("tom")?.asLocalDate(),
             )
-        return Opplysning(beskrivendeId, Periode, svar, ident, søknadId)
+        return QuizOpplysning(beskrivendeId, Periode, svar, ident, søknadId)
     }
 }
 

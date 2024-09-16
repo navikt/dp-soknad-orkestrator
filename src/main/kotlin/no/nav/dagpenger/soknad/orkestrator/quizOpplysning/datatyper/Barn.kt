@@ -1,7 +1,7 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper
+package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.helse.rapids_rivers.asLocalDate
 import java.time.LocalDate
 import java.util.UUID
@@ -13,7 +13,7 @@ data object Barn : Datatype<List<BarnSvar>>(List::class.java as Class<List<BarnS
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*> {
+    ): QuizOpplysning<*> {
         val fraRegister = beskrivendeId == "faktum.register.barn-liste"
 
         val barnSvar: List<BarnSvar> =
@@ -44,7 +44,7 @@ data object Barn : Datatype<List<BarnSvar>>(List::class.java as Class<List<BarnS
                 )
             }
 
-        return Opplysning(beskrivendeId, Barn, barnSvar, ident, søknadId)
+        return QuizOpplysning(beskrivendeId, Barn, barnSvar, ident, søknadId)
     }
 }
 

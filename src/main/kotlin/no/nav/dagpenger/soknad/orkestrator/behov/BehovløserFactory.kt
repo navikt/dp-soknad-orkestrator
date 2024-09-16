@@ -30,12 +30,12 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.UtdanningEllerOpplærin
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnskerDagpengerFraDatoBehovløser
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.helse.rapids_rivers.RapidsConnection
 
 class BehovløserFactory(
     rapidsConnection: RapidsConnection,
-    opplysningRepository: OpplysningRepositoryPostgres,
+    opplysningRepository: QuizOpplysningRepositoryPostgres,
 ) {
     private val behovløsere: Map<Behov, Behovløser> =
         mapOf(

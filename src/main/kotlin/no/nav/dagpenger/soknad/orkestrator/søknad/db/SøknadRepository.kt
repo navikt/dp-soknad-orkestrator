@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
@@ -17,7 +17,7 @@ import javax.sql.DataSource
 
 class SøknadRepository(
     dataSource: DataSource,
-    private val opplysningRepository: OpplysningRepository,
+    private val quizOpplysningRepository: QuizOpplysningRepository,
 ) {
     val database = Database.connect(dataSource)
 
@@ -28,7 +28,7 @@ class SøknadRepository(
                 it[ident] = søknad.ident
             }
 
-            søknad.opplysninger.forEach { opplysningRepository.lagre(it) }
+            søknad.opplysninger.forEach { quizOpplysningRepository.lagre(it) }
         }
     }
 
@@ -41,7 +41,7 @@ class SøknadRepository(
                     Søknad(
                         søknadId = it[SøknadTabell.søknadId],
                         ident = it[SøknadTabell.ident],
-                        opplysninger = opplysningRepository.hentAlle(søknadId),
+                        opplysninger = quizOpplysningRepository.hentAlle(søknadId),
                     )
                 }
                 .firstOrNull()
@@ -51,7 +51,7 @@ class SøknadRepository(
     fun slett(søknadId: UUID) {
         transaction {
             SøknadTabell.deleteWhere { SøknadTabell.søknadId eq søknadId }
-            opplysningRepository.slett(søknadId)
+            quizOpplysningRepository.slett(søknadId)
         }
     }
 }

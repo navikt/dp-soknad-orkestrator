@@ -1,14 +1,14 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper
+package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak.ARBEIDSGIVER_KONKURS
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak.AVSKJEDIGET
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak.IKKE_ENDRET
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak.KONTRAKT_UTGAATT
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak.REDUSERT_ARBEIDSTID
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak.SAGT_OPP_SELV
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.ARBEIDSGIVER_KONKURS
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.AVSKJEDIGET
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.IKKE_ENDRET
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.KONTRAKT_UTGAATT
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.REDUSERT_ARBEIDSTID
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.SAGT_OPP_SELV
 import java.util.UUID
 
 @Suppress("UNCHECKED_CAST")
@@ -20,14 +20,14 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*>? {
+    ): QuizOpplysning<*>? {
         val kompletteArbeidsforhold = faktum["svar"].filter { harAllePåkrevdeFelt(it) }
 
         if (kompletteArbeidsforhold.isEmpty()) return null
 
         val arbeidsforholdSvar: List<ArbeidsforholdSvar> = hentArbeidsforholdSvar(kompletteArbeidsforhold)
 
-        return Opplysning(beskrivendeId, Arbeidsforhold, arbeidsforholdSvar, ident, søknadId)
+        return QuizOpplysning(beskrivendeId, Arbeidsforhold, arbeidsforholdSvar, ident, søknadId)
     }
 
     private fun harAllePåkrevdeFelt(arbeidsforhold: JsonNode): Boolean {

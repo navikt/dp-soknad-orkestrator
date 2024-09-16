@@ -1,27 +1,27 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.db
+package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db
 
 import QuizOpplysningTabell
 import TekstTabell
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Barn
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.BarnSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Desimaltall
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EgenNæring
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforholdSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Flervalg
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Heltall
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Periode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.PeriodeSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Dato
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Desimaltall
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EgenNæring
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EøsArbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EøsArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Flervalg
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Heltall
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Periode
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.PeriodeSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -29,8 +29,8 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.UUID
 
-class OpplysningRepositoryPostgresTest {
-    private var opplysningRepository = OpplysningRepositoryPostgres(dataSource)
+class QuizQuizQuizOpplysningRepositoryPostgresTest {
+    private var opplysningRepository = QuizOpplysningRepositoryPostgres(dataSource)
     private val beskrivendeId = "beskrivendeId"
     private val ident = "12345678901"
     private val søknadId = UUID.randomUUID()
@@ -38,7 +38,7 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre og hente opplysning av type tekst`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = beskrivendeId,
                 type = Tekst,
                 svar = "svar",
@@ -60,7 +60,7 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre og hente opplysning av type heltall`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = beskrivendeId,
                 type = Heltall,
                 svar = 10,
@@ -82,7 +82,7 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre og hente opplysning av type desimaltall`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = beskrivendeId,
                 type = Desimaltall,
                 svar = 10.5,
@@ -104,7 +104,7 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre og hente opplysning av type boolsk`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = beskrivendeId,
                 type = Boolsk,
                 svar = true,
@@ -126,7 +126,7 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre og hente opplysning av type dato`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = beskrivendeId,
                 type = Dato,
                 svar = LocalDate.now(),
@@ -148,7 +148,7 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre og hente opplysning av type flervalg`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = beskrivendeId,
                 type = Flervalg,
                 svar = listOf("svar1", "svar2", "svar3"),
@@ -170,7 +170,7 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre og hente opplysning av type periode`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = beskrivendeId,
                 type = Periode,
                 svar = PeriodeSvar(LocalDate.now(), LocalDate.now().plusDays(10)),
@@ -192,7 +192,7 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre og hente opplysning av type generator - arbeidsforhold`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = beskrivendeId,
                 type = Arbeidsforhold,
                 svar =
@@ -218,7 +218,7 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre og hente opplysning av type generator - eøs arbeidsforhold`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = beskrivendeId,
                 type = EøsArbeidsforhold,
                 svar =
@@ -254,7 +254,7 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre og hente opplysning av type generator - egen næring`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = beskrivendeId,
                 type = EgenNæring,
                 svar = listOf(123456789, 987654321),
@@ -276,7 +276,7 @@ class OpplysningRepositoryPostgresTest {
     @Test
     fun `vi kan lagre og hente opplysning av type generator - barn`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = beskrivendeId,
                 type = Barn,
                 svar =
@@ -364,7 +364,7 @@ fun opplysning(
     beskrivendeId: String = "beskrivendeId",
     ident: String = "12345678901",
     søknadId: UUID = UUID.randomUUID(),
-) = Opplysning(
+) = QuizOpplysning(
     beskrivendeId = beskrivendeId,
     type = Tekst,
     svar = "svar",

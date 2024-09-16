@@ -1,13 +1,13 @@
 package no.nav.dagpenger.soknad.orkestrator.utils
 
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import java.util.UUID
 
-class InMemoryOpplysningRepository : OpplysningRepository {
-    private val opplysninger = mutableListOf<Opplysning<*>>()
+class InMemoryQuizOpplysningRepository : QuizOpplysningRepository {
+    private val opplysninger = mutableListOf<QuizOpplysning<*>>()
 
-    override fun lagre(opplysning: Opplysning<*>) {
+    override fun lagre(opplysning: QuizOpplysning<*>) {
         opplysninger.add(opplysning)
     }
 
@@ -15,13 +15,13 @@ class InMemoryOpplysningRepository : OpplysningRepository {
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*>? {
+    ): QuizOpplysning<*>? {
         return opplysninger.find {
             it.beskrivendeId == beskrivendeId && it.ident == ident && it.søknadId == søknadId
         }
     }
 
-    override fun hentAlle(søknadId: UUID): List<Opplysning<*>> {
+    override fun hentAlle(søknadId: UUID): List<QuizOpplysning<*>> {
         return opplysninger.filter { it.søknadId == søknadId }
     }
 

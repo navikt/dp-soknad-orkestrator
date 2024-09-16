@@ -2,7 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepositoryPostgres
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -10,7 +10,7 @@ import kotlin.test.Test
 
 class BehovløserFactoryTest {
     private val testRapid = TestRapid()
-    private val opplysningRepository = mockk<OpplysningRepositoryPostgres>(relaxed = true)
+    private val opplysningRepository = mockk<QuizOpplysningRepositoryPostgres>(relaxed = true)
     private val behovløserFactory = BehovløserFactory(testRapid, opplysningRepository)
 
     companion object {

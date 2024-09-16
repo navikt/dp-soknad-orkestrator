@@ -2,18 +2,18 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Ordinær
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Sluttårsak
-import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
+import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
 import kotlin.test.Test
 
 @Suppress("ktlint:standard:max-line-length")
 class OrdinærBehovløserTest {
-    val opplysningRepository = InMemoryOpplysningRepository()
+    val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
     val behovløser = OrdinærBehovløser(testRapid, opplysningRepository)
     val ident = "12345678910"
@@ -81,9 +81,9 @@ class OrdinærBehovløserTest {
                     sluttårsak = Sluttårsak.KONTRAKT_UTGAATT,
                 ),
             ),
-    ): Opplysning<List<ArbeidsforholdSvar>> {
+    ): QuizOpplysning<List<ArbeidsforholdSvar>> {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = behovløser.beskrivendeId,
                 type = Arbeidsforhold,
                 svar = svar,

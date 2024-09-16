@@ -1,7 +1,7 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper
+package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.helse.rapids_rivers.asLocalDate
 import java.util.UUID
 
@@ -14,7 +14,7 @@ data object EøsArbeidsforhold : Datatype<List<EøsArbeidsforholdSvar>>(
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*> {
+    ): QuizOpplysning<*> {
         val eøsArbeidsforholdSvar: List<EøsArbeidsforholdSvar> =
             faktum.get("svar").map { eøsArbeidsforhold ->
                 val arbeidsgivernavnSvar =
@@ -47,7 +47,7 @@ data object EøsArbeidsforhold : Datatype<List<EøsArbeidsforholdSvar>>(
                     varighet = PeriodeSvar(fom, tom),
                 )
             }
-        return Opplysning(beskrivendeId, EøsArbeidsforhold, eøsArbeidsforholdSvar, ident, søknadId)
+        return QuizOpplysning(beskrivendeId, EøsArbeidsforhold, eøsArbeidsforholdSvar, ident, søknadId)
     }
 }
 

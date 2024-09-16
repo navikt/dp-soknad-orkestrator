@@ -3,19 +3,19 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.fasterxml.jackson.databind.JsonNode
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Barn
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Datatype
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Desimaltall
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EgenNæring
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Flervalg
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Heltall
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Periode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Datatype
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Dato
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Desimaltall
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EgenNæring
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EøsArbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Flervalg
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Heltall
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Periode
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import java.util.UUID
 
@@ -44,12 +44,12 @@ class SøknadMapper(
         ident: String,
         søknadId: UUID,
         søknadstidspunkt: String,
-    ): List<Opplysning<*>> {
+    ): List<QuizOpplysning<*>> {
         try {
             val seksjoner = søknadData["seksjoner"]
 
             val søknadstidspunktOpplysning =
-                Opplysning(
+                QuizOpplysning(
                     beskrivendeId = "søknadstidspunkt",
                     type = Tekst,
                     svar = søknadstidspunkt,
@@ -78,7 +78,7 @@ class SøknadMapper(
         faktum: JsonNode,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*>? {
+    ): QuizOpplysning<*>? {
         val beskrivendeId = faktum.get("beskrivendeId").asText()
         val faktumtype = faktum.get("type").asText()
 

@@ -1,7 +1,7 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper
+package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import java.util.UUID
 
 data object Boolsk : Datatype<Boolean>(Boolean::class.java) {
@@ -10,8 +10,8 @@ data object Boolsk : Datatype<Boolean>(Boolean::class.java) {
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*> {
+    ): QuizOpplysning<*> {
         val svar = faktum.get("svar").asBoolean()
-        return Opplysning(beskrivendeId, Boolsk, svar, ident, søknadId)
+        return QuizOpplysning(beskrivendeId, Boolsk, svar, ident, søknadId)
     }
 }

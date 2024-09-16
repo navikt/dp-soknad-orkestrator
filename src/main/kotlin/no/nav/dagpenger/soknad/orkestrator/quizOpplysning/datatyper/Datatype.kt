@@ -1,7 +1,7 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper
+package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
 import com.fasterxml.jackson.databind.JsonNode
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import java.util.UUID
 
 sealed class Datatype<T>(val klasse: Class<T>) {
@@ -10,5 +10,5 @@ sealed class Datatype<T>(val klasse: Class<T>) {
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): Opplysning<*>?
+    ): QuizOpplysning<*>?
 }

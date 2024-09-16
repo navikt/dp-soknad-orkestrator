@@ -2,16 +2,16 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Boolsk
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
-import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.util.UUID
 import kotlin.test.Test
 
 class EØSArbeidBehovløserTest {
-    val opplysningRepository = InMemoryOpplysningRepository()
+    val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
     val behovløser = EØSArbeidBehovløser(testRapid, opplysningRepository)
     val ident = "12345678910"
@@ -20,7 +20,7 @@ class EØSArbeidBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov EøsArbeid`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = behovløser.beskrivendeId,
                 type = Boolsk,
                 svar = true,
@@ -37,7 +37,7 @@ class EØSArbeidBehovløserTest {
     @Test
     fun `Behovløser setter løsning til true når det er jobbet i eøs siste 36 mnd`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = "faktum.eos-arbeid-siste-36-mnd",
                 type = Tekst,
                 svar = "true",
@@ -54,7 +54,7 @@ class EØSArbeidBehovløserTest {
     @Test
     fun `Behovløser setter løsning til false når det ikke er jobbet i eøs siste 36 mnd`() {
         val opplysning =
-            Opplysning(
+            QuizOpplysning(
                 beskrivendeId = "faktum.eos-arbeid-siste-36-mnd",
                 type = Tekst,
                 svar = "false",

@@ -4,16 +4,16 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.asListOf
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Arbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.ArbeidsforholdSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.BarnSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Dato
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.EøsArbeidsforholdSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.PeriodeSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Dato
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EøsArbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EøsArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.PeriodeSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.februar
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
 import no.nav.dagpenger.soknad.orkestrator.utils.mars
@@ -36,21 +36,21 @@ class SøknadMapperTest {
 
         søknad.opplysninger shouldContainAll
             listOf(
-                Opplysning(
+                QuizOpplysning(
                     beskrivendeId = "faktum.mottatt-dagpenger-siste-12-mnd",
                     type = Tekst,
                     svar = "faktum.mottatt-dagpenger-siste-12-mnd.svar.nei",
                     ident = ident,
                     søknadId = søknadId,
                 ),
-                Opplysning(
+                QuizOpplysning(
                     beskrivendeId = "faktum.dagpenger-soknadsdato",
                     type = Dato,
                     svar = ønskerDagpengerFra,
                     ident = ident,
                     søknadId = søknadId,
                 ),
-                Opplysning(
+                QuizOpplysning(
                     beskrivendeId = "søknadstidspunkt",
                     type = Tekst,
                     svar = søknadstidspunkt,

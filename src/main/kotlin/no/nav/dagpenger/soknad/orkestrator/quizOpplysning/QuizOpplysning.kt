@@ -1,9 +1,9 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning
+package no.nav.dagpenger.soknad.orkestrator.quizOpplysning
 
-import no.nav.dagpenger.soknad.orkestrator.opplysning.datatyper.Datatype
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Datatype
 import java.util.UUID
 
-data class Opplysning<T>(
+data class QuizOpplysning<T>(
     val beskrivendeId: String,
     val type: Datatype<T>,
     val svar: T,
