@@ -39,7 +39,6 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: dp-soknad-frontend
         - application: dp-soknadsdialog
         {{#if wonderwalled}}
         - application: tokenx-token-generator
