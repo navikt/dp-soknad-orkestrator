@@ -7,7 +7,7 @@ plugins {
     kotlin("jvm") version "2.0.20"
     id("com.diffplug.spotless") version "6.25.0"
     id("io.ktor.plugin") version "2.3.12"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    alias(libs.plugins.shadow.jar)
 }
 
 group = "no.nav"
