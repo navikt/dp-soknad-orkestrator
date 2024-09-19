@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.spørsmål
+package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 enum class SpørsmålType {
     LAND,

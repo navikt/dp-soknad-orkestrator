@@ -13,7 +13,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.pipeline.PipelineContext
 import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import java.util.UUID
 
 internal fun Application.søknadApi(søknadService: SøknadService) {

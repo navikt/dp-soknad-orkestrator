@@ -6,13 +6,13 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Bostedsland
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Spørsmålgruppe
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Spørsmålgruppenavn
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getSpørsmålgruppe
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.toSporsmalDTO
+import no.nav.dagpenger.soknad.orkestrator.opplysning.SpørsmålType
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Bostedsland
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.toSporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.Spørsmål
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -49,8 +49,8 @@ class SøknadService(
             Spørsmål(
                 spørsmålId = UUID.randomUUID(),
                 gruppenavn = Bostedsland.navn,
-                gruppespørsmålId = Bostedsland.førsteSpørsmål().id,
-                type = Bostedsland.førsteSpørsmål().type,
+                gruppespørsmålId = Bostedsland.førsteOpplysningsbehov().id,
+                type = Bostedsland.førsteOpplysningsbehov().type,
                 svar = null,
             )
 
@@ -70,7 +70,7 @@ class SøknadService(
         svar: Svar<*>,
     ) {
         val (gruppespørsmålId, gruppenavn) = inMemorySøknadRepository.hentGruppeinfo(søknadId, svar.spørsmålId)
-        val spørsmålgruppe = getSpørsmålgruppe(gruppenavn!!)
+        val spørsmålgruppe = getSeksjon(gruppenavn!!)
 
         spørsmålgruppe.validerSvar(gruppespørsmålId!!, svar)
         inMemorySøknadRepository.lagreSvar(søknadId, svar)
@@ -87,11 +87,11 @@ class SøknadService(
     private fun håndterNesteSpørsmål(
         søknadId: UUID,
         svar: Svar<*>,
-        gruppenavn: Spørsmålgruppenavn,
+        gruppenavn: Seksjonsnavn,
         gruppespørsmålId: Int,
     ) {
-        val gruppe = getSpørsmålgruppe(gruppenavn)
-        gruppe.nesteSpørsmål(svar, gruppespørsmålId)?.let { nesteSpørsmål ->
+        val gruppe = getSeksjon(gruppenavn)
+        gruppe.nesteOpplysningsbehov(svar, gruppespørsmålId)?.let { nesteSpørsmål ->
             val erLagretIDB =
                 inMemorySøknadRepository.hent(
                     søknadId = søknadId,
@@ -136,7 +136,7 @@ class SøknadService(
 
     private fun nullstillAvhengigheter(
         søknadId: UUID,
-        gruppe: Spørsmålgruppe,
+        gruppe: Seksjon,
         idIGruppe: Int,
     ) {
         val avhengigheter = gruppe.avhengigheter(idIGruppe)
@@ -159,15 +159,15 @@ class SøknadService(
             } else {
                 alleSpørsmål.filter { it.gruppespørsmålId < nesteUbesvartSpørsmål.gruppespørsmålId }
             }
-        val gruppe = getSpørsmålgruppe(nesteUbesvartSpørsmål?.gruppenavn ?: Bostedsland.navn) // TODO: Teit med default
+        val gruppe = getSeksjon(nesteUbesvartSpørsmål?.gruppenavn ?: Bostedsland.navn) // TODO: Teit med default
 
         val nesteSpørsmålDTO =
             nesteUbesvartSpørsmål?.let {
-                gruppe.getSpørsmål(it.gruppespørsmålId).toSporsmalDTO(it.spørsmålId, null)
+                gruppe.getOpplysningsbehov(it.gruppespørsmålId).toSporsmalDTO(it.spørsmålId, null)
             }
         val besvarteSpørsmålDTO =
             besvarteSpørsmål.map {
-                gruppe.getSpørsmål(it.gruppespørsmålId).toSporsmalDTO(it.spørsmålId, toJson(it.svar!!))
+                gruppe.getOpplysningsbehov(it.gruppespørsmålId).toSporsmalDTO(it.spørsmålId, toJson(it.svar!!))
             }
 
         return SporsmalgruppeDTO(

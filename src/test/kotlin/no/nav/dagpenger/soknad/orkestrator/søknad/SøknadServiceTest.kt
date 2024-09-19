@@ -9,14 +9,14 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import io.mockk.verify
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.BooleanSvar
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.GrunnleggendeSpørsmål
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.LandSvar
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Spørsmålgruppe
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Spørsmålgruppenavn
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.getSpørsmålgruppe
+import no.nav.dagpenger.soknad.orkestrator.opplysning.BooleanSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
+import no.nav.dagpenger.soknad.orkestrator.opplysning.SpørsmålType
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.Spørsmål
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -28,7 +28,7 @@ import java.util.UUID
 class SøknadServiceTest {
     private val testRapid = TestRapid()
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
-    private val spørsmålgruppe = mockk<Spørsmålgruppe>(relaxed = true)
+    private val spørsmålgruppe = mockk<Seksjon>(relaxed = true)
     private val inMemorySøknadRepository = InMemorySøknadRepository()
     private var søknadService =
         SøknadService(
@@ -41,8 +41,8 @@ class SøknadServiceTest {
     @BeforeEach
     fun setup() {
         mockkStatic(spørsmålgruppePath)
-        every { getSpørsmålgruppe(Spørsmålgruppenavn.BOSTEDSLAND) } returns spørsmålgruppe
-        every { spørsmålgruppe.navn } returns Spørsmålgruppenavn.BOSTEDSLAND
+        every { getSeksjon(Seksjonsnavn.BOSTEDSLAND) } returns spørsmålgruppe
+        every { spørsmålgruppe.navn } returns Seksjonsnavn.BOSTEDSLAND
     }
 
     @AfterEach
@@ -99,8 +99,8 @@ class SøknadServiceTest {
     fun `lagreSvar lagrer besvart spørsmål og neste spørsmål`() {
         val søknadId = UUID.randomUUID()
         val spørsmålId = UUID.randomUUID()
-        every { spørsmålgruppe.nesteSpørsmål(any<Svar<*>>(), any<Int>()) } returns
-            GrunnleggendeSpørsmål(
+        every { spørsmålgruppe.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns
+            Opplysningsbehov(
                 id = 2,
                 tekstnøkkel = "spm2",
                 type = SpørsmålType.TEKST,
@@ -128,7 +128,7 @@ class SøknadServiceTest {
         val gruppespørsmålId1 = 1
         val gruppespørsmålId2 = 2
         every { spørsmålgruppe.avhengigheter(gruppespørsmålId1) } returns listOf(gruppespørsmålId2)
-        every { spørsmålgruppe.nesteSpørsmål(any<Svar<*>>(), any<Int>()) } returns null
+        every { spørsmålgruppe.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns null
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
             spørsmålId = spørsmålId1,
@@ -159,7 +159,7 @@ class SøknadServiceTest {
         val gruppespørsmålId1 = 1
         val gruppespørsmålId2 = 2
         every { spørsmålgruppe.avhengigheter(gruppespørsmålId1) } returns emptyList()
-        every { spørsmålgruppe.nesteSpørsmål(any<Svar<*>>(), any<Int>()) } returns null
+        every { spørsmålgruppe.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns null
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
             spørsmålId = spørsmålId1,
@@ -188,8 +188,8 @@ class SøknadServiceTest {
         val søknadId = UUID.randomUUID()
         val spørsmålId1 = UUID.randomUUID()
         val spørsmålId3 = UUID.randomUUID()
-        every { spørsmålgruppe.getSpørsmål(any()) } returns
-            GrunnleggendeSpørsmål(
+        every { spørsmålgruppe.getOpplysningsbehov(any()) } returns
+            Opplysningsbehov(
                 id = 99,
                 tekstnøkkel = "spm",
                 type = SpørsmålType.BOOLEAN,
@@ -225,8 +225,8 @@ class SøknadServiceTest {
     fun `erFullført blir true når det ikke er flere ubesvarte spørsmål i en spørsmålsgruppe`() {
         val søknadId = UUID.randomUUID()
         val spørsmålId = UUID.randomUUID()
-        every { spørsmålgruppe.getSpørsmål(any()) } returns
-            GrunnleggendeSpørsmål(
+        every { spørsmålgruppe.getOpplysningsbehov(any()) } returns
+            Opplysningsbehov(
                 id = 99,
                 tekstnøkkel = "spm",
                 type = SpørsmålType.BOOLEAN,
@@ -251,7 +251,7 @@ class SøknadServiceTest {
 fun InMemorySøknadRepository.lagreTestSpørsmål(
     søknadId: UUID = UUID.randomUUID(),
     spørsmålId: UUID = UUID.randomUUID(),
-    gruppenavn: Spørsmålgruppenavn = Spørsmålgruppenavn.BOSTEDSLAND,
+    gruppenavn: Seksjonsnavn = Seksjonsnavn.BOSTEDSLAND,
     gruppespørsmålId: Int = 1,
     type: SpørsmålType = SpørsmålType.BOOLEAN,
     svar: Svar<*>? = null,

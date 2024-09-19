@@ -1,8 +1,8 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Spørsmålgruppenavn
+import no.nav.dagpenger.soknad.orkestrator.opplysning.SpørsmålType
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
 import java.util.UUID
 
 class InMemorySøknadRepository {
@@ -31,7 +31,7 @@ class InMemorySøknadRepository {
 
     fun slettSpørsmål(
         søknadId: UUID,
-        gruppenavn: Spørsmålgruppenavn,
+        gruppenavn: Seksjonsnavn,
         gruppespørsmålId: Int,
     ) {
         tabell[søknadId] =
@@ -47,7 +47,7 @@ class InMemorySøknadRepository {
 
     fun hent(
         søknadId: UUID,
-        gruppenavn: Spørsmålgruppenavn,
+        gruppenavn: Seksjonsnavn,
         gruppespørsmålId: Int,
     ): Spørsmål? = tabell[søknadId]?.find { it.gruppenavn == gruppenavn && it.gruppespørsmålId == gruppespørsmålId }
 
@@ -61,7 +61,7 @@ class InMemorySøknadRepository {
     fun hentGruppeinfo(
         søknadId: UUID,
         spørsmålId: UUID,
-    ): Pair<Int?, Spørsmålgruppenavn?> {
+    ): Pair<Int?, Seksjonsnavn?> {
         val gruppespørsmålId = tabell[søknadId]?.find { it.spørsmålId == spørsmålId }?.gruppespørsmålId
         val gruppenavn = tabell[søknadId]?.find { it.spørsmålId == spørsmålId }?.gruppenavn
 
@@ -75,7 +75,7 @@ class InMemorySøknadRepository {
 
 data class Spørsmål(
     val spørsmålId: UUID,
-    val gruppenavn: Spørsmålgruppenavn,
+    val gruppenavn: Seksjonsnavn,
     val gruppespørsmålId: Int,
     val type: SpørsmålType,
     val svar: Svar<*>?,

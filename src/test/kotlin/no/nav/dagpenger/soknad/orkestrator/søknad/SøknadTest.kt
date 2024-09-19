@@ -13,8 +13,8 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.LandSvar
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.Bostedsland
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
