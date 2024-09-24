@@ -14,6 +14,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.LandSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
@@ -28,7 +29,8 @@ import java.util.UUID
 class SøknadServiceTest {
     private val testRapid = TestRapid()
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
-    private val spørsmålgruppe = mockk<Seksjon>(relaxed = true)
+    private val opplysningRepository = mockk<OpplysningRepository>(relaxed = true)
+    private val seksjon = mockk<Seksjon>(relaxed = true)
     private val inMemorySøknadRepository = InMemorySøknadRepository()
     private var søknadService =
         SøknadService(

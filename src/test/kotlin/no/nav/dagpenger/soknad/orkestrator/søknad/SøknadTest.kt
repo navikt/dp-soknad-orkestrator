@@ -14,6 +14,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -27,11 +28,13 @@ class SøknadTest {
 
     val rapid = mockk<RapidsConnection>(relaxed = true)
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val opplysningRepository = mockk<OpplysningRepository>(relaxed = true)
     val inMemorySøknadRepository = InMemorySøknadRepository()
     val søknadService =
         SøknadService(
             søknadRepository = søknadRepository,
             inMemorySøknadRepository = inMemorySøknadRepository,
+            opplysningRepository = opplysningRepository,
         ).also { it.setRapidsConnection(rapid) }
 
     @Test

@@ -8,6 +8,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.internalApi
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
@@ -28,8 +29,9 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
             dataSource = dataSource,
             quizOpplysningRepository = quizOpplysningRepositoryPostgres,
         )
+    private val opplysningRepository = OpplysningRepository(dataSource)
 
-    private val søknadService: SøknadService = SøknadService(søknadRepository = søknadRepository)
+    private val søknadService: SøknadService = SøknadService(søknadRepository = søknadRepository, opplysningRepository = opplysningRepository)
 
     private val rapidsConnection =
         RapidApplication.create(configuration) { engine, _ ->

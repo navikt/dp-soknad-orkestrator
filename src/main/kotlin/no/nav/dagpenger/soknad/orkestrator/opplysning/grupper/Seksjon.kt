@@ -5,6 +5,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 
 abstract class Seksjon {
     abstract val navn: Seksjonsnavn
+    abstract val versjon: String
 
     abstract fun førsteOpplysningsbehov(): Opplysningsbehov
 

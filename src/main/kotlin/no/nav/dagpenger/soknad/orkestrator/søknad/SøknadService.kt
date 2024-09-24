@@ -8,6 +8,7 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
@@ -21,6 +22,7 @@ import java.util.UUID
 class SøknadService(
     private val søknadRepository: SøknadRepository,
     private val inMemorySøknadRepository: InMemorySøknadRepository = InMemorySøknadRepository(),
+    private val opplysningRepository: OpplysningRepository,
 ) {
     private lateinit var rapidsConnection: RapidsConnection
 
@@ -58,6 +60,20 @@ class SøknadService(
             søknadId = søknad.søknadId,
             spørsmål = spørsmål,
         )
+
+        // TODO: Opprette og lagre første seksjon (?) og opplysning i DB. Hvordan vite at Bostedsland er først?
+//        val opplysning =
+//            Opplysning(
+//                opplysningId = UUID.randomUUID(),
+//                opplysningsbehovId = Bostedsland.førsteOpplysningsbehov().id,
+//                type = Bostedsland.førsteOpplysningsbehov().type,
+//                svar = null,
+//            )
+//
+//        opplysningRepository.lagre(
+//            søknadId = søknad.søknadId,
+//            opplysning = opplysning,
+//        )
 
         logger.info { "Opprettet søknad med søknadId: ${søknad.søknadId}" }
         sikkerlogg.info { "Opprettet søknad med søknadId: ${søknad.søknadId} og ident: $ident" }
