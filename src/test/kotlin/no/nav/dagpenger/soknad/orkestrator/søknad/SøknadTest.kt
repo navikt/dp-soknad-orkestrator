@@ -57,7 +57,7 @@ class SøknadTest {
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
                 val spørsmalgruppe = objectMapper.readValue(respons.bodyAsText(), SporsmalgruppeDTO::class.java)
-                spørsmalgruppe.navn shouldBe SporsmaalgruppeNavnDTO.BOSTEDSLAND
+                spørsmalgruppe.navn shouldBe SporsmaalgruppeNavnDTO.bostedsland
                 spørsmalgruppe.nesteSpørsmål shouldNotBe null
                 spørsmalgruppe.nesteSpørsmål!!.tekstnøkkel shouldBe Bostedsland.hvilketLandBorDuI.tekstnøkkel
                 spørsmalgruppe.erFullført shouldBe false
@@ -88,7 +88,7 @@ class SøknadTest {
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
                 val spørsmalgruppe = objectMapper.readValue(respons.bodyAsText(), SporsmalgruppeDTO::class.java)
-                spørsmalgruppe.navn shouldBe SporsmaalgruppeNavnDTO.BOSTEDSLAND
+                spørsmalgruppe.navn shouldBe SporsmaalgruppeNavnDTO.bostedsland
                 spørsmalgruppe.nesteSpørsmål shouldBe null
                 spørsmalgruppe.besvarteSpørsmål.size shouldBe 1
                 spørsmalgruppe.besvarteSpørsmål.first().svar shouldBe "NOR"

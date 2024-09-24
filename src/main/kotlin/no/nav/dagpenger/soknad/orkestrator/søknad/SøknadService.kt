@@ -166,7 +166,7 @@ class SøknadService(
             }
 
         return SporsmalgruppeDTO(
-            navn = SporsmaalgruppeNavnDTO.valueOf(gruppe.navn.name),
+            navn = SporsmaalgruppeNavnDTO.valueOf(gruppe.navn.name.lowercase()),
             besvarteSpørsmål = besvarteSpørsmålDTO,
             erFullført = nesteUbesvartSpørsmål == null,
             nesteSpørsmål = nesteSpørsmålDTO,

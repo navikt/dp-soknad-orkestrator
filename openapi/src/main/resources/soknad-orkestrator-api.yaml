@@ -127,7 +127,7 @@ components:
     SporsmaalgruppeNavn: # SpørsmålgruppeNavn
       type: string
       enum:
-        - BOSTEDSLAND
+        - bostedsland
     Periodesvar:
       type: object
       properties:
