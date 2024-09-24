@@ -41,7 +41,7 @@ class SøknadMottak(
 
             with(jsonNode) {
                 tilSøknad()
-                    .also(søknadRepository::lagre)
+                    .also(søknadRepository::lagreQuizSøknad)
 
                 publiserMeldingOmSøknadInnsendt()
             }

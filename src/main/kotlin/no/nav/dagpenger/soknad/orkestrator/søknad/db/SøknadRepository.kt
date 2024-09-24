@@ -21,7 +21,7 @@ class SøknadRepository(
 ) {
     val database = Database.connect(dataSource)
 
-    fun lagre(søknad: Søknad) {
+    fun lagreQuizSøknad(søknad: Søknad) {
         transaction {
             SøknadTabell.insertIgnore {
                 it[søknadId] = søknad.søknadId
@@ -29,6 +29,15 @@ class SøknadRepository(
             }
 
             søknad.opplysninger.forEach { quizOpplysningRepository.lagre(it) }
+        }
+    }
+
+    fun lagre(søknad: Søknad) {
+        transaction {
+            SøknadTabell.insertIgnore {
+                it[søknadId] = søknad.søknadId
+                it[ident] = søknad.ident
+            }
         }
     }
 
