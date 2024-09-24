@@ -7,7 +7,7 @@ import java.util.UUID
 data class Opplysningsbehov(
     val id: Int,
     val tekstnøkkel: String,
-    val type: SpørsmålType,
+    val type: Opplysningstype,
     val gyldigeSvar: List<String>,
 )
 

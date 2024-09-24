@@ -15,7 +15,7 @@ import kotlin.test.Test
 class BostedslandTest {
     @Test
     fun `neste spørsmål er null når hvilketLandBorDuI er Norge`() {
-        val svar = LandSvar(spørsmålId = UUID.randomUUID(), "NOR")
+        val svar = LandSvar(opplysningId = UUID.randomUUID(), "NOR")
 
         val nesteSpørsmål = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.hvilketLandBorDuI.id)
 
@@ -24,7 +24,7 @@ class BostedslandTest {
 
     @Test
     fun `neste spørsmål er reistTilbakeTilNorge når hvilketLandBorDuI ikke er Norge`() {
-        val svar = LandSvar(spørsmålId = UUID.randomUUID(), "SWE")
+        val svar = LandSvar(opplysningId = UUID.randomUUID(), "SWE")
 
         val nesteSpørsmål = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.hvilketLandBorDuI.id)
 
@@ -33,7 +33,7 @@ class BostedslandTest {
 
     @Test
     fun `neste spørsmål er datoForAvreise når reistTilbakeTilNorge er true`() {
-        val svar = BooleanSvar(spørsmålId = UUID.randomUUID(), true)
+        val svar = BooleanSvar(opplysningId = UUID.randomUUID(), true)
 
         val nesteSpørsmål = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.reistTilbakeTilNorge.id)
 
@@ -42,7 +42,7 @@ class BostedslandTest {
 
     @Test
     fun `neste spørsmål er enGangIUken når reistTilbakeTilNorge er false`() {
-        val svar = BooleanSvar(spørsmålId = UUID.randomUUID(), false)
+        val svar = BooleanSvar(opplysningId = UUID.randomUUID(), false)
 
         val nesteSpørsmål = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.reistTilbakeTilNorge.id)
 
@@ -51,7 +51,7 @@ class BostedslandTest {
 
     @Test
     fun `neste spørsmål er hvorforReisteFraNorge når datoForAvreise er besvart`() {
-        val svar = DatoSvar(spørsmålId = UUID.randomUUID(), LocalDate.now())
+        val svar = DatoSvar(opplysningId = UUID.randomUUID(), LocalDate.now())
 
         val nesteSpørsmål = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.datoForAvreise.id)
 
@@ -60,7 +60,7 @@ class BostedslandTest {
 
     @Test
     fun `neste spørsmål er enGangIUken når hvorforReisteFraNorge er besvart`() {
-        val svar = TekstSvar(spørsmålId = UUID.randomUUID(), "Derfor")
+        val svar = TekstSvar(opplysningId = UUID.randomUUID(), "Derfor")
 
         val nesteSpørsmål = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.hvorforReisteFraNorge.id)
 
@@ -69,7 +69,7 @@ class BostedslandTest {
 
     @Test
     fun `neste spørsmål er null når enGangIUken er true`() {
-        val svar = BooleanSvar(spørsmålId = UUID.randomUUID(), true)
+        val svar = BooleanSvar(opplysningId = UUID.randomUUID(), true)
 
         val nesteSpørsmål = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.enGangIUken.id)
 
@@ -78,7 +78,7 @@ class BostedslandTest {
 
     @Test
     fun `neste spørsmål er rotasjon når enGangIUken er false`() {
-        val svar = BooleanSvar(spørsmålId = UUID.randomUUID(), false)
+        val svar = BooleanSvar(opplysningId = UUID.randomUUID(), false)
 
         val nesteSpørsmål = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.enGangIUken.id)
 
@@ -87,7 +87,7 @@ class BostedslandTest {
 
     @Test
     fun `neste spørsmål er null når rotasjon er besvart med true`() {
-        val svar = BooleanSvar(spørsmålId = UUID.randomUUID(), true)
+        val svar = BooleanSvar(opplysningId = UUID.randomUUID(), true)
 
         val nesteSpørsmål = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.rotasjon.id)
 
@@ -96,7 +96,7 @@ class BostedslandTest {
 
     @Test
     fun `neste spørsmål er null når rotasjon er besvart med false`() {
-        val svar = BooleanSvar(spørsmålId = UUID.randomUUID(), false)
+        val svar = BooleanSvar(opplysningId = UUID.randomUUID(), false)
 
         val nesteSpørsmål = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.rotasjon.id)
 
@@ -107,7 +107,7 @@ class BostedslandTest {
     fun `validering kaster ikke feil når svar på hvilketLandBorDuI er gyldig`() {
         val svar =
             LandSvar(
-                spørsmålId = UUID.randomUUID(),
+                opplysningId = UUID.randomUUID(),
                 verdi = Bostedsland.hvilketLandBorDuI.gyldigeSvar.random(),
             )
 
@@ -123,7 +123,7 @@ class BostedslandTest {
     fun `validering kaster feil når svar på hvilketLandBorDuI ikke er definert i gyldigeValg`() {
         val svar =
             LandSvar(
-                spørsmålId = UUID.randomUUID(),
+                opplysningId = UUID.randomUUID(),
                 verdi = "XXX",
             )
 

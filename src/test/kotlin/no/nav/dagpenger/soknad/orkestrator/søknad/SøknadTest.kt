@@ -71,7 +71,7 @@ class SøknadTest {
                 body =
                     objectMapper.writeValueAsString(
                         LandSvar(
-                            spørsmålId = gjeldendeSpørsmålInfo.spørsmålId,
+                            opplysningId = gjeldendeSpørsmålInfo.spørsmålId,
                             verdi = "NOR",
                         ),
                     ),

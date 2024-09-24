@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
-import no.nav.dagpenger.soknad.orkestrator.opplysning.SpørsmålType
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
 import java.util.UUID
@@ -23,7 +23,7 @@ class InMemorySøknadRepository {
         søknadId: UUID,
         svar: Svar<*>,
     ) {
-        val spørsmål = hent(søknadId, svar.spørsmålId)
+        val spørsmål = hent(søknadId, svar.opplysningId)
         val besvartSpørsmål = spørsmål.copy(svar = svar)
 
         lagre(søknadId, besvartSpørsmål)
@@ -77,6 +77,6 @@ data class Spørsmål(
     val spørsmålId: UUID,
     val gruppenavn: Seksjonsnavn,
     val gruppespørsmålId: Int,
-    val type: SpørsmålType,
+    val type: Opplysningstype,
     val svar: Svar<*>?,
 )

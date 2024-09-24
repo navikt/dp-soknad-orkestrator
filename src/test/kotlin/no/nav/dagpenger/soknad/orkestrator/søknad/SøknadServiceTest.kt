@@ -12,7 +12,7 @@ import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.opplysning.BooleanSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
-import no.nav.dagpenger.soknad.orkestrator.opplysning.SpørsmålType
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
@@ -34,21 +34,22 @@ class SøknadServiceTest {
         SøknadService(
             søknadRepository = søknadRepository,
             inMemorySøknadRepository = inMemorySøknadRepository,
+            opplysningRepository = opplysningRepository,
         ).also { it.setRapidsConnection(testRapid) }
     private val ident = "12345678901"
-    private val spørsmålgruppePath = "no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.SpørsmålgruppeKt"
+    private val seksjonPath = "no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.SeksjonKt"
 
     @BeforeEach
     fun setup() {
-        mockkStatic(spørsmålgruppePath)
-        every { getSeksjon(Seksjonsnavn.BOSTEDSLAND) } returns spørsmålgruppe
-        every { spørsmålgruppe.navn } returns Seksjonsnavn.BOSTEDSLAND
+        mockkStatic(seksjonPath)
+        every { getSeksjon(Seksjonsnavn.BOSTEDSLAND) } returns seksjon
+        every { seksjon.navn } returns Seksjonsnavn.BOSTEDSLAND
     }
 
     @AfterEach
     fun reset() {
-        clearMocks(søknadRepository, spørsmålgruppe)
-        unmockkStatic(spørsmålgruppePath)
+        clearMocks(søknadRepository, seksjon)
+        unmockkStatic(seksjonPath)
     }
 
     @Test
@@ -99,11 +100,11 @@ class SøknadServiceTest {
     fun `lagreSvar lagrer besvart spørsmål og neste spørsmål`() {
         val søknadId = UUID.randomUUID()
         val spørsmålId = UUID.randomUUID()
-        every { spørsmålgruppe.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns
+        every { seksjon.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns
             Opplysningsbehov(
                 id = 2,
                 tekstnøkkel = "spm2",
-                type = SpørsmålType.TEKST,
+                type = Opplysningstype.TEKST,
                 gyldigeSvar = emptyList(),
             )
         inMemorySøknadRepository.lagreTestSpørsmål(
@@ -111,7 +112,7 @@ class SøknadServiceTest {
             spørsmålId = spørsmålId,
         )
 
-        val svar = BooleanSvar(spørsmålId = spørsmålId, verdi = true)
+        val svar = BooleanSvar(opplysningId = spørsmålId, verdi = true)
         søknadService.håndterSvar(søknadId, svar)
 
         inMemorySøknadRepository.hentAlle(søknadId).size shouldBe 2
@@ -127,22 +128,22 @@ class SøknadServiceTest {
         val spørsmålId1 = UUID.randomUUID()
         val gruppespørsmålId1 = 1
         val gruppespørsmålId2 = 2
-        every { spørsmålgruppe.avhengigheter(gruppespørsmålId1) } returns listOf(gruppespørsmålId2)
-        every { spørsmålgruppe.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns null
+        every { seksjon.avhengigheter(gruppespørsmålId1) } returns listOf(gruppespørsmålId2)
+        every { seksjon.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns null
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
             spørsmålId = spørsmålId1,
             gruppespørsmålId = gruppespørsmålId1,
-            type = SpørsmålType.LAND,
-            svar = LandSvar(spørsmålId = spørsmålId1, verdi = "NED"),
+            type = Opplysningstype.LAND,
+            svar = LandSvar(opplysningId = spørsmålId1, verdi = "NED"),
         )
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
             gruppespørsmålId = gruppespørsmålId2,
-            svar = BooleanSvar(spørsmålId = spørsmålId1, verdi = true),
+            svar = BooleanSvar(opplysningId = spørsmålId1, verdi = true),
         )
 
-        val svar = LandSvar(spørsmålId = spørsmålId1, verdi = "OPP")
+        val svar = LandSvar(opplysningId = spørsmålId1, verdi = "OPP")
         søknadService.håndterSvar(søknadId, svar)
 
         val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
@@ -158,22 +159,22 @@ class SøknadServiceTest {
         val spørsmålId1 = UUID.randomUUID()
         val gruppespørsmålId1 = 1
         val gruppespørsmålId2 = 2
-        every { spørsmålgruppe.avhengigheter(gruppespørsmålId1) } returns emptyList()
-        every { spørsmålgruppe.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns null
+        every { seksjon.avhengigheter(gruppespørsmålId1) } returns emptyList()
+        every { seksjon.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns null
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
             spørsmålId = spørsmålId1,
             gruppespørsmålId = gruppespørsmålId1,
-            type = SpørsmålType.LAND,
-            svar = LandSvar(spørsmålId = spørsmålId1, verdi = "NED"),
+            type = Opplysningstype.LAND,
+            svar = LandSvar(opplysningId = spørsmålId1, verdi = "NED"),
         )
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
             gruppespørsmålId = gruppespørsmålId2,
-            svar = BooleanSvar(spørsmålId = spørsmålId1, verdi = true),
+            svar = BooleanSvar(opplysningId = spørsmålId1, verdi = true),
         )
 
-        val svar = LandSvar(spørsmålId = spørsmålId1, verdi = "OPP")
+        val svar = LandSvar(opplysningId = spørsmålId1, verdi = "OPP")
         søknadService.håndterSvar(søknadId, svar)
 
         val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
@@ -188,18 +189,18 @@ class SøknadServiceTest {
         val søknadId = UUID.randomUUID()
         val spørsmålId1 = UUID.randomUUID()
         val spørsmålId3 = UUID.randomUUID()
-        every { spørsmålgruppe.getOpplysningsbehov(any()) } returns
+        every { seksjon.getOpplysningsbehov(any()) } returns
             Opplysningsbehov(
                 id = 99,
                 tekstnøkkel = "spm",
-                type = SpørsmålType.BOOLEAN,
+                type = Opplysningstype.BOOLEAN,
                 gyldigeSvar = emptyList(),
             )
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
             spørsmålId = spørsmålId1,
             gruppespørsmålId = 1,
-            svar = BooleanSvar(spørsmålId = spørsmålId1, verdi = true),
+            svar = BooleanSvar(opplysningId = spørsmålId1, verdi = true),
         )
         inMemorySøknadRepository.lagreTestSpørsmål(
             søknadId = søknadId,
@@ -210,7 +211,7 @@ class SøknadServiceTest {
             søknadId = søknadId,
             spørsmålId = spørsmålId3,
             gruppespørsmålId = 3,
-            svar = BooleanSvar(spørsmålId = spørsmålId1, verdi = false),
+            svar = BooleanSvar(opplysningId = spørsmålId1, verdi = false),
         )
 
         val nesteSpørsmålgruppe = søknadService.nesteSpørsmålgruppe(søknadId)
@@ -225,11 +226,11 @@ class SøknadServiceTest {
     fun `erFullført blir true når det ikke er flere ubesvarte spørsmål i en spørsmålsgruppe`() {
         val søknadId = UUID.randomUUID()
         val spørsmålId = UUID.randomUUID()
-        every { spørsmålgruppe.getOpplysningsbehov(any()) } returns
+        every { seksjon.getOpplysningsbehov(any()) } returns
             Opplysningsbehov(
                 id = 99,
                 tekstnøkkel = "spm",
-                type = SpørsmålType.BOOLEAN,
+                type = Opplysningstype.BOOLEAN,
                 gyldigeSvar = emptyList(),
             )
 
@@ -242,7 +243,7 @@ class SøknadServiceTest {
 
         søknadService.nesteSpørsmålgruppe(søknadId).erFullført shouldBe false
 
-        inMemorySøknadRepository.lagreSvar(søknadId, BooleanSvar(spørsmålId = spørsmålId, verdi = true))
+        inMemorySøknadRepository.lagreSvar(søknadId, BooleanSvar(opplysningId = spørsmålId, verdi = true))
 
         søknadService.nesteSpørsmålgruppe(søknadId).erFullført shouldBe true
     }
@@ -253,7 +254,7 @@ fun InMemorySøknadRepository.lagreTestSpørsmål(
     spørsmålId: UUID = UUID.randomUUID(),
     gruppenavn: Seksjonsnavn = Seksjonsnavn.BOSTEDSLAND,
     gruppespørsmålId: Int = 1,
-    type: SpørsmålType = SpørsmålType.BOOLEAN,
+    type: Opplysningstype = Opplysningstype.BOOLEAN,
     svar: Svar<*>? = null,
 ) {
     val spørsmål =

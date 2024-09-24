@@ -1,17 +1,18 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.grupper
 
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
-import no.nav.dagpenger.soknad.orkestrator.opplysning.SpørsmålType
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 
 object Bostedsland : Seksjon() {
     override val navn = Seksjonsnavn.BOSTEDSLAND
+    override val versjon = "BOSTEDSLAND_V1"
 
     val hvilketLandBorDuI =
         Opplysningsbehov(
             id = 1,
             tekstnøkkel = "faktum.hvilket-land-bor-du-i",
-            type = SpørsmålType.LAND,
+            type = Opplysningstype.LAND,
             gyldigeSvar = listOf("NOR", "SWE", "FIN"),
         )
 
@@ -19,7 +20,7 @@ object Bostedsland : Seksjon() {
         Opplysningsbehov(
             id = 2,
             tekstnøkkel = "faktum.reist-tilbake-etter-arbeidsledig",
-            type = SpørsmålType.BOOLEAN,
+            type = Opplysningstype.BOOLEAN,
             gyldigeSvar = emptyList(),
         )
 
@@ -27,7 +28,7 @@ object Bostedsland : Seksjon() {
         Opplysningsbehov(
             id = 3,
             tekstnøkkel = "faktum.reist-tilbake-periode",
-            type = SpørsmålType.PERIODE,
+            type = Opplysningstype.PERIODE,
             gyldigeSvar = emptyList(),
         )
 
@@ -35,7 +36,7 @@ object Bostedsland : Seksjon() {
         Opplysningsbehov(
             id = 4,
             tekstnøkkel = "faktum.reist-tilbake-aarsak",
-            type = SpørsmålType.TEKST,
+            type = Opplysningstype.TEKST,
             gyldigeSvar = emptyList(),
         )
 
@@ -43,7 +44,7 @@ object Bostedsland : Seksjon() {
         Opplysningsbehov(
             id = 5,
             tekstnøkkel = "faktum.reist-tilbake-en-gang-eller-mer",
-            type = SpørsmålType.BOOLEAN,
+            type = Opplysningstype.BOOLEAN,
             gyldigeSvar = emptyList(),
         )
 
@@ -51,7 +52,7 @@ object Bostedsland : Seksjon() {
         Opplysningsbehov(
             id = 6,
             tekstnøkkel = "faktum.reist-i-takt-med-rotasjon",
-            type = SpørsmålType.BOOLEAN,
+            type = Opplysningstype.BOOLEAN,
             gyldigeSvar = emptyList(),
         )
 

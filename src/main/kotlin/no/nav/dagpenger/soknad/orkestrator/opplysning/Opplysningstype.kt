@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-enum class SpørsmålType {
+enum class Opplysningstype {
     LAND,
     PERIODE,
     DATO,

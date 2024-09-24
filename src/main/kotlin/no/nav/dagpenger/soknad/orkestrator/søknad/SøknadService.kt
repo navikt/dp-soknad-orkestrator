@@ -6,7 +6,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
-import no.nav.dagpenger.soknad.orkestrator.opplysning.SpørsmålType
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
@@ -69,7 +69,7 @@ class SøknadService(
         søknadId: UUID,
         svar: Svar<*>,
     ) {
-        val (gruppespørsmålId, gruppenavn) = inMemorySøknadRepository.hentGruppeinfo(søknadId, svar.spørsmålId)
+        val (gruppespørsmålId, gruppenavn) = inMemorySøknadRepository.hentGruppeinfo(søknadId, svar.opplysningId)
         val spørsmålgruppe = getSeksjon(gruppenavn!!)
 
         spørsmålgruppe.validerSvar(gruppespørsmålId!!, svar)
@@ -130,7 +130,7 @@ class SøknadService(
 
     private fun toJson(svar: Svar<*>): String? =
         when (svar.type) {
-            SpørsmålType.LAND, SpørsmålType.TEKST -> svar.verdi.toString()
+            Opplysningstype.LAND, Opplysningstype.TEKST -> svar.verdi.toString()
             else -> objectMapper.writeValueAsString(svar.verdi)
         }
 
