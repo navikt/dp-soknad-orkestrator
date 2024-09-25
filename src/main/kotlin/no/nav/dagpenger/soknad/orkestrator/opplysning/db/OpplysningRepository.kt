@@ -1,6 +1,10 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import java.time.LocalDateTime
+import java.util.UUID
+import javax.sql.DataSource
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
@@ -14,11 +18,9 @@ import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.datetime
+import org.jetbrains.exposed.sql.json.jsonb
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.LocalDateTime
-import java.util.UUID
-import javax.sql.DataSource
 
 class OpplysningRepository(
     dataSource: DataSource,
@@ -62,7 +64,7 @@ class OpplysningRepository(
                 it[seksjonId] = seksjonDBId
                 it[opplysningsbehovId] = opplysning.opplysningsbehovId
                 it[type] = opplysning.type.name
-                it[svar] = jacksonObjectMapper().writeValueAsString(opplysning.svar)
+                it[svar] = opplysning.svar
             }
         }
     }
@@ -79,7 +81,7 @@ class OpplysningRepository(
                         seksjonversjon = it[SeksjonTabell.versjon],
                         opplysningsbehovId = it[OpplysningTabell.opplysningsbehovId],
                         type = Opplysningstype.valueOf(it[OpplysningTabell.type]),
-                        svar = jacksonObjectMapper().readValue(it[OpplysningTabell.svar], Svar::class.java),
+                        svar = it[OpplysningTabell.svar],
                     )
                 }.firstOrNull()
         }
@@ -98,8 +100,11 @@ object OpplysningTabell : IntIdTable("opplysning") {
     val seksjonId: Column<Int> = integer("seksjon_id").references(SeksjonTabell.id)
     val opplysningsbehovId: Column<Int> = integer("opplysningsbehov_id")
     val type: Column<String> = text("type")
-    val svar: Column<String?> = text("svar").nullable()
+    val svar: Column<Svar<*>?> = jsonb("svar", { serializeSvar(it) }, { deserializeSvar(it) }).nullable()
 }
+
+fun serializeSvar(svar: Svar<*>): String = objectMapper.writeValueAsString(svar)
+fun deserializeSvar(svar: String): Svar<*> = objectMapper.readValue(svar)
 
 object SeksjonTabell : IntIdTable("seksjon") {
     val versjon: Column<String> = text("versjon")
