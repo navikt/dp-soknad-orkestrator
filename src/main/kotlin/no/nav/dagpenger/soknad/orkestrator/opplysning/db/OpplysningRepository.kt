@@ -1,15 +1,20 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.getId
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.datetime
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
 import java.util.UUID
@@ -20,49 +25,64 @@ class OpplysningRepository(
 ) {
     val database = Database.connect(dataSource)
 
+    fun opprettSeksjon(
+        søknadId: UUID,
+        versjon: String,
+    ) {
+        transaction {
+            SeksjonTabell.insert {
+                it[this.versjon] = versjon
+                it[this.søknadId] = SøknadTabell.getId(søknadId)
+                    ?: error("Fant ikke søknad med id $søknadId")
+            }
+        }
+    }
+
     fun lagre(
         søknadId: UUID,
         opplysning: Opplysning,
     ) {
         transaction {
             val søknadDBId =
-                SøknadTabell.select(SøknadTabell.id)
-                    .where { SøknadTabell.søknadId eq søknadId }
-                    .singleOrNull()?.get(SøknadTabell.id)?.value
+                SøknadTabell.getId(søknadId)
                     ?: error("Fant ikke søknad med id $søknadId")
 
             val seksjonDBId =
-                SeksjonTabell.select(SeksjonTabell.id)
+                SeksjonTabell
+                    .select(SeksjonTabell.id)
                     .where { SeksjonTabell.søknadId eq søknadDBId }
-                    .singleOrNull()?.get(SøknadTabell.id)?.value
-                    ?: error("Fant ikke seksjon med id $søknadId")
+                    .andWhere { SeksjonTabell.versjon eq opplysning.seksjonversjon }
+                    .singleOrNull()
+                    ?.get(SeksjonTabell.id)
+                    ?.value
+                    ?: error("Fant ikke seksjon med søknadId $søknadId")
 
             OpplysningTabell.insert {
                 it[opplysningId] = opplysning.opplysningId
                 it[seksjonId] = seksjonDBId
                 it[opplysningsbehovId] = opplysning.opplysningsbehovId
                 it[type] = opplysning.type.name
-                // it[svar] = jacksonObjectMapper().writeValueAsString(opplysning.svar)
+                it[svar] = jacksonObjectMapper().writeValueAsString(opplysning.svar)
             }
         }
     }
 
-    fun hent(opplysningId: UUID): Opplysning? {
-        return transaction {
-            OpplysningTabell
-                .select(OpplysningTabell.opplysningId eq opplysningId)
+    fun hent(opplysningId: UUID): Opplysning? =
+        transaction {
+            (OpplysningTabell innerJoin SeksjonTabell)
+                .selectAll()
+                .where { OpplysningTabell.seksjonId eq SeksjonTabell.id }
+                .andWhere { OpplysningTabell.opplysningId eq opplysningId }
                 .map {
                     Opplysning(
                         opplysningId = it[OpplysningTabell.opplysningId],
+                        seksjonversjon = it[SeksjonTabell.versjon],
                         opplysningsbehovId = it[OpplysningTabell.opplysningsbehovId],
                         type = Opplysningstype.valueOf(it[OpplysningTabell.type]),
-                        svar = null,
-                        // svar = jacksonObjectMapper().readValue(it[OpplysningTabell.svar], Svar::class.java),
+                        svar = jacksonObjectMapper().readValue(it[OpplysningTabell.svar], Svar::class.java),
                     )
-                }
-                .firstOrNull()
+                }.firstOrNull()
         }
-    }
 
     fun slett(opplysningId: UUID) {
         transaction {

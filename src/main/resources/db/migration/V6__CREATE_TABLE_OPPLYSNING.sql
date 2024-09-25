@@ -15,6 +15,6 @@ CREATE TABLE IF NOT EXISTS opplysning
     seksjon_id            BIGINT                   NOT NULL REFERENCES seksjon (id) ON DELETE CASCADE,
     opplysningsbehov_id   BIGINT                   NOT NULL,
     type                  TEXT                     NOT NULL,
-    svar                  jsonb
+    svar                  TEXT -- TODO: jsonb/text
 );
 
