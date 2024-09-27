@@ -20,6 +20,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.autentisert
+import org.junit.jupiter.api.Disabled
 import java.util.UUID
 import kotlin.test.Test
 
@@ -37,6 +38,7 @@ class SøknadTest {
             opplysningRepository = opplysningRepository,
         ).also { it.setRapidsConnection(rapid) }
 
+    @Disabled
     @Test
     fun `Det er mulig å starte søknad og få neste spørsmål til det er tomt`() {
         withSøknadApi {

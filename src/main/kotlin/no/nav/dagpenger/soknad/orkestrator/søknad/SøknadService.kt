@@ -6,16 +6,15 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.toSporsmalDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
-import no.nav.dagpenger.soknad.orkestrator.søknad.db.Spørsmål
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.util.UUID
 
@@ -47,33 +46,21 @@ class SøknadService(
         val søknad = Søknad(ident = ident)
         søknadRepository.lagre(søknad)
 
-        val spørsmål =
-            Spørsmål(
-                spørsmålId = UUID.randomUUID(),
-                gruppenavn = Bostedsland.navn,
-                gruppespørsmålId = Bostedsland.førsteOpplysningsbehov().id,
+        val opplysning =
+            Opplysning(
+                opplysningId = UUID.randomUUID(),
+                seksjonversjon = Bostedsland.versjon,
+                opplysningsbehovId = Bostedsland.førsteOpplysningsbehov().id,
                 type = Bostedsland.førsteOpplysningsbehov().type,
                 svar = null,
             )
 
-        inMemorySøknadRepository.lagre(
-            søknadId = søknad.søknadId,
-            spørsmål = spørsmål,
-        )
+        opplysningRepository.opprettSeksjon(søknadId = søknad.søknadId, versjon = opplysning.seksjonversjon)
 
-        // TODO: Opprette og lagre første seksjon (?) og opplysning i DB. Hvordan vite at Bostedsland er først?
-//        val opplysning =
-//            Opplysning(
-//                opplysningId = UUID.randomUUID(),
-//                opplysningsbehovId = Bostedsland.førsteOpplysningsbehov().id,
-//                type = Bostedsland.førsteOpplysningsbehov().type,
-//                svar = null,
-//            )
-//
-//        opplysningRepository.lagre(
-//            søknadId = søknad.søknadId,
-//            opplysning = opplysning,
-//        )
+        opplysningRepository.lagre(
+            søknadId = søknad.søknadId,
+            opplysning = opplysning,
+        )
 
         logger.info { "Opprettet søknad med søknadId: ${søknad.søknadId}" }
         sikkerlogg.info { "Opprettet søknad med søknadId: ${søknad.søknadId} og ident: $ident" }
@@ -85,49 +72,53 @@ class SøknadService(
         søknadId: UUID,
         svar: Svar<*>,
     ) {
-        val (gruppespørsmålId, gruppenavn) = inMemorySøknadRepository.hentGruppeinfo(søknadId, svar.opplysningId)
-        val spørsmålgruppe = getSeksjon(gruppenavn!!)
+        val opplysning =
+            opplysningRepository.hent(svar.opplysningId)
+                ?: throw IllegalArgumentException("Fant ikke opplysning med id: ${svar.opplysningId}, kan ikke håndtere svar")
 
-        spørsmålgruppe.validerSvar(gruppespørsmålId!!, svar)
-        inMemorySøknadRepository.lagreSvar(søknadId, svar)
+        val opplysningsbehovId = opplysning.opplysningsbehovId
+        val seksjonversjon = opplysning.seksjonversjon
+        val seksjon = getSeksjon(seksjonversjon)
+
+        try {
+            seksjon.validerSvar(opplysningsbehovId, svar)
+            opplysningRepository.lagreSvar(svar)
+        } catch (e: IllegalArgumentException) {
+            logger.error(e) { "Validering av svar feilet" }
+            return
+        }
 
         nullstillAvhengigheter(
             søknadId = søknadId,
-            gruppe = spørsmålgruppe,
-            idIGruppe = gruppespørsmålId,
+            seksjon = seksjon,
+            opplysningsbehovId = opplysningsbehovId,
         )
 
-        håndterNesteSpørsmål(søknadId, svar, gruppenavn, gruppespørsmålId)
+        håndterNesteSpørsmål(søknadId, svar, seksjon, opplysningsbehovId)
     }
 
     private fun håndterNesteSpørsmål(
         søknadId: UUID,
         svar: Svar<*>,
-        gruppenavn: Seksjonsnavn,
-        gruppespørsmålId: Int,
+        seksjon: Seksjon,
+        opplysningsbehovId: Int,
     ) {
-        val gruppe = getSeksjon(gruppenavn)
-        gruppe.nesteOpplysningsbehov(svar, gruppespørsmålId)?.let { nesteSpørsmål ->
+        seksjon.nesteOpplysningsbehov(svar, opplysningsbehovId)?.let { nesteOpplysning ->
             val erLagretIDB =
-                inMemorySøknadRepository.hent(
-                    søknadId = søknadId,
-                    gruppenavn = gruppe.navn,
-                    gruppespørsmålId = nesteSpørsmål.id,
-                ) != null
+                opplysningRepository.hentAlleForSeksjon(søknadId, seksjon.versjon)
+                    .find { it.opplysningsbehovId == nesteOpplysning.id } != null
 
             if (!erLagretIDB) {
-                val nyttUbesvartSpørsmål =
-                    Spørsmål(
-                        spørsmålId = UUID.randomUUID(),
-                        gruppenavn = gruppe.navn,
-                        gruppespørsmålId = nesteSpørsmål.id,
-                        type = nesteSpørsmål.type,
+                val nyOpplysning =
+                    Opplysning(
+                        opplysningId = UUID.randomUUID(),
+                        seksjonversjon = seksjon.versjon,
+                        opplysningsbehovId = nesteOpplysning.id,
+                        type = nesteOpplysning.type,
                         svar = null,
                     )
-                inMemorySøknadRepository.lagre(
-                    søknadId = søknadId,
-                    spørsmål = nyttUbesvartSpørsmål,
-                )
+
+                opplysningRepository.lagre(søknadId, nyOpplysning)
             }
         }
     }
@@ -137,7 +128,6 @@ class SøknadService(
         ident: String,
     ) {
         søknadRepository.slett(søknadId)
-        inMemorySøknadRepository.slettSøknad(søknadId)
 
         SøknadMetrikker.slettet.inc()
         logger.info { "Slettet søknad med søknadId: $søknadId" }
@@ -152,45 +142,47 @@ class SøknadService(
 
     private fun nullstillAvhengigheter(
         søknadId: UUID,
-        gruppe: Seksjon,
-        idIGruppe: Int,
+        seksjon: Seksjon,
+        opplysningsbehovId: Int,
     ) {
-        val avhengigheter = gruppe.avhengigheter(idIGruppe)
+        val avhengigheter = seksjon.avhengigheter(opplysningsbehovId)
 
         avhengigheter.forEach {
-            inMemorySøknadRepository.slettSpørsmål(
+            opplysningRepository.slett(
                 søknadId = søknadId,
-                gruppenavn = gruppe.navn,
-                gruppespørsmålId = it,
+                seksjonversjon = seksjon.versjon,
+                opplysningsbehovId = it,
             )
         }
     }
 
-    fun nesteSpørsmålgruppe(søknadId: UUID): SporsmalgruppeDTO {
-        val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId).sortedBy { it.gruppespørsmålId }
-        val nesteUbesvartSpørsmål = alleSpørsmål.find { it.svar == null }
-        val besvarteSpørsmål =
-            if (nesteUbesvartSpørsmål == null) {
-                alleSpørsmål
-            } else {
-                alleSpørsmål.filter { it.gruppespørsmålId < nesteUbesvartSpørsmål.gruppespørsmålId }
-            }
-        val gruppe = getSeksjon(nesteUbesvartSpørsmål?.gruppenavn ?: Bostedsland.navn) // TODO: Teit med default
+    fun nesteSeksjon(søknadId: UUID): SporsmalgruppeDTO {
+        val alleOpplysninger = opplysningRepository.hentAlle(søknadId)
+        val ubesvarteOpplysninger = alleOpplysninger.filter { it.svar == null }.sortedBy { it.opplysningsbehovId }
+        val nesteUbesvarteOpplysning = ubesvarteOpplysninger.firstOrNull()
 
-        val nesteSpørsmålDTO =
-            nesteUbesvartSpørsmål?.let {
-                gruppe.getOpplysningsbehov(it.gruppespørsmålId).toSporsmalDTO(it.spørsmålId, null)
+        val besvarteOpplysninger =
+            if (nesteUbesvarteOpplysning == null) {
+                alleOpplysninger
+            } else {
+                alleOpplysninger.filter { it.svar != null && it.opplysningsbehovId < nesteUbesvarteOpplysning.opplysningsbehovId }
             }
-        val besvarteSpørsmålDTO =
-            besvarteSpørsmål.map {
-                gruppe.getOpplysningsbehov(it.gruppespørsmålId).toSporsmalDTO(it.spørsmålId, toJson(it.svar!!))
+        val seksjon = getSeksjon(Bostedsland.versjon) // TODO: Teit med default
+
+        val nesteUbesvarteOpplysningDTO =
+            nesteUbesvarteOpplysning?.let {
+                seksjon.getOpplysningsbehov(it.opplysningsbehovId).toSporsmalDTO(it.opplysningId, null)
+            }
+        val besvarteOpplysningerDTO =
+            besvarteOpplysninger.map {
+                seksjon.getOpplysningsbehov(it.opplysningsbehovId).toSporsmalDTO(it.opplysningId, toJson(it.svar!!))
             }
 
         return SporsmalgruppeDTO(
-            navn = SporsmaalgruppeNavnDTO.valueOf(gruppe.navn.name.lowercase()),
-            besvarteSpørsmål = besvarteSpørsmålDTO,
-            erFullført = nesteUbesvartSpørsmål == null,
-            nesteSpørsmål = nesteSpørsmålDTO,
+            navn = SporsmaalgruppeNavnDTO.valueOf(seksjon.navn.name.lowercase()),
+            besvarteSpørsmål = besvarteOpplysningerDTO,
+            erFullført = nesteUbesvarteOpplysning == null,
+            nesteSpørsmål = nesteUbesvarteOpplysningDTO,
         )
     }
 

@@ -1,16 +1,18 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.mockk.clearMocks
 import io.mockk.every
+import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.opplysning.BooleanSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
@@ -19,7 +21,6 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
-import no.nav.dagpenger.soknad.orkestrator.søknad.db.Spørsmål
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -44,13 +45,13 @@ class SøknadServiceTest {
     @BeforeEach
     fun setup() {
         mockkStatic(seksjonPath)
-        every { getSeksjon(Seksjonsnavn.BOSTEDSLAND) } returns seksjon
+        every { getSeksjon(any()) } returns seksjon
         every { seksjon.navn } returns Seksjonsnavn.BOSTEDSLAND
     }
 
     @AfterEach
     fun reset() {
-        clearMocks(søknadRepository, seksjon)
+        clearMocks(søknadRepository, seksjon, opplysningRepository)
         unmockkStatic(seksjonPath)
     }
 
@@ -62,7 +63,7 @@ class SøknadServiceTest {
             søknadRepository.hent(søknad.søknadId)
         } returns søknad
 
-        søknadService.søknadFinnes(UUID.randomUUID()) shouldBe true
+        søknadService.søknadFinnes(søknad.søknadId) shouldBe true
     }
 
     @Test
@@ -89,186 +90,244 @@ class SøknadServiceTest {
     }
 
     @Test
-    fun `oppretting av søknad oppretter også første spørsmål i søknaden`() {
+    fun `opprettSøknad oppretter søknad, første opplysning og seksjon`() {
+        justRun {
+            søknadRepository.lagre(any())
+            opplysningRepository.opprettSeksjon(any(), any())
+            opplysningRepository.lagre(any(), any())
+        }
+
         val søknad = søknadService.opprettSøknad(ident)
 
-        verify(exactly = 1) { søknadRepository.lagre(søknad) }
-        inMemorySøknadRepository.hentAlle(søknad.søknadId).size shouldBe 1
-        inMemorySøknadRepository.hentAlle(søknad.søknadId).first().gruppespørsmålId shouldBe 1
-        inMemorySøknadRepository.hentAlle(søknad.søknadId).first().svar shouldBe null
+        verify(exactly = 1) {
+            søknadRepository.lagre(søknad)
+            opplysningRepository.opprettSeksjon(søknad.søknadId, any())
+            opplysningRepository.lagre(any(), any())
+        }
     }
 
     @Test
-    fun `lagreSvar lagrer besvart spørsmål og neste spørsmål`() {
+    fun `håndterSvar kaster feil dersom man prøver å besvare en opplysning som ikke finnes`() {
+        every {
+            opplysningRepository.hent(any())
+        } returns null
+
+        val svar = BooleanSvar(opplysningId = UUID.randomUUID(), verdi = true)
+
+        shouldThrow<IllegalArgumentException> {
+            søknadService.håndterSvar(UUID.randomUUID(), svar)
+        }
+    }
+
+    @Test
+    fun `håndterSvar validerer og lagrer svar på opplysning`() {
+        val svar = BooleanSvar(opplysningId = UUID.randomUUID(), verdi = true)
+        søknadService.håndterSvar(UUID.randomUUID(), svar)
+
+        verify(exactly = 1) {
+            seksjon.validerSvar(any(), any())
+            opplysningRepository.lagreSvar(svar)
+        }
+    }
+
+    @Test
+    fun `håndterSvar nullstiller avhengigheter`() {
         val søknadId = UUID.randomUUID()
-        val spørsmålId = UUID.randomUUID()
+        val avhengigOpplysningsbehovId = 1
+
+        every { seksjon.avhengigheter(any()) } returns listOf(avhengigOpplysningsbehovId)
+
+        val svar = LandSvar(opplysningId = UUID.randomUUID(), verdi = "OPP")
+        søknadService.håndterSvar(søknadId, svar)
+
+        verify(exactly = 1) {
+            seksjon.avhengigheter(any())
+            opplysningRepository.slett(søknadId, any(), avhengigOpplysningsbehovId)
+        }
+    }
+
+    @Test
+    fun `håndterSvar nullstiller ingenting hvis det ikke finnes noen avhengigheter`() {
+        val søknadId = UUID.randomUUID()
+        val avhengigOpplysningsbehovId = 1
+
+        every { seksjon.avhengigheter(any()) } returns emptyList()
+
+        val svar = LandSvar(opplysningId = UUID.randomUUID(), verdi = "OPP")
+        søknadService.håndterSvar(søknadId, svar)
+
+        verify(exactly = 0) {
+            opplysningRepository.slett(søknadId, any(), avhengigOpplysningsbehovId)
+        }
+    }
+
+    @Test
+    fun `håndterSvar oppretter neste opplysning hvis den ikke finnes allerede`() {
+        val søknadId = UUID.randomUUID()
         every { seksjon.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns
             Opplysningsbehov(
                 id = 2,
-                tekstnøkkel = "spm2",
-                type = Opplysningstype.TEKST,
-                gyldigeSvar = emptyList(),
-            )
-        inMemorySøknadRepository.lagreTestSpørsmål(
-            søknadId = søknadId,
-            spørsmålId = spørsmålId,
-        )
-
-        val svar = BooleanSvar(opplysningId = spørsmålId, verdi = true)
-        søknadService.håndterSvar(søknadId, svar)
-
-        inMemorySøknadRepository.hentAlle(søknadId).size shouldBe 2
-        inMemorySøknadRepository.hentAlle(søknadId).find { it.spørsmålId == spørsmålId } shouldNotBe null
-        inMemorySøknadRepository
-            .hentAlle(søknadId)
-            .find { it.gruppespørsmålId == 2 } shouldNotBe null
-    }
-
-    @Test
-    fun `lagreBesvartSpørsmål lagrer besvartSpørsmål og nullstiller avhengigheter`() {
-        val søknadId = UUID.randomUUID()
-        val spørsmålId1 = UUID.randomUUID()
-        val gruppespørsmålId1 = 1
-        val gruppespørsmålId2 = 2
-        every { seksjon.avhengigheter(gruppespørsmålId1) } returns listOf(gruppespørsmålId2)
-        every { seksjon.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns null
-        inMemorySøknadRepository.lagreTestSpørsmål(
-            søknadId = søknadId,
-            spørsmålId = spørsmålId1,
-            gruppespørsmålId = gruppespørsmålId1,
-            type = Opplysningstype.LAND,
-            svar = LandSvar(opplysningId = spørsmålId1, verdi = "NED"),
-        )
-        inMemorySøknadRepository.lagreTestSpørsmål(
-            søknadId = søknadId,
-            gruppespørsmålId = gruppespørsmålId2,
-            svar = BooleanSvar(opplysningId = spørsmålId1, verdi = true),
-        )
-
-        val svar = LandSvar(opplysningId = spørsmålId1, verdi = "OPP")
-        søknadService.håndterSvar(søknadId, svar)
-
-        val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
-        alleSpørsmål.size shouldBe 1
-        alleSpørsmål.find { it.spørsmålId == spørsmålId1 } shouldNotBe null
-        alleSpørsmål.find { it.spørsmålId == spørsmålId1 }?.svar?.verdi shouldBe "OPP"
-        alleSpørsmål.find { it.gruppespørsmålId == gruppespørsmålId2 }?.svar shouldBe null
-    }
-
-    @Test
-    fun `lagreBesvartSpørsmål lagrer besvartSpørsmål uten å nullstille ikke-avhengigheter`() {
-        val søknadId = UUID.randomUUID()
-        val spørsmålId1 = UUID.randomUUID()
-        val gruppespørsmålId1 = 1
-        val gruppespørsmålId2 = 2
-        every { seksjon.avhengigheter(gruppespørsmålId1) } returns emptyList()
-        every { seksjon.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns null
-        inMemorySøknadRepository.lagreTestSpørsmål(
-            søknadId = søknadId,
-            spørsmålId = spørsmålId1,
-            gruppespørsmålId = gruppespørsmålId1,
-            type = Opplysningstype.LAND,
-            svar = LandSvar(opplysningId = spørsmålId1, verdi = "NED"),
-        )
-        inMemorySøknadRepository.lagreTestSpørsmål(
-            søknadId = søknadId,
-            gruppespørsmålId = gruppespørsmålId2,
-            svar = BooleanSvar(opplysningId = spørsmålId1, verdi = true),
-        )
-
-        val svar = LandSvar(opplysningId = spørsmålId1, verdi = "OPP")
-        søknadService.håndterSvar(søknadId, svar)
-
-        val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
-        alleSpørsmål.size shouldBe 2
-        alleSpørsmål.find { it.spørsmålId == spørsmålId1 } shouldNotBe null
-        alleSpørsmål.find { it.spørsmålId == spørsmålId1 }?.svar?.verdi shouldBe "OPP"
-        alleSpørsmål.find { it.gruppespørsmålId == gruppespørsmålId2 }?.svar?.verdi shouldBe true
-    }
-
-    @Test
-    fun `nesteSpørsmålgruppe henter kun besvarte spørsmål som kommer før det ubesvarte spørsmålet`() {
-        val søknadId = UUID.randomUUID()
-        val spørsmålId1 = UUID.randomUUID()
-        val spørsmålId3 = UUID.randomUUID()
-        every { seksjon.getOpplysningsbehov(any()) } returns
-            Opplysningsbehov(
-                id = 99,
-                tekstnøkkel = "spm",
+                tekstnøkkel = "tekstnøkkel",
                 type = Opplysningstype.BOOLEAN,
                 gyldigeSvar = emptyList(),
             )
-        inMemorySøknadRepository.lagreTestSpørsmål(
-            søknadId = søknadId,
-            spørsmålId = spørsmålId1,
-            gruppespørsmålId = 1,
-            svar = BooleanSvar(opplysningId = spørsmålId1, verdi = true),
-        )
-        inMemorySøknadRepository.lagreTestSpørsmål(
-            søknadId = søknadId,
-            gruppespørsmålId = 2,
-            svar = null,
-        )
-        inMemorySøknadRepository.lagreTestSpørsmål(
-            søknadId = søknadId,
-            spørsmålId = spørsmålId3,
-            gruppespørsmålId = 3,
-            svar = BooleanSvar(opplysningId = spørsmålId1, verdi = false),
-        )
 
-        val nesteSpørsmålgruppe = søknadService.nesteSpørsmålgruppe(søknadId)
+        val opplysningId = UUID.randomUUID()
+        val svar = BooleanSvar(opplysningId = opplysningId, verdi = true)
 
-        val alleSpørsmål = inMemorySøknadRepository.hentAlle(søknadId)
-        alleSpørsmål.filter { it.svar != null }.size shouldBe 2
+        every {
+            opplysningRepository.hentAlleForSeksjon(søknadId, any())
+        } returns emptyList()
+
+        søknadService.håndterSvar(søknadId, svar)
+
+        verify(exactly = 1) {
+            opplysningRepository.lagre(søknadId, any())
+        }
+    }
+
+    @Test
+    fun `håndterSvar oppretter ikke neste opplysning hvis den finnes allerede`() {
+        val søknadId = UUID.randomUUID()
+        val opplysningId = UUID.randomUUID()
+        val svar = BooleanSvar(opplysningId = opplysningId, verdi = true)
+
+        every { seksjon.nesteOpplysningsbehov(any<Svar<*>>(), any<Int>()) } returns
+            Opplysningsbehov(
+                id = 2,
+                tekstnøkkel = "tekstnøkkel",
+                type = Opplysningstype.BOOLEAN,
+                gyldigeSvar = emptyList(),
+            )
+
+        every {
+            opplysningRepository.hentAlleForSeksjon(søknadId, any())
+        } returns
+            listOf(
+                Opplysning(
+                    opplysningId = UUID.randomUUID(),
+                    seksjonversjon = "1",
+                    opplysningsbehovId = 2,
+                    type = Opplysningstype.BOOLEAN,
+                    svar = BooleanSvar(opplysningId = opplysningId, verdi = true),
+                ),
+            )
+
+        søknadService.håndterSvar(søknadId, svar)
+
+        verify(exactly = 0) {
+            opplysningRepository.lagre(any(), any())
+        }
+    }
+
+    @Test
+    fun `nesteSeksjon henter kun besvarte opplysninger som kommer før den ubesvarte opplysningen`() {
+        val søknadId = UUID.randomUUID()
+        val opplysningId1 = UUID.randomUUID()
+        val opplysningId3 = UUID.randomUUID()
+
+        every {
+            opplysningRepository.hentAlle(søknadId)
+        } returns
+            listOf(
+                Opplysning(
+                    opplysningId = opplysningId1,
+                    seksjonversjon = "1",
+                    opplysningsbehovId = 1,
+                    type = Opplysningstype.BOOLEAN,
+                    svar = BooleanSvar(opplysningId = opplysningId1, verdi = true),
+                ),
+                Opplysning(
+                    opplysningId = UUID.randomUUID(),
+                    seksjonversjon = "1",
+                    opplysningsbehovId = 2,
+                    type = Opplysningstype.BOOLEAN,
+                    svar = null,
+                ),
+                Opplysning(
+                    opplysningId = opplysningId3,
+                    seksjonversjon = "1",
+                    opplysningsbehovId = 3,
+                    type = Opplysningstype.BOOLEAN,
+                    svar = BooleanSvar(opplysningId = UUID.randomUUID(), verdi = true),
+                ),
+            )
+
+        every { seksjon.getOpplysningsbehov(2) } returns
+            Opplysningsbehov(
+                id = 2,
+                tekstnøkkel = "tekstnøkkel",
+                type = Opplysningstype.BOOLEAN,
+                gyldigeSvar = emptyList(),
+            )
+
+        every { seksjon.getOpplysningsbehov(1) } returns
+            Opplysningsbehov(
+                id = 1,
+                tekstnøkkel = "tekstnøkkel",
+                type = Opplysningstype.BOOLEAN,
+                gyldigeSvar = emptyList(),
+            )
+
+        val nesteSpørsmålgruppe = søknadService.nesteSeksjon(søknadId)
+
         nesteSpørsmålgruppe.besvarteSpørsmål.size shouldBe 1
-        nesteSpørsmålgruppe.besvarteSpørsmål.first().id shouldBe spørsmålId1
+        nesteSpørsmålgruppe.besvarteSpørsmål.first().id shouldBe opplysningId1
     }
 
     @Test
-    fun `erFullført blir true når det ikke er flere ubesvarte spørsmål i en spørsmålsgruppe`() {
+    fun `erFullført blir true når det ikke er flere ubesvarte opplysninger i en seksjon`() {
         val søknadId = UUID.randomUUID()
-        val spørsmålId = UUID.randomUUID()
+
+        every {
+            opplysningRepository.hentAlle(søknadId)
+        } returns
+            listOf(
+                Opplysning(
+                    opplysningId = UUID.randomUUID(),
+                    seksjonversjon = "1",
+                    opplysningsbehovId = 1,
+                    type = Opplysningstype.BOOLEAN,
+                    svar = BooleanSvar(opplysningId = UUID.randomUUID(), verdi = true),
+                ),
+            )
+
         every { seksjon.getOpplysningsbehov(any()) } returns
             Opplysningsbehov(
-                id = 99,
-                tekstnøkkel = "spm",
+                id = 1,
+                tekstnøkkel = "tekstnøkkel",
                 type = Opplysningstype.BOOLEAN,
                 gyldigeSvar = emptyList(),
             )
 
-        inMemorySøknadRepository.lagreTestSpørsmål(
-            søknadId = søknadId,
-            spørsmålId = spørsmålId,
-            gruppespørsmålId = 1,
-            svar = null,
-        )
-
-        søknadService.nesteSpørsmålgruppe(søknadId).erFullført shouldBe false
-
-        inMemorySøknadRepository.lagreSvar(søknadId, BooleanSvar(opplysningId = spørsmålId, verdi = true))
-
-        søknadService.nesteSpørsmålgruppe(søknadId).erFullført shouldBe true
+        søknadService.nesteSeksjon(søknadId).erFullført shouldBe true
     }
-}
 
-fun InMemorySøknadRepository.lagreTestSpørsmål(
-    søknadId: UUID = UUID.randomUUID(),
-    spørsmålId: UUID = UUID.randomUUID(),
-    gruppenavn: Seksjonsnavn = Seksjonsnavn.BOSTEDSLAND,
-    gruppespørsmålId: Int = 1,
-    type: Opplysningstype = Opplysningstype.BOOLEAN,
-    svar: Svar<*>? = null,
-) {
-    val spørsmål =
-        Spørsmål(
-            spørsmålId = spørsmålId,
-            gruppenavn = gruppenavn,
-            gruppespørsmålId = gruppespørsmålId,
-            type = type,
-            svar = svar,
-        )
-    lagre(
-        søknadId = søknadId,
-        spørsmål = spørsmål,
-    )
+    @Test
+    fun `erFullført blir false når det finnes ubesvarte opplysninger i en seksjon`() {
+        val søknadId = UUID.randomUUID()
+
+        every {
+            opplysningRepository.hentAlle(søknadId)
+        } returns
+            listOf(
+                Opplysning(
+                    opplysningId = UUID.randomUUID(),
+                    seksjonversjon = "1",
+                    opplysningsbehovId = 1,
+                    type = Opplysningstype.BOOLEAN,
+                    svar = null,
+                ),
+            )
+
+        every { seksjon.getOpplysningsbehov(any()) } returns
+            Opplysningsbehov(
+                id = 1,
+                tekstnøkkel = "tekstnøkkel",
+                type = Opplysningstype.BOOLEAN,
+                gyldigeSvar = emptyList(),
+            )
+
+        søknadService.nesteSeksjon(søknadId).erFullført shouldBe false
+    }
 }

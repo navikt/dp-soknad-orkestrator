@@ -58,7 +58,7 @@ class InMemorySøknadRepository {
         tabell[søknadId]?.find { it.spørsmålId == spørsmålId }
             ?: throw IllegalArgumentException("Fant ikke spørsmål med id: $spørsmålId")
 
-    fun hentGruppeinfo(
+    fun hentSeksjoninfo(
         søknadId: UUID,
         spørsmålId: UUID,
     ): Pair<Int?, Seksjonsnavn?> {

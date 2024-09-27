@@ -1,9 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import java.time.LocalDateTime
-import java.util.UUID
-import javax.sql.DataSource
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
@@ -14,6 +11,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
@@ -21,6 +19,10 @@ import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.json.jsonb
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
+import java.time.LocalDateTime
+import java.util.UUID
+import javax.sql.DataSource
 
 class OpplysningRepository(
     dataSource: DataSource,
@@ -69,6 +71,15 @@ class OpplysningRepository(
         }
     }
 
+    fun lagreSvar(svar: Svar<*>) {
+        transaction {
+            OpplysningTabell.update(where = { OpplysningTabell.opplysningId eq svar.opplysningId }) {
+                it[OpplysningTabell.svar] = svar
+                it[sistEndretAvBruker] = LocalDateTime.now()
+            }
+        }
+    }
+
     fun hent(opplysningId: UUID): Opplysning? =
         transaction {
             (OpplysningTabell innerJoin SeksjonTabell)
@@ -86,9 +97,67 @@ class OpplysningRepository(
                 }.firstOrNull()
         }
 
+    fun hentAlle(søknadId: UUID): List<Opplysning> =
+        transaction {
+            val søknadDBId = SøknadTabell.getId(søknadId) ?: error("Fant ikke søknad med id $søknadId")
+
+            (OpplysningTabell innerJoin SeksjonTabell)
+                .selectAll()
+                .where { OpplysningTabell.seksjonId eq SeksjonTabell.id }
+                .andWhere { SeksjonTabell.søknadId eq søknadDBId }
+                .map {
+                    Opplysning(
+                        opplysningId = it[OpplysningTabell.opplysningId],
+                        seksjonversjon = it[SeksjonTabell.versjon],
+                        opplysningsbehovId = it[OpplysningTabell.opplysningsbehovId],
+                        type = Opplysningstype.valueOf(it[OpplysningTabell.type]),
+                        svar = it[OpplysningTabell.svar],
+                    )
+                }
+        }
+
+    fun hentAlleForSeksjon(
+        søknadId: UUID,
+        seksjonversjon: String,
+    ): List<Opplysning> =
+        transaction {
+            val søknadDBId = SøknadTabell.getId(søknadId) ?: error("Fant ikke søknad med id $søknadId")
+
+            (OpplysningTabell innerJoin SeksjonTabell)
+                .selectAll()
+                .where { OpplysningTabell.seksjonId eq SeksjonTabell.id }
+                .andWhere { SeksjonTabell.versjon eq seksjonversjon }
+                .andWhere { SeksjonTabell.søknadId eq søknadDBId }
+                .map {
+                    Opplysning(
+                        opplysningId = it[OpplysningTabell.opplysningId],
+                        seksjonversjon = it[SeksjonTabell.versjon],
+                        opplysningsbehovId = it[OpplysningTabell.opplysningsbehovId],
+                        type = Opplysningstype.valueOf(it[OpplysningTabell.type]),
+                        svar = it[OpplysningTabell.svar],
+                    )
+                }
+        }
+
     fun slett(opplysningId: UUID) {
         transaction {
             OpplysningTabell.deleteWhere { OpplysningTabell.opplysningId eq opplysningId }
+        }
+    }
+
+    fun slett(
+        søknadId: UUID,
+        seksjonversjon: String,
+        opplysningsbehovId: Int,
+    ) {
+        transaction {
+            val søknadDBId = SøknadTabell.getId(søknadId) ?: error("Fant ikke søknad med id $søknadId")
+            val seksjonDBId = SeksjonTabell.getId(søknadDBId, seksjonversjon) ?: error("Fant ikke seksjon")
+
+            OpplysningTabell.deleteWhere {
+                seksjonId eq seksjonDBId and
+                    (OpplysningTabell.opplysningsbehovId eq opplysningsbehovId)
+            }
         }
     }
 }
@@ -104,6 +173,7 @@ object OpplysningTabell : IntIdTable("opplysning") {
 }
 
 fun serializeSvar(svar: Svar<*>): String = objectMapper.writeValueAsString(svar)
+
 fun deserializeSvar(svar: String): Svar<*> = objectMapper.readValue(svar)
 
 object SeksjonTabell : IntIdTable("seksjon") {
@@ -111,3 +181,14 @@ object SeksjonTabell : IntIdTable("seksjon") {
     val erFullført: Column<Boolean> = bool("er_fullfort").default(false)
     val søknadId: Column<Int> = integer("soknad_id").references(SøknadTabell.id)
 }
+
+fun SeksjonTabell.getId(
+    søknadDBId: Int,
+    seksjonversjon: String,
+): Int? =
+    SeksjonTabell
+        .selectAll()
+        .where { (søknadId eq søknadDBId) and (versjon eq seksjonversjon) }
+        .singleOrNull()
+        ?.get(SeksjonTabell.id)
+        ?.value
