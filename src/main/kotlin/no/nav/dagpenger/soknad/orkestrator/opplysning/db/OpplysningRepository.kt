@@ -52,13 +52,7 @@ class OpplysningRepository(
                     ?: error("Fant ikke søknad med id $søknadId")
 
             val seksjonDBId =
-                SeksjonTabell
-                    .select(SeksjonTabell.id)
-                    .where { SeksjonTabell.søknadId eq søknadDBId }
-                    .andWhere { SeksjonTabell.versjon eq opplysning.seksjonversjon }
-                    .singleOrNull()
-                    ?.get(SeksjonTabell.id)
-                    ?.value
+                SeksjonTabell.getId(søknadDBId, opplysning.seksjonversjon)
                     ?: error("Fant ikke seksjon med søknadId $søknadId")
 
             OpplysningTabell.insert {
@@ -67,15 +61,6 @@ class OpplysningRepository(
                 it[opplysningsbehovId] = opplysning.opplysningsbehovId
                 it[type] = opplysning.type.name
                 it[svar] = opplysning.svar
-            }
-        }
-    }
-
-    fun lagreSvar(svar: Svar<*>) {
-        transaction {
-            OpplysningTabell.update(where = { OpplysningTabell.opplysningId eq svar.opplysningId }) {
-                it[OpplysningTabell.svar] = svar
-                it[sistEndretAvBruker] = LocalDateTime.now()
             }
         }
     }
@@ -96,6 +81,19 @@ class OpplysningRepository(
                     )
                 }.firstOrNull()
         }
+
+    fun lagreSvar(svar: Svar<*>) {
+        transaction {
+            val updatedRows =
+                OpplysningTabell.update(where = { OpplysningTabell.opplysningId eq svar.opplysningId }) {
+                    it[OpplysningTabell.svar] = svar
+                    it[sistEndretAvBruker] = LocalDateTime.now()
+                }
+            if (updatedRows == 0) {
+                throw IllegalStateException("Fant ikke opplysning med id ${svar.opplysningId}, kan ikke lagre svar")
+            }
+        }
+    }
 
     fun hentAlle(søknadId: UUID): List<Opplysning> =
         transaction {
@@ -121,17 +119,19 @@ class OpplysningRepository(
         seksjonversjon: String,
     ): List<Opplysning> =
         transaction {
-            val søknadDBId = SøknadTabell.getId(søknadId) ?: error("Fant ikke søknad med id $søknadId")
+            val søknadDBId = SøknadTabell.getId(søknadId) ?: error("Fant ikke søknad med id $søknadId, kan ikke hente opplysninger")
 
-            (OpplysningTabell innerJoin SeksjonTabell)
+            val seksjonDBId =
+                SeksjonTabell.getId(søknadDBId, seksjonversjon)
+                    ?: error("Fant ikke seksjon med versjon $seksjonversjon for søknad med id $søknadId, kan ikke hente opplysninger")
+
+            OpplysningTabell
                 .selectAll()
-                .where { OpplysningTabell.seksjonId eq SeksjonTabell.id }
-                .andWhere { SeksjonTabell.versjon eq seksjonversjon }
-                .andWhere { SeksjonTabell.søknadId eq søknadDBId }
+                .where { OpplysningTabell.seksjonId eq seksjonDBId }
                 .map {
                     Opplysning(
                         opplysningId = it[OpplysningTabell.opplysningId],
-                        seksjonversjon = it[SeksjonTabell.versjon],
+                        seksjonversjon = seksjonversjon,
                         opplysningsbehovId = it[OpplysningTabell.opplysningsbehovId],
                         type = Opplysningstype.valueOf(it[OpplysningTabell.type]),
                         svar = it[OpplysningTabell.svar],
@@ -139,20 +139,16 @@ class OpplysningRepository(
                 }
         }
 
-    fun slett(opplysningId: UUID) {
-        transaction {
-            OpplysningTabell.deleteWhere { OpplysningTabell.opplysningId eq opplysningId }
-        }
-    }
-
     fun slett(
         søknadId: UUID,
         seksjonversjon: String,
         opplysningsbehovId: Int,
     ) {
         transaction {
-            val søknadDBId = SøknadTabell.getId(søknadId) ?: error("Fant ikke søknad med id $søknadId")
-            val seksjonDBId = SeksjonTabell.getId(søknadDBId, seksjonversjon) ?: error("Fant ikke seksjon")
+            val søknadDBId = SøknadTabell.getId(søknadId) ?: error("Fant ikke søknad med id $søknadId, kan ikke slette opplysning")
+            val seksjonDBId =
+                SeksjonTabell.getId(søknadDBId, seksjonversjon)
+                    ?: error("Fant ikke seksjon med versjon $seksjonversjon for søknad med id $søknadId, kan ikke slette opplysning")
 
             OpplysningTabell.deleteWhere {
                 seksjonId eq seksjonDBId and

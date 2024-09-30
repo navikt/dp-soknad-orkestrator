@@ -105,7 +105,8 @@ class SøknadService(
     ) {
         seksjon.nesteOpplysningsbehov(svar, opplysningsbehovId)?.let { nesteOpplysning ->
             val erLagretIDB =
-                opplysningRepository.hentAlleForSeksjon(søknadId, seksjon.versjon)
+                opplysningRepository
+                    .hentAlleForSeksjon(søknadId, seksjon.versjon)
                     .find { it.opplysningsbehovId == nesteOpplysning.id } != null
 
             if (!erLagretIDB) {
