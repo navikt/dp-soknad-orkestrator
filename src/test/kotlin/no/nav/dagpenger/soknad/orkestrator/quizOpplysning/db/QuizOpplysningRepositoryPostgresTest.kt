@@ -29,7 +29,7 @@ import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.UUID
 
-class QuizQuizQuizOpplysningRepositoryPostgresTest {
+class QuizOpplysningRepositoryPostgresTest {
     private var opplysningRepository = QuizOpplysningRepositoryPostgres(dataSource)
     private val beskrivendeId = "beskrivendeId"
     private val ident = "12345678901"
