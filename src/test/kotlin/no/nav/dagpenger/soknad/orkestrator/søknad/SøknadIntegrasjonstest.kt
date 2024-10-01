@@ -26,7 +26,6 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
-import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
@@ -41,7 +40,6 @@ import kotlin.test.Test
 
 class SøknadTest {
     val søknadEndepunkt = "/soknad"
-    val inMemorySøknadRepository = InMemorySøknadRepository()
 
     lateinit var søknadRepository: SøknadRepository
     lateinit var opplysningRepository: OpplysningRepository
@@ -63,7 +61,6 @@ class SøknadTest {
             SøknadService(
                 rapid = TestRapid(),
                 søknadRepository = søknadRepository,
-                inMemorySøknadRepository = inMemorySøknadRepository,
                 opplysningRepository = opplysningRepository,
             )
     }

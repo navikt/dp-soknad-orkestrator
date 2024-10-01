@@ -14,13 +14,11 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Bostedsland
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.toSporsmalDTO
-import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.util.UUID
 
 class SøknadService(
     private val søknadRepository: SøknadRepository,
-    private val inMemorySøknadRepository: InMemorySøknadRepository = InMemorySøknadRepository(),
     private val opplysningRepository: OpplysningRepository,
 ) {
     private lateinit var rapidsConnection: RapidsConnection

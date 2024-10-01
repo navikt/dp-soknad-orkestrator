@@ -20,7 +20,6 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
 import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
-import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -32,11 +31,9 @@ class SøknadServiceTest {
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     private val opplysningRepository = mockk<OpplysningRepository>(relaxed = true)
     private val seksjon = mockk<Seksjon>(relaxed = true)
-    private val inMemorySøknadRepository = InMemorySøknadRepository()
     private var søknadService =
         SøknadService(
             søknadRepository = søknadRepository,
-            inMemorySøknadRepository = inMemorySøknadRepository,
             opplysningRepository = opplysningRepository,
         ).also { it.setRapidsConnection(testRapid) }
     private val ident = "12345678901"
