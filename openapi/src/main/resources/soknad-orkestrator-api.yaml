@@ -102,11 +102,11 @@ components:
     SporsmalType: # SpørsmålType
       type: string
       enum:
-        - LAND
-        - PERIODE
-        - DATO
-        - TEKST
-        - BOOLEAN
+        - land
+        - periode
+        - dato
+        - tekst
+        - boolean
     Sporsmalgruppe: # Spørsmålgruppe
       type: object
       properties:

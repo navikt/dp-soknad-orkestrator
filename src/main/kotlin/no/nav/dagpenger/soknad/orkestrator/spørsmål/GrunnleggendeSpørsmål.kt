@@ -18,7 +18,7 @@ fun GrunnleggendeSpørsmål.toSporsmalDTO(
     SporsmalDTO(
         id = spørsmålId,
         tekstnøkkel = tekstnøkkel,
-        type = SporsmalTypeDTO.valueOf(type.name),
+        type = SporsmalTypeDTO.valueOf(type.name.lowercase()),
         svar = svar,
         gyldigeSvar = gyldigeSvar,
     )
