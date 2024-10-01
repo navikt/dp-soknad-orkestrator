@@ -2,7 +2,9 @@ package no.nav.dagpenger.soknad.orkestrator.opplysning.db
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.date.shouldBeBefore
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
@@ -11,6 +13,8 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype.BOOLEAN
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -69,6 +73,26 @@ class OpplysningRepositoryTest {
     }
 
     @Test
+    fun `sistEndretAvBruker er null når en ny opplysning lagres`() {
+        val opplysningId = UUID.randomUUID()
+        val søknad = Søknad(UUID.randomUUID(), "1234567890")
+        val opplysning =
+            Opplysning(
+                opplysningId = opplysningId,
+                seksjonversjon = "SEKSJON_V1",
+                opplysningsbehovId = 1,
+                type = BOOLEAN,
+                svar = null,
+            )
+
+        søknadRepository.lagre(søknad)
+        opplysningRepository.opprettSeksjon(søknad.søknadId, opplysning.seksjonversjon)
+        opplysningRepository.lagre(søknad.søknadId, opplysning)
+
+        sistEndretAvBruker(opplysningId) shouldBe null
+    }
+
+    @Test
     fun `Lagring av opplysning feiler hvis seksjon ikke er lagret`() {
         val opplysningId = UUID.randomUUID()
         val søknad = Søknad(UUID.randomUUID(), "1234567890")
@@ -109,7 +133,6 @@ class OpplysningRepositoryTest {
         }.message shouldBe "Fant ikke søknad med id $søknadId"
     }
 
-    // TODO: Lag test for å sjekke at sistEndretAvBruker blir satt riktig
     @Test
     fun `lagreSvar legger til svar på eksisterende opplysning`() {
         val opplysningId = UUID.randomUUID()
@@ -133,6 +156,33 @@ class OpplysningRepositoryTest {
 
         val oppdatertOpplysning = opplysningRepository.hent(opplysningId)
         oppdatertOpplysning?.svar?.verdi shouldBe true
+    }
+
+    @Test
+    fun `lagreSvar oppdaterer sistEndretAvBruker i databasen`() {
+        val opplysningId = UUID.randomUUID()
+        val søknad = Søknad(UUID.randomUUID(), "1234567890")
+        val opplysning =
+            Opplysning(
+                opplysningId = opplysningId,
+                seksjonversjon = "SEKSJON_V1",
+                opplysningsbehovId = 1,
+                type = BOOLEAN,
+                svar = null,
+            )
+
+        søknadRepository.lagre(søknad)
+        opplysningRepository.opprettSeksjon(søknad.søknadId, opplysning.seksjonversjon)
+        opplysningRepository.lagre(søknad.søknadId, opplysning)
+        opplysningRepository.lagreSvar(BooleanSvar(opplysningId, true))
+        val sistEndretAvBruker = sistEndretAvBruker(opplysningId)
+
+        sistEndretAvBruker shouldNotBe null
+
+        opplysningRepository.lagreSvar(BooleanSvar(opplysningId, false))
+        val nySistEndretAvBruker = sistEndretAvBruker(opplysningId)
+
+        sistEndretAvBruker!! shouldBeBefore nySistEndretAvBruker!!
     }
 
     @Test
@@ -340,4 +390,10 @@ class OpplysningRepositoryTest {
             opplysningRepository.slett(søknad.søknadId, seksjonversjon, 1)
         }.message shouldBe "Fant ikke seksjon med versjon $seksjonversjon for søknad med id ${søknad.søknadId}, kan ikke slette opplysning"
     }
+
+    private fun sistEndretAvBruker(opplysningId: UUID?) =
+        transaction {
+            OpplysningTabell.selectAll()
+                .single { it[OpplysningTabell.opplysningId] == opplysningId }[OpplysningTabell.sistEndretAvBruker]
+        }
 }
