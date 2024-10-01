@@ -32,6 +32,8 @@ jobs:
         run: ./gradlew --configuration-cache build
       - name: Push docker image to GAR
         uses: nais/docker-build-push@v0
+        env:
+          TRIVY_JAVA_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-java-db:1"
         id: docker-build-push
         with:
           team: teamdagpenger
