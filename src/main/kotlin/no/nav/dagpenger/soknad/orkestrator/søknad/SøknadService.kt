@@ -46,12 +46,14 @@ class SøknadService(
         val søknad = Søknad(ident = ident)
         søknadRepository.lagre(søknad)
 
+        val seksjon = getSeksjon(Bostedsland.versjon)
+
         val opplysning =
             Opplysning(
                 opplysningId = UUID.randomUUID(),
-                seksjonversjon = Bostedsland.versjon,
-                opplysningsbehovId = Bostedsland.førsteOpplysningsbehov().id,
-                type = Bostedsland.førsteOpplysningsbehov().type,
+                seksjonversjon = seksjon.versjon,
+                opplysningsbehovId = seksjon.førsteOpplysningsbehov().id,
+                type = seksjon.førsteOpplysningsbehov().type,
                 svar = null,
             )
 
