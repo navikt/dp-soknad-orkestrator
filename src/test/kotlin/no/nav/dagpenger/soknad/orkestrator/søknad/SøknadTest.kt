@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import io.ktor.client.statement.bodyAsText
@@ -18,7 +19,6 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.InMemorySøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.autentisert
-import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
 import kotlin.test.Test
 

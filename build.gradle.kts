@@ -62,6 +62,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("de.slub-dresden:urnlib:2.0.1")
+    implementation("io.prometheus:prometheus-metrics-core:1.3.1")
 
     implementation("io.ktor:ktor-server-netty:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-server-config-yaml:${libs.versions.ktor.get()}")
@@ -73,6 +74,7 @@ dependencies {
     testImplementation(libs.bundles.postgres.test)
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.11.1")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
+    testImplementation(libs.rapids.and.rivers.test)
 }
 
 tasks.withType<ShadowJar> {

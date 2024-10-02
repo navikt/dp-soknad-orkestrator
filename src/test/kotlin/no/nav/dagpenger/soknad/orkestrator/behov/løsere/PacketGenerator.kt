@@ -1,8 +1,8 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
-import no.nav.helse.rapids_rivers.JsonMessage
 import java.util.UUID
 
 fun lagBehovmelding(

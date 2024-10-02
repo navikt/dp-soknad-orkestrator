@@ -1,10 +1,10 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.RapidsConnection
 import java.util.UUID
 
 abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysningRepository: QuizOpplysningRepository) {
@@ -28,7 +28,7 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
         behovmelding.innkommendePacket["@løsning"] = mapOf(behov to mapOf("verdi" to svarPåBehov))
         rapidsConnection.publish(behovmelding.ident, behovmelding.innkommendePacket.toJson())
 
-        BehovMetrikker.løst.labels(behov).inc()
+        BehovMetrikker.løst.labelValues(behov).inc()
         logger.info { "Løste behov $behov" }
         sikkerlogg.info { "Løste behov $behov med løsning: $svarPåBehov" }
     }

@@ -1,8 +1,8 @@
 package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
-import no.nav.helse.rapids_rivers.asLocalDate
 import java.util.UUID
 
 @Suppress("UNCHECKED_CAST")

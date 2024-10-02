@@ -1,14 +1,14 @@
 package no.nav.dagpenger.soknad.orkestrator.behov
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import com.github.navikt.tbd_libs.rapids_and_rivers.River
+import com.github.navikt.tbd_libs.rapids_and_rivers.withMDC
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
-import no.nav.helse.rapids_rivers.JsonMessage
-import no.nav.helse.rapids_rivers.MessageContext
-import no.nav.helse.rapids_rivers.RapidsConnection
-import no.nav.helse.rapids_rivers.River
-import no.nav.helse.rapids_rivers.withMDC
 
 class BehovMottak(
     val rapidsConnection: RapidsConnection,
@@ -48,7 +48,7 @@ class BehovMottak(
 
     private fun JsonMessage.løsBehov() {
         this.mottatteBehov().forEach { behov ->
-            BehovMetrikker.mottatt.labels(behov).inc()
+            BehovMetrikker.mottatt.labelValues(behov).inc()
             try {
                 behovsløserFor(BehovløserFactory.Behov.valueOf(behov)).løs(Behovmelding(this))
             } catch (e: IllegalArgumentException) {

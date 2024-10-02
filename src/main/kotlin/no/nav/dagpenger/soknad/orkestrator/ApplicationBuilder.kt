@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator
 
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
@@ -13,7 +14,6 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.søknadApi
 import no.nav.helse.rapids_rivers.RapidApplication
-import no.nav.helse.rapids_rivers.RapidsConnection
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.name
 
@@ -23,15 +23,13 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
     }
 
     private val rapidsConnection =
-        RapidApplication.Builder(RapidApplication.RapidApplicationConfig.fromEnv(configuration))
-            .withKtorModule {
+        RapidApplication.create(configuration) { engine, _ ->
+            with(engine.application) {
                 apiKonfigurasjon()
                 internalApi()
-                søknadApi(
-                    søknadService = søknadService(),
-                )
+                søknadApi(søknadService = søknadService())
             }
-            .build()
+        }
 
     private val quizOpplysningRepositoryPostgres = QuizOpplysningRepositoryPostgres(dataSource)
     private val søknadRepository =

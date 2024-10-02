@@ -1,9 +1,9 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

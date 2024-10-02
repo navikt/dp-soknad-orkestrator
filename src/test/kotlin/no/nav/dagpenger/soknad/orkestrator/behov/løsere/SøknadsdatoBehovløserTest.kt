@@ -1,13 +1,13 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
-import no.nav.helse.rapids_rivers.asLocalDate
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.Test

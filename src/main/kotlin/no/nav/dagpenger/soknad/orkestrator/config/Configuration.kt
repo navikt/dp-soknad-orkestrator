@@ -12,7 +12,7 @@ internal object Configuration {
                 "RAPID_APP_NAME" to "dp-soknad-orkestrator",
                 "KAFKA_CONSUMER_GROUP_ID" to "dp-soknad-orkestrator-v1",
                 "KAFKA_RAPID_TOPIC" to "teamdagpenger.rapid.v1",
-                "KAFKA_RESET_POLICY" to "latest",
+                "KAFKA_RESET_POLICY" to "LATEST",
                 "KAFKA_BOOTSTRAP_SERVERS" to "127.0.0.1:9092",
             ),
         )
