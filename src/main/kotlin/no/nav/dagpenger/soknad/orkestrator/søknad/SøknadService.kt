@@ -44,18 +44,18 @@ class SøknadService(
         val søknad = Søknad(ident = ident)
         søknadRepository.lagre(søknad)
 
-        val seksjon = getSeksjon(Bostedsland.versjon)
+        val seksjon = getSeksjon(Bostedsland.navn)
 
         val opplysning =
             Opplysning(
                 opplysningId = UUID.randomUUID(),
-                seksjonversjon = seksjon.versjon,
+                seksjonsnavn = seksjon.navn,
                 opplysningsbehovId = seksjon.førsteOpplysningsbehov().id,
                 type = seksjon.førsteOpplysningsbehov().type,
                 svar = null,
             )
 
-        opplysningRepository.opprettSeksjon(søknadId = søknad.søknadId, versjon = opplysning.seksjonversjon)
+        opplysningRepository.opprettSeksjon(søknadId = søknad.søknadId, seksjon = seksjon)
 
         opplysningRepository.lagre(
             søknadId = søknad.søknadId,
@@ -77,8 +77,8 @@ class SøknadService(
                 ?: throw IllegalArgumentException("Fant ikke opplysning med id: ${svar.opplysningId}, kan ikke håndtere svar")
 
         val opplysningsbehovId = opplysning.opplysningsbehovId
-        val seksjonversjon = opplysning.seksjonversjon
-        val seksjon = getSeksjon(seksjonversjon)
+        val seksjonsnavn = opplysning.seksjonsnavn
+        val seksjon = getSeksjon(seksjonsnavn)
 
         try {
             seksjon.validerSvar(opplysningsbehovId, svar)
@@ -106,14 +106,14 @@ class SøknadService(
         seksjon.nesteOpplysningsbehov(svar, opplysningsbehovId)?.let { nesteOpplysning ->
             val erLagretIDB =
                 opplysningRepository
-                    .hentAlleForSeksjon(søknadId, seksjon.versjon)
+                    .hentAlleForSeksjon(søknadId, seksjon.navn)
                     .find { it.opplysningsbehovId == nesteOpplysning.id } != null
 
             if (!erLagretIDB) {
                 val nyOpplysning =
                     Opplysning(
                         opplysningId = UUID.randomUUID(),
-                        seksjonversjon = seksjon.versjon,
+                        seksjonsnavn = seksjon.navn,
                         opplysningsbehovId = nesteOpplysning.id,
                         type = nesteOpplysning.type,
                         svar = null,
@@ -151,7 +151,7 @@ class SøknadService(
         avhengigheter.forEach {
             opplysningRepository.slett(
                 søknadId = søknadId,
-                seksjonversjon = seksjon.versjon,
+                seksjonsnavn = seksjon.navn,
                 opplysningsbehovId = it,
             )
         }
@@ -168,7 +168,7 @@ class SøknadService(
             } else {
                 alleOpplysninger.filter { it.svar != null && it.opplysningsbehovId < nesteUbesvarteOpplysning.opplysningsbehovId }
             }
-        val seksjon = getSeksjon(Bostedsland.versjon) // TODO: Teit med default
+        val seksjon = getSeksjon(Bostedsland.navn) // TODO: Teit med default
 
         val nesteUbesvarteOpplysningDTO =
             nesteUbesvarteOpplysning?.let {

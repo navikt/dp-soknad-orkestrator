@@ -5,13 +5,16 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.date.shouldBeAfter
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import no.nav.dagpenger.soknad.orkestrator.opplysning.BooleanSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype.BOOLEAN
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import org.jetbrains.exposed.sql.selectAll
@@ -23,6 +26,7 @@ import kotlin.test.Test
 class OpplysningRepositoryTest {
     private lateinit var søknadRepository: SøknadRepository
     private lateinit var opplysningRepository: OpplysningRepository
+    val seksjon = mockk<Seksjon>(relaxed = true)
 
     @BeforeTest
     fun setup() {
@@ -34,15 +38,17 @@ class OpplysningRepositoryTest {
                 )
             opplysningRepository = OpplysningRepository(dataSource)
         }
+
+        every { seksjon.navn } returns Seksjonsnavn.BOSTEDSLAND
+        every { seksjon.versjon } returns "TESTSEKSJON_V1"
     }
 
     @Test
     fun `Lagring av seksjon feiler hvis søknad ikke er lagret`() {
         val søknad = Søknad(UUID.randomUUID(), "1234567890")
-        val seksjonversjon = "SEKSJON_V1"
 
         shouldThrow<IllegalStateException> {
-            opplysningRepository.opprettSeksjon(søknad.søknadId, seksjonversjon)
+            opplysningRepository.opprettSeksjon(søknad.søknadId, seksjon)
         }.message shouldBe "Fant ikke søknad med id ${søknad.søknadId}"
     }
 
@@ -52,12 +58,12 @@ class OpplysningRepositoryTest {
         val opplysning = lagOpplysning()
 
         søknadRepository.lagre(søknad)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, opplysning.seksjonversjon)
+        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjon)
         opplysningRepository.lagre(søknad.søknadId, opplysning)
         val hentetOpplysning = opplysningRepository.hent(opplysning.opplysningId)
 
         hentetOpplysning?.opplysningId shouldBe opplysning.opplysningId
-        hentetOpplysning?.seksjonversjon shouldBe opplysning.seksjonversjon
+        hentetOpplysning?.seksjonsnavn shouldBe opplysning.seksjonsnavn
         hentetOpplysning?.opplysningsbehovId shouldBe opplysning.opplysningsbehovId
         hentetOpplysning?.type shouldBe opplysning.type
         hentetOpplysning?.svar?.verdi shouldBe opplysning.svar?.verdi
@@ -69,7 +75,7 @@ class OpplysningRepositoryTest {
         val opplysning = lagOpplysning()
 
         søknadRepository.lagre(søknad)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, opplysning.seksjonversjon)
+        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjon)
         opplysningRepository.lagre(søknad.søknadId, opplysning)
 
         sistEndretAvBruker(opplysning.opplysningId) shouldBe null
@@ -103,7 +109,7 @@ class OpplysningRepositoryTest {
         val opplysning = lagOpplysning()
 
         søknadRepository.lagre(søknad)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, opplysning.seksjonversjon)
+        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjon)
         opplysningRepository.lagre(søknad.søknadId, opplysning)
         val hentetOpplysning = opplysningRepository.hent(opplysning.opplysningId)
 
@@ -121,7 +127,7 @@ class OpplysningRepositoryTest {
         val opplysning = lagOpplysning()
 
         søknadRepository.lagre(søknad)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, opplysning.seksjonversjon)
+        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjon)
         opplysningRepository.lagre(søknad.søknadId, opplysning)
         opplysningRepository.lagreSvar(BooleanSvar(opplysning.opplysningId, true))
         val opprinneligSistEndretAvBruker = sistEndretAvBruker(opplysning.opplysningId)
@@ -146,12 +152,11 @@ class OpplysningRepositoryTest {
     @Test
     fun `hentAlle returnerer alle opplysninger for en gitt søknadId`() {
         val søknad = Søknad(UUID.randomUUID(), "1234567890")
-        val opplysning1 = lagOpplysning(seksjonversjon = "SEKSJON_V1")
-        val opplysning2 = lagOpplysning(seksjonversjon = "SEKSJON_V2")
+        val opplysning1 = lagOpplysning()
+        val opplysning2 = lagOpplysning()
 
         søknadRepository.lagre(søknad)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, opplysning1.seksjonversjon)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, opplysning2.seksjonversjon)
+        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjon)
         opplysningRepository.lagre(søknad.søknadId, opplysning1)
         opplysningRepository.lagre(søknad.søknadId, opplysning2)
 
@@ -183,33 +188,27 @@ class OpplysningRepositoryTest {
     @Test
     fun `hentAlleForSeksjon returnerer alle opplysninger for gitt seksjonversjon`() {
         val søknad = Søknad(UUID.randomUUID(), "1234567890")
-        val opplysning1 = lagOpplysning(seksjonversjon = "SEKSJON_V1")
-        val opplysning2 = lagOpplysning(seksjonversjon = "ANNEN_SEKSJON_V1")
+        val opplysning1 = lagOpplysning()
+        val opplysning2 = lagOpplysning()
 
         søknadRepository.lagre(søknad)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, opplysning1.seksjonversjon)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, opplysning2.seksjonversjon)
+        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjon)
         opplysningRepository.lagre(søknad.søknadId, opplysning1)
         opplysningRepository.lagre(søknad.søknadId, opplysning2)
 
-        val opplysninger = opplysningRepository.hentAlleForSeksjon(søknad.søknadId, opplysning1.seksjonversjon)
+        val opplysninger = opplysningRepository.hentAlleForSeksjon(søknad.søknadId, seksjon.navn)
 
-        opplysninger.size shouldBe 1
-        opplysninger[0].opplysningId shouldBe opplysning1.opplysningId
+        opplysninger.size shouldBe 2
     }
 
     @Test
     fun `hentAlleForSeksjon returnerer tom liste hvis ingen opplysninger finnes for gitt seksjonversjon`() {
         val søknad = Søknad(UUID.randomUUID(), "1234567890")
-        val seksjonversjon = "SEKSJON_V1"
-        val opplysning = lagOpplysning(seksjonversjon = "ANNEN_SEKSJON_V1")
 
         søknadRepository.lagre(søknad)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjonversjon)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, opplysning.seksjonversjon)
-        opplysningRepository.lagre(søknad.søknadId, opplysning)
+        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjon)
 
-        val opplysninger = opplysningRepository.hentAlleForSeksjon(søknad.søknadId, seksjonversjon)
+        val opplysninger = opplysningRepository.hentAlleForSeksjon(søknad.søknadId, seksjon.navn)
 
         opplysninger shouldBe emptyList()
     }
@@ -217,38 +216,35 @@ class OpplysningRepositoryTest {
     @Test
     fun `hentAlleForSeksjon kaster feil hvis søknad ikke finnes`() {
         val søknadId = UUID.randomUUID()
-        val seksjonversjon = "SEKSJON_V1"
 
         shouldThrow<IllegalStateException> {
-            opplysningRepository.hentAlleForSeksjon(søknadId, seksjonversjon)
+            opplysningRepository.hentAlleForSeksjon(søknadId, seksjon.navn)
         }.message shouldBe "Fant ikke søknad med id $søknadId, kan ikke hente opplysninger"
     }
 
     @Test
     fun `hentAlleForSeksjon kaster feil hvis seksjon ikke finnes`() {
         val søknad = Søknad(UUID.randomUUID(), "1234567890")
-        val seksjonversjon = "SEKSJON_V1"
 
         søknadRepository.lagre(søknad)
 
         shouldThrow<IllegalStateException> {
-            opplysningRepository.hentAlleForSeksjon(søknad.søknadId, seksjonversjon)
-        }.message shouldBe "Fant ikke seksjon med versjon $seksjonversjon for søknad med id ${søknad.søknadId}, kan ikke hente opplysninger"
+            opplysningRepository.hentAlleForSeksjon(søknad.søknadId, seksjon.navn)
+        }.message shouldBe "Fant ikke seksjon med navn ${seksjon.navn} for søknad med id ${søknad.søknadId}, kan ikke hente opplysninger"
     }
 
     @Test
-    fun `kan slette opplysning basert på søknadId, seksjonversjon og opplysningsbehovId`() {
+    fun `kan slette opplysning basert på søknadId, seksjonsnavn og opplysningsbehovId`() {
         val søknad = Søknad(UUID.randomUUID(), "1234567890")
-        val seksjonversjon = "SEKSJON_V1"
-        val opplysning = lagOpplysning(seksjonversjon = seksjonversjon, opplysningbehovId = 1)
-        val opplysning2 = lagOpplysning(seksjonversjon = seksjonversjon, opplysningbehovId = 2)
+        val opplysning = lagOpplysning(opplysningbehovId = 1)
+        val opplysning2 = lagOpplysning(opplysningbehovId = 2)
 
         søknadRepository.lagre(søknad)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjonversjon)
+        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjon)
         opplysningRepository.lagre(søknad.søknadId, opplysning)
         opplysningRepository.lagre(søknad.søknadId, opplysning2)
 
-        opplysningRepository.slett(søknad.søknadId, seksjonversjon, opplysning.opplysningsbehovId)
+        opplysningRepository.slett(søknad.søknadId, seksjon.navn, opplysning.opplysningsbehovId)
 
         val opplysninger = opplysningRepository.hentAlle(søknad.søknadId)
         opplysninger.size shouldBe 1
@@ -258,53 +254,51 @@ class OpplysningRepositoryTest {
     @Test
     fun `slett gjør ingenting hvis opplysning ikke finnes`() {
         val søknad = Søknad(UUID.randomUUID(), "1234567890")
-        val seksjonversjon = "SEKSJON_V1"
 
         søknadRepository.lagre(søknad)
-        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjonversjon)
+        opplysningRepository.opprettSeksjon(søknad.søknadId, seksjon)
 
         shouldNotThrowAny {
-            opplysningRepository.slett(søknad.søknadId, seksjonversjon, 999)
+            opplysningRepository.slett(søknad.søknadId, seksjon.navn, 999)
         }
     }
 
     @Test
     fun `slett kaster exception hvis søknad ikke finnes`() {
         val søknadId = UUID.randomUUID()
-        val seksjonversjon = "SEKSJON_V1"
 
         shouldThrow<IllegalStateException> {
-            opplysningRepository.slett(søknadId, seksjonversjon, 1)
+            opplysningRepository.slett(søknadId, seksjon.navn, 1)
         }.message shouldBe "Fant ikke søknad med id $søknadId, kan ikke slette opplysning"
     }
 
     @Test
     fun `slett kaster exception hvis seksjon ikke finnes`() {
         val søknad = Søknad(UUID.randomUUID(), "1234567890")
-        val seksjonversjon = "SEKSJON_V1"
 
         søknadRepository.lagre(søknad)
 
         shouldThrow<IllegalStateException> {
-            opplysningRepository.slett(søknad.søknadId, seksjonversjon, 1)
-        }.message shouldBe "Fant ikke seksjon med versjon $seksjonversjon for søknad med id ${søknad.søknadId}, kan ikke slette opplysning"
+            opplysningRepository.slett(søknad.søknadId, seksjon.navn, 1)
+        }.message shouldBe "Fant ikke seksjon med navn ${seksjon.navn} for søknad med id ${søknad.søknadId}, kan ikke slette opplysning"
     }
 
     private fun lagOpplysning(
-        seksjonversjon: String = "SEKSJON_V1",
+        seksjonsnavn: Seksjonsnavn = seksjon.navn,
         opplysningbehovId: Int = 1,
         svar: Svar<*>? = null,
     ) = Opplysning(
         opplysningId = UUID.randomUUID(),
-        seksjonversjon = seksjonversjon,
+        seksjonsnavn = seksjonsnavn,
         opplysningsbehovId = opplysningbehovId,
-        type = svar?.type ?: BOOLEAN,
+        type = svar?.type ?: Opplysningstype.BOOLEAN,
         svar = svar,
     )
 
     private fun sistEndretAvBruker(opplysningId: UUID?) =
         transaction {
-            OpplysningTabell.selectAll()
+            OpplysningTabell
+                .selectAll()
                 .single { it[OpplysningTabell.opplysningId] == opplysningId }[OpplysningTabell.sistEndretAvBruker]
         }
 }

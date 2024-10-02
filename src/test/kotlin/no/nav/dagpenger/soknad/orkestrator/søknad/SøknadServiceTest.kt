@@ -23,8 +23,8 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 import java.util.UUID
+import kotlin.test.Test
 
 class SøknadServiceTest {
     private val testRapid = TestRapid()
@@ -203,7 +203,7 @@ class SøknadServiceTest {
             listOf(
                 Opplysning(
                     opplysningId = UUID.randomUUID(),
-                    seksjonversjon = "1",
+                    seksjonsnavn = seksjon.navn,
                     opplysningsbehovId = 2,
                     type = Opplysningstype.BOOLEAN,
                     svar = BooleanSvar(opplysningId = opplysningId, verdi = true),
@@ -229,21 +229,21 @@ class SøknadServiceTest {
             listOf(
                 Opplysning(
                     opplysningId = opplysningId1,
-                    seksjonversjon = "1",
+                    seksjonsnavn = seksjon.navn,
                     opplysningsbehovId = 1,
                     type = Opplysningstype.BOOLEAN,
                     svar = BooleanSvar(opplysningId = opplysningId1, verdi = true),
                 ),
                 Opplysning(
                     opplysningId = UUID.randomUUID(),
-                    seksjonversjon = "1",
+                    seksjonsnavn = seksjon.navn,
                     opplysningsbehovId = 2,
                     type = Opplysningstype.BOOLEAN,
                     svar = null,
                 ),
                 Opplysning(
                     opplysningId = opplysningId3,
-                    seksjonversjon = "1",
+                    seksjonsnavn = seksjon.navn,
                     opplysningsbehovId = 3,
                     type = Opplysningstype.BOOLEAN,
                     svar = BooleanSvar(opplysningId = UUID.randomUUID(), verdi = true),
@@ -282,7 +282,7 @@ class SøknadServiceTest {
             listOf(
                 Opplysning(
                     opplysningId = UUID.randomUUID(),
-                    seksjonversjon = "1",
+                    seksjonsnavn = seksjon.navn,
                     opplysningsbehovId = 1,
                     type = Opplysningstype.BOOLEAN,
                     svar = BooleanSvar(opplysningId = UUID.randomUUID(), verdi = true),
@@ -310,7 +310,7 @@ class SøknadServiceTest {
             listOf(
                 Opplysning(
                     opplysningId = UUID.randomUUID(),
-                    seksjonversjon = "1",
+                    seksjonsnavn = seksjon.navn,
                     opplysningsbehovId = 1,
                     type = Opplysningstype.BOOLEAN,
                     svar = null,

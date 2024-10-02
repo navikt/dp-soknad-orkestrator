@@ -5,6 +5,8 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.getId
 import org.jetbrains.exposed.dao.id.IntIdTable
@@ -31,11 +33,12 @@ class OpplysningRepository(
 
     fun opprettSeksjon(
         søknadId: UUID,
-        versjon: String,
+        seksjon: Seksjon,
     ) {
         transaction {
             SeksjonTabell.insert {
-                it[this.versjon] = versjon
+                it[this.navn] = seksjon.navn.name
+                it[this.versjon] = seksjon.versjon
                 it[this.søknadId] = SøknadTabell.getId(søknadId)
                     ?: error("Fant ikke søknad med id $søknadId")
             }
@@ -52,7 +55,7 @@ class OpplysningRepository(
                     ?: error("Fant ikke søknad med id $søknadId")
 
             val seksjonDBId =
-                SeksjonTabell.getId(søknadDBId, opplysning.seksjonversjon)
+                SeksjonTabell.getId(søknadDBId, opplysning.seksjonsnavn)
                     ?: error("Fant ikke seksjon med søknadId $søknadId")
 
             OpplysningTabell.insert {
@@ -74,7 +77,7 @@ class OpplysningRepository(
                 .map {
                     Opplysning(
                         opplysningId = it[OpplysningTabell.opplysningId],
-                        seksjonversjon = it[SeksjonTabell.versjon],
+                        seksjonsnavn = Seksjonsnavn.valueOf(it[SeksjonTabell.navn]),
                         opplysningsbehovId = it[OpplysningTabell.opplysningsbehovId],
                         type = Opplysningstype.valueOf(it[OpplysningTabell.type]),
                         svar = it[OpplysningTabell.svar],
@@ -106,7 +109,7 @@ class OpplysningRepository(
                 .map {
                     Opplysning(
                         opplysningId = it[OpplysningTabell.opplysningId],
-                        seksjonversjon = it[SeksjonTabell.versjon],
+                        seksjonsnavn = Seksjonsnavn.valueOf(it[SeksjonTabell.navn]),
                         opplysningsbehovId = it[OpplysningTabell.opplysningsbehovId],
                         type = Opplysningstype.valueOf(it[OpplysningTabell.type]),
                         svar = it[OpplysningTabell.svar],
@@ -116,14 +119,14 @@ class OpplysningRepository(
 
     fun hentAlleForSeksjon(
         søknadId: UUID,
-        seksjonversjon: String,
+        seksjonsnavn: Seksjonsnavn,
     ): List<Opplysning> =
         transaction {
             val søknadDBId = SøknadTabell.getId(søknadId) ?: error("Fant ikke søknad med id $søknadId, kan ikke hente opplysninger")
 
             val seksjonDBId =
-                SeksjonTabell.getId(søknadDBId, seksjonversjon)
-                    ?: error("Fant ikke seksjon med versjon $seksjonversjon for søknad med id $søknadId, kan ikke hente opplysninger")
+                SeksjonTabell.getId(søknadDBId, seksjonsnavn)
+                    ?: error("Fant ikke seksjon med navn $seksjonsnavn for søknad med id $søknadId, kan ikke hente opplysninger")
 
             OpplysningTabell
                 .selectAll()
@@ -131,7 +134,7 @@ class OpplysningRepository(
                 .map {
                     Opplysning(
                         opplysningId = it[OpplysningTabell.opplysningId],
-                        seksjonversjon = seksjonversjon,
+                        seksjonsnavn = seksjonsnavn,
                         opplysningsbehovId = it[OpplysningTabell.opplysningsbehovId],
                         type = Opplysningstype.valueOf(it[OpplysningTabell.type]),
                         svar = it[OpplysningTabell.svar],
@@ -141,14 +144,14 @@ class OpplysningRepository(
 
     fun slett(
         søknadId: UUID,
-        seksjonversjon: String,
+        seksjonsnavn: Seksjonsnavn,
         opplysningsbehovId: Int,
     ) {
         transaction {
             val søknadDBId = SøknadTabell.getId(søknadId) ?: error("Fant ikke søknad med id $søknadId, kan ikke slette opplysning")
             val seksjonDBId =
-                SeksjonTabell.getId(søknadDBId, seksjonversjon)
-                    ?: error("Fant ikke seksjon med versjon $seksjonversjon for søknad med id $søknadId, kan ikke slette opplysning")
+                SeksjonTabell.getId(søknadDBId, seksjonsnavn)
+                    ?: error("Fant ikke seksjon med navn $seksjonsnavn for søknad med id $søknadId, kan ikke slette opplysning")
 
             OpplysningTabell.deleteWhere {
                 seksjonId eq seksjonDBId and
@@ -173,6 +176,7 @@ fun serializeSvar(svar: Svar<*>): String = objectMapper.writeValueAsString(svar)
 fun deserializeSvar(svar: String): Svar<*> = objectMapper.readValue(svar)
 
 object SeksjonTabell : IntIdTable("seksjon") {
+    val navn: Column<String> = text("navn")
     val versjon: Column<String> = text("versjon")
     val erFullført: Column<Boolean> = bool("er_fullfort").default(false)
     val søknadId: Column<Int> = integer("soknad_id").references(SøknadTabell.id)
@@ -180,11 +184,11 @@ object SeksjonTabell : IntIdTable("seksjon") {
 
 fun SeksjonTabell.getId(
     søknadDBId: Int,
-    seksjonversjon: String,
+    seksjonsnavn: Seksjonsnavn,
 ): Int? =
     SeksjonTabell
         .selectAll()
-        .where { (søknadId eq søknadDBId) and (versjon eq seksjonversjon) }
+        .where { (søknadId eq søknadDBId) and (navn eq seksjonsnavn.name) }
         .singleOrNull()
         ?.get(SeksjonTabell.id)
         ?.value

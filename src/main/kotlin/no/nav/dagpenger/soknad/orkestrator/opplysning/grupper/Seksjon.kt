@@ -24,10 +24,10 @@ abstract class Seksjon {
     )
 }
 
-fun getSeksjon(versjon: String): Seksjon {
-    when (versjon) {
-        "BOSTEDSLAND_V1" -> return Bostedsland
-        else -> throw IllegalArgumentException("Ukjent gruppe med navn: $versjon")
+fun getSeksjon(navn: Seksjonsnavn): Seksjon {
+    when (navn) {
+        Seksjonsnavn.BOSTEDSLAND -> return Bostedsland
+        else -> throw IllegalArgumentException("Ukjent seksjon med navn: $navn")
     }
 }
 

@@ -38,7 +38,7 @@ import java.util.UUID
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
-class SøknadTest {
+class SøknadIntegrasjonstest {
     val søknadEndepunkt = "/soknad"
 
     lateinit var søknadRepository: SøknadRepository
@@ -77,7 +77,7 @@ class SøknadTest {
                 val søknadId = objectMapper.readValue(respons.bodyAsText(), UUID::class.java)
                 søknadRepository.hent(søknadId)?.søknadId shouldBe søknadId
                 opplysningRepository.hentAlle(søknadId).first().also { opplysning ->
-                    opplysning.seksjonversjon shouldBe TestSeksjon.versjon
+                    opplysning.seksjonsnavn shouldBe TestSeksjon.navn
                     opplysning.opplysningsbehovId shouldBe TestSeksjon.førsteOpplysningsbehov().id
                 }
             }
@@ -141,6 +141,7 @@ class SøknadTest {
             val seksjonDBId =
                 SeksjonTabell
                     .insertAndGetId {
+                        it[navn] = TestSeksjon.navn.name
                         it[versjon] = TestSeksjon.versjon
                         it[søknadId] = søknadDBId
                     }.value
