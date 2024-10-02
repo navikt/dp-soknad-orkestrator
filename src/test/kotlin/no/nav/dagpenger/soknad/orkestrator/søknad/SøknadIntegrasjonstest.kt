@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.equality.shouldBeEqualToComparingFields
 import io.kotest.matchers.shouldBe
 import io.ktor.client.statement.bodyAsText
@@ -30,7 +31,6 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.autentisert
-import no.nav.helse.rapids_rivers.testsupport.TestRapid
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -59,10 +59,11 @@ class SøknadTest {
 
         søknadService =
             SøknadService(
-                rapid = TestRapid(),
                 søknadRepository = søknadRepository,
                 opplysningRepository = opplysningRepository,
-            )
+            ).also {
+                it.setRapidsConnection(TestRapid())
+            }
     }
 
     @Test
@@ -131,16 +132,18 @@ class SøknadTest {
     private fun lagreSøknadSeksjonOpplysning(søknad: Søknad) {
         transaction {
             val søknadDBId =
-                SøknadTabell.insertAndGetId {
-                    it[søknadId] = søknad.søknadId
-                    it[ident] = søknad.ident
-                }.value
+                SøknadTabell
+                    .insertAndGetId {
+                        it[søknadId] = søknad.søknadId
+                        it[ident] = søknad.ident
+                    }.value
 
             val seksjonDBId =
-                SeksjonTabell.insertAndGetId {
-                    it[versjon] = TestSeksjon.versjon
-                    it[søknadId] = søknadDBId
-                }.value
+                SeksjonTabell
+                    .insertAndGetId {
+                        it[versjon] = TestSeksjon.versjon
+                        it[søknadId] = søknadDBId
+                    }.value
 
             OpplysningTabell.insert {
                 it[opplysningId] = UUID.randomUUID()
@@ -177,32 +180,29 @@ object TestSeksjon : Seksjon() {
     override fun nesteOpplysningsbehov(
         svar: Svar<*>,
         opplysningsbehovId: Int,
-    ): Opplysningsbehov? {
-        return when (opplysningsbehovId) {
+    ): Opplysningsbehov? =
+        when (opplysningsbehovId) {
             opplysningsbehov1.id -> if (svar.verdi == true) opplysningsbehov2 else opplysningsbehov3
             opplysningsbehov2.id -> opplysningsbehov3
             opplysningsbehov3.id -> opplysningsbehov4
             opplysningsbehov4.id -> null
             else -> null
         }
-    }
 
-    override fun getOpplysningsbehov(opplysningsbehovId: Int): Opplysningsbehov {
-        return when (opplysningsbehovId) {
+    override fun getOpplysningsbehov(opplysningsbehovId: Int): Opplysningsbehov =
+        when (opplysningsbehovId) {
             opplysningsbehov1.id -> opplysningsbehov1
             opplysningsbehov2.id -> opplysningsbehov2
             opplysningsbehov3.id -> opplysningsbehov3
             opplysningsbehov4.id -> opplysningsbehov4
             else -> throw IllegalArgumentException("Ukjent spørsmål med id: $opplysningsbehovId")
         }
-    }
 
-    override fun avhengigheter(opplysningsbehovId: Int): List<Int> {
-        return when (opplysningsbehovId) {
+    override fun avhengigheter(opplysningsbehovId: Int): List<Int> =
+        when (opplysningsbehovId) {
             opplysningsbehov1.id -> listOf(opplysningsbehov2.id)
             else -> emptyList()
         }
-    }
 
     override fun validerSvar(
         opplysningsbehovId: Int,

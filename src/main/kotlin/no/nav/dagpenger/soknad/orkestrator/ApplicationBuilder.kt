@@ -18,7 +18,9 @@ import no.nav.helse.rapids_rivers.RapidApplication
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.name
 
-internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsConnection.StatusListener {
+internal class ApplicationBuilder(
+    configuration: Map<String, String>,
+) : RapidsConnection.StatusListener {
     private companion object {
         private val logger = KotlinLogging.logger {}
     }
@@ -31,22 +33,27 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
         )
     private val opplysningRepository = OpplysningRepository(dataSource)
 
-    private val søknadService: SøknadService = SøknadService(søknadRepository = søknadRepository, opplysningRepository = opplysningRepository)
+    private val søknadService: SøknadService =
+        SøknadService(
+            søknadRepository = søknadRepository,
+            opplysningRepository = opplysningRepository,
+        )
 
     private val rapidsConnection =
-        RapidApplication.create(configuration) { engine, _ ->
-            engine.application.apiKonfigurasjon()
-            engine.application.internalApi()
-            engine.application.søknadApi(søknadService = søknadService)
-        }.also { rapidsConnection ->
-            søknadService.setRapidsConnection(rapidsConnection)
-            SøknadMottak(rapidsConnection, søknadService, søknadRepository)
-            BehovMottak(
-                rapidsConnection = rapidsConnection,
-                behovløserFactory = BehovløserFactory(rapidsConnection, QuizOpplysningRepositoryPostgres(dataSource)),
-                søknadService = søknadService,
-            )
-        }
+        RapidApplication
+            .create(configuration) { engine, _ ->
+                engine.application.apiKonfigurasjon()
+                engine.application.internalApi()
+                engine.application.søknadApi(søknadService = søknadService)
+            }.also { rapidsConnection ->
+                søknadService.setRapidsConnection(rapidsConnection)
+                SøknadMottak(rapidsConnection, søknadService, søknadRepository)
+                BehovMottak(
+                    rapidsConnection = rapidsConnection,
+                    behovløserFactory = BehovløserFactory(rapidsConnection, QuizOpplysningRepositoryPostgres(dataSource)),
+                    søknadService = søknadService,
+                )
+            }
 
     init {
         rapidsConnection.register(this)
@@ -58,7 +65,8 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
 
     override fun onStartup(rapidsConnection: RapidsConnection) {
         logger.info { "Starter dp-soknad-orkestrator" }
-        Database.connect(datasource = dataSource)
+        Database
+            .connect(datasource = dataSource)
             .also {
                 logger.info { "Koblet til database ${it.name}}" }
                 runMigration()
