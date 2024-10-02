@@ -30,10 +30,9 @@ class SøknadTest {
     val inMemorySøknadRepository = InMemorySøknadRepository()
     val søknadService =
         SøknadService(
-            rapid = rapid,
             søknadRepository = søknadRepository,
             inMemorySøknadRepository = inMemorySøknadRepository,
-        )
+        ).also { it.setRapidsConnection(rapid) }
 
     @Test
     fun `Det er mulig å starte søknad og få neste spørsmål til det er tomt`() {

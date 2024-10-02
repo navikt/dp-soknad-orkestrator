@@ -11,10 +11,9 @@ class SøknadMottakTest {
     private val testRapid = TestRapid()
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     private val søknadService =
-        SøknadService(
-            rapid = testRapid,
-            søknadRepository = søknadRepository,
-        )
+        SøknadService(søknadRepository = søknadRepository).also {
+            it.setRapidsConnection(testRapid)
+        }
 
     init {
         SøknadMottak(

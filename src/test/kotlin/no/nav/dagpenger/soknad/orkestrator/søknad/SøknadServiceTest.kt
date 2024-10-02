@@ -32,10 +32,9 @@ class SøknadServiceTest {
     private val inMemorySøknadRepository = InMemorySøknadRepository()
     private var søknadService =
         SøknadService(
-            rapid = testRapid,
             søknadRepository = søknadRepository,
             inMemorySøknadRepository = inMemorySøknadRepository,
-        )
+        ).also { it.setRapidsConnection(testRapid) }
     private val ident = "12345678901"
     private val spørsmålgruppePath = "no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper.SpørsmålgruppeKt"
 

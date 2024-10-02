@@ -19,17 +19,22 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.util.UUID
 
 class SøknadService(
-    private val rapid: RapidsConnection,
     private val søknadRepository: SøknadRepository,
     private val inMemorySøknadRepository: InMemorySøknadRepository = InMemorySøknadRepository(),
 ) {
+    private lateinit var rapidsConnection: RapidsConnection
+
+    fun setRapidsConnection(rapidsConnection: RapidsConnection) {
+        this.rapidsConnection = rapidsConnection
+    }
+
     fun søknadFinnes(søknadId: UUID) = søknadRepository.hent(søknadId) != null
 
     fun publiserMeldingOmSøknadInnsendt(
         søknadId: UUID,
         ident: String,
     ) {
-        rapid.publish(ident, MeldingOmSøknadInnsendt(søknadId, ident).asMessage().toJson())
+        rapidsConnection.publish(ident, MeldingOmSøknadInnsendt(søknadId, ident).asMessage().toJson())
         SøknadMetrikker.varslet.inc()
 
         logger.info { "Publiserte melding om ny søknad med søknadId: $søknadId" }

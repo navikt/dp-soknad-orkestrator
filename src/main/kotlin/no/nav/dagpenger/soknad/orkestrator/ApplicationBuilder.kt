@@ -22,15 +22,6 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
         private val logger = KotlinLogging.logger {}
     }
 
-    private val rapidsConnection =
-        RapidApplication.create(configuration) { engine, _ ->
-            with(engine.application) {
-                apiKonfigurasjon()
-                internalApi()
-                søknadApi(søknadService = søknadService())
-            }
-        }
-
     private val quizOpplysningRepositoryPostgres = QuizOpplysningRepositoryPostgres(dataSource)
     private val søknadRepository =
         SøknadRepository(
@@ -38,7 +29,22 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
             quizOpplysningRepository = quizOpplysningRepositoryPostgres,
         )
 
-    private val søknadService: SøknadService = SøknadService(rapid = rapidsConnection, søknadRepository = søknadRepository)
+    private val søknadService: SøknadService = SøknadService(søknadRepository = søknadRepository)
+
+    private val rapidsConnection =
+        RapidApplication.create(configuration) { engine, _ ->
+            engine.application.apiKonfigurasjon()
+            engine.application.internalApi()
+            engine.application.søknadApi(søknadService = søknadService)
+        }.also { rapidsConnection ->
+            søknadService.setRapidsConnection(rapidsConnection)
+            SøknadMottak(rapidsConnection, søknadService, søknadRepository)
+            BehovMottak(
+                rapidsConnection = rapidsConnection,
+                behovløserFactory = BehovløserFactory(rapidsConnection, QuizOpplysningRepositoryPostgres(dataSource)),
+                søknadService = søknadService,
+            )
+        }
 
     init {
         rapidsConnection.register(this)
@@ -55,18 +61,5 @@ internal class ApplicationBuilder(configuration: Map<String, String>) : RapidsCo
                 logger.info { "Koblet til database ${it.name}}" }
                 runMigration()
             }
-
-        SøknadMottak(
-            rapidsConnection,
-            søknadService(),
-            søknadRepository,
-        )
-        BehovMottak(
-            rapidsConnection = rapidsConnection,
-            behovløserFactory = BehovløserFactory(rapidsConnection, QuizOpplysningRepositoryPostgres(dataSource)),
-            søknadService = søknadService(),
-        )
     }
-
-    private fun søknadService(): SøknadService = søknadService
 }
