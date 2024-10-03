@@ -60,6 +60,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-java-time:$exposedVersion")
+    implementation("org.jetbrains.exposed:exposed-json:$exposedVersion")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("de.slub-dresden:urnlib:2.0.1")
     implementation("io.prometheus:prometheus-metrics-core:1.3.1")

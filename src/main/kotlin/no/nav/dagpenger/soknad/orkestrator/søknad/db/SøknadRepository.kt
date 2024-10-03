@@ -21,7 +21,7 @@ class SøknadRepository(
 ) {
     val database = Database.connect(dataSource)
 
-    fun lagre(søknad: Søknad) {
+    fun lagreQuizSøknad(søknad: Søknad) {
         transaction {
             SøknadTabell.insertIgnore {
                 it[søknadId] = søknad.søknadId
@@ -32,8 +32,17 @@ class SøknadRepository(
         }
     }
 
-    fun hent(søknadId: UUID): Søknad? {
-        return transaction {
+    fun lagre(søknad: Søknad) {
+        transaction {
+            SøknadTabell.insertIgnore {
+                it[søknadId] = søknad.søknadId
+                it[ident] = søknad.ident
+            }
+        }
+    }
+
+    fun hent(søknadId: UUID): Søknad? =
+        transaction {
             SøknadTabell
                 .selectAll()
                 .where { SøknadTabell.søknadId eq søknadId }
@@ -43,10 +52,8 @@ class SøknadRepository(
                         ident = it[SøknadTabell.ident],
                         opplysninger = quizOpplysningRepository.hentAlle(søknadId),
                     )
-                }
-                .firstOrNull()
+                }.firstOrNull()
         }
-    }
 
     fun slett(søknadId: UUID) {
         transaction {
@@ -61,3 +68,11 @@ object SøknadTabell : IntIdTable("soknad") {
     val søknadId: Column<UUID> = uuid("soknad_id")
     val ident: Column<String> = varchar("ident", 11)
 }
+
+fun SøknadTabell.getId(søknadId: UUID) =
+    SøknadTabell
+        .select(SøknadTabell.id)
+        .where { SøknadTabell.søknadId eq søknadId }
+        .singleOrNull()
+        ?.get(SøknadTabell.id)
+        ?.value

@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.spørsmål
+package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
@@ -15,14 +15,14 @@ import java.util.UUID
     JsonSubTypes.Type(value = PeriodesvarSvar::class, name = "PERIODE"),
 )
 abstract class Svar<T>(
-    val spørsmålId: UUID,
-    val type: SpørsmålType,
+    val opplysningId: UUID,
+    val type: Opplysningstype,
     var verdi: T,
 )
 
-class LandSvar(spørsmålId: UUID, verdi: String) : Svar<String>(
-    spørsmålId = spørsmålId,
-    type = SpørsmålType.LAND,
+class LandSvar(opplysningId: UUID, verdi: String) : Svar<String>(
+    opplysningId = opplysningId,
+    type = Opplysningstype.LAND,
     verdi = verdi,
 ) {
     init {
@@ -32,26 +32,26 @@ class LandSvar(spørsmålId: UUID, verdi: String) : Svar<String>(
     }
 }
 
-class BooleanSvar(spørsmålId: UUID, verdi: Boolean) : Svar<Boolean>(
-    spørsmålId = spørsmålId,
-    type = SpørsmålType.BOOLEAN,
+class BooleanSvar(opplysningId: UUID, verdi: Boolean) : Svar<Boolean>(
+    opplysningId = opplysningId,
+    type = Opplysningstype.BOOLEAN,
     verdi = verdi,
 )
 
-class DatoSvar(spørsmålId: UUID, verdi: LocalDate) : Svar<LocalDate>(
-    spørsmålId = spørsmålId,
-    type = SpørsmålType.DATO,
+class DatoSvar(opplysningId: UUID, verdi: LocalDate) : Svar<LocalDate>(
+    opplysningId = opplysningId,
+    type = Opplysningstype.DATO,
     verdi = verdi,
 )
 
-class TekstSvar(spørsmålId: UUID, verdi: String) : Svar<String>(
-    spørsmålId = spørsmålId,
-    type = SpørsmålType.TEKST,
+class TekstSvar(opplysningId: UUID, verdi: String) : Svar<String>(
+    opplysningId = opplysningId,
+    type = Opplysningstype.TEKST,
     verdi = verdi,
 )
 
-class PeriodesvarSvar(spørsmålId: UUID, verdi: PeriodeSvar) : Svar<PeriodeSvar>(
-    spørsmålId = spørsmålId,
-    type = SpørsmålType.PERIODE,
+class PeriodesvarSvar(opplysningId: UUID, verdi: PeriodeSvar) : Svar<PeriodeSvar>(
+    opplysningId = opplysningId,
+    type = Opplysningstype.PERIODE,
     verdi = verdi,
 )

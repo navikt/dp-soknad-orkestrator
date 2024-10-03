@@ -1,67 +1,68 @@
-package no.nav.dagpenger.soknad.orkestrator.spørsmål.grupper
+package no.nav.dagpenger.soknad.orkestrator.opplysning.grupper
 
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.GrunnleggendeSpørsmål
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.SpørsmålType
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 
-object Bostedsland : Spørsmålgruppe() {
-    override val navn = Spørsmålgruppenavn.BOSTEDSLAND
+object Bostedsland : Seksjon() {
+    override val navn = Seksjonsnavn.BOSTEDSLAND
+    override val versjon = "BOSTEDSLAND_V1"
 
     val hvilketLandBorDuI =
-        GrunnleggendeSpørsmål(
+        Opplysningsbehov(
             id = 1,
             tekstnøkkel = "faktum.hvilket-land-bor-du-i",
-            type = SpørsmålType.LAND,
+            type = Opplysningstype.LAND,
             gyldigeSvar = listOf("NOR", "SWE", "FIN"),
         )
 
     val reistTilbakeTilNorge =
-        GrunnleggendeSpørsmål(
+        Opplysningsbehov(
             id = 2,
             tekstnøkkel = "faktum.reist-tilbake-etter-arbeidsledig",
-            type = SpørsmålType.BOOLEAN,
+            type = Opplysningstype.BOOLEAN,
             gyldigeSvar = emptyList(),
         )
 
     val datoForAvreise =
-        GrunnleggendeSpørsmål(
+        Opplysningsbehov(
             id = 3,
             tekstnøkkel = "faktum.reist-tilbake-periode",
-            type = SpørsmålType.PERIODE,
+            type = Opplysningstype.PERIODE,
             gyldigeSvar = emptyList(),
         )
 
     val hvorforReisteFraNorge =
-        GrunnleggendeSpørsmål(
+        Opplysningsbehov(
             id = 4,
             tekstnøkkel = "faktum.reist-tilbake-aarsak",
-            type = SpørsmålType.TEKST,
+            type = Opplysningstype.TEKST,
             gyldigeSvar = emptyList(),
         )
 
     val enGangIUken =
-        GrunnleggendeSpørsmål(
+        Opplysningsbehov(
             id = 5,
             tekstnøkkel = "faktum.reist-tilbake-en-gang-eller-mer",
-            type = SpørsmålType.BOOLEAN,
+            type = Opplysningstype.BOOLEAN,
             gyldigeSvar = emptyList(),
         )
 
     val rotasjon =
-        GrunnleggendeSpørsmål(
+        Opplysningsbehov(
             id = 6,
             tekstnøkkel = "faktum.reist-i-takt-med-rotasjon",
-            type = SpørsmålType.BOOLEAN,
+            type = Opplysningstype.BOOLEAN,
             gyldigeSvar = emptyList(),
         )
 
-    override fun førsteSpørsmål(): GrunnleggendeSpørsmål = hvilketLandBorDuI
+    override fun førsteOpplysningsbehov(): Opplysningsbehov = hvilketLandBorDuI
 
-    override fun nesteSpørsmål(
+    override fun nesteOpplysningsbehov(
         svar: Svar<*>,
-        gruppespørsmålId: Int,
-    ): GrunnleggendeSpørsmål? {
-        return when (gruppespørsmålId) {
+        opplysningsbehovId: Int,
+    ): Opplysningsbehov? {
+        return when (opplysningsbehovId) {
             hvilketLandBorDuI.id -> if (svar.verdi != "NOR") reistTilbakeTilNorge else null
             reistTilbakeTilNorge.id -> if (svar.verdi == true) datoForAvreise else enGangIUken
             datoForAvreise.id -> hvorforReisteFraNorge
@@ -72,19 +73,19 @@ object Bostedsland : Spørsmålgruppe() {
         }
     }
 
-    override fun getSpørsmål(spørsmålId: Int): GrunnleggendeSpørsmål =
-        when (spørsmålId) {
+    override fun getOpplysningsbehov(opplysningsbehovId: Int): Opplysningsbehov =
+        when (opplysningsbehovId) {
             hvilketLandBorDuI.id -> hvilketLandBorDuI
             reistTilbakeTilNorge.id -> reistTilbakeTilNorge
             datoForAvreise.id -> datoForAvreise
             hvorforReisteFraNorge.id -> hvorforReisteFraNorge
             enGangIUken.id -> enGangIUken
             rotasjon.id -> rotasjon
-            else -> throw IllegalArgumentException("Ukjent spørsmål med id: $spørsmålId")
+            else -> throw IllegalArgumentException("Ukjent spørsmål med id: $opplysningsbehovId")
         }
 
-    override fun avhengigheter(spørsmålId: Int): List<Int> =
-        when (spørsmålId) {
+    override fun avhengigheter(opplysningsbehovId: Int): List<Int> =
+        when (opplysningsbehovId) {
             hvilketLandBorDuI.id ->
                 listOf(
                     reistTilbakeTilNorge.id,
@@ -99,14 +100,14 @@ object Bostedsland : Spørsmålgruppe() {
             hvorforReisteFraNorge.id -> emptyList()
             enGangIUken.id -> listOf(rotasjon.id)
             rotasjon.id -> emptyList()
-            else -> throw IllegalArgumentException("Ukjent spørsmål med spørsmålId: $spørsmålId")
+            else -> throw IllegalArgumentException("Ukjent spørsmål med spørsmålId: $opplysningsbehovId")
         }
 
     override fun validerSvar(
-        spørsmålId: Int,
+        opplysningsbehovId: Int,
         svar: Svar<*>,
     ) {
-        if (spørsmålId == hvilketLandBorDuI.id) {
+        if (opplysningsbehovId == hvilketLandBorDuI.id) {
             if (svar.verdi !in hvilketLandBorDuI.gyldigeSvar) {
                 throw IllegalArgumentException("$svar er ikke et gyldig svar")
             }

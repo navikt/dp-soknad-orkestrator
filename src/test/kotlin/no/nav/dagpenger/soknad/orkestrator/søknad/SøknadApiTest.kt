@@ -95,14 +95,14 @@ class SøknadApiTest {
             listOf(
                 """
                 {
-                  "spørsmålId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
                   "type": "BOOLEAN",
                   "verdi": true
                 }
                 """.trimIndent(),
                 """
                 {
-                  "spørsmålId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
                   "type": "PERIODE",
                   "verdi": {
                     "fom": "2022-01-01",
@@ -112,21 +112,21 @@ class SøknadApiTest {
                 """.trimIndent(),
                 """
                 {
-                  "spørsmålId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
                   "type": "LAND",
                   "verdi": "NOR"
                 }
                 """.trimIndent(),
                 """
                 {
-                  "spørsmålId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
                   "type": "TEKST",
                   "verdi": "Tekst svar"
                 }
                 """.trimIndent(),
                 """
                 {
-                  "spørsmålId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
                   "type": "DATO",
                   "verdi": "2022-12-31"
                 }

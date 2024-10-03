@@ -13,7 +13,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.pipeline.PipelineContext
 import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
-import no.nav.dagpenger.soknad.orkestrator.spørsmål.Svar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import java.util.UUID
 
 internal fun Application.søknadApi(søknadService: SøknadService) {
@@ -29,9 +29,9 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
                 get("/{søknadId}/neste") {
                     val søknadId = søknadId()
 
-                    val nesteSpørsmålgruppe = søknadService.nesteSpørsmålgruppe(søknadId)
+                    val nesteSeksjon = søknadService.nesteSeksjon(søknadId)
 
-                    call.respond(HttpStatusCode.OK, nesteSpørsmålgruppe)
+                    call.respond(HttpStatusCode.OK, nesteSeksjon)
                 }
 
                 post("/{søknadId}/svar") {

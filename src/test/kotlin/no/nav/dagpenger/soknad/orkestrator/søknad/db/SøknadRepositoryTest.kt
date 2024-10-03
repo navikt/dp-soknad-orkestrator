@@ -50,7 +50,7 @@ class SøknadRepositoryTest {
                     ),
             )
 
-        søknadRepository.lagre(søknad)
+        søknadRepository.lagreQuizSøknad(søknad)
         val hentetSøknad = søknadRepository.hent(søknadId)
 
         hentetSøknad?.ident shouldBe søknad.ident
@@ -77,7 +77,7 @@ class SøknadRepositoryTest {
                     ),
             )
 
-        søknadRepository.lagre(søknad)
+        søknadRepository.lagreQuizSøknad(søknad)
         søknadRepository.hent(søknadId) shouldNotBe null
 
         søknadRepository.slett(søknadId)
@@ -110,7 +110,7 @@ class SøknadRepositoryTest {
                     ),
             )
 
-        søknadRepository.lagre(søknad)
+        søknadRepository.lagreQuizSøknad(søknad)
         opplysningRepository.hentAlle(søknadId).size shouldBe 2
 
         søknadRepository.slett(søknadId)
