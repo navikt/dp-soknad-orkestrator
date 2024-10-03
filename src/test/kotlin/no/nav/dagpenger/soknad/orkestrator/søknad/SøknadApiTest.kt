@@ -78,6 +78,29 @@ class SøknadApiTest {
         }
     }
 
+    @Test
+    fun `Kan besvare opplysning når type er definert i lowercase`() {
+        val jsonSvarMedLowercaseType =
+            """
+            {
+              "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+              "type": "boolean",
+              "verdi": true
+            }
+            """.trimIndent()
+
+        withSøknadApi {
+            autentisert(
+                endepunkt = "$søknadEndepunkt/$søknadId/svar",
+                httpMethod = HttpMethod.Post,
+                //language=JSON
+                body = jsonSvarMedLowercaseType,
+            ).let { respons ->
+                respons.status shouldBe HttpStatusCode.OK
+            }
+        }
+    }
+
     private fun withSøknadApi(test: suspend ApplicationTestBuilder.() -> Unit) {
         TestApplication.withMockAuthServerAndTestApplication(
             moduleFunction = {

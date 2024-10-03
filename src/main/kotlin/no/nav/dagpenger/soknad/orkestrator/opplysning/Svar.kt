@@ -9,10 +9,15 @@ import java.util.UUID
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes(
     JsonSubTypes.Type(value = LandSvar::class, name = "LAND"),
+    JsonSubTypes.Type(value = LandSvar::class, name = "land"),
     JsonSubTypes.Type(value = BooleanSvar::class, name = "BOOLEAN"),
+    JsonSubTypes.Type(value = BooleanSvar::class, name = "boolean"),
     JsonSubTypes.Type(value = DatoSvar::class, name = "DATO"),
+    JsonSubTypes.Type(value = DatoSvar::class, name = "dato"),
     JsonSubTypes.Type(value = TekstSvar::class, name = "TEKST"),
+    JsonSubTypes.Type(value = TekstSvar::class, name = "tekst"),
     JsonSubTypes.Type(value = PeriodesvarSvar::class, name = "PERIODE"),
+    JsonSubTypes.Type(value = PeriodesvarSvar::class, name = "periode"),
 )
 abstract class Svar<T>(
     val opplysningId: UUID,
