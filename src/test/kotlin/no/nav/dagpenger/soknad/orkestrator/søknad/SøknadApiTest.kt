@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.post
 import io.ktor.client.statement.bodyAsText
@@ -70,7 +71,6 @@ class SøknadApiTest {
             autentisert(
                 endepunkt = "$søknadEndepunkt/$søknadId/svar",
                 httpMethod = HttpMethod.Post,
-                //language=JSON
                 body = jsonSvar,
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
@@ -97,6 +97,22 @@ class SøknadApiTest {
                 body = jsonSvarMedLowercaseType,
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
+            }
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("svarMedFeilVerditype")
+    fun `Kan ikke besvare en opplysning hvor type og verdi ikke samsvarer`(jsonSvarMedFeilVerditype: String) {
+        shouldThrow<IllegalArgumentException> {
+            withSøknadApi {
+                autentisert(
+                    endepunkt = "$søknadEndepunkt/$søknadId/svar",
+                    httpMethod = HttpMethod.Post,
+                    body = jsonSvarMedFeilVerditype,
+                ).let { respons ->
+                    respons.status shouldBe HttpStatusCode.OK
+                }
             }
         }
     }
@@ -152,6 +168,50 @@ class SøknadApiTest {
                   "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
                   "type": "DATO",
                   "verdi": "2022-12-31"
+                }
+                """.trimIndent(),
+            )
+
+        //language=JSON
+        @JvmStatic
+        fun svarMedFeilVerditype() =
+            listOf(
+                """
+                {
+                  "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "type": "BOOLEAN",
+                  "verdi": "dette er ikke en boolean"
+                }
+                """.trimIndent(),
+                """
+                {
+                  "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "type": "PERIODE",
+                  "verdi": "2022-12-31"
+                }
+                """.trimIndent(),
+                """
+                {
+                  "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "type": "LAND",
+                  "verdi": true
+                }
+                """.trimIndent(),
+                """
+                {
+                  "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "type": "TEKST",
+                  "verdi": {
+                    "fom": "2022-01-01",
+                    "tom": "2022-12-31"
+                  }
+                }
+                """.trimIndent(),
+                """
+                {
+                  "opplysningId": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                  "type": "DATO",
+                  "verdi": "dette er ikke en dato"
                 }
                 """.trimIndent(),
             )
