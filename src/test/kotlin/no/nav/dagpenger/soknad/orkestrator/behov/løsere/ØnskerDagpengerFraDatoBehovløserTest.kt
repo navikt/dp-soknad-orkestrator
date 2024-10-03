@@ -7,8 +7,10 @@ import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Dato
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
+import java.time.ZonedDateTime
 import java.util.UUID
 import kotlin.test.Test
 
@@ -20,7 +22,7 @@ class ØnskerDagpengerFraDatoBehovløserTest {
     val søknadId = UUID.randomUUID()
 
     @Test
-    fun `Behovløser publiserer løsning på behov ØnskerDagpengerFraDato`() {
+    fun `Behovløser publiserer løsning på behov ØnskerDagpengerFraDato med verdi og gjelderFra`() {
         val svar = 1.januar(2021)
 
         val opplysning =
@@ -32,10 +34,25 @@ class ØnskerDagpengerFraDatoBehovløserTest {
                 søknadId = søknadId,
             )
 
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+
         opplysningRepository.lagre(opplysning)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.ØnskerDagpengerFraDato))
 
-        testRapid.inspektør.message(0)["@løsning"]["ØnskerDagpengerFraDato"]["verdi"].asLocalDate() shouldBe svar
+        testRapid.inspektør.message(0)["@løsning"]["ØnskerDagpengerFraDato"].also { løsning ->
+            løsning["verdi"].asLocalDate() shouldBe svar
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
     }
 
     @Test

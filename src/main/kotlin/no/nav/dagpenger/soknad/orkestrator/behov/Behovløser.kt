@@ -5,6 +5,9 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import java.time.LocalDate
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysningRepository: QuizOpplysningRepository) {
@@ -13,10 +16,11 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
 
     internal open fun løs(behovmelding: Behovmelding) {
         val svarPåBehov =
-            opplysningRepository.hent(beskrivendeId, behovmelding.ident, behovmelding.søknadId)?.svar ?: throw IllegalStateException(
-                "Fant ingen opplysning med beskrivendeId: $beskrivendeId " +
-                    "og kan ikke svare på behov $behov for søknad med id: ${behovmelding.søknadId}",
-            )
+            opplysningRepository.hent(beskrivendeId, behovmelding.ident, behovmelding.søknadId)?.svar
+                ?: throw IllegalStateException(
+                    "Fant ingen opplysning med beskrivendeId: $beskrivendeId " +
+                        "og kan ikke svare på behov $behov for søknad med id: ${behovmelding.søknadId}",
+                )
 
         publiserLøsning(behovmelding, svarPåBehov)
     }
@@ -25,12 +29,27 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
         behovmelding: Behovmelding,
         svarPåBehov: Any,
     ) {
-        behovmelding.innkommendePacket["@løsning"] = mapOf(behov to mapOf("verdi" to svarPåBehov))
+        leggLøsningPåBehovmelding(behovmelding, svarPåBehov)
         rapidsConnection.publish(behovmelding.ident, behovmelding.innkommendePacket.toJson())
 
         BehovMetrikker.løst.labelValues(behov).inc()
         logger.info { "Løste behov $behov" }
         sikkerlogg.info { "Løste behov $behov med løsning: $svarPåBehov" }
+    }
+
+    private fun leggLøsningPåBehovmelding(
+        behovmelding: Behovmelding,
+        svarPåBehov: Any,
+    ) {
+        val gjelderFra: LocalDate? = finnGjelderFraDato(behovmelding.søknadId, behovmelding.ident)
+        behovmelding.innkommendePacket["@løsning"] =
+            mapOf(
+                behov to
+                    mapOf(
+                        "verdi" to svarPåBehov,
+                        "gjelderFra" to gjelderFra,
+                    ),
+            )
     }
 
     internal companion object {
@@ -41,4 +60,21 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
     fun JsonMessage.søknadId(): UUID = UUID.fromString(get("søknadId").asText())
 
     fun JsonMessage.ident(): String = get("ident").asText()
+
+    // I første omgang er gjelderFra lik søknadstidspunkt
+    fun finnGjelderFraDato(
+        søknadId: UUID,
+        ident: String,
+    ): LocalDate? {
+        val søknadstidspunkt =
+            opplysningRepository.hent(
+                beskrivendeId = "søknadstidspunkt",
+                ident = ident,
+                søknadId = søknadId,
+            )?.svar
+
+        return søknadstidspunkt?.let {
+            ZonedDateTime.parse(it as String, DateTimeFormatter.ISO_ZONED_DATE_TIME).toLocalDate()
+        }
+    }
 }

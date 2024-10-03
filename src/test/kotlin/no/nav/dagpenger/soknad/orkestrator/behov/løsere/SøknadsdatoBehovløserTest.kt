@@ -8,7 +8,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
-import java.time.LocalDate
+import java.time.ZonedDateTime
 import java.util.UUID
 import kotlin.test.Test
 
@@ -20,12 +20,13 @@ class SøknadsdatoBehovløserTest {
     val søknadId = UUID.randomUUID()
 
     @Test
-    fun `Behovløser publiserer løsning på behov Søknadsdato`() {
+    fun `Behovløser publiserer løsning på behov Søknadsdato med verdi og gjelderFra`() {
+        val svar = ZonedDateTime.now()
         val opplysning =
             QuizOpplysning(
                 beskrivendeId = behovløser.beskrivendeId,
                 type = Tekst,
-                svar = "2024-04-17T12:04:20+02:00",
+                svar = svar.toString(),
                 ident = ident,
                 søknadId = søknadId,
             )
@@ -33,7 +34,10 @@ class SøknadsdatoBehovløserTest {
         opplysningRepository.lagre(opplysning)
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Søknadsdato))
 
-        testRapid.inspektør.message(0)["@løsning"]["Søknadsdato"]["verdi"].asLocalDate() shouldBe LocalDate.parse("2024-04-17")
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdato"].also { løsning ->
+            løsning["verdi"].asLocalDate() shouldBe svar.toLocalDate()
+            løsning["gjelderFra"].asLocalDate() shouldBe svar.toLocalDate()
+        }
     }
 
     @Test
