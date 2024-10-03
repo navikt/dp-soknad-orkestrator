@@ -120,7 +120,7 @@ class SøknadIntegrasjonstest {
         withSøknadApi {
             autentisert(
                 endepunkt = "$søknadEndepunkt/${søknad.søknadId}/svar",
-                httpMethod = HttpMethod.Post,
+                httpMethod = HttpMethod.Put,
                 body = objectMapper.writeValueAsString(svar),
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK

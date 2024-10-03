@@ -70,7 +70,7 @@ class SøknadApiTest {
         withSøknadApi {
             autentisert(
                 endepunkt = "$søknadEndepunkt/$søknadId/svar",
-                httpMethod = HttpMethod.Post,
+                httpMethod = HttpMethod.Put,
                 body = jsonSvar,
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
@@ -92,7 +92,7 @@ class SøknadApiTest {
         withSøknadApi {
             autentisert(
                 endepunkt = "$søknadEndepunkt/$søknadId/svar",
-                httpMethod = HttpMethod.Post,
+                httpMethod = HttpMethod.Put,
                 //language=JSON
                 body = jsonSvarMedLowercaseType,
             ).let { respons ->
@@ -108,7 +108,7 @@ class SøknadApiTest {
             withSøknadApi {
                 autentisert(
                     endepunkt = "$søknadEndepunkt/$søknadId/svar",
-                    httpMethod = HttpMethod.Post,
+                    httpMethod = HttpMethod.Put,
                     body = jsonSvarMedFeilVerditype,
                 ).let { respons ->
                     respons.status shouldBe HttpStatusCode.OK

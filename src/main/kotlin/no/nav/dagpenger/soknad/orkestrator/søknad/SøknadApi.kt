@@ -9,6 +9,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.ktor.util.pipeline.PipelineContext
@@ -34,7 +35,7 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
                     call.respond(HttpStatusCode.OK, nesteSeksjon)
                 }
 
-                post("/{søknadId}/svar") {
+                put("/{søknadId}/svar") {
                     val søknadId = søknadId()
 
                     val svar =
