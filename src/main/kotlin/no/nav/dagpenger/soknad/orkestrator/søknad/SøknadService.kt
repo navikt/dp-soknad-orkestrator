@@ -2,18 +2,18 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
-import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SeksjonDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SeksjonsnavnDTO
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Bostedsland
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
-import no.nav.dagpenger.soknad.orkestrator.opplysning.toSporsmalDTO
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Bostedsland
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.getSeksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.toOpplysningDTO
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.util.UUID
 
@@ -94,10 +94,10 @@ class SøknadService(
             opplysningsbehovId = opplysningsbehovId,
         )
 
-        håndterNesteSpørsmål(søknadId, svar, seksjon, opplysningsbehovId)
+        håndterNesteOpplysning(søknadId, svar, seksjon, opplysningsbehovId)
     }
 
-    private fun håndterNesteSpørsmål(
+    private fun håndterNesteOpplysning(
         søknadId: UUID,
         svar: Svar<*>,
         seksjon: Seksjon,
@@ -157,7 +157,7 @@ class SøknadService(
         }
     }
 
-    fun nesteSeksjon(søknadId: UUID): SporsmalgruppeDTO {
+    fun nesteSeksjon(søknadId: UUID): SeksjonDTO {
         val alleOpplysninger = opplysningRepository.hentAlle(søknadId)
         val ubesvarteOpplysninger = alleOpplysninger.filter { it.svar == null }.sortedBy { it.opplysningsbehovId }
         val nesteUbesvarteOpplysning = ubesvarteOpplysninger.firstOrNull()
@@ -172,18 +172,18 @@ class SøknadService(
 
         val nesteUbesvarteOpplysningDTO =
             nesteUbesvarteOpplysning?.let {
-                seksjon.getOpplysningsbehov(it.opplysningsbehovId).toSporsmalDTO(it.opplysningId, null)
+                seksjon.getOpplysningsbehov(it.opplysningsbehovId).toOpplysningDTO(it.opplysningId, null)
             }
         val besvarteOpplysningerDTO =
             besvarteOpplysninger.map {
-                seksjon.getOpplysningsbehov(it.opplysningsbehovId).toSporsmalDTO(it.opplysningId, toJson(it.svar!!))
+                seksjon.getOpplysningsbehov(it.opplysningsbehovId).toOpplysningDTO(it.opplysningId, toJson(it.svar!!))
             }
 
-        return SporsmalgruppeDTO(
-            navn = SporsmaalgruppeNavnDTO.valueOf(seksjon.navn.name.lowercase()),
-            besvarteSpørsmål = besvarteOpplysningerDTO,
+        return SeksjonDTO(
+            navn = SeksjonsnavnDTO.valueOf(seksjon.navn.name.lowercase()),
+            besvarteOpplysninger = besvarteOpplysningerDTO,
             erFullført = nesteUbesvarteOpplysning == null,
-            nesteSpørsmål = nesteUbesvarteOpplysningDTO,
+            nesteUbesvarteOpplysning = nesteUbesvarteOpplysningDTO,
         )
     }
 

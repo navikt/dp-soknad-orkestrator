@@ -10,8 +10,8 @@ import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
-import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmaalgruppeNavnDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SeksjonDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SeksjonsnavnDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
@@ -23,9 +23,9 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningTabell
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.SeksjonTabell
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjonsnavn
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.getSeksjon
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
@@ -45,7 +45,7 @@ class SøknadIntegrasjonstest {
     lateinit var opplysningRepository: OpplysningRepository
     lateinit var søknadService: SøknadService
 
-    private val seksjonPath = "no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.SeksjonKt"
+    private val seksjonPath = "no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.SeksjonKt"
 
     @BeforeTest
     fun setup() {
@@ -95,10 +95,10 @@ class SøknadIntegrasjonstest {
                 httpMethod = HttpMethod.Get,
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
-                val seksjon = objectMapper.readValue(respons.bodyAsText(), SporsmalgruppeDTO::class.java)
-                seksjon.navn shouldBe SporsmaalgruppeNavnDTO.bostedsland
-                seksjon.besvarteSpørsmål shouldBe emptyList()
-                seksjon.nesteSpørsmål!!.tekstnøkkel shouldBe TestSeksjon.opplysningsbehov1.tekstnøkkel
+                val seksjon = objectMapper.readValue(respons.bodyAsText(), SeksjonDTO::class.java)
+                seksjon.navn shouldBe SeksjonsnavnDTO.bostedsland
+                seksjon.besvarteOpplysninger shouldBe emptyList()
+                seksjon.nesteUbesvarteOpplysning!!.tekstnøkkel shouldBe TestSeksjon.opplysningsbehov1.tekstnøkkel
                 seksjon.erFullført shouldBe false
             }
         }
@@ -196,7 +196,7 @@ object TestSeksjon : Seksjon() {
             opplysningsbehov2.id -> opplysningsbehov2
             opplysningsbehov3.id -> opplysningsbehov3
             opplysningsbehov4.id -> opplysningsbehov4
-            else -> throw IllegalArgumentException("Ukjent spørsmål med id: $opplysningsbehovId")
+            else -> throw IllegalArgumentException("Ukjent opplysning med id: $opplysningsbehovId")
         }
 
     override fun avhengigheter(opplysningsbehovId: Int): List<Int> =

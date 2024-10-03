@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjonsnavn
 import java.util.UUID
 
 data class Opplysning(

@@ -9,7 +9,7 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.mockk
-import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalgruppeDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SeksjonDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
@@ -47,7 +47,7 @@ class SøknadApiTest {
     }
 
     @Test
-    fun `Returnerer neste spørsmålgruppe for en gitt søknadId`() {
+    fun `Returnerer neste seksjon for en gitt søknadId`() {
         withSøknadApi {
             autentisert(
                 endepunkt = "$søknadEndepunkt/$søknadId/neste",
@@ -57,7 +57,7 @@ class SøknadApiTest {
                 shouldNotThrow<Exception> {
                     objectMapper.readValue(
                         respons.bodyAsText(),
-                        SporsmalgruppeDTO::class.java,
+                        SeksjonDTO::class.java,
                     )
                 }
             }
@@ -66,7 +66,7 @@ class SøknadApiTest {
 
     @ParameterizedTest
     @MethodSource("alleSvartyperSomJson")
-    fun `Kan besvare spørsmål`(jsonSvar: String) {
+    fun `Kan besvare en opplysning`(jsonSvar: String) {
         withSøknadApi {
             autentisert(
                 endepunkt = "$søknadEndepunkt/$søknadId/svar",

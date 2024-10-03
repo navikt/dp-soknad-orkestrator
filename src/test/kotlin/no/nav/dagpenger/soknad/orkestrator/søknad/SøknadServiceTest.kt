@@ -17,9 +17,9 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.getSeksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjonsnavn
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.getSeksjon
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -37,7 +37,7 @@ class SøknadServiceTest {
             opplysningRepository = opplysningRepository,
         ).also { it.setRapidsConnection(testRapid) }
     private val ident = "12345678901"
-    private val seksjonPath = "no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.SeksjonKt"
+    private val seksjonPath = "no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.SeksjonKt"
 
     @BeforeEach
     fun setup() {
@@ -266,10 +266,10 @@ class SøknadServiceTest {
                 gyldigeSvar = emptyList(),
             )
 
-        val nesteSpørsmålgruppe = søknadService.nesteSeksjon(søknadId)
+        val nesteSeksjon = søknadService.nesteSeksjon(søknadId)
 
-        nesteSpørsmålgruppe.besvarteSpørsmål.size shouldBe 1
-        nesteSpørsmålgruppe.besvarteSpørsmål.first().id shouldBe opplysningId1
+        nesteSeksjon.besvarteOpplysninger.size shouldBe 1
+        nesteSeksjon.besvarteOpplysninger.first().opplysningId shouldBe opplysningId1
     }
 
     @Test

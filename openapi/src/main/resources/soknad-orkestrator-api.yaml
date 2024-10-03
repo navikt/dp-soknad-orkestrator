@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Søknad Orkestrator API
   version: 1.0.0
-  description: API for å opprette søknad, besvare spørsmå og hente neste spørsmål.
+  description: API for å opprette søknad, besvare opplysninger og hente neste seksjon.
   contact:
     name: '#team-dagpenger-brukerdialog'
 servers:
@@ -24,7 +24,7 @@ paths:
                 format: uuid
   /soknad/{søknadId}/neste:
     get:
-      summary: Hent spørsmålsgruppe som har neste ubesvarte spørsmål
+      summary: Hent seksjon
       parameters:
         - in: path
           name: søknadId
@@ -34,11 +34,11 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Spørsmålsgruppe med neste ubesvarte spørsmål ble returnert
+          description: Seksjon med neste ubesvarte opplysning ble returnert
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Sporsmalgruppe'
+                $ref: '#/components/schemas/Seksjon'
   /soknad/{søknadId}/svar:
     put:
       summary: Besvar en opplysning
@@ -61,45 +61,45 @@ paths:
 
 components:
   schemas:
-    Sporsmal: # Spørsmål
+    Opplysning:
       type: object
       properties:
-        id:
+        opplysningId:
           type: string
           format: uuid
         tekstnøkkel:
           type: string
         type:
-          $ref: '#/components/schemas/SporsmalType'
+          $ref: '#/components/schemas/Opplysningstype'
         svar:
           type: string
           nullable: true
-          description: Svar kan være enten en string, boolean, dato eller periode (se Periodesvar) avhengig av hvilken type spørsmål det er.
+          description: Svar kan være enten en string, boolean, dato eller periode (se Periodesvar) avhengig av hvilken type opplysning det er.
         gyldigeSvar:
           type: array
           items:
             type: string
           nullable: true
       required:
-        - id
+        - opplysningId
         - tekstnøkkel
         - type
-    Svar: # Svar
+    Svar:
      type: object
      properties:
-       spørsmålId:
+       opplysningId:
          type: string
          format: uuid
        type:
-         $ref: '#/components/schemas/SporsmalType'
+         $ref: '#/components/schemas/Opplysningstype'
        verdi:
          type: string
-         description: Svarverdien må være enten en string, boolean, dato eller periode (se Periodesvar) avhengig av hvilken type spørsmål det besvarer.
+         description: Svarverdien må være enten en string, boolean, dato eller periode (se Periodesvar) avhengig av hvilken type opplysning det besvarer.
      required:
-       - spørsmålId
+       - opplysningId
        - type
        - verdi
-    SporsmalType: # SpørsmålType
+    Opplysningstype:
       type: string
       enum:
         - land
@@ -107,24 +107,24 @@ components:
         - dato
         - tekst
         - boolean
-    Sporsmalgruppe: # Spørsmålgruppe
+    Seksjon:
       type: object
       properties:
         navn:
-          $ref: '#/components/schemas/SporsmaalgruppeNavn'
-        nesteSpørsmål:
-          $ref: '#/components/schemas/Sporsmal'
-        besvarteSpørsmål:
+          $ref: '#/components/schemas/Seksjonsnavn'
+        nesteUbesvarteOpplysning:
+          $ref: '#/components/schemas/Opplysning'
+        besvarteOpplysninger:
           type: array
           items:
-            $ref: '#/components/schemas/Sporsmal'
+            $ref: '#/components/schemas/Opplysning'
         erFullført:
           type: boolean
       required:
         - navn
-        - besvarteSpørsmål
+        - besvarteOpplysninger
         - erFullført
-    SporsmaalgruppeNavn: # SpørsmålgruppeNavn
+    Seksjonsnavn:
       type: string
       enum:
         - bostedsland

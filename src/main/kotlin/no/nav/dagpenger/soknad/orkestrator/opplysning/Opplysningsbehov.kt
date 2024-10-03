@@ -1,7 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.SporsmalTypeDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.OpplysningDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.OpplysningstypeDTO
 import java.util.UUID
 
 data class Opplysningsbehov(
@@ -11,14 +11,14 @@ data class Opplysningsbehov(
     val gyldigeSvar: List<String>,
 )
 
-fun Opplysningsbehov.toSporsmalDTO(
-    spørsmålId: UUID,
+fun Opplysningsbehov.toOpplysningDTO(
+    opplysningId: UUID,
     svar: String?,
-): SporsmalDTO =
-    SporsmalDTO(
-        id = spørsmålId,
+): OpplysningDTO =
+    OpplysningDTO(
+        opplysningId = opplysningId,
         tekstnøkkel = tekstnøkkel,
-        type = SporsmalTypeDTO.valueOf(type.name.lowercase()),
+        type = OpplysningstypeDTO.valueOf(type.name.lowercase()),
         svar = svar,
         gyldigeSvar = gyldigeSvar,
     )

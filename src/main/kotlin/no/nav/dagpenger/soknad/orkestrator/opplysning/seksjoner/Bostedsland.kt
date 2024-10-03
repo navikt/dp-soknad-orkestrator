@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.grupper
+package no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner
 
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
@@ -81,7 +81,7 @@ object Bostedsland : Seksjon() {
             hvorforReisteFraNorge.id -> hvorforReisteFraNorge
             enGangIUken.id -> enGangIUken
             rotasjon.id -> rotasjon
-            else -> throw IllegalArgumentException("Ukjent spørsmål med id: $opplysningsbehovId")
+            else -> throw IllegalArgumentException("Ukjent opplysning med id: $opplysningsbehovId")
         }
 
     override fun avhengigheter(opplysningsbehovId: Int): List<Int> =
@@ -100,7 +100,7 @@ object Bostedsland : Seksjon() {
             hvorforReisteFraNorge.id -> emptyList()
             enGangIUken.id -> listOf(rotasjon.id)
             rotasjon.id -> emptyList()
-            else -> throw IllegalArgumentException("Ukjent spørsmål med spørsmålId: $opplysningsbehovId")
+            else -> throw IllegalArgumentException("Ukjent opplysning med opplysningId: $opplysningsbehovId")
         }
 
     override fun validerSvar(

@@ -5,8 +5,8 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysning
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjon
-import no.nav.dagpenger.soknad.orkestrator.opplysning.grupper.Seksjonsnavn
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjon
+import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjonsnavn
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.getId
 import org.jetbrains.exposed.dao.id.IntIdTable

@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.opplysning.grupper
+package no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner
 
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
