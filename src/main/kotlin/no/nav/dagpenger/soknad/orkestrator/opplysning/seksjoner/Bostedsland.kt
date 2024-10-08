@@ -21,7 +21,6 @@ object Bostedsland : Seksjon() {
             id = 2,
             tekstnøkkel = "faktum.reist-tilbake-etter-arbeidsledig",
             type = Opplysningstype.BOOLEAN,
-            gyldigeSvar = emptyList(),
         )
 
     val datoForAvreise =
@@ -29,7 +28,6 @@ object Bostedsland : Seksjon() {
             id = 3,
             tekstnøkkel = "faktum.reist-tilbake-periode",
             type = Opplysningstype.PERIODE,
-            gyldigeSvar = emptyList(),
         )
 
     val hvorforReisteFraNorge =
@@ -37,7 +35,6 @@ object Bostedsland : Seksjon() {
             id = 4,
             tekstnøkkel = "faktum.reist-tilbake-aarsak",
             type = Opplysningstype.TEKST,
-            gyldigeSvar = emptyList(),
         )
 
     val enGangIUken =
@@ -45,7 +42,6 @@ object Bostedsland : Seksjon() {
             id = 5,
             tekstnøkkel = "faktum.reist-tilbake-en-gang-eller-mer",
             type = Opplysningstype.BOOLEAN,
-            gyldigeSvar = emptyList(),
         )
 
     val rotasjon =
@@ -53,7 +49,6 @@ object Bostedsland : Seksjon() {
             id = 6,
             tekstnøkkel = "faktum.reist-i-takt-med-rotasjon",
             type = Opplysningstype.BOOLEAN,
-            gyldigeSvar = emptyList(),
         )
 
     override fun førsteOpplysningsbehov(): Opplysningsbehov = hvilketLandBorDuI
@@ -108,7 +103,7 @@ object Bostedsland : Seksjon() {
         svar: Svar<*>,
     ) {
         if (opplysningsbehovId == hvilketLandBorDuI.id) {
-            if (svar.verdi !in hvilketLandBorDuI.gyldigeSvar) {
+            if (hvilketLandBorDuI.gyldigeSvar?.contains(svar.verdi) != true) {
                 throw IllegalArgumentException("$svar er ikke et gyldig svar")
             }
         }

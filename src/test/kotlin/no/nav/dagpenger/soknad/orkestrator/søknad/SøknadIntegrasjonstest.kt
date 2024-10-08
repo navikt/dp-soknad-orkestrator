@@ -170,11 +170,11 @@ object TestSeksjon : Seksjon() {
     override val navn = Seksjonsnavn.BOSTEDSLAND
     override val versjon = "TESTSEKSJON_V1"
 
-    val opplysningsbehov1 = Opplysningsbehov(1, "tekstnøkkel1", Opplysningstype.BOOLEAN, emptyList())
+    val opplysningsbehov1 = Opplysningsbehov(1, "tekstnøkkel1", Opplysningstype.BOOLEAN)
     val opplysningsbehov2 =
         Opplysningsbehov(2, "tekstnøkkel2", Opplysningstype.LAND, listOf("NOR", "SWE", "FIN"))
-    val opplysningsbehov3 = Opplysningsbehov(3, "tekstnøkkel3", Opplysningstype.TEKST, emptyList())
-    val opplysningsbehov4 = Opplysningsbehov(4, "tekstnøkkel4", Opplysningstype.TEKST, emptyList())
+    val opplysningsbehov3 = Opplysningsbehov(3, "tekstnøkkel3", Opplysningstype.TEKST)
+    val opplysningsbehov4 = Opplysningsbehov(4, "tekstnøkkel4", Opplysningstype.TEKST)
 
     override fun førsteOpplysningsbehov() = opplysningsbehov1
 
@@ -210,7 +210,7 @@ object TestSeksjon : Seksjon() {
         svar: Svar<*>,
     ) {
         if (opplysningsbehovId == opplysningsbehov2.id) {
-            if (svar.verdi !in opplysningsbehov2.gyldigeSvar) {
+            if (opplysningsbehov2.gyldigeSvar?.contains(svar.verdi) != true) {
                 throw IllegalArgumentException("$svar er ikke et gyldig svar")
             }
         }

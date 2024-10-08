@@ -8,7 +8,7 @@ data class Opplysningsbehov(
     val id: Int,
     val tekstnøkkel: String,
     val type: Opplysningstype,
-    val gyldigeSvar: List<String>,
+    val gyldigeSvar: List<String>? = null,
 )
 
 fun Opplysningsbehov.toOpplysningDTO(

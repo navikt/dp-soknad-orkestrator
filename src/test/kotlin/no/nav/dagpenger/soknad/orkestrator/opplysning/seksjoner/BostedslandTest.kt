@@ -107,7 +107,7 @@ class BostedslandTest {
         val svar =
             LandSvar(
                 opplysningId = UUID.randomUUID(),
-                verdi = Bostedsland.hvilketLandBorDuI.gyldigeSvar.random(),
+                verdi = Bostedsland.hvilketLandBorDuI.gyldigeSvar!!.random(),
             )
 
         shouldNotThrow<IllegalArgumentException> {

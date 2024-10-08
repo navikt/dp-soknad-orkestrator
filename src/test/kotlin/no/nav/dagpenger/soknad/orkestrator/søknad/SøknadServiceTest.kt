@@ -166,7 +166,6 @@ class SøknadServiceTest {
                 id = 2,
                 tekstnøkkel = "tekstnøkkel",
                 type = Opplysningstype.BOOLEAN,
-                gyldigeSvar = emptyList(),
             )
 
         val opplysningId = UUID.randomUUID()
@@ -194,7 +193,6 @@ class SøknadServiceTest {
                 id = 2,
                 tekstnøkkel = "tekstnøkkel",
                 type = Opplysningstype.BOOLEAN,
-                gyldigeSvar = emptyList(),
             )
 
         every {
@@ -255,7 +253,6 @@ class SøknadServiceTest {
                 id = 2,
                 tekstnøkkel = "tekstnøkkel",
                 type = Opplysningstype.BOOLEAN,
-                gyldigeSvar = emptyList(),
             )
 
         every { seksjon.getOpplysningsbehov(1) } returns
@@ -263,7 +260,6 @@ class SøknadServiceTest {
                 id = 1,
                 tekstnøkkel = "tekstnøkkel",
                 type = Opplysningstype.BOOLEAN,
-                gyldigeSvar = emptyList(),
             )
 
         val nesteSeksjon = søknadService.nesteSeksjon(søknadId)
@@ -294,7 +290,6 @@ class SøknadServiceTest {
                 id = 1,
                 tekstnøkkel = "tekstnøkkel",
                 type = Opplysningstype.BOOLEAN,
-                gyldigeSvar = emptyList(),
             )
 
         søknadService.nesteSeksjon(søknadId).erFullført shouldBe true
@@ -322,7 +317,6 @@ class SøknadServiceTest {
                 id = 1,
                 tekstnøkkel = "tekstnøkkel",
                 type = Opplysningstype.BOOLEAN,
-                gyldigeSvar = emptyList(),
             )
 
         søknadService.nesteSeksjon(søknadId).erFullført shouldBe false
