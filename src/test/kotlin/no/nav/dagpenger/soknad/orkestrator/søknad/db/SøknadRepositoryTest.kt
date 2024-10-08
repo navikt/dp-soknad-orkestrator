@@ -55,6 +55,7 @@ class SøknadRepositoryTest {
 
         hentetSøknad?.ident shouldBe søknad.ident
         hentetSøknad?.søknadId shouldBe søknad.søknadId
+        hentetSøknad?.tilstand shouldBe søknad.tilstand
         hentetSøknad?.opplysninger?.size shouldBe 1
     }
 
