@@ -10,6 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import java.util.UUID
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -38,6 +39,7 @@ class SøknadRepositoryTest {
             Søknad(
                 søknadId = søknadId,
                 ident = ident,
+                tilstand = Tilstand.INNSENDT,
                 opplysninger =
                     listOf(
                         QuizOpplysning(
@@ -66,6 +68,7 @@ class SøknadRepositoryTest {
             Søknad(
                 søknadId = søknadId,
                 ident = ident,
+                tilstand = Tilstand.INNSENDT,
                 opplysninger =
                     listOf(
                         QuizOpplysning(
@@ -92,6 +95,7 @@ class SøknadRepositoryTest {
             Søknad(
                 søknadId = søknadId,
                 ident = ident,
+                tilstand = Tilstand.INNSENDT,
                 opplysninger =
                     listOf(
                         QuizOpplysning(

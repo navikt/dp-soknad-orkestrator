@@ -76,6 +76,7 @@ class SøknadIntegrasjonstest {
                 respons.status shouldBe HttpStatusCode.Created
                 val søknadId = objectMapper.readValue(respons.bodyAsText(), UUID::class.java)
                 søknadRepository.hent(søknadId)?.søknadId shouldBe søknadId
+                søknadRepository.hent(søknadId)?.tilstand shouldBe Tilstand.PÅBEGYNT
                 opplysningRepository.hentAlle(søknadId).first().also { opplysning ->
                     opplysning.seksjonsnavn shouldBe TestSeksjon.navn
                     opplysning.opplysningsbehovId shouldBe TestSeksjon.førsteOpplysningsbehov().id
@@ -136,6 +137,7 @@ class SøknadIntegrasjonstest {
                     .insertAndGetId {
                         it[søknadId] = søknad.søknadId
                         it[ident] = søknad.ident
+                        it[tilstand] = søknad.tilstand.name
                     }.value
 
             val seksjonDBId =
