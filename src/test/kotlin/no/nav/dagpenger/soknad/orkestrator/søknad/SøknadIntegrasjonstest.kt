@@ -73,7 +73,7 @@ class SøknadIntegrasjonstest {
                 endepunkt = "$søknadEndepunkt/start",
                 httpMethod = HttpMethod.Post,
             ).let { respons ->
-                respons.status shouldBe HttpStatusCode.Created
+                respons.status shouldBe HttpStatusCode.OK
                 val søknadId = objectMapper.readValue(respons.bodyAsText(), UUID::class.java)
                 søknadRepository.hent(søknadId)?.søknadId shouldBe søknadId
                 søknadRepository.hent(søknadId)?.tilstand shouldBe Tilstand.PÅBEGYNT

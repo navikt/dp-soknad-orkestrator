@@ -62,6 +62,27 @@ class SøknadRepositoryTest {
     }
 
     @Test
+    fun `hentPåbegynt henter påbegynt søknad for en gitt ident`() {
+        val søknadId = UUID.randomUUID()
+        val søknad = Søknad(søknadId = søknadId, ident = ident, tilstand = Tilstand.PÅBEGYNT)
+
+        søknadRepository.lagre(søknad)
+
+        val hentetSøknad = søknadRepository.hentPåbegynt(ident)
+
+        hentetSøknad?.ident shouldBe søknad.ident
+        hentetSøknad?.søknadId shouldBe søknad.søknadId
+        hentetSøknad?.tilstand shouldBe søknad.tilstand
+    }
+
+    @Test
+    fun `hentPåbegynt returnerer null hvis det ikke finnes en søknad for gitt ident`() {
+        val hentetSøknad = søknadRepository.hentPåbegynt(ident)
+
+        hentetSøknad shouldBe null
+    }
+
+    @Test
     fun `kan slette søknad`() {
         val søknadId = UUID.randomUUID()
         val søknad =

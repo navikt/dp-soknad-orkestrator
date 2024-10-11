@@ -87,18 +87,39 @@ class SøknadServiceTest {
     }
 
     @Test
-    fun `opprettSøknad oppretter søknad, første opplysning og seksjon`() {
+    fun `hentEllerOpprettSøknad oppretter søknad, første opplysning og seksjon`() {
+        every {
+            søknadRepository.hentPåbegynt(ident)
+        } returns null
+
         justRun {
             søknadRepository.lagre(any())
             opplysningRepository.opprettSeksjon(any(), any())
             opplysningRepository.lagre(any(), any())
         }
 
-        val søknad = søknadService.opprettSøknad(ident)
+        val søknad = søknadService.hentEllerOpprettSøknad(ident)
 
         verify(exactly = 1) {
             søknadRepository.lagre(søknad)
             opplysningRepository.opprettSeksjon(søknad.søknadId, any())
+            opplysningRepository.lagre(any(), any())
+        }
+    }
+
+    @Test
+    fun `hentEllerOpprettSøknad returnerer påbegynt søknad hvis det finnes`() {
+        val søknad = Søknad(ident = ident, tilstand = Tilstand.PÅBEGYNT)
+        every {
+            søknadRepository.hentPåbegynt(ident)
+        } returns søknad
+
+        val hentetSøknad = søknadService.hentEllerOpprettSøknad(ident)
+
+        hentetSøknad.søknadId shouldBe søknad.søknadId
+        verify(exactly = 0) {
+            søknadRepository.lagre(any())
+            opplysningRepository.opprettSeksjon(any(), any())
             opplysningRepository.lagre(any(), any())
         }
     }

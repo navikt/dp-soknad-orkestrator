@@ -22,9 +22,9 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
         authenticate("tokenX") {
             route("/soknad") {
                 post("/start") {
-                    val søknad = søknadService.opprettSøknad(call.ident())
+                    val søknad = søknadService.hentEllerOpprettSøknad(call.ident())
 
-                    call.respond(HttpStatusCode.Created, søknad.søknadId)
+                    call.respond(HttpStatusCode.OK, søknad.søknadId)
                 }
 
                 get("/{søknadId}/neste") {

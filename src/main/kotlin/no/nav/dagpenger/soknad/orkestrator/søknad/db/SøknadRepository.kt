@@ -7,6 +7,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.javatime.datetime
@@ -56,6 +57,21 @@ class SøknadRepository(
                         ident = it[SøknadTabell.ident],
                         tilstand = Tilstand.valueOf(it[SøknadTabell.tilstand]),
                         opplysninger = quizOpplysningRepository.hentAlle(søknadId),
+                    )
+                }.firstOrNull()
+        }
+
+    fun hentPåbegynt(ident: String): Søknad? =
+        transaction {
+            SøknadTabell
+                .selectAll()
+                .where { SøknadTabell.ident eq ident }
+                .andWhere { SøknadTabell.tilstand eq Tilstand.PÅBEGYNT.name }
+                .map {
+                    Søknad(
+                        søknadId = it[SøknadTabell.søknadId],
+                        ident = it[SøknadTabell.ident],
+                        tilstand = Tilstand.valueOf(it[SøknadTabell.tilstand]),
                     )
                 }.firstOrNull()
         }

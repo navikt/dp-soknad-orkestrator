@@ -13,10 +13,10 @@ servers:
 paths:
   /soknad/start:
     post:
-      summary: Opprett en ny søknad
+      summary: Opprett en ny søknad eller hent en eksisterende påbegynt søknad
       responses:
-        '201':
-          description: Søknad opprettet
+        '200':
+          description: Søknad id returnert
           content:
             application/json:
               schema:

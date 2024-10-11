@@ -33,7 +33,7 @@ class SøknadApiTest {
                 endepunkt = "$søknadEndepunkt/start",
                 httpMethod = HttpMethod.Post,
             ).let { respons ->
-                respons.status shouldBe HttpStatusCode.Created
+                respons.status shouldBe HttpStatusCode.OK
                 shouldNotThrow<Exception> { objectMapper.readValue(respons.bodyAsText(), UUID::class.java) }
             }
         }
