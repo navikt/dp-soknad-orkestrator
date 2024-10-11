@@ -12,6 +12,7 @@ import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.upsert
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.sql.DataSource
@@ -24,7 +25,7 @@ class SøknadRepository(
 
     fun lagreQuizSøknad(søknad: Søknad) {
         transaction {
-            SøknadTabell.insertIgnore {
+            SøknadTabell.upsert {
                 it[søknadId] = søknad.søknadId
                 it[ident] = søknad.ident
                 it[tilstand] = søknad.tilstand.name
@@ -71,7 +72,7 @@ object SøknadTabell : IntIdTable("soknad") {
     val opprettet: Column<LocalDateTime> = datetime("opprettet").default(LocalDateTime.now())
     val søknadId: Column<UUID> = uuid("soknad_id")
     val ident: Column<String> = varchar("ident", 11)
-    val tilstand: Column<String> = text("tilstand").default(Tilstand.PÅBEGYNT.name) // TODO: Se TODO i flyway
+    val tilstand: Column<String> = text("tilstand").default(Tilstand.PÅBEGYNT.name)
 }
 
 fun SøknadTabell.getId(søknadId: UUID) =
