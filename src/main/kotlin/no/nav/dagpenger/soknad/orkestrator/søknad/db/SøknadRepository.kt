@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
@@ -11,6 +12,7 @@ import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.upsert
 import java.time.LocalDateTime
 import java.util.UUID
 import javax.sql.DataSource
@@ -23,9 +25,10 @@ class SøknadRepository(
 
     fun lagreQuizSøknad(søknad: Søknad) {
         transaction {
-            SøknadTabell.insertIgnore {
+            SøknadTabell.upsert {
                 it[søknadId] = søknad.søknadId
                 it[ident] = søknad.ident
+                it[tilstand] = søknad.tilstand.name
             }
 
             søknad.opplysninger.forEach { quizOpplysningRepository.lagre(it) }
@@ -37,6 +40,7 @@ class SøknadRepository(
             SøknadTabell.insertIgnore {
                 it[søknadId] = søknad.søknadId
                 it[ident] = søknad.ident
+                it[tilstand] = søknad.tilstand.name
             }
         }
     }
@@ -50,6 +54,7 @@ class SøknadRepository(
                     Søknad(
                         søknadId = it[SøknadTabell.søknadId],
                         ident = it[SøknadTabell.ident],
+                        tilstand = Tilstand.valueOf(it[SøknadTabell.tilstand]),
                         opplysninger = quizOpplysningRepository.hentAlle(søknadId),
                     )
                 }.firstOrNull()
@@ -67,6 +72,7 @@ object SøknadTabell : IntIdTable("soknad") {
     val opprettet: Column<LocalDateTime> = datetime("opprettet").default(LocalDateTime.now())
     val søknadId: Column<UUID> = uuid("soknad_id")
     val ident: Column<String> = varchar("ident", 11)
+    val tilstand: Column<String> = text("tilstand").default(Tilstand.PÅBEGYNT.name)
 }
 
 fun SøknadTabell.getId(søknadId: UUID) =

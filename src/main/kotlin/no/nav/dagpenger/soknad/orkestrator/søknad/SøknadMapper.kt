@@ -31,6 +31,7 @@ class SøknadMapper(
         Søknad(
             søknadId = søknadId,
             ident = ident,
+            tilstand = Tilstand.INNSENDT,
             opplysninger = søknadDataTilOpplysninger(søknadData, ident, søknadId, søknadstidspunkt),
         )
     }

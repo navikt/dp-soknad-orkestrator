@@ -14,6 +14,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EøsArbeidsf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.EøsArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.PeriodeSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.utils.februar
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
 import no.nav.dagpenger.soknad.orkestrator.utils.mars
@@ -32,6 +33,7 @@ class SøknadMapperTest {
         val søknad = SøknadMapper(søknad_innsendt_event).søknad
         søknad.søknadId shouldBe søknadId
         søknad.ident shouldBe ident
+        søknad.tilstand shouldBe INNSENDT
         søknad.opplysninger.size shouldBe 3
 
         søknad.opplysninger shouldContainAll

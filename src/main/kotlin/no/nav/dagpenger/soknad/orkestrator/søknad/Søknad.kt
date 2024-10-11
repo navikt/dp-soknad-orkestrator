@@ -12,4 +12,5 @@ class Søknad(
 
 enum class Tilstand {
     PÅBEGYNT,
+    INNSENDT,
 }
