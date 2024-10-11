@@ -1,0 +1,1 @@
+UPDATE soknad SET tilstand = 'INNSENDT';
