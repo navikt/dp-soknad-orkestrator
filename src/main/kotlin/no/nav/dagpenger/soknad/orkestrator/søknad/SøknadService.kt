@@ -154,7 +154,7 @@ class SøknadService(
         }
     }
 
-    fun nesteSeksjon(søknadId: UUID): SeksjonDTO {
+    fun nesteSeksjon(søknadId: UUID): List<SeksjonDTO> {
         val alleOpplysninger = opplysningRepository.hentAlle(søknadId)
         val ubesvarteOpplysninger = alleOpplysninger.filter { it.svar == null }.sortedBy { it.opplysningsbehovId }
         val nesteUbesvarteOpplysning = ubesvarteOpplysninger.firstOrNull()
@@ -176,11 +176,13 @@ class SøknadService(
                 seksjon.getOpplysningsbehov(it.opplysningsbehovId).toOpplysningDTO(it.opplysningId, toJson(it.svar!!))
             }
 
-        return SeksjonDTO(
-            navn = SeksjonsnavnDTO.valueOf(seksjon.navn.name.lowercase()),
-            besvarteOpplysninger = besvarteOpplysningerDTO,
-            erFullført = nesteUbesvarteOpplysning == null,
-            nesteUbesvarteOpplysning = nesteUbesvarteOpplysningDTO,
+        return listOf(
+            SeksjonDTO(
+                navn = SeksjonsnavnDTO.valueOf(seksjon.navn.name.lowercase()),
+                besvarteOpplysninger = besvarteOpplysningerDTO,
+                erFullført = nesteUbesvarteOpplysning == null,
+                nesteUbesvarteOpplysning = nesteUbesvarteOpplysningDTO,
+            ),
         )
     }
 

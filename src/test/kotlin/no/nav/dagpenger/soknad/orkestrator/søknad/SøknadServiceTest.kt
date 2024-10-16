@@ -285,8 +285,12 @@ class SøknadServiceTest {
 
         val nesteSeksjon = søknadService.nesteSeksjon(søknadId)
 
-        nesteSeksjon.besvarteOpplysninger.size shouldBe 1
-        nesteSeksjon.besvarteOpplysninger.first().opplysningId shouldBe opplysningId1
+        nesteSeksjon.first().besvarteOpplysninger.size shouldBe 1
+        nesteSeksjon
+            .first()
+            .besvarteOpplysninger
+            .first()
+            .opplysningId shouldBe opplysningId1
     }
 
     @Test
@@ -313,7 +317,7 @@ class SøknadServiceTest {
                 type = Opplysningstype.BOOLEAN,
             )
 
-        søknadService.nesteSeksjon(søknadId).erFullført shouldBe true
+        søknadService.nesteSeksjon(søknadId).first().erFullført shouldBe true
     }
 
     @Test
@@ -340,6 +344,6 @@ class SøknadServiceTest {
                 type = Opplysningstype.BOOLEAN,
             )
 
-        søknadService.nesteSeksjon(søknadId).erFullført shouldBe false
+        søknadService.nesteSeksjon(søknadId).first().erFullført shouldBe false
     }
 }

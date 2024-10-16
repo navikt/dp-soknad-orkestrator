@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.equality.shouldBeEqualToComparingFields
 import io.kotest.matchers.shouldBe
@@ -96,11 +97,11 @@ class SøknadIntegrasjonstest {
                 httpMethod = HttpMethod.Get,
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
-                val seksjon = objectMapper.readValue(respons.bodyAsText(), SeksjonDTO::class.java)
-                seksjon.navn shouldBe SeksjonsnavnDTO.bostedsland
-                seksjon.besvarteOpplysninger shouldBe emptyList()
-                seksjon.nesteUbesvarteOpplysning!!.tekstnøkkel shouldBe TestSeksjon.opplysningsbehov1.tekstnøkkel
-                seksjon.erFullført shouldBe false
+                val seksjoner = objectMapper.readValue<List<SeksjonDTO>>(respons.bodyAsText())
+                seksjoner.first().navn shouldBe SeksjonsnavnDTO.bostedsland
+                seksjoner.first().besvarteOpplysninger shouldBe emptyList()
+                seksjoner.first().nesteUbesvarteOpplysning!!.tekstnøkkel shouldBe TestSeksjon.opplysningsbehov1.tekstnøkkel
+                seksjoner.first().erFullført shouldBe false
             }
         }
     }

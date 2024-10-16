@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
+import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
@@ -55,10 +56,7 @@ class SøknadApiTest {
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
                 shouldNotThrow<Exception> {
-                    objectMapper.readValue(
-                        respons.bodyAsText(),
-                        SeksjonDTO::class.java,
-                    )
+                    objectMapper.readValue<List<SeksjonDTO>>(respons.bodyAsText())
                 }
             }
         }
