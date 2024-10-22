@@ -10,7 +10,6 @@ import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.mockk
-import no.nav.dagpenger.soknad.orkestrator.api.models.SeksjonDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
@@ -56,7 +55,7 @@ class SøknadApiTest {
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
                 shouldNotThrow<Exception> {
-                    objectMapper.readValue<List<SeksjonDTO>>(respons.bodyAsText())
+                    objectMapper.readValue<OrkestratorSoknadDTO>(respons.bodyAsText())
                 }
             }
         }
