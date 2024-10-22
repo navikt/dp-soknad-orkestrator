@@ -76,10 +76,12 @@ class SøknadRepository(
                 }.firstOrNull()
         }
 
-    fun slett(søknadId: UUID) {
-        transaction {
-            SøknadTabell.deleteWhere { SøknadTabell.søknadId eq søknadId }
+    fun slett(søknadId: UUID): Int {
+        return transaction {
+            val antallSlettedeRader = SøknadTabell.deleteWhere { SøknadTabell.søknadId eq søknadId }
             quizOpplysningRepository.slett(søknadId)
+
+            antallSlettedeRader
         }
     }
 }

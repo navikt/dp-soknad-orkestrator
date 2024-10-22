@@ -12,6 +12,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadSlettetMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.søknadApi
 import no.nav.helse.rapids_rivers.RapidApplication
@@ -53,6 +54,7 @@ internal class ApplicationBuilder(
                     behovløserFactory = BehovløserFactory(rapidsConnection, QuizOpplysningRepositoryPostgres(dataSource)),
                     søknadService = søknadService,
                 )
+                SøknadSlettetMottak(rapidsConnection, søknadService)
             }
 
     init {

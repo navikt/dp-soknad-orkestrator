@@ -125,11 +125,13 @@ class SøknadService(
         søknadId: UUID,
         ident: String,
     ) {
-        søknadRepository.slett(søknadId)
+        val antallSøknaderSlettet = søknadRepository.slett(søknadId)
 
-        SøknadMetrikker.slettet.inc()
-        logger.info { "Slettet søknad med søknadId: $søknadId" }
-        sikkerlogg.info { "Slettet søknad med søknadId: $søknadId og ident: $ident" }
+        if (antallSøknaderSlettet > 0) {
+            SøknadMetrikker.slettet.inc()
+            logger.info { "Slettet søknad med søknadId: $søknadId" }
+            sikkerlogg.info { "Slettet søknad med søknadId: $søknadId og ident: $ident" }
+        }
     }
 
     private fun toJson(svar: Svar<*>): String? =
