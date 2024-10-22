@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
+import no.nav.dagpenger.soknad.orkestrator.api.models.OrkestratorSoknadDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SeksjonDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SeksjonsnavnDTO
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper

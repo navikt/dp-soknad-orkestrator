@@ -11,6 +11,7 @@ import io.ktor.server.testing.ApplicationTestBuilder
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import no.nav.dagpenger.soknad.orkestrator.api.models.OrkestratorSoknadDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SeksjonsnavnDTO
 import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper

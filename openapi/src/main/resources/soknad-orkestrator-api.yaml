@@ -24,7 +24,7 @@ paths:
                 format: uuid
   /soknad/{søknadId}/neste:
     get:
-      summary: Hent seksjon
+      summary: Hent søknad med seksjoner (kun orkestrator seksjoner)
       parameters:
         - in: path
           name: søknadId
@@ -34,11 +34,11 @@ paths:
             format: uuid
       responses:
         '200':
-          description: Seksjon med neste ubesvarte opplysning ble returnert
+          description: Søknad ble returnert
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Seksjon'
+                $ref: '#/components/schemas/OrkestratorSoknad'
   /soknad/{søknadId}/svar:
     put:
       summary: Besvar en opplysning
@@ -61,6 +61,26 @@ paths:
 
 components:
   schemas:
+    OrkestratorSoknad:
+      type: object
+      properties:
+        søknadId:
+          type: string
+          format: uuid
+        seksjoner:
+          type: array
+          items:
+            $ref: '#/components/schemas/Seksjon'
+        antallSeksjoner:
+          type: integer
+        erFullført:
+          type: boolean
+          description: Søknaden er fullført når alle seksjoner er fullført
+      required:
+        - søknadId
+        - seksjoner
+        - antallSeksjoner
+        - erFullført
     Opplysning:
       type: object
       properties:
