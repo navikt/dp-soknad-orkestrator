@@ -96,14 +96,12 @@ class SøknadIntegrasjonstest {
                 httpMethod = HttpMethod.Get,
             ).let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
-                val seksjoner = objectMapper.readValue<OrkestratorSoknadDTO>(respons.bodyAsText())
-                seksjoner.seksjoner.first().navn shouldBe SeksjonsnavnDTO.bostedsland
-                seksjoner.seksjoner.first().besvarteOpplysninger shouldBe emptyList()
-                seksjoner.seksjoner
-                    .first()
-                    .nesteUbesvarteOpplysning!!
+                val søknadRespons = objectMapper.readValue<OrkestratorSoknadDTO>(respons.bodyAsText())
+                søknadRespons.seksjoner.first().navn shouldBe SeksjonsnavnDTO.bostedsland
+                søknadRespons.seksjoner.first().besvarteOpplysninger shouldBe emptyList()
+                søknadRespons.seksjoner.first().nesteUbesvarteOpplysning!!
                     .tekstnøkkel shouldBe TestSeksjon.opplysningsbehov1.tekstnøkkel
-                seksjoner.seksjoner.first().erFullført shouldBe false
+                søknadRespons.seksjoner.first().erFullført shouldBe false
             }
         }
     }

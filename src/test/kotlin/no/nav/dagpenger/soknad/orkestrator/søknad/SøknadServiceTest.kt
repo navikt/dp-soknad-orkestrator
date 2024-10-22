@@ -283,9 +283,9 @@ class SøknadServiceTest {
                 type = Opplysningstype.BOOLEAN,
             )
 
-        val nesteSeksjon = søknadService.nesteSeksjon(søknadId)
+        val søknad = søknadService.hentSøknad(søknadId)
 
-        nesteSeksjon.seksjoner.first().besvarteOpplysninger.also { opplysninger ->
+        søknad.seksjoner.first().besvarteOpplysninger.also { opplysninger ->
             opplysninger.size shouldBe 1
             opplysninger.first().opplysningId shouldBe opplysningId1
         }
@@ -316,7 +316,7 @@ class SøknadServiceTest {
             )
 
         søknadService
-            .nesteSeksjon(søknadId)
+            .hentSøknad(søknadId)
             .seksjoner
             .first()
             .erFullført shouldBe true
@@ -347,7 +347,7 @@ class SøknadServiceTest {
             )
 
         søknadService
-            .nesteSeksjon(søknadId)
+            .hentSøknad(søknadId)
             .seksjoner
             .first()
             .erFullført shouldBe false

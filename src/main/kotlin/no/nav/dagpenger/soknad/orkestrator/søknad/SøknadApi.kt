@@ -30,9 +30,9 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
                 get("/{søknadId}/neste") {
                     val søknadId = søknadId()
 
-                    val nesteSeksjon = søknadService.nesteSeksjon(søknadId)
+                    val søknad = søknadService.hentSøknad(søknadId)
 
-                    call.respond(HttpStatusCode.OK, nesteSeksjon)
+                    call.respond(HttpStatusCode.OK, søknad)
                 }
 
                 put("/{søknadId}/svar") {

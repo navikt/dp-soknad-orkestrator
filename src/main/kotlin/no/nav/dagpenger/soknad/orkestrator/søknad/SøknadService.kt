@@ -156,7 +156,7 @@ class SøknadService(
         }
     }
 
-    fun nesteSeksjon(søknadId: UUID): OrkestratorSoknadDTO {
+    fun hentSøknad(søknadId: UUID): OrkestratorSoknadDTO {
         val alleOpplysninger = opplysningRepository.hentAlle(søknadId)
         val ubesvarteOpplysninger = alleOpplysninger.filter { it.svar == null }.sortedBy { it.opplysningsbehovId }
         val nesteUbesvarteOpplysning = ubesvarteOpplysninger.firstOrNull()
