@@ -12,6 +12,7 @@ import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.upsert
 import java.time.LocalDateTime
@@ -26,7 +27,11 @@ class SøknadRepository(
 
     fun lagreQuizSøknad(søknad: Søknad) {
         transaction {
-            SøknadTabell.upsert {
+            // Hvis søknadId allerede finnes oppdaterer vi bare tilstand for søknaden
+            SøknadTabell.upsert(
+                SøknadTabell.søknadId,
+                onUpdate = listOf(Pair(SøknadTabell.tilstand, stringLiteral(søknad.tilstand.name))),
+            ) {
                 it[søknadId] = søknad.søknadId
                 it[ident] = søknad.ident
                 it[tilstand] = søknad.tilstand.name

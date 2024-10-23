@@ -11,6 +11,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import java.util.UUID
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -39,7 +40,7 @@ class SøknadRepositoryTest {
             Søknad(
                 søknadId = søknadId,
                 ident = ident,
-                tilstand = Tilstand.INNSENDT,
+                tilstand = INNSENDT,
                 opplysninger =
                     listOf(
                         QuizOpplysning(
@@ -59,6 +60,18 @@ class SøknadRepositoryTest {
         hentetSøknad?.søknadId shouldBe søknad.søknadId
         hentetSøknad?.tilstand shouldBe søknad.tilstand
         hentetSøknad?.opplysninger?.size shouldBe 1
+    }
+
+    @Test
+    fun `oppdaterer bare tilstand når vi lagrer en søknad som allerede er lagret`() {
+        val søknadId = UUID.randomUUID()
+        val søknad = Søknad(søknadId, "123456780")
+        søknadRepository.lagre(søknad)
+        val sammeSøknadMedNyTilstand = Søknad(søknadId, "123456780", tilstand = INNSENDT)
+
+        søknadRepository.lagreQuizSøknad(sammeSøknadMedNyTilstand)
+
+        søknadRepository.hent(søknadId)?.tilstand shouldBe INNSENDT
     }
 
     @Test
@@ -89,7 +102,7 @@ class SøknadRepositoryTest {
             Søknad(
                 søknadId = søknadId,
                 ident = ident,
-                tilstand = Tilstand.INNSENDT,
+                tilstand = INNSENDT,
                 opplysninger =
                     listOf(
                         QuizOpplysning(
@@ -116,7 +129,7 @@ class SøknadRepositoryTest {
             Søknad(
                 søknadId = søknadId,
                 ident = ident,
-                tilstand = Tilstand.INNSENDT,
+                tilstand = INNSENDT,
                 opplysninger =
                     listOf(
                         QuizOpplysning(
