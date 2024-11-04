@@ -50,6 +50,8 @@ class SøknadMottak(
 
                 publiserMeldingOmSøknadInnsendt()
             }
+
+            opprettKomplettSøknadData(jsonNode)
         }
     }
 
@@ -65,5 +67,13 @@ class SøknadMottak(
         val søknadId = this.get("søknadId").asUUID()
 
         søknadService.publiserMeldingOmSøknadInnsendt(søknadId, ident)
+    }
+
+    private fun opprettKomplettSøknadData(søknadMelding: JsonNode) {
+        val ident = søknadMelding.get("ident").asText()
+        val søknadId = søknadMelding.get("søknadId").asUUID()
+        val seksjoner = søknadMelding["søknadData"]["seksjoner"]
+
+        søknadService.opprettKomplettSøknadData(ident, søknadId, seksjoner)
     }
 }

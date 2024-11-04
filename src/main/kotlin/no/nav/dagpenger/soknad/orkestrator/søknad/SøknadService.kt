@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
+import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.OrkestratorSoknadDTO
@@ -29,6 +30,37 @@ class SøknadService(
     }
 
     fun søknadFinnes(søknadId: UUID) = søknadRepository.hent(søknadId) != null
+
+    fun opprettKomplettSøknadData(
+        ident: String,
+        søknadId: UUID,
+        seksjoner: JsonNode,
+    ) {
+        val komplettSøknaddata =
+            objectMapper.createObjectNode().apply {
+                put("ident", ident)
+                put("søknadId", søknadId.toString())
+                set<JsonNode>("seksjoner", seksjoner)
+
+                val orkestratorOpplysninger = opplysningRepository.hentAlle(søknadId).groupBy { it.seksjonsnavn }
+
+                val orkestratorSeksjoner =
+                    orkestratorOpplysninger.map { (seksjonsnavn, opplysninger) ->
+                        objectMapper.createObjectNode().apply {
+                            put("seksjon", seksjonsnavn.name)
+                            set<JsonNode>("opplysninger", objectMapper.valueToTree(opplysninger))
+                        }
+                    }
+
+                set<JsonNode>("orkestratorSeksjoner", objectMapper.valueToTree(orkestratorSeksjoner))
+            }
+
+        lagreKomplettSøknadData(komplettSøknaddata)
+    }
+
+    fun lagreKomplettSøknadData(komplettSøknaddata: JsonNode) {
+        // TODO: Implement
+    }
 
     fun publiserMeldingOmSøknadInnsendt(
         søknadId: UUID,
@@ -176,7 +208,8 @@ class SøknadService(
             }
         val besvarteOpplysningerDTO =
             besvarteOpplysninger.map {
-                seksjon.getOpplysningsbehov(it.opplysningsbehovId).toOpplysningDTO(it.opplysningId, toJson(it.svar!!))
+                seksjon.getOpplysningsbehov(it.opplysningsbehovId)
+                    .toOpplysningDTO(it.opplysningId, toJson(it.svar!!))
             }
 
         val seksjoner =
