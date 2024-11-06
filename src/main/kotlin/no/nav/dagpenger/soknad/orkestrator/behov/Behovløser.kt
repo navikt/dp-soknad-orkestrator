@@ -10,7 +10,10 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysningRepository: QuizOpplysningRepository) {
+abstract class Behovløser(
+    val rapidsConnection: RapidsConnection,
+    val opplysningRepository: QuizOpplysningRepository,
+) {
     abstract val behov: String
     abstract val beskrivendeId: String
 
@@ -67,11 +70,12 @@ abstract class Behovløser(val rapidsConnection: RapidsConnection, val opplysnin
         ident: String,
     ): LocalDate? {
         val søknadstidspunkt =
-            opplysningRepository.hent(
-                beskrivendeId = "søknadstidspunkt",
-                ident = ident,
-                søknadId = søknadId,
-            )?.svar
+            opplysningRepository
+                .hent(
+                    beskrivendeId = "søknadstidspunkt",
+                    ident = ident,
+                    søknadId = søknadId,
+                )?.svar
 
         return søknadstidspunkt?.let {
             ZonedDateTime.parse(it as String, DateTimeFormatter.ISO_ZONED_DATE_TIME).toLocalDate()
