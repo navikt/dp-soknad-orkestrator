@@ -46,9 +46,16 @@ class SøknadService(
 
                 val orkestratorSeksjoner =
                     orkestratorOpplysninger.map { (seksjonsnavn, opplysninger) ->
+                        val seksjon = getSeksjon(seksjonsnavn)
+                        val opplysningDTOer =
+                            opplysninger.map {
+                                seksjon.getOpplysningsbehov(it.opplysningsbehovId)
+                                    .toOpplysningDTO(it.opplysningId, toJson(it.svar!!))
+                            }
+
                         objectMapper.createObjectNode().apply {
                             put("seksjon", seksjonsnavn.name)
-                            set<JsonNode>("opplysninger", objectMapper.valueToTree(opplysninger))
+                            set<JsonNode>("opplysninger", objectMapper.valueToTree(opplysningDTOer))
                         }
                     }
 
