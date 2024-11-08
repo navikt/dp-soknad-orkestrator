@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.OrkestratorSoknadDTO
@@ -35,7 +36,7 @@ class SøknadService(
         ident: String,
         søknadId: UUID,
         seksjoner: JsonNode,
-    ) {
+    ): ObjectNode {
         val komplettSøknaddata =
             objectMapper.createObjectNode().apply {
                 put("ident", ident)
@@ -47,25 +48,41 @@ class SøknadService(
                 val orkestratorSeksjoner =
                     orkestratorOpplysninger.map { (seksjonsnavn, opplysninger) ->
                         val seksjon = getSeksjon(seksjonsnavn)
-                        val opplysningDTOer =
-                            opplysninger.map {
-                                seksjon.getOpplysningsbehov(it.opplysningsbehovId)
-                                    .toOpplysningDTO(it.opplysningId, toJson(it.svar!!))
-                            }
+                        val opplysningObjectNodes = opplysninger.toSøknadDataObjectNodes(seksjon)
 
                         objectMapper.createObjectNode().apply {
-                            put("seksjon", seksjonsnavn.name)
-                            set<JsonNode>("opplysninger", objectMapper.valueToTree(opplysningDTOer))
+                            put("seksjonsnavn", seksjonsnavn.name)
+                            set<ObjectNode>("opplysninger", objectMapper.valueToTree(opplysningObjectNodes))
                         }
                     }
 
                 set<JsonNode>("orkestratorSeksjoner", objectMapper.valueToTree(orkestratorSeksjoner))
             }
 
-        lagreKomplettSøknadData(komplettSøknaddata)
+        // TODO: Lagre komplett søknaddata i stedet for return
+        return komplettSøknaddata
     }
 
-    fun lagreKomplettSøknadData(komplettSøknaddata: JsonNode) {
+    private fun List<Opplysning>.toSøknadDataObjectNodes(seksjon: Seksjon): List<ObjectNode> =
+        this.map {
+            val opplysningsbehov = seksjon.getOpplysningsbehov(it.opplysningsbehovId)
+
+            val id = it.opplysningId
+            val tekstnøkkel = opplysningsbehov.tekstnøkkel
+            val type = opplysningsbehov.type
+            val svar = it.svar!!.verdi
+            val gyldigeSvar = opplysningsbehov.gyldigeSvar
+
+            objectMapper.createObjectNode().apply {
+                put("opplysningId", id.toString())
+                put("tekstnøkkel", tekstnøkkel)
+                put("type", type.name)
+                set<JsonNode>("svar", objectMapper.valueToTree(svar))
+                set<JsonNode>("gyldigeSvar", objectMapper.valueToTree(gyldigeSvar))
+            }
+        }
+
+    private fun lagreKomplettSøknadData(komplettSøknaddata: JsonNode) {
         // TODO: Implement
     }
 
@@ -215,7 +232,8 @@ class SøknadService(
             }
         val besvarteOpplysningerDTO =
             besvarteOpplysninger.map {
-                seksjon.getOpplysningsbehov(it.opplysningsbehovId)
+                seksjon
+                    .getOpplysningsbehov(it.opplysningsbehovId)
                     .toOpplysningDTO(it.opplysningId, toJson(it.svar!!))
             }
 
