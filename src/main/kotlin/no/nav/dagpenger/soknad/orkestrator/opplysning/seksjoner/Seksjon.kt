@@ -33,5 +33,4 @@ fun getSeksjon(navn: Seksjonsnavn): Seksjon {
 
 enum class Seksjonsnavn {
     BOSTEDSLAND,
-    NY_SEKSJON,
 }

@@ -16,14 +16,14 @@ class SøknadMottak(
     rapidsConnection: RapidsConnection,
     private val søknadService: SøknadService,
     private val søknadRepository: SøknadRepository,
-) :
-    River.PacketListener {
+) : River.PacketListener {
     init {
-        River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "søknad_innsendt_varsel") }
-            validate { it.requireKey("ident", "søknadId", "søknadstidspunkt", "søknadData") }
-            validate { it.interestedIn("@id", "@opprettet") }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                validate { it.demandValue("@event_name", "søknad_innsendt_varsel") }
+                validate { it.requireKey("ident", "søknadId", "søknadstidspunkt", "søknadData") }
+                validate { it.interestedIn("@id", "@opprettet") }
+            }.register(this)
     }
 
     override fun onPacket(
@@ -51,7 +51,12 @@ class SøknadMottak(
                 publiserMeldingOmSøknadInnsendt()
             }
 
-            opprettKomplettSøknadData(jsonNode)
+            try {
+                opprettKomplettSøknadData(jsonNode)
+            } catch (e: Exception) {
+                logger.error(e) { "Feil ved opprettelse av komplett søknaddata for søknad ${packet["søknadId"]}" }
+                sikkerlogg.error(e) { "Feil ved opprettelse av komplett søknaddata. Packet: ${packet.toJson()}" }
+            }
         }
     }
 
