@@ -32,7 +32,7 @@ class SøknadService(
 
     fun søknadFinnes(søknadId: UUID) = søknadRepository.hent(søknadId) != null
 
-    fun opprettKomplettSøknadData(
+    fun opprettOgLagreKomplettSøknaddata(
         ident: String,
         søknadId: UUID,
         seksjoner: JsonNode,
@@ -59,7 +59,7 @@ class SøknadService(
                 set<JsonNode>("orkestratorSeksjoner", objectMapper.valueToTree(orkestratorSeksjoner))
             }
 
-        // TODO: Lagre komplett søknaddata i stedet for return
+        søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
         return komplettSøknaddata
     }
 
@@ -81,10 +81,6 @@ class SøknadService(
                 set<JsonNode>("gyldigeSvar", objectMapper.valueToTree(gyldigeSvar))
             }
         }
-
-    private fun lagreKomplettSøknadData(komplettSøknaddata: JsonNode) {
-        // TODO: Implement
-    }
 
     fun publiserMeldingOmSøknadInnsendt(
         søknadId: UUID,

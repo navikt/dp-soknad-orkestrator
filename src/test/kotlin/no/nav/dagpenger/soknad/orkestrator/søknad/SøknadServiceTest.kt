@@ -85,8 +85,9 @@ class SøknadServiceTest {
         val seksjoner = objectMapper.readTree(quizSeksjoner)
         every { opplysningRepository.hentAlle(søknadId) } returns emptyList()
 
-        val søknadData = søknadService.opprettKomplettSøknadData(ident = ident, søknadId = søknadId, seksjoner = seksjoner)
+        val søknadData = søknadService.opprettOgLagreKomplettSøknaddata(ident = ident, søknadId = søknadId, seksjoner = seksjoner)
 
+        verify(exactly = 1) { søknadRepository.lagreKomplettSøknadData(søknadId, any()) }
         søknadData["ident"].asText() shouldBe ident
         søknadData["søknadId"].asText() shouldBe søknadId.toString()
         søknadData["seksjoner"] shouldBe seksjoner
@@ -142,8 +143,9 @@ class SøknadServiceTest {
                 gyldigeSvar = listOf("NOR", "SWE", "FIN"),
             )
 
-        val søknadData = søknadService.opprettKomplettSøknadData(ident = ident, søknadId = søknadId, seksjoner = seksjoner)
+        val søknadData = søknadService.opprettOgLagreKomplettSøknaddata(ident = ident, søknadId = søknadId, seksjoner = seksjoner)
 
+        verify(exactly = 1) { søknadRepository.lagreKomplettSøknadData(søknadId, any()) }
         søknadData["ident"].asText() shouldBe ident
         søknadData["søknadId"].asText() shouldBe søknadId.toString()
         søknadData["seksjoner"] shouldBe seksjoner

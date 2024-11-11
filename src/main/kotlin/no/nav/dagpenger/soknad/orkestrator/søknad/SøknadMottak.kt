@@ -79,6 +79,6 @@ class SøknadMottak(
         val søknadId = søknadMelding.get("søknadId").asUUID()
         val seksjoner = søknadMelding["søknadData"]["seksjoner"]
 
-        søknadService.opprettKomplettSøknadData(ident, søknadId, seksjoner)
+        søknadService.opprettOgLagreKomplettSøknaddata(ident, søknadId, seksjoner)
     }
 }
