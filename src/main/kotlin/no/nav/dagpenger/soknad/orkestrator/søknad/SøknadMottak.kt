@@ -30,11 +30,6 @@ class SøknadMottak(
         packet: JsonMessage,
         context: MessageContext,
     ) {
-        if (packet["søknadId"].asText() == "dea97606-49cc-4aca-ae83-160ce5fcf588") {
-            logger.info { "Hopper over feilende søknad" }
-            return
-        }
-
         withMDC(
             mapOf("søknadId" to packet["søknadId"].asText()),
         ) {
