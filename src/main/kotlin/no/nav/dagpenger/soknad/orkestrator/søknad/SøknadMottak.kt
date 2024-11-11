@@ -37,17 +37,12 @@ class SøknadMottak(
             SøknadMetrikker.mottatt.inc()
             sikkerlogg.info { "Mottok søknad innsendt hendelse: ${packet.toJson()}" }
 
-            val jsonNode = objectMapper.readTree(packet.toJson())
-
-            with(jsonNode) {
-                tilSøknad()
-                    .also(søknadRepository::lagreQuizSøknad)
-
-                publiserMeldingOmSøknadInnsendt()
-            }
+            val søknadmelding = objectMapper.readTree(packet.toJson())
+            søknadRepository.lagreQuizSøknad(søknadmelding.tilSøknad())
+            søknadmelding.publiserMeldingOmSøknadInnsendt()
 
             try {
-                val søknaddata = opprettOgLagreKomplettSøknaddata(jsonNode)
+                val søknaddata = opprettOgLagreKomplettSøknaddata(søknadmelding)
                 logger.info { "Komplett søknaddata opprettet for søknad ${packet["søknadId"]}" }
                 sikkerlogg.info { "Komplett søknaddata opprettet for søknad ${packet["søknadId"]}: $søknaddata" }
             } catch (e: Exception) {
