@@ -52,7 +52,9 @@ class SøknadMottak(
             }
 
             try {
-                opprettKomplettSøknadData(jsonNode)
+                val søknaddata = opprettOgLagreKomplettSøknaddata(jsonNode)
+                logger.info { "Komplett søknaddata opprettet for søknad ${packet["søknadId"]}" }
+                sikkerlogg.info { "Komplett søknaddata opprettet for søknad ${packet["søknadId"]}: $søknaddata" }
             } catch (e: Exception) {
                 logger.error(e) { "Feil ved opprettelse av komplett søknaddata for søknad ${packet["søknadId"]}" }
                 sikkerlogg.error(e) { "Feil ved opprettelse av komplett søknaddata. Packet: ${packet.toJson()}" }
@@ -74,11 +76,11 @@ class SøknadMottak(
         søknadService.publiserMeldingOmSøknadInnsendt(søknadId, ident)
     }
 
-    private fun opprettKomplettSøknadData(søknadMelding: JsonNode) {
+    private fun opprettOgLagreKomplettSøknaddata(søknadMelding: JsonNode): JsonNode {
         val ident = søknadMelding.get("ident").asText()
         val søknadId = søknadMelding.get("søknadId").asUUID()
         val seksjoner = søknadMelding["søknadData"]["seksjoner"]
 
-        søknadService.opprettOgLagreKomplettSøknaddata(ident, søknadId, seksjoner)
+        return søknadService.opprettOgLagreKomplettSøknaddata(ident, søknadId, seksjoner)
     }
 }
