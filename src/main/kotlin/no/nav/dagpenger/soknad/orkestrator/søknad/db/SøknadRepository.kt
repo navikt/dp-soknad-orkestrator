@@ -1,5 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
+import com.fasterxml.jackson.databind.JsonNode
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
@@ -9,8 +11,10 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.javatime.datetime
+import org.jetbrains.exposed.sql.json.jsonb
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -81,6 +85,27 @@ class SøknadRepository(
                 }.firstOrNull()
         }
 
+    fun lagreKomplettSøknadData(
+        søknadId: UUID,
+        komplettSøknadData: JsonNode,
+    ) {
+        transaction {
+            SøknadDataTabell.insert { it ->
+                it[SøknadDataTabell.søknadId] = søknadId
+                it[soknadData] = komplettSøknadData
+            }
+        }
+    }
+
+    fun hentKomplettSøknadData(søknadId: UUID): JsonNode? =
+        transaction {
+            SøknadDataTabell
+                .select(SøknadDataTabell.soknadData)
+                .where { SøknadDataTabell.søknadId eq søknadId }
+                .singleOrNull()
+                ?.get(SøknadDataTabell.soknadData)
+        }
+
     fun slett(søknadId: UUID): Int {
         return transaction {
             val antallSlettedeRader = SøknadTabell.deleteWhere { SøknadTabell.søknadId eq søknadId }
@@ -97,6 +122,17 @@ object SøknadTabell : IntIdTable("soknad") {
     val ident: Column<String> = varchar("ident", 11)
     val tilstand: Column<String> = text("tilstand").default(Tilstand.PÅBEGYNT.name)
 }
+
+object SøknadDataTabell : IntIdTable("soknad_data") {
+    val opprettet: Column<LocalDateTime> = datetime("opprettet").default(LocalDateTime.now())
+    val søknadId: Column<UUID> = uuid("soknad_id").references(SøknadTabell.søknadId)
+    val soknadData: Column<JsonNode> =
+        jsonb("soknad_data", { serializeSøknadData(it) }, { deserializeSøknadData(it) })
+}
+
+private fun serializeSøknadData(søknadData: JsonNode): String = objectMapper.writeValueAsString(søknadData)
+
+private fun deserializeSøknadData(søknadData: String): JsonNode = objectMapper.readTree(søknadData)
 
 fun SøknadTabell.getId(søknadId: UUID) =
     SøknadTabell

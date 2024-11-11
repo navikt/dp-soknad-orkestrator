@@ -1,7 +1,9 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
@@ -12,6 +14,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import java.util.UUID
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -96,6 +99,29 @@ class SøknadRepositoryTest {
     }
 
     @Test
+    fun `Kan lagre og hente komplett søknaddata`() {
+        val søknadId = UUID.randomUUID()
+        søknadRepository.lagre(Søknad(søknadId = søknadId, ident = "1234567891"))
+
+        søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
+        val hentetSøknaddata = søknadRepository.hentKomplettSøknadData(søknadId)
+
+        hentetSøknaddata shouldBe komplettSøknaddata
+    }
+
+    @Test
+    fun `Kan ikke lagre komplett søknaddata for én søknad flere ganger`() {
+        val søknadId = UUID.randomUUID()
+        søknadRepository.lagre(Søknad(søknadId = søknadId, ident = "1234567891"))
+
+        søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
+
+        shouldThrow<ExposedSQLException> {
+            søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
+        }
+    }
+
+    @Test
     fun `kan slette søknad`() {
         val søknadId = UUID.randomUUID()
         val søknad =
@@ -163,3 +189,46 @@ class SøknadRepositoryTest {
         }
     }
 }
+
+private val komplettSøknaddata =
+    objectMapper.readTree(
+        //language=JSON
+        """
+        {
+          "ident": "12345678901",
+          "søknadId": "3a8c70ed-a902-47aa-9ba2-ae5ea6448c4d",
+          "seksjoner": {
+            "seksjoner": [
+              {
+                "fakta": [
+                  {
+                    "id": "6001",
+                    "svar": "NOR",
+                    "type": "land",
+                    "beskrivendeId": "faktum.hvilket-land-bor-du-i"
+                  }
+                ],
+                "beskrivendeId": "bostedsland"
+              }
+            ]
+          },
+          "orkestratorSeksjoner": [
+            {
+              "seksjonsnavn": "BOSTEDSLAND",
+              "opplysninger": [
+                {
+                  "opplysningId": "a34beb9c-0fa6-48a8-a9b6-0b0dde283ae5",
+                  "tekstnøkkel": "tekstnøkkel.periode",
+                  "type": "PERIODE",
+                  "svar": {
+                    "fom": "2024-11-11",
+                    "tom": "2024-11-11"
+                  },
+                  "gyldigeSvar": null
+                }
+              ]
+            }
+          ]
+        }
+        """.trimIndent(),
+    )

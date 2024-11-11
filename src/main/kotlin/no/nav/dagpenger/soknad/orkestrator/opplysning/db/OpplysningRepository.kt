@@ -171,9 +171,9 @@ object OpplysningTabell : IntIdTable("opplysning") {
     val svar: Column<Svar<*>?> = jsonb("svar", { serializeSvar(it) }, { deserializeSvar(it) }).nullable()
 }
 
-fun serializeSvar(svar: Svar<*>): String = objectMapper.writeValueAsString(svar)
+private fun serializeSvar(svar: Svar<*>): String = objectMapper.writeValueAsString(svar)
 
-fun deserializeSvar(svar: String): Svar<*> = objectMapper.readValue(svar)
+private fun deserializeSvar(svar: String): Svar<*> = objectMapper.readValue(svar)
 
 object SeksjonTabell : IntIdTable("seksjon") {
     val navn: Column<String> = text("navn")
