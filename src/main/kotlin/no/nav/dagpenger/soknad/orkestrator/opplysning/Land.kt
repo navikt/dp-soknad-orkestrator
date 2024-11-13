@@ -1,6 +1,11 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.EØS_ELLER_SVEITS
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.NORGE
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.STORBRITANNIA
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.TREDJELAND
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.VERDEN
 import java.io.FileNotFoundException
 
 // TODO: Vil vi ha en enum for hver gruppering av land, eller flere enums som gyldig svar?
@@ -54,6 +59,15 @@ object Landfabrikk {
     val eøsEllerSveits = alleLand.filter { it.alpha3Code in eøsEllerSveitsLandkoder }
     val eøsOgSveitsOgStorbritannia = eøsEllerSveits + storbritannia
     val tredjeland = alleLand - norge.toSet() - storbritannia.toSet() - eøsEllerSveits.toSet()
+
+    fun LandGruppe.hentLandkoder(): List<Land> =
+        when (this) {
+            NORGE -> norge
+            STORBRITANNIA -> storbritannia
+            EØS_ELLER_SVEITS -> eøsEllerSveits
+            TREDJELAND -> tredjeland.toList()
+            VERDEN -> verden.toList()
+        }
 }
 
 data class LandKode(

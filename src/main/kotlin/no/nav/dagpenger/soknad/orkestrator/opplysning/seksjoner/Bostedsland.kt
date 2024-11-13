@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner
 
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk.hentLandkoder
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
@@ -103,7 +104,14 @@ object Bostedsland : Seksjon() {
         svar: Svar<*>,
     ) {
         if (opplysningsbehovId == hvilketLandBorDuI.id) {
-            if (hvilketLandBorDuI.gyldigeSvar?.contains(svar.verdi) != true) {
+            val gyldigeLand =
+                hvilketLandBorDuI.gyldigeSvar
+                    ?.map {
+                        LandGruppe.valueOf(it).hentLandkoder().map { land ->
+                            land.alpha3Code
+                        }
+                    }?.flatten()
+            if (gyldigeLand?.contains(svar.verdi) != true) {
                 throw IllegalArgumentException("$svar er ikke et gyldig svar")
             }
         }
