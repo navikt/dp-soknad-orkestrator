@@ -2,17 +2,15 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.application.call
 import io.ktor.server.auth.authenticate
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import io.ktor.util.pipeline.PipelineContext
 import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import java.util.UUID
@@ -28,7 +26,7 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
                 }
 
                 get("/{søknadId}/neste") {
-                    val søknadId = søknadId()
+                    val søknadId = søknadUuid()
 
                     val søknad = søknadService.hentSøknad(søknadId)
 
@@ -36,7 +34,7 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
                 }
 
                 put("/{søknadId}/svar") {
-                    val søknadId = søknadId()
+                    val søknadId = søknadUuid()
 
                     val svar =
                         try {
@@ -54,6 +52,8 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
     }
 }
 
-internal fun PipelineContext<Unit, ApplicationCall>.søknadId() =
-    call.parameters["søknadId"].let { UUID.fromString(it) }
-        ?: throw IllegalArgumentException("Må ha med id i parameter")
+private fun RoutingContext.søknadUuid() =
+    (
+        call.parameters["søknadId"].let { UUID.fromString(it) }
+            ?: throw IllegalArgumentException("Må ha med søknadId i parameter")
+    )
