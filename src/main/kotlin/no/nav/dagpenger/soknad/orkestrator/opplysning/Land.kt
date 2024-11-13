@@ -1,11 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.EØS_ELLER_SVEITS
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.NORGE
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.STORBRITANNIA
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.TREDJELAND
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.VERDEN
 import java.io.FileNotFoundException
 
 // TODO: Vil vi ha en enum for hver gruppering av land, eller flere enums som gyldig svar?
@@ -17,14 +12,48 @@ enum class LandGruppe {
     VERDEN,
 }
 
-fun LandGruppe.hentLandkoder() {
-    when (this) {
-        NORGE -> listOf("NOR")
-        STORBRITANNIA -> listOf("GBR")
-        EØS_ELLER_SVEITS -> listOf("SWE", "FIN", "SUI")
-        TREDJELAND -> listOf("USA", "CAN", "AUS")
-        VERDEN -> listOf("NOR", "SWE", "FIN", "SUI", "USA", "CAN", "AUS")
-    }
+object Landfabrikk {
+    val alleLand = LandOppslag.land
+
+    val verden = alleLand
+    val norge = alleLand.filter { it.alpha3Code in listOf("NOR", "SJM") }
+    val storbritannia = alleLand.filter { it.alpha3Code in listOf("GBR", "JEY", "IMN") }
+    val eøsEllerSveitsLandkoder =
+        listOf(
+            "BEL",
+            "BGR",
+            "DNK",
+            "EST",
+            "FIN",
+            "FRA",
+            "GRC",
+            "IRL",
+            "ISL",
+            "ITA",
+            "HRV",
+            "CYP",
+            "LVA",
+            "LIE",
+            "LTU",
+            "LUX",
+            "MLT",
+            "NLD",
+            "POL",
+            "PRT",
+            "ROU",
+            "SVK",
+            "SVN",
+            "ESP",
+            "CHE",
+            "SWE",
+            "CZE",
+            "DEU",
+            "HUN",
+            "AUT",
+        )
+    val eøsEllerSveits = alleLand.filter { it.alpha3Code in eøsEllerSveitsLandkoder }
+    val eøsOgSveitsOgStorbritannia = eøsEllerSveits + storbritannia
+    val tredjeland = alleLand - norge.toSet() - storbritannia.toSet() - eøsEllerSveits.toSet()
 }
 
 data class LandKode(

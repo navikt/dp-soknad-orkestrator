@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner
 
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
@@ -13,7 +14,7 @@ object Bostedsland : Seksjon() {
             id = 1,
             tekstnøkkel = "faktum.hvilket-land-bor-du-i",
             type = Opplysningstype.LAND,
-            gyldigeSvar = listOf("NOR", "SWE", "FIN"),
+            gyldigeSvar = listOf(LandGruppe.VERDEN.name),
         )
 
     val reistTilbakeTilNorge =
@@ -56,8 +57,8 @@ object Bostedsland : Seksjon() {
     override fun nesteOpplysningsbehov(
         svar: Svar<*>,
         opplysningsbehovId: Int,
-    ): Opplysningsbehov? {
-        return when (opplysningsbehovId) {
+    ): Opplysningsbehov? =
+        when (opplysningsbehovId) {
             hvilketLandBorDuI.id -> if (svar.verdi != "NOR") reistTilbakeTilNorge else null
             reistTilbakeTilNorge.id -> if (svar.verdi == true) datoForAvreise else enGangIUken
             datoForAvreise.id -> hvorforReisteFraNorge
@@ -66,7 +67,6 @@ object Bostedsland : Seksjon() {
             rotasjon.id -> null
             else -> null
         }
-    }
 
     override fun getOpplysningsbehov(opplysningsbehovId: Int): Opplysningsbehov =
         when (opplysningsbehovId) {
