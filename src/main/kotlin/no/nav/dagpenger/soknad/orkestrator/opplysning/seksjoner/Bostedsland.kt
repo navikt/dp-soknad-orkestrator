@@ -106,11 +106,8 @@ object Bostedsland : Seksjon() {
         if (opplysningsbehovId == hvilketLandBorDuI.id) {
             val gyldigeLand =
                 hvilketLandBorDuI.gyldigeSvar
-                    ?.map {
-                        LandGruppe.valueOf(it).hentLandkoder().map { land ->
-                            land.alpha3Code
-                        }
-                    }?.flatten()
+                    ?.map { LandGruppe.valueOf(it).hentLandkoder() }
+                    ?.flatten()
             if (gyldigeLand?.contains(svar.verdi) != true) {
                 throw IllegalArgumentException("$svar er ikke et gyldig svar")
             }

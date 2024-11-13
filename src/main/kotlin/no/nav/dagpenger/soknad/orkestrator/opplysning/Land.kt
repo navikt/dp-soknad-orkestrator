@@ -60,20 +60,17 @@ object Landfabrikk {
     val eøsOgSveitsOgStorbritannia = eøsEllerSveits + storbritannia
     val tredjeland = alleLand - norge.toSet() - storbritannia.toSet() - eøsEllerSveits.toSet()
 
-    fun LandGruppe.hentLandkoder(): List<Land> =
+    fun LandGruppe.hentLandkoder(): List<String> =
         when (this) {
-            NORGE -> norge
-            STORBRITANNIA -> storbritannia
-            EØS_ELLER_SVEITS -> eøsEllerSveits
-            TREDJELAND -> tredjeland.toList()
-            VERDEN -> verden.toList()
+            NORGE -> norge.toLandkoder()
+            STORBRITANNIA -> storbritannia.toLandkoder()
+            EØS_ELLER_SVEITS -> eøsEllerSveits.toLandkoder()
+            TREDJELAND -> tredjeland.toList().toLandkoder()
+            VERDEN -> verden.toList().toLandkoder()
         }
-}
 
-data class LandKode(
-    private val id: Int,
-    val alpha3Code: String,
-)
+    fun List<Land>.toLandkoder(): List<String> = this.map { it.alpha3Code }
+}
 
 internal object LandOppslag {
     /**
