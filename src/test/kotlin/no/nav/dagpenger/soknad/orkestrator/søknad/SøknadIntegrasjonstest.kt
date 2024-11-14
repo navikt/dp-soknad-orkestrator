@@ -11,8 +11,10 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.every
@@ -139,6 +141,7 @@ class SøknadIntegrasjonstest {
         ) {
             client.put("$søknadEndepunkt/${søknad.søknadId}/svar") {
                 header(HttpHeaders.Authorization, "Bearer $testToken")
+                contentType(ContentType.Application.Json)
                 setBody(objectMapper.writeValueAsString(svar))
             }.let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
