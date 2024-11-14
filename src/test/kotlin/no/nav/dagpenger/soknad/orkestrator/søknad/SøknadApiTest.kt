@@ -40,12 +40,13 @@ class SøknadApiTest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.post("$søknadEndepunkt/start") {
-                header(HttpHeaders.Authorization, "Bearer $testToken")
-            }.let { respons ->
-                respons.status shouldBe HttpStatusCode.OK
-                shouldNotThrow<Exception> { objectMapper.readValue(respons.bodyAsText(), UUID::class.java) }
-            }
+            client
+                .post("$søknadEndepunkt/start") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.let { respons ->
+                    respons.status shouldBe HttpStatusCode.OK
+                    shouldNotThrow<Exception> { objectMapper.readValue(respons.bodyAsText(), UUID::class.java) }
+                }
         }
     }
 
@@ -67,14 +68,15 @@ class SøknadApiTest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.get("$søknadEndepunkt/$søknadId/neste") {
-                header(HttpHeaders.Authorization, "Bearer $testToken")
-            }.let { respons ->
-                respons.status shouldBe HttpStatusCode.OK
-                shouldNotThrow<Exception> {
-                    objectMapper.readValue<OrkestratorSoknadDTO>(respons.bodyAsText())
+            client
+                .get("$søknadEndepunkt/$søknadId/neste") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.let { respons ->
+                    respons.status shouldBe HttpStatusCode.OK
+                    shouldNotThrow<Exception> {
+                        objectMapper.readValue<OrkestratorSoknadDTO>(respons.bodyAsText())
+                    }
                 }
-            }
         }
 
     @ParameterizedTest
@@ -85,13 +87,14 @@ class SøknadApiTest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.put("$søknadEndepunkt/$søknadId/svar") {
-                header(HttpHeaders.Authorization, "Bearer $testToken")
-                contentType(ContentType.Application.Json)
-                setBody(jsonSvar)
-            }.let { respons ->
-                respons.status shouldBe HttpStatusCode.OK
-            }
+            client
+                .put("$søknadEndepunkt/$søknadId/svar") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                    contentType(ContentType.Application.Json)
+                    setBody(jsonSvar)
+                }.let { respons ->
+                    respons.status shouldBe HttpStatusCode.OK
+                }
         }
     }
 
@@ -106,6 +109,7 @@ class SøknadApiTest {
             val respons =
                 client.put("$søknadEndepunkt/$søknadId/svar") {
                     header(HttpHeaders.Authorization, "Bearer $testToken")
+                    contentType(ContentType.Application.Json)
                     setBody(jsonSvarMedFeilVerditype)
                 }
             respons.status shouldBe HttpStatusCode.BadRequest
@@ -128,12 +132,14 @@ class SøknadApiTest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.put("$søknadEndepunkt/$søknadId/svar") {
-                header(HttpHeaders.Authorization, "Bearer $testToken")
-                setBody(jsonSvarMedLowercaseType)
-            }.let { respons ->
-                respons.status shouldBe HttpStatusCode.OK
-            }
+            client
+                .put("$søknadEndepunkt/$søknadId/svar") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                    contentType(ContentType.Application.Json)
+                    setBody(jsonSvarMedLowercaseType)
+                }.let { respons ->
+                    respons.status shouldBe HttpStatusCode.OK
+                }
         }
     }
 
