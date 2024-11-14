@@ -4,10 +4,9 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
-import no.nav.dagpenger.soknad.orkestrator.api.internalApi
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
-import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
@@ -42,16 +41,20 @@ internal class ApplicationBuilder(
 
     private val rapidsConnection =
         RapidApplication
-            .create(configuration) { engine, _ ->
-                engine.application.apiKonfigurasjon()
-                engine.application.internalApi()
-                engine.application.søknadApi(søknadService = søknadService)
-            }.also { rapidsConnection ->
+            .create(
+                configuration,
+                objectMapper = objectMapper,
+                builder = { withKtorModule { søknadApi(søknadService) } },
+            ).also { rapidsConnection ->
                 søknadService.setRapidsConnection(rapidsConnection)
                 SøknadMottak(rapidsConnection, søknadService, søknadRepository)
                 BehovMottak(
                     rapidsConnection = rapidsConnection,
-                    behovløserFactory = BehovløserFactory(rapidsConnection, QuizOpplysningRepositoryPostgres(dataSource)),
+                    behovløserFactory =
+                        BehovløserFactory(
+                            rapidsConnection,
+                            QuizOpplysningRepositoryPostgres(dataSource),
+                        ),
                     søknadService = søknadService,
                 )
                 SøknadSlettetMottak(rapidsConnection, søknadService)

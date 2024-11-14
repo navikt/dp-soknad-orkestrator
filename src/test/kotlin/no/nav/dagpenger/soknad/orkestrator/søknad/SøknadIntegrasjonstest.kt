@@ -1,19 +1,25 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.equality.shouldBeEqualToComparingFields
 import io.kotest.matchers.shouldBe
+import io.ktor.client.request.get
+import io.ktor.client.request.header
+import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
-import io.ktor.http.HttpMethod
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.server.testing.ApplicationTestBuilder
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import no.nav.dagpenger.soknad.orkestrator.api.models.OrkestratorSoknadDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SeksjonsnavnDTO
-import no.nav.dagpenger.soknad.orkestrator.config.apiKonfigurasjon
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
@@ -31,7 +37,6 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
-import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.autentisert
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -45,6 +50,7 @@ class SøknadIntegrasjonstest {
     lateinit var søknadRepository: SøknadRepository
     lateinit var opplysningRepository: OpplysningRepository
     lateinit var søknadService: SøknadService
+    val testToken by TestApplication
 
     private val seksjonPath = "no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.SeksjonKt"
 
@@ -68,12 +74,15 @@ class SøknadIntegrasjonstest {
     }
 
     @Test
-    fun `Ny søknad fører til opprettelse av søknad, opplysning og seksjon`() {
-        withSøknadApi {
-            autentisert(
-                endepunkt = "$søknadEndepunkt/start",
-                httpMethod = HttpMethod.Post,
-            ).let { respons ->
+    fun `Ny søknad fører til opprettelse av søknad, opplysning og seksjon 2`() {
+        naisfulTestApp(
+            testApplicationModule = { søknadApi(søknadService) },
+            meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
+            objectMapper = objectMapper,
+        ) {
+            client.post("$søknadEndepunkt/start") {
+                header(HttpHeaders.Authorization, "Bearer $testToken")
+            }.let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
                 val søknadId = objectMapper.readValue(respons.bodyAsText(), UUID::class.java)
                 søknadRepository.hent(søknadId)?.søknadId shouldBe søknadId
@@ -91,11 +100,14 @@ class SøknadIntegrasjonstest {
         val søknad = Søknad(UUID.randomUUID(), "12345678901")
         lagreSøknadSeksjonOpplysning(søknad)
 
-        withSøknadApi {
-            autentisert(
-                endepunkt = "$søknadEndepunkt/${søknad.søknadId}/neste",
-                httpMethod = HttpMethod.Get,
-            ).let { respons ->
+        naisfulTestApp(
+            testApplicationModule = { søknadApi(søknadService) },
+            meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
+            objectMapper = objectMapper,
+        ) {
+            client.get("$søknadEndepunkt/${søknad.søknadId}/neste") {
+                header(HttpHeaders.Authorization, "Bearer $testToken")
+            }.let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
                 val søknadRespons = objectMapper.readValue<OrkestratorSoknadDTO>(respons.bodyAsText())
                 søknadRespons.seksjoner.first().navn shouldBe SeksjonsnavnDTO.bostedsland
@@ -120,12 +132,15 @@ class SøknadIntegrasjonstest {
                 verdi = true,
             )
 
-        withSøknadApi {
-            autentisert(
-                endepunkt = "$søknadEndepunkt/${søknad.søknadId}/svar",
-                httpMethod = HttpMethod.Put,
-                body = objectMapper.writeValueAsString(svar),
-            ).let { respons ->
+        naisfulTestApp(
+            testApplicationModule = { søknadApi(søknadService) },
+            meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
+            objectMapper = objectMapper,
+        ) {
+            client.put("$søknadEndepunkt/${søknad.søknadId}/svar") {
+                header(HttpHeaders.Authorization, "Bearer $testToken")
+                setBody(objectMapper.writeValueAsString(svar))
+            }.let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
                 opplysningRepository.hent(nesteOpplysning.opplysningId)?.svar?.shouldBeEqualToComparingFields(svar)
             }
@@ -157,16 +172,6 @@ class SøknadIntegrasjonstest {
                 it[type] = TestSeksjon.opplysningsbehov1.type.name
             }
         }
-    }
-
-    private fun withSøknadApi(test: suspend ApplicationTestBuilder.() -> Unit) {
-        TestApplication.withMockAuthServerAndTestApplication(
-            moduleFunction = {
-                apiKonfigurasjon()
-                søknadApi(søknadService)
-            },
-            test = test,
-        )
     }
 }
 

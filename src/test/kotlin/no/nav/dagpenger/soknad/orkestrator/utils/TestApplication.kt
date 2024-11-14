@@ -13,6 +13,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.testing.ApplicationTestBuilder
 import io.ktor.server.testing.testApplication
 import no.nav.security.mock.oauth2.MockOAuth2Server
+import kotlin.reflect.KProperty
 
 object TestApplication {
     private const val TOKENX_ISSUER_ID = "tokenx"
@@ -25,6 +26,11 @@ object TestApplication {
         }
     }
 
+    init {
+        System.setProperty("token-x.client-id", CLIENT_ID)
+        System.setProperty("token-x.well-known-url", "${mockOAuth2Server.wellKnownUrl(TOKENX_ISSUER_ID)}")
+    }
+
     internal val testTokenXToken: String by lazy {
         mockOAuth2Server.issueToken(
             issuerId = TOKENX_ISSUER_ID,
@@ -33,13 +39,20 @@ object TestApplication {
         ).serialize()
     }
 
+    operator fun getValue(
+        thisRef: Any?,
+        property: KProperty<*>,
+    ): Any =
+        mockOAuth2Server.issueToken(
+            issuerId = TOKENX_ISSUER_ID,
+            audience = CLIENT_ID,
+            claims = mapOf("pid" to DEFAULT_DUMMY_FODSELSNUMMER),
+        ).serialize()
+
     internal fun withMockAuthServerAndTestApplication(
         moduleFunction: Application.() -> Unit,
         test: suspend ApplicationTestBuilder.() -> Unit,
     ) {
-        System.setProperty("token-x.client-id", CLIENT_ID)
-        System.setProperty("token-x.well-known-url", "${mockOAuth2Server.wellKnownUrl(TOKENX_ISSUER_ID)}")
-
         return testApplication {
             application(moduleFunction)
             test()
