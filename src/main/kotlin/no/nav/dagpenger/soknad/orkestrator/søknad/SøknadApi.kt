@@ -27,6 +27,8 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
     }
 
     routing {
+        get("/") { call.respond(HttpStatusCode.OK) }
+
         authenticate("tokenX") {
             route("/soknad") {
                 post("/start") {
