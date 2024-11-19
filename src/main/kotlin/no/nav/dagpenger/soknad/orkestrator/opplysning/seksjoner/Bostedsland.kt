@@ -1,7 +1,10 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner
 
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.ALLE_LAND
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.EØS_ELLER_SVEITS
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.NORGE
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.STORBRITANNIA
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.TREDJELAND
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk.eøsOgSveits
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk.hentLandkoder
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk.toLandkoder
@@ -18,7 +21,7 @@ object Bostedsland : Seksjon() {
             id = 1,
             tekstnøkkel = "faktum.hvilket-land-bor-du-i",
             type = Opplysningstype.LAND,
-            gyldigeSvar = listOf(ALLE_LAND.name),
+            gyldigeSvar = listOf(NORGE.name, STORBRITANNIA.name, EØS_ELLER_SVEITS.name, TREDJELAND.name),
         )
 
     val reistTilbakeTilNorge =

@@ -1,16 +1,13 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.ALLE_LAND
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.EØS_ELLER_SVEITS
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.NORGE
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.STORBRITANNIA
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.TREDJELAND
 import java.io.FileNotFoundException
 
-// TODO: Vil vi ha en enum for hver gruppering av land, eller flere enums som gyldig svar?
 enum class LandGruppe {
-    ALLE_LAND,
     NORGE,
     STORBRITANNIA,
     EØS_ELLER_SVEITS,
@@ -60,7 +57,6 @@ object Landfabrikk {
 
     fun LandGruppe.hentLandkoder(): List<String> =
         when (this) {
-            ALLE_LAND -> alleLand.toLandkoder()
             NORGE -> norge.toLandkoder()
             STORBRITANNIA -> storbritannia.toLandkoder()
             EØS_ELLER_SVEITS -> eøsOgSveits.toLandkoder()
