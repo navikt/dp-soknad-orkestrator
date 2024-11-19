@@ -6,6 +6,8 @@ import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.opplysning.BooleanSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.DatoSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandSvar
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk.eøsOgSveits
 import no.nav.dagpenger.soknad.orkestrator.opplysning.TekstSvar
 import java.time.LocalDate
 import java.util.UUID
@@ -22,10 +24,19 @@ class BostedslandTest {
     }
 
     @Test
-    fun `neste opplysning er reistTilbakeTilNorge når hvilketLandBorDuI ikke er Norge`() {
-        val svar = LandSvar(opplysningId = UUID.randomUUID(), "SWE")
+    fun `neste opplysning er null når hvilketLandBorDuI er et tredjeland`() {
+        val svar = LandSvar(opplysningId = UUID.randomUUID(), Landfabrikk.tredjeland.random().alpha3Code)
 
         val nesteOpplysningsbehov = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.hvilketLandBorDuI.id)
+
+        nesteOpplysningsbehov shouldBe null
+    }
+
+    @Test
+    fun `neste opplysning er reistTilbakeTilNorge når hvilketLandBorDuI er et EØS-land eller Sveits`() {
+        val eøsLandSvar = LandSvar(opplysningId = UUID.randomUUID(), eøsOgSveits.random().alpha3Code)
+
+        val nesteOpplysningsbehov = Bostedsland.nesteOpplysningsbehov(eøsLandSvar, Bostedsland.hvilketLandBorDuI.id)
 
         nesteOpplysningsbehov shouldBe Bostedsland.reistTilbakeTilNorge
     }

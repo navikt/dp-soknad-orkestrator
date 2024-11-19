@@ -1,26 +1,24 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.ALLE_LAND
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.EØS_ELLER_SVEITS
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.NORGE
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.STORBRITANNIA
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.TREDJELAND
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.VERDEN
 import java.io.FileNotFoundException
 
 // TODO: Vil vi ha en enum for hver gruppering av land, eller flere enums som gyldig svar?
 enum class LandGruppe {
+    ALLE_LAND,
     NORGE,
     STORBRITANNIA,
     EØS_ELLER_SVEITS,
     TREDJELAND,
-    VERDEN,
 }
 
 object Landfabrikk {
-    val alleLand = LandOppslag.land
-
-    val verden = alleLand
+    val alleLand = LandOppslag.land.toList()
     val norge = alleLand.filter { it.alpha3Code in listOf("NOR", "SJM") }
     val storbritannia = alleLand.filter { it.alpha3Code in listOf("GBR", "JEY", "IMN") }
     val eøsEllerSveitsLandkoder =
@@ -56,17 +54,17 @@ object Landfabrikk {
             "HUN",
             "AUT",
         )
-    val eøsEllerSveits = alleLand.filter { it.alpha3Code in eøsEllerSveitsLandkoder }
-    val eøsOgSveitsOgStorbritannia = eøsEllerSveits + storbritannia
-    val tredjeland = alleLand - norge.toSet() - storbritannia.toSet() - eøsEllerSveits.toSet()
+    val eøsOgSveits = alleLand.filter { it.alpha3Code in eøsEllerSveitsLandkoder }
+    val eøsOgSveitsOgStorbritannia = eøsOgSveits + storbritannia
+    val tredjeland = alleLand - norge - storbritannia - eøsOgSveits
 
     fun LandGruppe.hentLandkoder(): List<String> =
         when (this) {
+            ALLE_LAND -> alleLand.toLandkoder()
             NORGE -> norge.toLandkoder()
             STORBRITANNIA -> storbritannia.toLandkoder()
-            EØS_ELLER_SVEITS -> eøsEllerSveits.toLandkoder()
-            TREDJELAND -> tredjeland.toList().toLandkoder()
-            VERDEN -> verden.toList().toLandkoder()
+            EØS_ELLER_SVEITS -> eøsOgSveits.toLandkoder()
+            TREDJELAND -> tredjeland.toLandkoder()
         }
 
     fun List<Land>.toLandkoder(): List<String> = this.map { it.alpha3Code }
