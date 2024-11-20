@@ -2,7 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import no.nav.dagpenger.soknad.orkestrator.api.models.LandgruppeDTO
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.EØS_ELLER_SVEITS
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.EØS_OG_SVEITS
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.NORGE
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.STORBRITANNIA
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.TREDJELAND
@@ -11,7 +11,7 @@ import java.io.FileNotFoundException
 enum class Landgruppe {
     NORGE,
     STORBRITANNIA,
-    EØS_ELLER_SVEITS,
+    EØS_OG_SVEITS,
     TREDJELAND,
 }
 
@@ -19,7 +19,7 @@ object Landfabrikk {
     val alleLand = Landoppslag.land.toList()
     val norge = alleLand.filter { it.alpha3Code in listOf("NOR", "SJM") }
     val storbritannia = alleLand.filter { it.alpha3Code in listOf("GBR", "JEY", "IMN") }
-    val eøsEllerSveitsLandkoder =
+    val eøsOgSveitsLandkoder =
         listOf(
             "BEL",
             "BGR",
@@ -52,7 +52,7 @@ object Landfabrikk {
             "HUN",
             "AUT",
         )
-    val eøsOgSveits = alleLand.filter { it.alpha3Code in eøsEllerSveitsLandkoder }
+    val eøsOgSveits = alleLand.filter { it.alpha3Code in eøsOgSveitsLandkoder }
     val eøsOgSveitsOgStorbritannia = eøsOgSveits + storbritannia
     val tredjeland = alleLand - norge - storbritannia - eøsOgSveits
 
@@ -60,7 +60,7 @@ object Landfabrikk {
         when (this) {
             NORGE -> norge.toLandkoder()
             STORBRITANNIA -> storbritannia.toLandkoder()
-            EØS_ELLER_SVEITS -> eøsOgSveits.toLandkoder()
+            EØS_OG_SVEITS -> eøsOgSveits.toLandkoder()
             TREDJELAND -> tredjeland.toLandkoder()
         }
 
