@@ -58,6 +58,39 @@ paths:
       responses:
         '200':
           description: Svar ble lagret
+  /land/oppslag:
+    post:
+        summary: Hent landlister for gitte landgrupper
+        responses:
+          '200':
+            description: Liste med landgrupper returnert
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Landgruppe'
+          '400':
+            description: Ugyldig request body
+            content:
+              application/json:
+                schema:
+                  type: string
+                  example: Kunne ikke parse request body til liste med landgrupper
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+                  enum:
+                    - NORGE
+                    - STORBRITANNIA
+                    - EØS_OG_SVEITS
+                    - TREDJELAND
+                description: Liste med landgrupper
 
 components:
   schemas:
@@ -159,6 +192,20 @@ components:
           format: date
       required:
         - fom
+    Landgruppe:
+      type: object
+      properties:
+        gruppeId:
+          type: string
+          example: gupppe.norge
+        land:
+          type: array
+          items:
+            type: string
+          example: [NOR, SJM]
+      required:
+        - gruppeId
+        - land
 
 
 
