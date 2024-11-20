@@ -15,6 +15,7 @@ import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import no.nav.dagpenger.soknad.orkestrator.api.models.LandgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe
 import kotlin.test.Test
 
 class LandApiTest {

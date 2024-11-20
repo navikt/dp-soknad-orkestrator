@@ -3,11 +3,11 @@ package no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.eøsOgSveits
+import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.tredjeland
 import no.nav.dagpenger.soknad.orkestrator.opplysning.BooleanSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.DatoSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandSvar
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk.eøsOgSveits
 import no.nav.dagpenger.soknad.orkestrator.opplysning.TekstSvar
 import java.time.LocalDate
 import java.util.UUID
@@ -25,7 +25,7 @@ class BostedslandTest {
 
     @Test
     fun `neste opplysning er null når hvilketLandBorDuI er et tredjeland`() {
-        val svar = LandSvar(opplysningId = UUID.randomUUID(), Landfabrikk.tredjeland.random())
+        val svar = LandSvar(opplysningId = UUID.randomUUID(), tredjeland.random())
 
         val nesteOpplysningsbehov = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.hvilketLandBorDuI.id)
 

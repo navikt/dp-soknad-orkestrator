@@ -7,6 +7,8 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe
 
 internal fun Application.landApi() {
     routing {

@@ -1,12 +1,12 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner
 
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk.eøsOgSveits
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk.hentLandkoder
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.EØS_OG_SVEITS
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.NORGE
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.STORBRITANNIA
-import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.TREDJELAND
+import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.eøsOgSveits
+import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.hentLandkoder
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.EØS_OG_SVEITS
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.NORGE
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.STORBRITANNIA
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.TREDJELAND
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
