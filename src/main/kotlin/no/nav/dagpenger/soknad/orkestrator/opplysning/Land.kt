@@ -17,8 +17,8 @@ enum class Landgruppe {
 
 object Landfabrikk {
     val alleLand = Landoppslag.land.toList()
-    val norge = alleLand.filter { it.alpha3Code in listOf("NOR", "SJM") }
-    val storbritannia = alleLand.filter { it.alpha3Code in listOf("GBR", "JEY", "IMN") }
+    val norge = alleLand.filter { it in listOf("NOR", "SJM") }
+    val storbritannia = alleLand.filter { it in listOf("GBR", "JEY", "IMN") }
     val eøsOgSveitsLandkoder =
         listOf(
             "BEL",
@@ -52,19 +52,17 @@ object Landfabrikk {
             "HUN",
             "AUT",
         )
-    val eøsOgSveits = alleLand.filter { it.alpha3Code in eøsOgSveitsLandkoder }
+    val eøsOgSveits = alleLand.filter { it in eøsOgSveitsLandkoder }
     val eøsOgSveitsOgStorbritannia = eøsOgSveits + storbritannia
     val tredjeland = alleLand - norge - storbritannia - eøsOgSveits
 
     fun Landgruppe.hentLandkoder(): List<String> =
         when (this) {
-            NORGE -> norge.toLandkoder()
-            STORBRITANNIA -> storbritannia.toLandkoder()
-            EØS_OG_SVEITS -> eøsOgSveits.toLandkoder()
-            TREDJELAND -> tredjeland.toLandkoder()
+            NORGE -> norge
+            STORBRITANNIA -> storbritannia
+            EØS_OG_SVEITS -> eøsOgSveits
+            TREDJELAND -> tredjeland
         }
-
-    fun List<Land>.toLandkoder(): List<String> = this.map { it.alpha3Code }
 
     fun tilLandgruppeDTO(landgrupper: List<Landgruppe>): List<LandgruppeDTO> =
         landgrupper.map {
@@ -88,27 +86,12 @@ internal object Landoppslag {
         } ?: throw FileNotFoundException("Fant ikke filen $WORLD_JSON")
     }
 
-    val land = world.let { mapper.readTree(it) }.map { Land(it["alpha3"].asText().uppercase()) }.toSet()
-}
-
-class Land(
-    alpha3Code: String,
-) : Comparable<Land> {
-    val alpha3Code: String
-
-    init {
-        require(alpha3Code.length == 3) {
-            "ISO 3166-1-alpha3 må være 3 bokstaver lang. Fikk: $alpha3Code"
-        }
-
-        this.alpha3Code = alpha3Code.uppercase()
-    }
-
-    override fun compareTo(other: Land): Int = this.alpha3Code.compareTo(other.alpha3Code)
-
-    override fun equals(other: Any?): Boolean = other is Land && this.alpha3Code == other.alpha3Code
-
-    override fun hashCode(): Int = this.alpha3Code.hashCode()
-
-    override fun toString(): String = "Land(alpha3Code='$alpha3Code')"
+    val land =
+        world.let { mapper.readTree(it) }.map {
+            val alpha3Code = it["alpha3"].asText()
+            require(alpha3Code.length == 3) {
+                "ISO 3166-1-alpha3 må være 3 bokstaver lang. Fikk: $alpha3Code"
+            }
+            alpha3Code.uppercase()
+        }.toSet()
 }

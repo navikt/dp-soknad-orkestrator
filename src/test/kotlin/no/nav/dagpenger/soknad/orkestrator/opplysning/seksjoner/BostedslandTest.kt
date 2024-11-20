@@ -25,7 +25,7 @@ class BostedslandTest {
 
     @Test
     fun `neste opplysning er null når hvilketLandBorDuI er et tredjeland`() {
-        val svar = LandSvar(opplysningId = UUID.randomUUID(), Landfabrikk.tredjeland.random().alpha3Code)
+        val svar = LandSvar(opplysningId = UUID.randomUUID(), Landfabrikk.tredjeland.random())
 
         val nesteOpplysningsbehov = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.hvilketLandBorDuI.id)
 
@@ -34,7 +34,7 @@ class BostedslandTest {
 
     @Test
     fun `neste opplysning er reistTilbakeTilNorge når hvilketLandBorDuI er et EØS-land eller Sveits`() {
-        val eøsLandSvar = LandSvar(opplysningId = UUID.randomUUID(), eøsOgSveits.random().alpha3Code)
+        val eøsLandSvar = LandSvar(opplysningId = UUID.randomUUID(), eøsOgSveits.random())
 
         val nesteOpplysningsbehov = Bostedsland.nesteOpplysningsbehov(eøsLandSvar, Bostedsland.hvilketLandBorDuI.id)
 
