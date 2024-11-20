@@ -1,13 +1,13 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.EØS_ELLER_SVEITS
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.NORGE
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.STORBRITANNIA
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.TREDJELAND
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.EØS_ELLER_SVEITS
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.NORGE
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.STORBRITANNIA
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.TREDJELAND
 import java.io.FileNotFoundException
 
-enum class LandGruppe {
+enum class Landgruppe {
     NORGE,
     STORBRITANNIA,
     EØS_ELLER_SVEITS,
@@ -15,7 +15,7 @@ enum class LandGruppe {
 }
 
 object Landfabrikk {
-    val alleLand = LandOppslag.land.toList()
+    val alleLand = Landoppslag.land.toList()
     val norge = alleLand.filter { it.alpha3Code in listOf("NOR", "SJM") }
     val storbritannia = alleLand.filter { it.alpha3Code in listOf("GBR", "JEY", "IMN") }
     val eøsEllerSveitsLandkoder =
@@ -55,7 +55,7 @@ object Landfabrikk {
     val eøsOgSveitsOgStorbritannia = eøsOgSveits + storbritannia
     val tredjeland = alleLand - norge - storbritannia - eøsOgSveits
 
-    fun LandGruppe.hentLandkoder(): List<String> =
+    fun Landgruppe.hentLandkoder(): List<String> =
         when (this) {
             NORGE -> norge.toLandkoder()
             STORBRITANNIA -> storbritannia.toLandkoder()
@@ -64,9 +64,17 @@ object Landfabrikk {
         }
 
     fun List<Land>.toLandkoder(): List<String> = this.map { it.alpha3Code }
+
+    fun tilLandgruppeDTO(landgrupper: List<Landgruppe>): List<LandgruppeDTO> =
+        landgrupper.map {
+            LandgruppeDTO(
+                land = it.hentLandkoder(),
+                gruppeId = "gruppe.${it.name.lowercase()}",
+            )
+        }
 }
 
-internal object LandOppslag {
+internal object Landoppslag {
     /**
      * world.json hentet fra https://github.com/stefangabos/world_countries
      */
@@ -81,6 +89,11 @@ internal object LandOppslag {
 
     val land = world.let { mapper.readTree(it) }.map { Land(it["alpha3"].asText().uppercase()) }.toSet()
 }
+
+data class LandgruppeDTO(
+    val land: List<String>,
+    val gruppeId: String,
+)
 
 class Land(
     alpha3Code: String,

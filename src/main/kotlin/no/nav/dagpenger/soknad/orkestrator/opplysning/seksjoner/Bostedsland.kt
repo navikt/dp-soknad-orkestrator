@@ -1,13 +1,13 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner
 
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.EØS_ELLER_SVEITS
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.NORGE
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.STORBRITANNIA
-import no.nav.dagpenger.soknad.orkestrator.opplysning.LandGruppe.TREDJELAND
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk.eøsOgSveits
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk.hentLandkoder
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landfabrikk.toLandkoder
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.EØS_ELLER_SVEITS
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.NORGE
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.STORBRITANNIA
+import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.TREDJELAND
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
@@ -112,7 +112,7 @@ object Bostedsland : Seksjon() {
         if (opplysningsbehovId == hvilketLandBorDuI.id) {
             val gyldigeLand =
                 hvilketLandBorDuI.gyldigeSvar
-                    ?.map { LandGruppe.valueOf(it).hentLandkoder() }
+                    ?.map { Landgruppe.valueOf(it).hentLandkoder() }
                     ?.flatten()
             if (gyldigeLand?.contains(svar.verdi) != true) {
                 throw IllegalArgumentException("$svar er ikke et gyldig svar")
