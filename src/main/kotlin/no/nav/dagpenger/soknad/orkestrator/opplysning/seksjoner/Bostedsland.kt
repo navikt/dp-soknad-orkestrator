@@ -1,5 +1,12 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner
 
+import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.eøsOgSveits
+import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.hentLandkoder
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.EØS_OG_SVEITS
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.NORGE
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.STORBRITANNIA
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.TREDJELAND
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningsbehov
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Opplysningstype
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
@@ -13,7 +20,7 @@ object Bostedsland : Seksjon() {
             id = 1,
             tekstnøkkel = "faktum.hvilket-land-bor-du-i",
             type = Opplysningstype.LAND,
-            gyldigeSvar = listOf("NOR", "SWE", "FIN"),
+            gyldigeSvar = listOf(NORGE.name, STORBRITANNIA.name, EØS_OG_SVEITS.name, TREDJELAND.name),
         )
 
     val reistTilbakeTilNorge =
@@ -56,9 +63,9 @@ object Bostedsland : Seksjon() {
     override fun nesteOpplysningsbehov(
         svar: Svar<*>,
         opplysningsbehovId: Int,
-    ): Opplysningsbehov? {
-        return when (opplysningsbehovId) {
-            hvilketLandBorDuI.id -> if (svar.verdi != "NOR") reistTilbakeTilNorge else null
+    ): Opplysningsbehov? =
+        when (opplysningsbehovId) {
+            hvilketLandBorDuI.id -> if (svar.verdi in eøsOgSveits) reistTilbakeTilNorge else null
             reistTilbakeTilNorge.id -> if (svar.verdi == true) datoForAvreise else enGangIUken
             datoForAvreise.id -> hvorforReisteFraNorge
             hvorforReisteFraNorge.id -> enGangIUken
@@ -66,7 +73,6 @@ object Bostedsland : Seksjon() {
             rotasjon.id -> null
             else -> null
         }
-    }
 
     override fun getOpplysningsbehov(opplysningsbehovId: Int): Opplysningsbehov =
         when (opplysningsbehovId) {
@@ -103,7 +109,11 @@ object Bostedsland : Seksjon() {
         svar: Svar<*>,
     ) {
         if (opplysningsbehovId == hvilketLandBorDuI.id) {
-            if (hvilketLandBorDuI.gyldigeSvar?.contains(svar.verdi) != true) {
+            val gyldigeLand =
+                hvilketLandBorDuI.gyldigeSvar
+                    ?.map { Landgruppe.valueOf(it).hentLandkoder() }
+                    ?.flatten()
+            if (gyldigeLand?.contains(svar.verdi) != true) {
                 throw IllegalArgumentException("$svar er ikke et gyldig svar")
             }
         }
