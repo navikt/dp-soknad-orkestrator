@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.dagpenger.soknad.orkestrator.api.models.LandgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.EØS_ELLER_SVEITS
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.NORGE
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Landgruppe.STORBRITANNIA
@@ -89,11 +90,6 @@ internal object Landoppslag {
 
     val land = world.let { mapper.readTree(it) }.map { Land(it["alpha3"].asText().uppercase()) }.toSet()
 }
-
-data class LandgruppeDTO(
-    val land: List<String>,
-    val gruppeId: String,
-)
 
 class Land(
     alpha3Code: String,

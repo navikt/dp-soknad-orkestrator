@@ -13,6 +13,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
+import no.nav.dagpenger.soknad.orkestrator.api.models.LandgruppeDTO
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import kotlin.test.Test
 
