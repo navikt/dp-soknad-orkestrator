@@ -44,6 +44,7 @@ class BehovløserFactoryTest {
             "Søknadsdato",
             "TarUtdanningEllerOpplæring",
             "Barnetillegg",
+            "AndreØkonomiskeYtelser",
         )
     }
 }
