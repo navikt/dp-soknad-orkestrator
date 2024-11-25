@@ -51,8 +51,8 @@ object Landfabrikk {
             Landgruppe.TREDJELAND -> tredjeland
         }
 
-    fun tilLandgruppeDTO(landgrupper: List<Landgruppe>): List<LandgruppeDTO> =
-        landgrupper.map {
+    fun alleLandgrupper(): List<LandgruppeDTO> =
+        Landgruppe.entries.map {
             LandgruppeDTO(
                 land = it.hentLandkoder(),
                 gruppeId = "gruppe.${it.name.lowercase()}",

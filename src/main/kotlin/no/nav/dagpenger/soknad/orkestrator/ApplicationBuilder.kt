@@ -8,7 +8,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
-import no.nav.dagpenger.soknad.orkestrator.opplysning.landApi
+import no.nav.dagpenger.soknad.orkestrator.opplysning.landgruppeApi
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
@@ -48,7 +48,7 @@ internal class ApplicationBuilder(
                 builder = {
                     withKtorModule {
                         søknadApi(søknadService)
-                        landApi()
+                        landgruppeApi()
                     }
                 },
             ).also { rapidsConnection ->
