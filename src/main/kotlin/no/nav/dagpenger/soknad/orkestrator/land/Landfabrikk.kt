@@ -54,6 +54,7 @@ object Landfabrikk {
     fun alleLandgrupper(): List<LandgruppeDTO> =
         Landgruppe.entries.map {
             LandgruppeDTO(
+                gruppenavn = LandgruppeDTO.Gruppenavn.valueOf(it.name),
                 land = it.hentLandkoder(),
                 gruppeId = "gruppe.${it.name.lowercase()}",
             )
