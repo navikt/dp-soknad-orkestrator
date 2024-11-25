@@ -94,6 +94,7 @@ class SøknadService(
     }
 
     fun hentEllerOpprettSøknad(ident: String): Søknad {
+        søknadRepository.setStatusInnsendt(UUID.fromString("dea97606-49cc-4aca-ae83-160ce5fcf588"))
         søknadRepository.hentPåbegynt(ident)?.let {
             logger.info { "Fant påbegynt søknad med id: ${it.søknadId}. Oppretter ikke ny." }
             sikkerlogg.info { "Fant påbegynt søknad med id: ${it.søknadId} og ident: $ident. Oppretter ikke ny." }

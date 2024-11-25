@@ -18,6 +18,7 @@ import org.jetbrains.exposed.sql.json.jsonb
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsert
 import java.time.LocalDateTime
 import java.util.UUID
@@ -85,6 +86,14 @@ class SøknadRepository(
                 }.firstOrNull()
         }
 
+    fun setStatusInnsendt(søknadId: UUID) {
+        transaction {
+            SøknadTabell.update(where = { SøknadTabell.søknadId eq søknadId }) {
+                it[tilstand] = Tilstand.INNSENDT.name
+            }
+        }
+    }
+
     fun lagreKomplettSøknadData(
         søknadId: UUID,
         komplettSøknadData: JsonNode,
@@ -106,14 +115,13 @@ class SøknadRepository(
                 ?.get(SøknadDataTabell.soknadData)
         }
 
-    fun slett(søknadId: UUID): Int {
-        return transaction {
+    fun slett(søknadId: UUID): Int =
+        transaction {
             val antallSlettedeRader = SøknadTabell.deleteWhere { SøknadTabell.søknadId eq søknadId }
             quizOpplysningRepository.slett(søknadId)
 
             antallSlettedeRader
         }
-    }
 }
 
 object SøknadTabell : IntIdTable("soknad") {
