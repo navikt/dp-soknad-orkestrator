@@ -18,6 +18,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.TarUtd
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Verneplikt
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.VilligTilÅBytteYrke
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnskerDagpengerFraDato
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnsketArbeidstid
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.AndreØkonomiskeYtelserBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EØSArbeidBehovløser
@@ -35,6 +36,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.UtdanningEllerOpplærin
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnskerDagpengerFraDatoBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnsketArbeidstidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 
 class BehovløserFactory(
@@ -60,6 +62,7 @@ class BehovløserFactory(
             TarUtdanningEllerOpplæring to UtdanningEllerOpplæringBehovløser(rapidsConnection, opplysningRepository),
             Barnetillegg to BarnetilleggBehovLøser(rapidsConnection, opplysningRepository),
             AndreØkonomiskeYtelser to AndreØkonomiskeYtelserBehovløser(rapidsConnection, opplysningRepository),
+            ØnsketArbeidstid to ØnsketArbeidstidBehovløser(rapidsConnection, opplysningRepository),
         )
 
     fun behovløserFor(behov: Behov): Behovløser =
@@ -85,5 +88,6 @@ class BehovløserFactory(
         TarUtdanningEllerOpplæring,
         Barnetillegg,
         AndreØkonomiskeYtelser,
+        ØnsketArbeidstid,
     }
 }
