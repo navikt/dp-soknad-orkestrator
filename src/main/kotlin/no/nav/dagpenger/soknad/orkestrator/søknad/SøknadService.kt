@@ -93,31 +93,6 @@ class SøknadService(
         sikkerlogg.info { "Publiserte melding om ny søknad med søknadId: $søknadId og ident: $ident" }
     }
 
-    fun hentEllerOpprettSøknad(ident: String): Søknad {
-        søknadRepository.hentPåbegynt(ident)?.let {
-            logger.info { "Fant påbegynt søknad med id: ${it.søknadId}. Oppretter ikke ny." }
-            sikkerlogg.info { "Fant påbegynt søknad med id: ${it.søknadId} og ident: $ident. Oppretter ikke ny." }
-            return it
-        }
-
-        val nySøknad = Søknad(ident = ident).also { søknadRepository.lagre(it) }
-        val seksjon = getSeksjon(Bostedsland.navn)
-        opplysningRepository.opprettSeksjon(søknadId = nySøknad.søknadId, seksjon = seksjon)
-
-        Opplysning(
-            opplysningId = UUID.randomUUID(),
-            seksjonsnavn = seksjon.navn,
-            opplysningsbehovId = seksjon.førsteOpplysningsbehov().id,
-            type = seksjon.førsteOpplysningsbehov().type,
-            svar = null,
-        ).also { opplysningRepository.lagre(nySøknad.søknadId, it) }
-
-        logger.info { "Opprettet søknad med søknadId: ${nySøknad.søknadId}" }
-        sikkerlogg.info { "Opprettet søknad med søknadId: ${nySøknad.søknadId} og ident: $ident" }
-
-        return nySøknad
-    }
-
     fun håndterSvar(
         søknadId: UUID,
         svar: Svar<*>,

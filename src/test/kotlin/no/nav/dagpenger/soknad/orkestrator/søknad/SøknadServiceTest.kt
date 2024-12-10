@@ -6,7 +6,6 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
 import io.mockk.every
-import io.mockk.justRun
 import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
@@ -179,44 +178,6 @@ class SøknadServiceTest {
             field(0, "@event_name").asText() shouldBe "søknad_innsendt"
             field(0, "søknadId").asText() shouldBe søknadId.toString()
             field(0, "ident").asText() shouldBe ident
-        }
-    }
-
-    @Test
-    fun `hentEllerOpprettSøknad oppretter søknad, første opplysning og seksjon`() {
-        every {
-            søknadRepository.hentPåbegynt(ident)
-        } returns null
-
-        justRun {
-            søknadRepository.lagre(any())
-            opplysningRepository.opprettSeksjon(any(), any())
-            opplysningRepository.lagre(any(), any())
-        }
-
-        val søknad = søknadService.hentEllerOpprettSøknad(ident)
-
-        verify(exactly = 1) {
-            søknadRepository.lagre(søknad)
-            opplysningRepository.opprettSeksjon(søknad.søknadId, any())
-            opplysningRepository.lagre(any(), any())
-        }
-    }
-
-    @Test
-    fun `hentEllerOpprettSøknad returnerer påbegynt søknad hvis det finnes`() {
-        val søknad = Søknad(ident = ident, tilstand = Tilstand.PÅBEGYNT)
-        every {
-            søknadRepository.hentPåbegynt(ident)
-        } returns søknad
-
-        val hentetSøknad = søknadService.hentEllerOpprettSøknad(ident)
-
-        hentetSøknad.søknadId shouldBe søknad.søknadId
-        verify(exactly = 0) {
-            søknadRepository.lagre(any())
-            opplysningRepository.opprettSeksjon(any(), any())
-            opplysningRepository.lagre(any(), any())
         }
     }
 

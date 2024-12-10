@@ -6,7 +6,6 @@ import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -32,34 +31,6 @@ class SøknadApiTest {
     val testToken by TestApplication
 
     val søknadService = mockk<SøknadService>(relaxed = true)
-
-    @Test
-    fun `Start-søknad svarer med en uuid`() {
-        naisfulTestApp(
-            testApplicationModule = { søknadApi(søknadService) },
-            meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
-            objectMapper = objectMapper,
-        ) {
-            client
-                .post("$søknadEndepunkt/start") {
-                    header(HttpHeaders.Authorization, "Bearer $testToken")
-                }.let { respons ->
-                    respons.status shouldBe HttpStatusCode.OK
-                    shouldNotThrow<Exception> { objectMapper.readValue(respons.bodyAsText(), UUID::class.java) }
-                }
-        }
-    }
-
-    @Test
-    fun `Uautentiserte kall responderer med Unauthorized`() {
-        naisfulTestApp(
-            testApplicationModule = { søknadApi(søknadService) },
-            meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
-            objectMapper = objectMapper,
-        ) {
-            client.post("$søknadEndepunkt/start").status shouldBe HttpStatusCode.Unauthorized
-        }
-    }
 
     @Test
     fun `Returnerer neste seksjon for en gitt søknadId`() =

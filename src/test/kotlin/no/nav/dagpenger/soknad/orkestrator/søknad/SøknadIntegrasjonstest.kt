@@ -7,7 +7,6 @@ import io.kotest.matchers.equality.shouldBeEqualToComparingFields
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -76,28 +75,6 @@ class SøknadIntegrasjonstest {
     }
 
     @Test
-    fun `Ny søknad fører til opprettelse av søknad, opplysning og seksjon 2`() {
-        naisfulTestApp(
-            testApplicationModule = { søknadApi(søknadService) },
-            meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
-            objectMapper = objectMapper,
-        ) {
-            client.post("$søknadEndepunkt/start") {
-                header(HttpHeaders.Authorization, "Bearer $testToken")
-            }.let { respons ->
-                respons.status shouldBe HttpStatusCode.OK
-                val søknadId = objectMapper.readValue(respons.bodyAsText(), UUID::class.java)
-                søknadRepository.hent(søknadId)?.søknadId shouldBe søknadId
-                søknadRepository.hent(søknadId)?.tilstand shouldBe Tilstand.PÅBEGYNT
-                opplysningRepository.hentAlle(søknadId).first().also { opplysning ->
-                    opplysning.seksjonsnavn shouldBe TestSeksjon.navn
-                    opplysning.opplysningsbehovId shouldBe TestSeksjon.førsteOpplysningsbehov().id
-                }
-            }
-        }
-    }
-
-    @Test
     fun `Det er mulig å hente neste seksjon når det finnes en søknad, seksjon og opplysning`() {
         val søknad = Søknad(UUID.randomUUID(), "12345678901")
         lagreSøknadSeksjonOpplysning(søknad)
@@ -107,17 +84,20 @@ class SøknadIntegrasjonstest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.get("$søknadEndepunkt/${søknad.søknadId}/neste") {
-                header(HttpHeaders.Authorization, "Bearer $testToken")
-            }.let { respons ->
-                respons.status shouldBe HttpStatusCode.OK
-                val søknadRespons = objectMapper.readValue<OrkestratorSoknadDTO>(respons.bodyAsText())
-                søknadRespons.seksjoner.first().navn shouldBe SeksjonsnavnDTO.bostedsland
-                søknadRespons.seksjoner.first().besvarteOpplysninger shouldBe emptyList()
-                søknadRespons.seksjoner.first().nesteUbesvarteOpplysning!!
-                    .tekstnøkkel shouldBe TestSeksjon.opplysningsbehov1.tekstnøkkel
-                søknadRespons.seksjoner.first().erFullført shouldBe false
-            }
+            client
+                .get("$søknadEndepunkt/${søknad.søknadId}/neste") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.let { respons ->
+                    respons.status shouldBe HttpStatusCode.OK
+                    val søknadRespons = objectMapper.readValue<OrkestratorSoknadDTO>(respons.bodyAsText())
+                    søknadRespons.seksjoner.first().navn shouldBe SeksjonsnavnDTO.bostedsland
+                    søknadRespons.seksjoner.first().besvarteOpplysninger shouldBe emptyList()
+                    søknadRespons.seksjoner
+                        .first()
+                        .nesteUbesvarteOpplysning!!
+                        .tekstnøkkel shouldBe TestSeksjon.opplysningsbehov1.tekstnøkkel
+                    søknadRespons.seksjoner.first().erFullført shouldBe false
+                }
         }
     }
 
@@ -139,14 +119,15 @@ class SøknadIntegrasjonstest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.put("$søknadEndepunkt/${søknad.søknadId}/svar") {
-                header(HttpHeaders.Authorization, "Bearer $testToken")
-                contentType(ContentType.Application.Json)
-                setBody(objectMapper.writeValueAsString(svar))
-            }.let { respons ->
-                respons.status shouldBe HttpStatusCode.OK
-                opplysningRepository.hent(nesteOpplysning.opplysningId)?.svar?.shouldBeEqualToComparingFields(svar)
-            }
+            client
+                .put("$søknadEndepunkt/${søknad.søknadId}/svar") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                    contentType(ContentType.Application.Json)
+                    setBody(objectMapper.writeValueAsString(svar))
+                }.let { respons ->
+                    respons.status shouldBe HttpStatusCode.OK
+                    opplysningRepository.hent(nesteOpplysning.opplysningId)?.svar?.shouldBeEqualToComparingFields(svar)
+                }
         }
     }
 

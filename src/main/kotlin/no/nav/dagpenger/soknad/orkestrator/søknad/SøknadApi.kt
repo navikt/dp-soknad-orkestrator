@@ -10,12 +10,10 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
-import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
-import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
 import no.nav.dagpenger.soknad.orkestrator.opplysning.Svar
 import java.util.UUID
 
@@ -29,12 +27,6 @@ internal fun Application.søknadApi(søknadService: SøknadService) {
 
         authenticate("tokenX") {
             route("/soknad") {
-                post("/start") {
-                    val søknad = søknadService.hentEllerOpprettSøknad(call.ident())
-
-                    call.respond(HttpStatusCode.OK, søknad.søknadId)
-                }
-
                 get("/{søknadId}/neste") {
                     val søknadId = søknadUuid()
 
