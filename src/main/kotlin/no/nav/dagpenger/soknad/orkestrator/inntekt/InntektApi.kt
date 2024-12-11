@@ -38,7 +38,8 @@ internal fun Application.inntektApi(inntektService: InntektService) {
                     post("/foreleggingResultat/{søknadId}") {
                         val søknadId = søknadUuid()
 
-                        inntektService.lagreSvar(søknadId, call.receive())
+                        val svar = call.receive<ForeleggingMinsteinntektGrunnlagSvarDTO>()
+                        inntektService.lagreSvar(søknadId, svar)
 
                         call.respond(HttpStatusCode.OK)
                     }

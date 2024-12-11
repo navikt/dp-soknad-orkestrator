@@ -18,7 +18,6 @@ import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
-import org.junit.jupiter.api.Disabled
 import java.util.UUID
 import kotlin.test.Test
 
@@ -59,17 +58,15 @@ class InntektApiTest {
         }
     }
 
-    @Disabled
     @Test
     fun `Post forelegging resultat returnerer 200 OK`() {
         //language=JSON
         val foreleggingResultat =
             """
             {
-              "minsteinntektGrunnlag": {
-                "siste12mnd": "100000",
-                "siste36mnd": "200000"
-              }
+              "søknadId": "$søknadId",
+              "bekreftet": false,
+              "begrunnelse": "Begrunnelse"
             }
             """.trimIndent()
 
