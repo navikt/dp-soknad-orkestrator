@@ -1,13 +1,15 @@
 package no.nav.dagpenger.soknad.orkestrator.inntekt
 
 import mu.KotlinLogging
+import no.nav.dagpenger.soknad.orkestrator.api.models.ForeleggingresultatDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.MinsteinntektGrunnlagDTO
 import java.util.UUID
 
 class InntektService {
-    fun hentMinsteinntektGrunnlag(søknadId: UUID): MinsteinntektGrunnlag {
+    fun hentMinsteinntektGrunnlag(søknadId: UUID): MinsteinntektGrunnlagDTO {
         logger.info { "Henter forelagt inntekt for søknadId: $søknadId" }
 
-        return MinsteinntektGrunnlag(
+        return MinsteinntektGrunnlagDTO(
             siste12mnd = "100000",
             siste36mnd = "200000",
         )
@@ -15,7 +17,7 @@ class InntektService {
 
     fun lagreSvar(
         søknadId: UUID,
-        svar: ForeleggingMinsteinntektGrunnlagSvarDTO,
+        svar: ForeleggingresultatDTO,
     ) {
         logger.info { "Mottatt svar: $svar for søknad: $søknadId" }
     }
@@ -25,14 +27,3 @@ class InntektService {
         private val sikkerlogg = KotlinLogging.logger("tjenestekall.InntektService")
     }
 }
-
-data class MinsteinntektGrunnlag(
-    val siste12mnd: String,
-    val siste36mnd: String,
-)
-
-data class ForeleggingMinsteinntektGrunnlagSvarDTO(
-    val søknadId: String,
-    val bekreftet: Boolean,
-    val begrunnelse: String?,
-)

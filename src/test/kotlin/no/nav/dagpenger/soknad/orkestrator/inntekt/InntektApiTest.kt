@@ -16,6 +16,7 @@ import io.ktor.http.contentType
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.mockk
+import no.nav.dagpenger.soknad.orkestrator.api.models.MinsteinntektGrunnlagDTO
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
 import java.util.UUID
@@ -50,10 +51,8 @@ class InntektApiTest {
             }.let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
                 shouldNotThrow<Exception> {
-                    objectMapper.readValue<MinsteinntektGrunnlag>(respons.bodyAsText())
+                    objectMapper.readValue<MinsteinntektGrunnlagDTO>(respons.bodyAsText())
                 }
-
-                println("PRINT:" + objectMapper.readValue<MinsteinntektGrunnlag>(respons.bodyAsText()))
             }
         }
     }
@@ -75,7 +74,7 @@ class InntektApiTest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.post("$minsteinntektEndepunkt/foreleggingResultat") {
+            client.post("$minsteinntektEndepunkt/foreleggingresultat") {
                 header(HttpHeaders.Authorization, "Bearer $testToken")
                 contentType(ContentType.Application.Json)
                 setBody(foreleggingResultat)
