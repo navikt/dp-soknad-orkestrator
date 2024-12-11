@@ -13,9 +13,13 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
+import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.jwt.jwt
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.mockk
+import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
 import no.nav.dagpenger.soknad.orkestrator.api.models.MinsteinntektGrunnlagDTO
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
@@ -31,7 +35,12 @@ class InntektApiTest {
     @Test
     fun `Uautentiserte kall returnerer 401`() {
         naisfulTestApp(
-            testApplicationModule = { inntektApi(inntektService) },
+            testApplicationModule = {
+                install(Authentication) {
+                    jwt("tokenX") { tokenX() }
+                }
+                inntektApi(inntektService)
+            },
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
@@ -42,7 +51,12 @@ class InntektApiTest {
     @Test
     fun `Hent minsteinntektGrunnlag for en gitt søknadId returnerer 200 OK og minsteinntektGrunnlag`() {
         naisfulTestApp(
-            testApplicationModule = { inntektApi(inntektService) },
+            testApplicationModule = {
+                install(Authentication) {
+                    jwt("tokenX") { tokenX() }
+                }
+                inntektApi(inntektService)
+            },
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
@@ -70,7 +84,12 @@ class InntektApiTest {
             """.trimIndent()
 
         naisfulTestApp(
-            testApplicationModule = { inntektApi(inntektService) },
+            testApplicationModule = {
+                install(Authentication) {
+                    jwt("tokenX") { tokenX() }
+                }
+                inntektApi(inntektService)
+            },
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
