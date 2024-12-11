@@ -22,9 +22,9 @@ import java.util.UUID
 import kotlin.test.Test
 
 class InntektApiTest {
-    val minsteinntektEndepunkt = "/inntekt/minsteinntektGrunnlag"
     val inntektService = mockk<InntektService>(relaxed = true)
     val søknadId = UUID.randomUUID()
+    val minsteinntektEndepunkt = "/inntekt/$søknadId/minsteinntektGrunnlag"
     val testToken by TestApplication
 
     @Test
@@ -34,7 +34,7 @@ class InntektApiTest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.get("$minsteinntektEndepunkt/$søknadId").status shouldBe HttpStatusCode.Unauthorized
+            client.get(minsteinntektEndepunkt).status shouldBe HttpStatusCode.Unauthorized
         }
     }
 
@@ -45,7 +45,7 @@ class InntektApiTest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.get("$minsteinntektEndepunkt/$søknadId") {
+            client.get(minsteinntektEndepunkt) {
                 header(HttpHeaders.Authorization, "Bearer $testToken")
             }.let { respons ->
                 respons.status shouldBe HttpStatusCode.OK
@@ -75,7 +75,7 @@ class InntektApiTest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.post("$minsteinntektEndepunkt/foreleggingResultat/$søknadId") {
+            client.post("$minsteinntektEndepunkt/foreleggingResultat") {
                 header(HttpHeaders.Authorization, "Bearer $testToken")
                 contentType(ContentType.Application.Json)
                 setBody(foreleggingResultat)
