@@ -70,6 +70,42 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Landgruppe'
+  /inntekt/{søknadId}/minsteinntektGrunnlag:
+    get:
+      summary: Hent opplysinger om minsteinntektgrunnlag for en gitt søknadId
+      parameters:
+        - in: path
+          name: søknadId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MinsteinntektGrunnlag'
+  /inntekt/{søknadId}/minsteinntektGrunnlag/foreleggingresultat:
+    post:
+      summary: Post forelegging resultat
+      parameters:
+        - in: path
+          name: søknadId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Foreleggingresultat'
+      responses:
+        '200':
+          description: OK
 components:
   schemas:
     OrkestratorSoknad:
@@ -192,7 +228,34 @@ components:
         - gruppenavn
         - gruppeId
         - land
-
+    MinsteinntektGrunnlag:
+      type: object
+      properties:
+        siste12mnd:
+          type: string
+          example: "100000"
+        siste36mnd:
+          type: string
+          example: "200000"
+      required:
+        - siste12mnd
+        - siste36mnd
+    Foreleggingresultat:
+      type: object
+      properties:
+        søknadId:
+          type: string
+          format: uuid
+        bekreftet:
+          type: boolean
+          description: Om bruker har sagt seg enig i opplysningene
+        begrunnelse:
+          type: string
+          description: Begrunnelse for hvorfor bruker har sagt seg uenig i opplysningene
+          example: Det der er feil!
+      required:
+        - søknadId
+        - bekreftet
 
 
 

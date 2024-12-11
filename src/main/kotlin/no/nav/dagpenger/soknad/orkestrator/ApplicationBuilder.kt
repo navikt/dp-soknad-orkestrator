@@ -7,6 +7,8 @@ import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigratio
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
+import no.nav.dagpenger.soknad.orkestrator.inntekt.InntektService
+import no.nav.dagpenger.soknad.orkestrator.inntekt.inntektApi
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.landgruppeApi
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
@@ -40,6 +42,8 @@ internal class ApplicationBuilder(
             opplysningRepository = opplysningRepository,
         )
 
+    private val inntektService: InntektService = InntektService()
+
     private val rapidsConnection =
         RapidApplication
             .create(
@@ -49,6 +53,7 @@ internal class ApplicationBuilder(
                     withKtorModule {
                         søknadApi(søknadService)
                         landgruppeApi()
+                        inntektApi(inntektService)
                     }
                 },
             ).also { rapidsConnection ->
