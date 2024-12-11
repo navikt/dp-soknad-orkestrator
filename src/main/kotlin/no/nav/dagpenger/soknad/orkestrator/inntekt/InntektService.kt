@@ -4,18 +4,18 @@ import mu.KotlinLogging
 import java.util.UUID
 
 class InntektService {
-    fun hentForelagtOpplysning(søknadId: UUID): ForelagtInntekt {
+    fun hentMinsteinntektGrunnlag(søknadId: UUID): MinsteinntektGrunnlag {
         logger.info { "Henter forelagt inntekt for søknadId: $søknadId" }
 
-        return ForelagtInntekt(
-            siste1År = "1000000",
-            siste3År = "1000000",
+        return MinsteinntektGrunnlag(
+            siste12mnd = "100000",
+            siste36mnd = "200000",
         )
     }
 
     fun lagreSvar(
         søknadId: UUID,
-        svar: InntektsvarDTO,
+        svar: ForeleggingMinsteinntektGrunnlagSvarDTO,
     ) {
         logger.info { "Mottatt svar: $svar for søknad: $søknadId" }
     }
@@ -26,12 +26,12 @@ class InntektService {
     }
 }
 
-data class ForelagtInntekt(
-    val siste1År: String,
-    val siste3År: String,
+data class MinsteinntektGrunnlag(
+    val siste12mnd: String,
+    val siste36mnd: String,
 )
 
-data class InntektsvarDTO(
+data class ForeleggingMinsteinntektGrunnlagSvarDTO(
     val søknadId: String,
     val bekreftet: Boolean,
     val begrunnelse: String?,

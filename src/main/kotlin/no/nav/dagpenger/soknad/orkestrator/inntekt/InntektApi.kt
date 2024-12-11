@@ -26,20 +26,22 @@ internal fun Application.inntektApi(inntektService: InntektService) {
 
         authenticate("tokenX") {
             route("/inntekt") {
-                get("/{søknadId}/forelagtopplysning") {
-                    val søknadId = søknadUuid()
+                route("/minsteinntektGrunnlag") {
+                    get("/{søknadId}") {
+                        val søknadId = søknadUuid()
 
-                    val inntekt = inntektService.hentForelagtOpplysning(søknadId)
+                        val minsteinntektGrunnlag = inntektService.hentMinsteinntektGrunnlag(søknadId)
 
-                    call.respond(HttpStatusCode.OK, inntekt)
-                }
+                        call.respond(HttpStatusCode.OK, minsteinntektGrunnlag)
+                    }
 
-                post("/{søknadId}/svar") {
-                    val søknadId = søknadUuid()
+                    post("/foreleggingResultat/{søknadId}") {
+                        val søknadId = søknadUuid()
 
-                    inntektService.lagreSvar(søknadId, call.receive())
+                        inntektService.lagreSvar(søknadId, call.receive())
 
-                    call.respond(HttpStatusCode.OK)
+                        call.respond(HttpStatusCode.OK)
+                    }
                 }
             }
         }
