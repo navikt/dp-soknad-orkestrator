@@ -5,7 +5,9 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.withMDC
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
@@ -20,15 +22,21 @@ class SøknadMottak(
     init {
         River(rapidsConnection)
             .apply {
-                validate { it.demandValue("@event_name", "søknad_innsendt_varsel") }
-                validate { it.requireKey("ident", "søknadId", "søknadstidspunkt", "søknadData") }
-                validate { it.interestedIn("@id", "@opprettet") }
+                precondition {
+                    it.requireValue("@event_name", "søknad_innsendt_varsel")
+                }
+                validate {
+                    it.requireKey("ident", "søknadId", "søknadstidspunkt", "søknadData")
+                    it.interestedIn("@id", "@opprettet")
+                }
             }.register(this)
     }
 
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
     ) {
         withMDC(
             mapOf("søknadId" to packet["søknadId"].asText()),

@@ -4,7 +4,9 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.withMDC
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
@@ -18,16 +20,22 @@ class BehovMottak(
     init {
         River(rapidsConnection)
             .apply {
-                validate { it.demandValue("@event_name", "behov") }
-                validate { it.demandAllOrAny("@behov", behovløserFactory.behov()) }
-                validate { it.requireKey("ident", "søknadId", "behandlingId", "@behovId") }
-                validate { it.rejectKey("@løsning") }
+                precondition {
+                    it.requireValue("@event_name", "behov")
+                    it.requireAllOrAny("@behov", behovløserFactory.behov())
+                    it.forbid("@løsning")
+                }
+                validate {
+                    it.requireKey("ident", "søknadId", "behandlingId", "@behovId")
+                }
             }.register(this)
     }
 
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
     ) {
         withMDC(
             mapOf(

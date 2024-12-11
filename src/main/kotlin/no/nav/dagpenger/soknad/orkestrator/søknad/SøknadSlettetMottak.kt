@@ -4,7 +4,9 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.withMDC
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageContext
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.MessageMetadata
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.micrometer.core.instrument.MeterRegistry
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 
@@ -14,15 +16,21 @@ class SøknadSlettetMottak(
 ) : River.PacketListener {
     init {
         River(rapidsConnection).apply {
-            validate { it.demandValue("@event_name", "søknad_slettet") }
-            validate { it.requireKey("søknad_uuid", "ident") }
-            validate { it.interestedIn("@id", "@opprettet") }
+            precondition {
+                it.requireValue("@event_name", "søknad_slettet")
+            }
+            validate {
+                it.requireKey("søknad_uuid", "ident")
+                it.interestedIn("@id", "@opprettet")
+            }
         }.register(this)
     }
 
     override fun onPacket(
         packet: JsonMessage,
         context: MessageContext,
+        metadata: MessageMetadata,
+        meterRegistry: MeterRegistry,
     ) {
         withMDC(
             mapOf("søknadId" to packet["søknad_uuid"].asText()),
