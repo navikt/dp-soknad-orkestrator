@@ -16,7 +16,6 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadSlettetMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
-import no.nav.dagpenger.soknad.orkestrator.søknad.søknadApi
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.name
@@ -51,7 +50,6 @@ internal class ApplicationBuilder(
                 objectMapper = objectMapper,
                 builder = {
                     withKtorModule {
-                        søknadApi(søknadService)
                         landgruppeApi()
                         inntektApi(inntektService)
                     }
