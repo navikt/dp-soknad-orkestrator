@@ -47,6 +47,22 @@ paths:
       responses:
         '200':
           description: OK
+    get:
+      summary: Hent forelegging resultat
+      parameters:
+        - in: path
+          name: søknadId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Foreleggingresultat'
   /landgrupper:
     get:
       summary: Hent landlister for alle landgrupper

@@ -16,6 +16,7 @@ import io.ktor.http.contentType
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.mockk.mockk
+import no.nav.dagpenger.soknad.orkestrator.api.models.ForeleggingresultatDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.MinsteinntektGrunnlagDTO
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication
@@ -46,14 +47,15 @@ class InntektApiTest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.get(minsteinntektEndepunkt) {
-                header(HttpHeaders.Authorization, "Bearer $testToken")
-            }.let { respons ->
-                respons.status shouldBe HttpStatusCode.OK
-                shouldNotThrow<Exception> {
-                    objectMapper.readValue<MinsteinntektGrunnlagDTO>(respons.bodyAsText())
+            client
+                .get(minsteinntektEndepunkt) {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.let { respons ->
+                    respons.status shouldBe HttpStatusCode.OK
+                    shouldNotThrow<Exception> {
+                        objectMapper.readValue<MinsteinntektGrunnlagDTO>(respons.bodyAsText())
+                    }
                 }
-            }
         }
     }
 
@@ -74,13 +76,33 @@ class InntektApiTest {
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            client.post("$minsteinntektEndepunkt/foreleggingresultat") {
-                header(HttpHeaders.Authorization, "Bearer $testToken")
-                contentType(ContentType.Application.Json)
-                setBody(foreleggingResultat)
-            }.let { respons ->
-                respons.status shouldBe HttpStatusCode.OK
-            }
+            client
+                .post("$minsteinntektEndepunkt/foreleggingresultat") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                    contentType(ContentType.Application.Json)
+                    setBody(foreleggingResultat)
+                }.let { respons ->
+                    respons.status shouldBe HttpStatusCode.OK
+                }
+        }
+    }
+
+    @Test
+    fun `Get foreleggingresultat returnerer 200 OK med body`() {
+        naisfulTestApp(
+            testApplicationModule = { inntektApi(inntektService) },
+            meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
+            objectMapper = objectMapper,
+        ) {
+            client
+                .get("$minsteinntektEndepunkt/foreleggingresultat") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                }.let { respons ->
+                    respons.status shouldBe HttpStatusCode.OK
+                    shouldNotThrow<Exception> {
+                        objectMapper.readValue<ForeleggingresultatDTO>(respons.bodyAsText())
+                    }
+                }
         }
     }
 }

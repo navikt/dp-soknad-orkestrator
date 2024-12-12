@@ -22,6 +22,16 @@ class InntektService {
         logger.info { "Mottatt svar: $svar for søknad: $søknadId" }
     }
 
+    fun hentForeleggingresultat(søknadId: UUID): ForeleggingresultatDTO {
+        logger.info { "Henter foreleggingresultat for søknadId: $søknadId" }
+
+        return ForeleggingresultatDTO(
+            søknadId = søknadId,
+            bekreftet = false,
+            begrunnelse = "Alt er feil",
+        )
+    }
+
     private companion object {
         private val logger = KotlinLogging.logger {}
         private val sikkerlogg = KotlinLogging.logger("tjenestekall.InntektService")

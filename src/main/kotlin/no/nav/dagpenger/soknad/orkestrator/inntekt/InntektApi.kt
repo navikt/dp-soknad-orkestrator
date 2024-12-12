@@ -35,12 +35,22 @@ internal fun Application.inntektApi(inntektService: InntektService) {
                         call.respond(HttpStatusCode.OK, minsteinntektGrunnlag)
                     }
 
-                    post("/foreleggingresultat") {
-                        val søknadId = søknadUuid()
+                    route("/foreleggingresultat") {
+                        post {
+                            val søknadId = søknadUuid()
 
-                        inntektService.lagreSvar(søknadId, call.receive())
+                            inntektService.lagreSvar(søknadId, call.receive())
 
-                        call.respond(HttpStatusCode.OK)
+                            call.respond(HttpStatusCode.OK)
+                        }
+
+                        get {
+                            val søknadId = søknadUuid()
+
+                            val foreleggingresultat = inntektService.hentForeleggingresultat(søknadId)
+
+                            call.respond(HttpStatusCode.OK, foreleggingresultat)
+                        }
                     }
                 }
             }
