@@ -11,65 +11,6 @@ servers:
   - url: https://dp-soknad-orkestrator.intern.nav.no
     description: prod
 paths:
-  /soknad/start:
-    post:
-      summary: Opprett en ny søknad eller hent en eksisterende påbegynt søknad
-      responses:
-        '200':
-          description: Søknad id returnert
-          content:
-            application/json:
-              schema:
-                type: string
-                format: uuid
-  /soknad/{søknadId}/neste:
-    get:
-      summary: Hent søknad med seksjoner (kun orkestrator seksjoner)
-      parameters:
-        - in: path
-          name: søknadId
-          required: true
-          schema:
-            type: string
-            format: uuid
-      responses:
-        '200':
-          description: Søknad ble returnert
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/OrkestratorSoknad'
-  /soknad/{søknadId}/svar:
-    put:
-      summary: Besvar en opplysning
-      parameters:
-        - in: path
-          name: søknadId
-          required: true
-          schema:
-            type: string
-            format: uuid
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Svar'
-      responses:
-        '200':
-          description: Svar ble lagret
-  /landgrupper:
-    get:
-      summary: Hent landlister for alle landgrupper
-      responses:
-        '200':
-          description: Liste med landgrupper returnert
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Landgruppe'
   /inntekt/{søknadId}/minsteinntektGrunnlag:
     get:
       summary: Hent opplysinger om minsteinntektgrunnlag for en gitt søknadId
@@ -106,28 +47,20 @@ paths:
       responses:
         '200':
           description: OK
+  /landgrupper:
+    get:
+      summary: Hent landlister for alle landgrupper
+      responses:
+        '200':
+          description: Liste med landgrupper returnert
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Landgruppe'
 components:
   schemas:
-    OrkestratorSoknad:
-      type: object
-      properties:
-        søknadId:
-          type: string
-          format: uuid
-        seksjoner:
-          type: array
-          items:
-            $ref: '#/components/schemas/Seksjon'
-        antallSeksjoner:
-          type: integer
-        erFullført:
-          type: boolean
-          description: Søknaden er fullført når alle seksjoner er fullført
-      required:
-        - søknadId
-        - seksjoner
-        - antallSeksjoner
-        - erFullført
     Opplysning:
       type: object
       properties:
@@ -151,21 +84,6 @@ components:
         - opplysningId
         - tekstnøkkel
         - type
-    Svar:
-      type: object
-      properties:
-        opplysningId:
-          type: string
-          format: uuid
-        type:
-          $ref: '#/components/schemas/Opplysningstype'
-        verdi:
-          type: string
-          description: Svarverdien må være enten en string, boolean, dato eller periode (se Periodesvar) avhengig av hvilken type opplysning det besvarer.
-      required:
-        - opplysningId
-        - type
-        - verdi
     Opplysningstype:
       type: string
       enum:
