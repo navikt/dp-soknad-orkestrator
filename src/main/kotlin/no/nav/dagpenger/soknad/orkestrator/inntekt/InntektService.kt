@@ -32,6 +32,13 @@ class InntektService {
         )
     }
 
+    fun lagrePdf(
+        søknadId: UUID,
+        html: String,
+    ) {
+        logger.info("Lagrer PDF for søknadId: $søknadId")
+    }
+
     private companion object {
         private val logger = KotlinLogging.logger {}
         private val sikkerlogg = KotlinLogging.logger("tjenestekall.InntektService")

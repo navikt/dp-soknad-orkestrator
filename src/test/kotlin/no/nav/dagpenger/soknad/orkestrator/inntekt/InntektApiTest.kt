@@ -88,6 +88,29 @@ class InntektApiTest {
     }
 
     @Test
+    fun `Post pdf returnerer 200 OK`() {
+        //language=html
+        val pdf =
+            """
+            <html><body><h1>Hei</h1></body></html>
+            """.trimIndent()
+
+        naisfulTestApp(
+            testApplicationModule = { inntektApi(inntektService) },
+            meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
+            objectMapper = objectMapper,
+        ) {
+            client
+                .post("$minsteinntektEndepunkt/foreleggingresultat/pdf") {
+                    header(HttpHeaders.Authorization, "Bearer $testToken")
+                    setBody(pdf)
+                }.let { respons ->
+                    respons.status shouldBe HttpStatusCode.OK
+                }
+        }
+    }
+
+    @Test
     fun `Get foreleggingresultat returnerer 200 OK med body`() {
         naisfulTestApp(
             testApplicationModule = { inntektApi(inntektService) },

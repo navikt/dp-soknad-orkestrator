@@ -44,6 +44,14 @@ internal fun Application.inntektApi(inntektService: InntektService) {
                             call.respond(HttpStatusCode.OK)
                         }
 
+                        post("/pdf") {
+                            val søknadId = søknadUuid()
+
+                            inntektService.lagrePdf(søknadId, call.receive())
+
+                            call.respond(HttpStatusCode.OK)
+                        }
+
                         get {
                             val søknadId = søknadUuid()
 
