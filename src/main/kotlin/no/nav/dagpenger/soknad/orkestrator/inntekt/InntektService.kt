@@ -32,11 +32,11 @@ class InntektService {
         )
     }
 
-    fun lagrePdf(
+    fun journalfør(
         søknadId: UUID,
         html: String,
     ) {
-        logger.info("Lagrer PDF for søknadId: $søknadId")
+        logger.info("Journalfør PDF basert på html for søknadId: $søknadId")
     }
 
     private companion object {

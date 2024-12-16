@@ -101,7 +101,7 @@ class InntektApiTest {
             objectMapper = objectMapper,
         ) {
             client
-                .post("$minsteinntektEndepunkt/foreleggingresultat/pdf") {
+                .post("$minsteinntektEndepunkt/foreleggingresultat/journalforing") {
                     header(HttpHeaders.Authorization, "Bearer $testToken")
                     setBody(pdf)
                 }.let { respons ->
