@@ -63,6 +63,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Foreleggingresultat'
+  /inntekt/{søknadId}/minsteinntektGrunnlag/foreleggingresultat/journalforing:
+    post:
+      summary: Post journalforing
+      parameters:
+        - in: path
+          name: søknadId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HtmlDokument'
+      responses:
+        '200':
+          description: OK
   /landgrupper:
     get:
       summary: Hent landlister for alle landgrupper
@@ -190,6 +209,14 @@ components:
       required:
         - søknadId
         - bekreftet
+    HtmlDokument:
+        type: object
+        properties:
+            html:
+              type: string
+              description: Skjemaet bruker har fylt som html, inkludert styling
+        required:
+            - html
 
 
 

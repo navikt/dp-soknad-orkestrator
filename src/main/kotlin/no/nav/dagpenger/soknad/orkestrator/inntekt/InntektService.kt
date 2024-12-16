@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.inntekt
 
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.ForeleggingresultatDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.HtmlDokumentDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.MinsteinntektGrunnlagDTO
 import java.util.UUID
 
@@ -34,7 +35,7 @@ class InntektService {
 
     fun journalfør(
         søknadId: UUID,
-        html: String,
+        html: HtmlDokumentDTO,
     ) {
         logger.info("Journalfør PDF basert på html for søknadId: $søknadId")
     }

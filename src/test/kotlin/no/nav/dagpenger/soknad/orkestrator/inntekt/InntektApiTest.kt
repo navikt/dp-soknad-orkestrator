@@ -89,10 +89,12 @@ class InntektApiTest {
 
     @Test
     fun `Post pdf returnerer 200 OK`() {
-        //language=html
-        val pdf =
+        //language=JSON
+        val htmlDokument =
             """
-            <html><body><h1>Hei</h1></body></html>
+            {
+              "html": "<html><body><h1>Hei</h1></body></html>"
+            }
             """.trimIndent()
 
         naisfulTestApp(
@@ -103,7 +105,8 @@ class InntektApiTest {
             client
                 .post("$minsteinntektEndepunkt/foreleggingresultat/journalforing") {
                     header(HttpHeaders.Authorization, "Bearer $testToken")
-                    setBody(pdf)
+                    contentType(ContentType.Application.Json)
+                    setBody(htmlDokument)
                 }.let { respons ->
                     respons.status shouldBe HttpStatusCode.OK
                 }
