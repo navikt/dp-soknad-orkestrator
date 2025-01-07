@@ -64,7 +64,7 @@ dependencies {
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("de.slub-dresden:urnlib:2.0.1")
     implementation("io.prometheus:prometheus-metrics-core:1.3.5")
-    implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.22")
+    implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.24")
     implementation("io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.24")
 
     implementation("io.ktor:ktor-server-netty:${libs.versions.ktor.get()}")
