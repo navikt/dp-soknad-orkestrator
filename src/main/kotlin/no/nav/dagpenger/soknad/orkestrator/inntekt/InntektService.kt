@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.ForeleggingresultatDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.HtmlDokumentDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.MinsteinntektGrunnlagDTO
+import java.time.LocalDateTime
 import java.util.UUID
 
 class InntektService {
@@ -30,6 +31,7 @@ class InntektService {
             søknadId = søknadId,
             bekreftet = false,
             begrunnelse = "Alt er feil",
+            innsendtTidspunkt = LocalDateTime.now(),
         )
     }
 
