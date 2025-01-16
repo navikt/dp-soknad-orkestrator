@@ -4,9 +4,13 @@ import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.ForeleggingresultatDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.HtmlDokumentDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.MinsteinntektGrunnlagDTO
+import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
+import no.nav.dagpenger.soknad.orkestrator.utils.genererPdfFraHtml
 import java.util.UUID
 
-class InntektService {
+class InntektService(
+    val journalføringService: JournalføringService,
+) {
     fun hentMinsteinntektGrunnlag(søknadId: UUID): MinsteinntektGrunnlagDTO {
         logger.info { "Henter forelagt inntekt for søknadId: $søknadId" }
 
@@ -36,8 +40,19 @@ class InntektService {
     fun journalfør(
         søknadId: UUID,
         html: HtmlDokumentDTO,
+        personident: String,
     ) {
         logger.info("Journalfør PDF basert på html for søknadId: $søknadId")
+
+        val pdf = genererPdfFraHtml(html.html)
+
+        journalføringService.sendJournalførMinidialogBehov(
+            ident = personident,
+            søknadId = søknadId,
+            dialogId = UUID.randomUUID(),
+            pdf = pdf,
+            json = html.html,
+        )
     }
 
     private companion object {

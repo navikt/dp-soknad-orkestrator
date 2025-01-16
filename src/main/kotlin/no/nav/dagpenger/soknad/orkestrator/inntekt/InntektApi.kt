@@ -14,6 +14,7 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
+import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
 import java.util.UUID
 
 internal fun Application.inntektApi(inntektService: InntektService) {
@@ -46,8 +47,13 @@ internal fun Application.inntektApi(inntektService: InntektService) {
 
                         post("/journalforing") {
                             val søknadId = søknadUuid()
+                            val personident = call.ident()
 
-                            inntektService.journalfør(søknadId, call.receive())
+                            inntektService.journalfør(
+                                søknadId = søknadId,
+                                html = call.receive(),
+                                personident = personident,
+                            )
 
                             call.respond(HttpStatusCode.OK)
                         }
