@@ -9,6 +9,8 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.inntekt.InntektService
 import no.nav.dagpenger.soknad.orkestrator.inntekt.inntektApi
+import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
+import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.landgruppeApi
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
@@ -41,7 +43,9 @@ internal class ApplicationBuilder(
             opplysningRepository = opplysningRepository,
         )
 
-    private val inntektService: InntektService = InntektService()
+    private val journalføringService = JournalføringService()
+
+    private val inntektService: InntektService = InntektService(journalføringService)
 
     private val rapidsConnection =
         RapidApplication
@@ -56,7 +60,9 @@ internal class ApplicationBuilder(
                 },
             ).also { rapidsConnection ->
                 søknadService.setRapidsConnection(rapidsConnection)
+                journalføringService.setRapidsConnection(rapidsConnection)
                 SøknadMottak(rapidsConnection, søknadService, søknadRepository)
+                MinidialogJournalførtMottak(rapidsConnection)
                 BehovMottak(
                     rapidsConnection = rapidsConnection,
                     behovløserFactory =
