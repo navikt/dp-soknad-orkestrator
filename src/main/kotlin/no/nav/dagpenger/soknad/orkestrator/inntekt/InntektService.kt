@@ -4,6 +4,7 @@ import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.ForeleggingresultatDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.HtmlDokumentDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.MinsteinntektGrunnlagDTO
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
 import no.nav.dagpenger.soknad.orkestrator.utils.genererPdfFraHtml
 import java.util.UUID
@@ -46,12 +47,21 @@ class InntektService(
 
         val pdf = genererPdfFraHtml(html.html)
 
+        val resultat =
+            ForeleggingresultatDTO(
+                søknadId = søknadId,
+                bekreftet = true,
+                begrunnelse = "Alt er riktig",
+            )
+
+        val resultatJson = objectMapper.writeValueAsString(resultat)
+
         journalføringService.sendJournalførMinidialogBehov(
             ident = personident,
             søknadId = søknadId,
             dialogId = UUID.randomUUID(),
             pdf = pdf,
-            json = html.html,
+            json = resultatJson,
         )
     }
 
