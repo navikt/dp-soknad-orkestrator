@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.journalføring
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import mu.KotlinLogging
+import java.util.Base64
 import java.util.UUID
 
 class JournalføringService {
@@ -36,7 +37,7 @@ class JournalføringService {
                 "dialog_uuid" to dialogId,
                 "tittel" to "Minidialog",
                 "json" to json,
-                "pdf" to pdf,
+                "pdf" to Base64.getEncoder().encodeToString(pdf),
             )
 
         val behov =

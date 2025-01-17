@@ -26,7 +26,6 @@ internal class MinidialogJournalførtMottak(
                 precondition { it.requireValue("@event_name", "behov") }
                 precondition { it.requireAll("@behov", listOf(behov)) }
                 validate { it.requireKey("@løsning") }
-                validate { it.requireValue("@final", true) } // TODO: Trenger vi dette?
                 validate {
                     it.require("@løsning") { løsning ->
                         løsning.required(behov)
