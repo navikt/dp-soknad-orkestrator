@@ -35,7 +35,16 @@ internal class MinidialogJournalførtMottak(
                         løsning.required(behov)
                     }
                 }
-                validate { it.interestedIn("@id", "@opprettet", "@behovId") } // TODO: Hva trenger vi her?
+                validate {
+                    it.require(behov) { behov ->
+                        behov.required("skjemakode")
+                        behov.required("dialog_uuid")
+                        behov.required("tittel")
+                        behov.required("json")
+                        behov.required("pdf")
+                    }
+                }
+                validate { it.interestedIn("@id", "@opprettet", "@behovId", "søknad_uuid") } // TODO: Hva trenger vi her?
             }.register(this)
     }
 
