@@ -6,7 +6,6 @@ import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
-import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.inntekt.InntektService
 import no.nav.dagpenger.soknad.orkestrator.inntekt.inntektApi
 import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
@@ -51,7 +50,6 @@ internal class ApplicationBuilder(
         RapidApplication
             .create(
                 configuration,
-                objectMapper = objectMapper,
                 builder = {
                     withKtorModule {
                         landgruppeApi()
