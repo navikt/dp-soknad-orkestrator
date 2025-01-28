@@ -1,11 +1,15 @@
 package no.nav.dagpenger.soknad.orkestrator
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.ktor.serialization.jackson.jackson
+import io.ktor.server.application.install
+import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.inntekt.InntektService
 import no.nav.dagpenger.soknad.orkestrator.inntekt.inntektApi
 import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
@@ -52,6 +56,11 @@ internal class ApplicationBuilder(
                 configuration,
                 builder = {
                     withKtorModule {
+
+                        install(ContentNegotiation) {
+                            jackson { objectMapper }
+                        }
+
                         landgruppeApi()
                         inntektApi(inntektService)
                     }
