@@ -56,7 +56,6 @@ internal class ApplicationBuilder(
                 configuration,
                 builder = {
                     withKtorModule {
-
                         install(ContentNegotiation) {
                             jackson { objectMapper }
                         }
