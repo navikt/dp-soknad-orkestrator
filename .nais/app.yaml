@@ -27,6 +27,11 @@ spec:
           - name : soknad-orkestrator
             envVarPrefix: DB
         tier: db-custom-1-3840
+        flags:
+          - name: cloudsql.enable_pgaudit
+            value: "true"
+          - name: pgaudit.log
+            value: 'write'
   observability:
     autoInstrumentation:
       enabled: true
