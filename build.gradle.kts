@@ -5,8 +5,8 @@ val exposedVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.1.0"
-    id("com.diffplug.spotless") version "7.0.2"
     id("io.ktor.plugin") version "3.0.3"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
     alias(libs.plugins.shadow.jar)
 }
 
@@ -28,18 +28,8 @@ tasks.test {
     useJUnitPlatform()
 }
 
-spotless {
-    kotlin {
-        ktlint("1.1.1")
-    }
-
-    kotlinGradle {
-        ktlint("1.1.1")
-    }
-}
-
 tasks.withType<KotlinCompile>().configureEach {
-    dependsOn("spotlessApply")
+    dependsOn("ktlintFormat")
 }
 
 repositories {
