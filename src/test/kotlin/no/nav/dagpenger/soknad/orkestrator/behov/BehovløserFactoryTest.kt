@@ -46,6 +46,7 @@ class BehovløserFactoryTest {
             "Barnetillegg",
             "AndreØkonomiskeYtelser",
             "ØnsketArbeidstid",
+            "HarTilleggsopplysninger",
         )
     }
 }
