@@ -16,7 +16,9 @@ internal object Configuration {
                 "KAFKA_BOOTSTRAP_SERVERS" to "127.0.0.1:9092",
             ),
         )
-    private val properties = ConfigurationProperties.systemProperties() overriding EnvironmentVariables() overriding defaultProperties
+
+    private val properties =
+        ConfigurationProperties.systemProperties() overriding EnvironmentVariables() overriding defaultProperties
 
     val config: Map<String, String> =
         properties.list()
