@@ -41,6 +41,9 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
+  env:
+    name: GRUPPER_SAKSBEHANDLER
+    value: {{azure.grupper.saksbehandler}}
   azure:
     application:
       enabled: true
