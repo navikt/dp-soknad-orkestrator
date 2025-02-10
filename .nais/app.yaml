@@ -41,6 +41,13 @@ spec:
   prometheus:
     enabled: true
     path: /metrics
+  azure:
+    application:
+      enabled: true
+      allowAllUsers: false
+      claims:
+        groups:
+          - id: {{azure.grupper.saksbehandler}}
   accessPolicy:
     inbound:
       rules:
