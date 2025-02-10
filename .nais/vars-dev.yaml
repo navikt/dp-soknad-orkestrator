@@ -5,6 +5,10 @@ replicas:
   max: 1
   min: 1
 
+azure:
+  grupper:
+    saksbehandler: "3e28466f-c53d-46da-8b44-a4abc2ad4593" # 0000-GA-Dagpenger-Saksbehandler
+
 wonderwalled: true
 ingresses:
   - https://dp-soknad-orkestrator.intern.dev.nav.no
