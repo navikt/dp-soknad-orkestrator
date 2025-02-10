@@ -55,6 +55,9 @@ spec:
         {{#if wonderwalled}}
         - application: tokenx-token-generator
           namespace: aura
+        - application: azure-token-generator
+          namespace: aura
+          cluster: dev-gcp
         {{/if}}
   tokenx:
     enabled: true
