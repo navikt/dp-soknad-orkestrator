@@ -50,6 +50,8 @@ spec:
       tenant: {{azure.tenant}}
       allowAllUsers: false
       claims:
+        extra:
+          - NAVident
         groups:
           - id: {{azure.grupper.saksbehandler}}
   accessPolicy:
