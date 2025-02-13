@@ -1,4 +1,4 @@
-FROM ghcr.io/navikt/baseimages/temurin:21
+FROM gcr.io/distroless/java21
 
 COPY build/libs/*-all.jar app.jar
 
