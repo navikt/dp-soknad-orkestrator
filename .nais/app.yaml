@@ -58,6 +58,7 @@ spec:
     inbound:
       rules:
         - application: dp-brukerdialog-frontend
+        - application: dp-saksbehandling-frontend
         {{#if wonderwalled}}
         - application: tokenx-token-generator
           namespace: aura
