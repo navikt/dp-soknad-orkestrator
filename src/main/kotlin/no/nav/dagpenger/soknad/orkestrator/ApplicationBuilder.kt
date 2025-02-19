@@ -13,6 +13,7 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.inntekt.InntektService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
+import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.opplysningApi
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
@@ -49,6 +50,8 @@ internal class ApplicationBuilder(
 
     private val inntektService: InntektService = InntektService(journalføringService)
 
+    private val opplysningService: OpplysningService = OpplysningService(quizOpplysningRepositoryPostgres)
+
     private val rapidsConnection =
         RapidApplication
             .create(
@@ -58,7 +61,7 @@ internal class ApplicationBuilder(
                         install(ContentNegotiation) {
                             jackson { objectMapper }
                         }
-                        opplysningApi()
+                        opplysningApi(opplysningService)
                     }
                 },
             ).also { rapidsConnection ->
