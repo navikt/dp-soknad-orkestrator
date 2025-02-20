@@ -94,6 +94,14 @@ class QuizOpplysningRepositoryPostgres(
                 .firstOrNull()
         }
 
+    override fun hent(
+        beskrivendeId: String,
+        søknadId: UUID,
+    ): QuizOpplysning<*>? {
+        // TODO: Not yet implemented
+        return null
+    }
+
     override fun hentAlle(søknadId: UUID): List<QuizOpplysning<*>> =
         transaction {
             QuizOpplysningTabell

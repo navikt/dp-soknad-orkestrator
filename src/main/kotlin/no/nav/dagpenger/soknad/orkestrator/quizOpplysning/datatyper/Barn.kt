@@ -35,12 +35,12 @@ data object Barn : Datatype<List<BarnSvar>>(List::class.java as Class<List<BarnS
                         .get("svar").asBoolean()
 
                 BarnSvar(
-                    fornavnOgMellomnavn,
-                    etternavn,
-                    fødselsdato,
-                    statsborgerskap,
-                    forsørgerBarnet,
-                    fraRegister,
+                    fornavnOgMellomnavn = fornavnOgMellomnavn,
+                    etternavn = etternavn,
+                    fødselsdato = fødselsdato,
+                    statsborgerskap = statsborgerskap,
+                    forsørgerBarnet = forsørgerBarnet,
+                    fraRegister = fraRegister,
                 )
             }
 
@@ -49,10 +49,16 @@ data object Barn : Datatype<List<BarnSvar>>(List::class.java as Class<List<BarnS
 }
 
 data class BarnSvar(
+    val barnId: UUID = UUID.randomUUID(),
     val fornavnOgMellomnavn: String,
     val etternavn: String,
     val fødselsdato: LocalDate,
     val statsborgerskap: String,
     val forsørgerBarnet: Boolean,
     val fraRegister: Boolean,
+    val kvalifisererTilBarnetillegg: Boolean? = null,
+    val barnetilleggFom: LocalDate? = null,
+    val barnetilleggTom: LocalDate? = null,
+    val begrunnelse: String? = null,
+    val endretAv: String? = null,
 )

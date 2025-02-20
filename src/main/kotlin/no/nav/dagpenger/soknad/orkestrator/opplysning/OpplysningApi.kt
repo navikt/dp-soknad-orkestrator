@@ -8,6 +8,7 @@ import io.ktor.server.auth.authenticate
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
+import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
@@ -25,17 +26,33 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
         get("/") { call.respond(HttpStatusCode.OK) }
 
         authenticate("azureAd") {
-            route("/opplysninger") {
+            route("/opplysninger/{søknadId}") {
                 get {
                     call.respond(HttpStatusCode.OK)
                 }
                 route("/barn") {
                     get {
-                        call.respond(HttpStatusCode.OK, opplysningService.hentBarn())
+                        val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
+
+                        call.respond(HttpStatusCode.OK, opplysningService.hentBarn(søknadId))
                     }
 
-                    put {
-                        val barn = call.receive<BarnDTO>()
+                    put("/oppdater") {
+                        val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
+                        val oppdatertBarn = call.receive<OppdatertBarnRequestDTO>()
+
+                        if (opplysningService.hentBarn(søknadId).find { it.barnId == oppdatertBarn.barnId } == null) {
+                            call.respond(HttpStatusCode.NotFound, "Fant ikke barn med id ${oppdatertBarn.barnId} for søknad $søknadId")
+                            return@put
+                        }
+
+                        if (opplysningService.erEndret(oppdatertBarn, søknadId)) {
+                            // TODO: Oppdater barn
+                            call.respond(HttpStatusCode.OK)
+                        } else {
+                            call.respond(HttpStatusCode.NotModified, "Opplysningen inneholder ingen endringer, kan ikke oppdatere")
+                        }
+
                         call.respond(HttpStatusCode.OK)
                     }
                 }
@@ -44,17 +61,56 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
     }
 }
 
-data class BarnDTO(
-    val barnSvarId: UUID,
+private suspend fun RoutingContext.validerOgFormaterSøknadIdParam(): UUID? {
+    val søknadIdParam =
+        call.parameters["søknadId"] ?: run {
+            call.respond(HttpStatusCode.BadRequest, "Mangler søknadId i parameter")
+            return null
+        }
+
+    return try {
+        UUID.fromString(søknadIdParam)
+    } catch (e: Exception) {
+        call.respond<String>(
+            HttpStatusCode.BadRequest,
+            "Kunne ikke parse søknadId parameter $søknadIdParam til UUID. Feilmelding: $e",
+        )
+        return null
+    }
+}
+
+data class BarnResponseDTO(
+    val barnId: UUID,
     val fornavnOgMellomnavn: String,
     val etternavn: String,
     val fødselsdato: LocalDate,
     val oppholdssted: String,
     val forsørgerBarnet: Boolean,
     val fraRegister: Boolean,
-    val girBarnetillegg: Boolean,
-    val girBarnetilleggFom: LocalDate? = null,
-    val girBarnetilleggTom: LocalDate? = null,
+    val kvalifisererTilBarnetillegg: Boolean? = null,
+    val barnetilleggFom: LocalDate? = null,
+    val barnetilleggTom: LocalDate? = null,
     val begrunnelse: String? = null,
     val endretAv: String? = null,
 )
+
+data class OppdatertBarnRequestDTO(
+    val barnId: UUID,
+    val fornavnOgMellomnavn: String,
+    val etternavn: String,
+    val fødselsdato: LocalDate,
+    val oppholdssted: String,
+    val forsørgerBarnet: Boolean,
+    val fraRegister: Boolean,
+    val kvalifisererTilBarnetillegg: Boolean,
+    val barnetilleggFom: LocalDate? = null,
+    val barnetilleggTom: LocalDate? = null,
+    val begrunnelse: String,
+) {
+    init {
+        if (kvalifisererTilBarnetillegg) {
+            requireNotNull(barnetilleggFom) { "girBarnetilleggFom må være satt" }
+            requireNotNull(barnetilleggTom) { "girBarnetilleggTom må være satt" }
+        }
+    }
+}

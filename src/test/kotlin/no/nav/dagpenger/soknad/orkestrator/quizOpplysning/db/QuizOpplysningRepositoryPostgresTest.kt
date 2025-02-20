@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
@@ -305,11 +306,14 @@ class QuizOpplysningRepositoryPostgresTest {
         withMigratedDb {
             opplysningRepository.lagre(opplysning)
 
-            opplysningRepository.hent(
-                beskrivendeId,
-                ident,
-                søknadId,
-            ) shouldBe opplysning
+            opplysningRepository.hent(beskrivendeId, ident, søknadId)!!.also {
+                it.beskrivendeId shouldBe opplysning.beskrivendeId
+                it.type shouldBe opplysning.type
+                it.svar.asListOf<BarnSvar>().first().fraRegister shouldBe false
+                it.svar.asListOf<BarnSvar>().last().fraRegister shouldBe true
+                it.ident shouldBe opplysning.ident
+                it.søknadId shouldBe opplysning.søknadId
+            }
         }
     }
 
