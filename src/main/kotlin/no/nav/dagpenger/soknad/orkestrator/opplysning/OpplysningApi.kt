@@ -47,8 +47,13 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                         }
 
                         if (oppdatertBarn.kvalifisererTilBarnetillegg) {
-                            requireNotNull(oppdatertBarn.barnetilleggFom) { "girBarnetilleggFom må være satt" }
-                            requireNotNull(oppdatertBarn.barnetilleggTom) { "girBarnetilleggTom må være satt" }
+                            if (oppdatertBarn.barnetilleggFom == null || oppdatertBarn.barnetilleggTom == null) {
+                                call.respond(
+                                    HttpStatusCode.BadRequest,
+                                    "barnetilleggFom og barnetilleggTom må være satt når kvalifisererTilBarnetillegg er true",
+                                )
+                                return@put
+                            }
                         }
 
                         if (opplysningService.erEndret(oppdatertBarn, søknadId)) {
@@ -56,6 +61,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                             call.respond(HttpStatusCode.OK)
                         } else {
                             call.respond(HttpStatusCode.NotModified, "Opplysningen inneholder ingen endringer, kan ikke oppdatere")
+                            return@put
                         }
 
                         call.respond(HttpStatusCode.OK)

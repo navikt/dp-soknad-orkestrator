@@ -162,7 +162,7 @@ class OpplysningApiTest {
     }
 
     @Test
-    fun `Oppdater opplysning svarer med 200 OK`() {
+    fun `Oppdater opplysning returnerer 400 Bad Request hvis fom og tom ikke er satt når kvalifisererTilBarnetillegg er true`() {
         val opplysning =
             QuizOpplysning(
                 beskrivendeId = beskrivendeIdPdlBarn,
@@ -196,13 +196,13 @@ class OpplysningApiTest {
                         etternavn = opplysning.svar.first().etternavn,
                         fødselsdato = opplysning.svar.first().fødselsdato,
                         oppholdssted = opplysning.svar.first().statsborgerskap,
-                        forsørgerBarnet = true,
-                        kvalifisererTilBarnetillegg = false,
+                        forsørgerBarnet = opplysning.svar.first().forsørgerBarnet,
+                        kvalifisererTilBarnetillegg = true,
                         begrunnelse = "Begrunnelse",
                     ),
                 )
             }.let { response ->
-                response.status shouldBe HttpStatusCode.OK
+                response.status shouldBe HttpStatusCode.BadRequest
             }
         }
     }
@@ -254,7 +254,7 @@ class OpplysningApiTest {
     }
 
     @Test
-    fun `Kan redigere opplysning om barn`() {
+    fun `Oppdater opplysning svarer med 200 OK`() {
         val opplysning =
             QuizOpplysning(
                 beskrivendeId = beskrivendeIdPdlBarn,
@@ -280,6 +280,7 @@ class OpplysningApiTest {
         withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
             client.put("/opplysninger/$søknadId/barn/oppdater") {
                 header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                header(HttpHeaders.ContentType, "application/json")
                 setBody(
                     OppdatertBarnRequestDTO(
                         barnId = opplysning.svar.first().barnId,
@@ -294,7 +295,6 @@ class OpplysningApiTest {
                         begrunnelse = "Begrunnelse",
                     ),
                 )
-                header(HttpHeaders.ContentType, "application/json")
             }.let { response ->
                 response.status shouldBe HttpStatusCode.OK
             }

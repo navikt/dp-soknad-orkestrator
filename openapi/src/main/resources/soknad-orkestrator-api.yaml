@@ -28,7 +28,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BarnResponse'
-        '404':
+        '400':
           description: SøknadId mangler eller har feil format
   /opplysninger/{søknadId}/barn/oppdater:
     put:
@@ -49,6 +49,10 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          description: barnetilleggFom og barnetilleggTom må være satt når kvalifisererTilBarnetillegg er true
+        '404':
+            description: Fant ikke opplysningen som skal oppdateres
         '304':
           description: Opplysningen inneholder ingen endringer, kan ikke oppdatere
   /inntekt/{søknadId}/minsteinntektGrunnlag:
