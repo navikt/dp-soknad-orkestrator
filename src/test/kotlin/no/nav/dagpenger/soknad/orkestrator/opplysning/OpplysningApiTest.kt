@@ -9,6 +9,8 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning

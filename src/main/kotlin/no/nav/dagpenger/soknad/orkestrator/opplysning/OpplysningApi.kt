@@ -14,7 +14,7 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
-import java.time.LocalDate
+import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import java.util.UUID
 
 internal fun Application.opplysningApi(opplysningService: OpplysningService) {
@@ -44,6 +44,11 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                         if (opplysningService.hentBarn(søknadId).find { it.barnId == oppdatertBarn.barnId } == null) {
                             call.respond(HttpStatusCode.NotFound, "Fant ikke barn med id ${oppdatertBarn.barnId} for søknad $søknadId")
                             return@put
+                        }
+
+                        if (oppdatertBarn.kvalifisererTilBarnetillegg) {
+                            requireNotNull(oppdatertBarn.barnetilleggFom) { "girBarnetilleggFom må være satt" }
+                            requireNotNull(oppdatertBarn.barnetilleggTom) { "girBarnetilleggTom må være satt" }
                         }
 
                         if (opplysningService.erEndret(oppdatertBarn, søknadId)) {
@@ -76,40 +81,5 @@ private suspend fun RoutingContext.validerOgFormaterSøknadIdParam(): UUID? {
             "Kunne ikke parse søknadId parameter $søknadIdParam til UUID. Feilmelding: $e",
         )
         return null
-    }
-}
-
-data class BarnResponseDTO(
-    val barnId: UUID,
-    val fornavnOgMellomnavn: String,
-    val etternavn: String,
-    val fødselsdato: LocalDate,
-    val oppholdssted: String,
-    val forsørgerBarnet: Boolean,
-    val fraRegister: Boolean,
-    val kvalifisererTilBarnetillegg: Boolean? = null,
-    val barnetilleggFom: LocalDate? = null,
-    val barnetilleggTom: LocalDate? = null,
-    val begrunnelse: String? = null,
-    val endretAv: String? = null,
-)
-
-data class OppdatertBarnRequestDTO(
-    val barnId: UUID,
-    val fornavnOgMellomnavn: String,
-    val etternavn: String,
-    val fødselsdato: LocalDate,
-    val oppholdssted: String,
-    val forsørgerBarnet: Boolean,
-    val kvalifisererTilBarnetillegg: Boolean,
-    val barnetilleggFom: LocalDate? = null,
-    val barnetilleggTom: LocalDate? = null,
-    val begrunnelse: String,
-) {
-    init {
-        if (kvalifisererTilBarnetillegg) {
-            requireNotNull(barnetilleggFom) { "girBarnetilleggFom må være satt" }
-            requireNotNull(barnetilleggTom) { "girBarnetilleggTom må være satt" }
-        }
     }
 }

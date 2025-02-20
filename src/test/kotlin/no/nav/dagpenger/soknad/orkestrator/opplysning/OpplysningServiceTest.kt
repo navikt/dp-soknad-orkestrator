@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.opplysning
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning

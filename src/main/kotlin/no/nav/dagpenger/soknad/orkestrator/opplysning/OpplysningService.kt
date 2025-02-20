@@ -1,5 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
+import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
@@ -8,7 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import java.util.UUID
 
 class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
-    fun hentBarn(søknadId: UUID): List<BarnResponseDTO> {
+    fun hentBarn(søknadId: UUID): List<no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO> {
         val registerBarn =
             opplysningRepository.hent(
                 beskrivendeId = beskrivendeIdPdlBarn,
