@@ -52,7 +52,6 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
             opprinneligOpplysning.fødselsdato != opplysning.fødselsdato ||
             opprinneligOpplysning.oppholdssted != opplysning.oppholdssted ||
             opprinneligOpplysning.forsørgerBarnet != opplysning.forsørgerBarnet ||
-            opprinneligOpplysning.fraRegister != opplysning.fraRegister ||
             opprinneligOpplysning.kvalifisererTilBarnetillegg != opplysning.kvalifisererTilBarnetillegg ||
             opprinneligOpplysning.barnetilleggFom != opplysning.barnetilleggFom ||
             opprinneligOpplysning.barnetilleggTom != opplysning.barnetilleggTom

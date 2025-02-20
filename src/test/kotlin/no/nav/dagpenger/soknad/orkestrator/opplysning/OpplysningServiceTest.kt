@@ -102,7 +102,6 @@ class OpplysningServiceTest {
                 fødselsdato = LocalDate.of(2020, 1, 1),
                 oppholdssted = "NOR",
                 forsørgerBarnet = true,
-                fraRegister = false,
                 kvalifisererTilBarnetillegg = true,
                 barnetilleggFom = LocalDate.of(2020, 1, 1),
                 barnetilleggTom = LocalDate.of(2038, 1, 1),
@@ -147,7 +146,6 @@ class OpplysningServiceTest {
                 fødselsdato = LocalDate.of(2020, 1, 1),
                 oppholdssted = "NOR",
                 forsørgerBarnet = false,
-                fraRegister = false,
                 kvalifisererTilBarnetillegg = false,
                 begrunnelse = "Begrunnelse",
             )

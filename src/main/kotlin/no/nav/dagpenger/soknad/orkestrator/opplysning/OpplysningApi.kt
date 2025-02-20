@@ -101,7 +101,6 @@ data class OppdatertBarnRequestDTO(
     val fødselsdato: LocalDate,
     val oppholdssted: String,
     val forsørgerBarnet: Boolean,
-    val fraRegister: Boolean,
     val kvalifisererTilBarnetillegg: Boolean,
     val barnetilleggFom: LocalDate? = null,
     val barnetilleggTom: LocalDate? = null,
