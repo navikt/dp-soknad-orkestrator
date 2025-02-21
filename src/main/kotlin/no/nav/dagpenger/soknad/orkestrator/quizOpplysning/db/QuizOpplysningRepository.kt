@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db
 
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import java.util.UUID
 
 interface QuizOpplysningRepository {
@@ -20,4 +21,9 @@ interface QuizOpplysningRepository {
     fun hentAlle(søknadId: UUID): List<QuizOpplysning<*>>
 
     fun slett(søknadId: UUID)
+
+    fun oppdaterBarn(
+        søknadId: UUID,
+        oppdatertBarn: BarnSvar,
+    )
 }

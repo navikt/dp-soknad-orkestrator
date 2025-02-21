@@ -5,6 +5,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import java.util.UUID
@@ -57,5 +58,37 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
             opprinneligOpplysning.kvalifisererTilBarnetillegg != opplysning.kvalifisererTilBarnetillegg ||
             opprinneligOpplysning.barnetilleggFom != opplysning.barnetilleggFom ||
             opprinneligOpplysning.barnetilleggTom != opplysning.barnetilleggTom
+    }
+
+    fun oppdaterBarn(
+        oppdatering: OppdatertBarnRequestDTO,
+        søknadId: UUID,
+        saksbehandlerId: String,
+    ) {
+        val opprinneligBarnOpplysning =
+            opplysningRepository.hentAlle(søknadId).find { it.type == Barn }
+                ?: throw IllegalArgumentException("Fant ikke opplysning om barn for søknad med id $søknadId")
+
+        val opprinneligBarnSvar =
+            opprinneligBarnOpplysning.svar.asListOf<BarnSvar>().find { it.barnId == oppdatering.barnId }
+                ?: throw IllegalArgumentException("Fant ikke barn med id ${oppdatering.barnId}")
+
+        val oppdatertBarnSvar =
+            BarnSvar(
+                barnId = oppdatering.barnId,
+                fornavnOgMellomnavn = oppdatering.fornavnOgMellomnavn,
+                etternavn = oppdatering.etternavn,
+                fødselsdato = oppdatering.fødselsdato,
+                statsborgerskap = oppdatering.oppholdssted,
+                forsørgerBarnet = oppdatering.forsørgerBarnet,
+                fraRegister = opprinneligBarnSvar.fraRegister,
+                kvalifisererTilBarnetillegg = oppdatering.kvalifisererTilBarnetillegg,
+                barnetilleggFom = oppdatering.barnetilleggFom,
+                barnetilleggTom = oppdatering.barnetilleggTom,
+                begrunnelse = oppdatering.begrunnelse,
+                endretAv = saksbehandlerId,
+            )
+
+        opplysningRepository.oppdaterBarn(søknadId, oppdatertBarnSvar)
     }
 }

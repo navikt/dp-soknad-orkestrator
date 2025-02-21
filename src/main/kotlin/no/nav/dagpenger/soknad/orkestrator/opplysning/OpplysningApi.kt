@@ -56,7 +56,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                         }
 
                         if (opplysningService.erEndret(oppdatertBarn, søknadId)) {
-                            // TODO: Oppdater barn
+                            opplysningService.oppdaterBarn(oppdatertBarn, søknadId, saksbehandlerId)
                             call.respond(HttpStatusCode.OK)
                         } else {
                             call.respond(HttpStatusCode.NotModified, "Opplysningen inneholder ingen endringer, kan ikke oppdatere")

@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.opplysning
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
@@ -163,5 +164,71 @@ class OpplysningServiceTest {
         every { opplysningRepository.hent(beskrivendeIdEgneBarn, søknadId) } returns null
 
         opplysningService.erEndret(oppdatertBarn, søknadId) shouldBe false
+    }
+
+    @Test
+    fun `oppdaterBarn oppdaterer barn`() {
+        val søknadId = UUID.randomUUID()
+        val barnId = UUID.randomUUID()
+        val opprinneligBarnSvar =
+            BarnSvar(
+                barnId = barnId,
+                fornavnOgMellomnavn = "Opprinnelig Navn",
+                etternavn = "Opprinnelig Etternavn",
+                fødselsdato = LocalDate.of(2010, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = true,
+                kvalifisererTilBarnetillegg = false,
+                barnetilleggFom = null,
+                barnetilleggTom = null,
+                begrunnelse = null,
+                endretAv = null,
+            )
+        val oppdatertBarnRequest =
+            OppdatertBarnRequestDTO(
+                barnId = barnId,
+                fornavnOgMellomnavn = "Oppdatert Navn",
+                etternavn = "Oppdatert Etternavn",
+                fødselsdato = LocalDate.of(2010, 1, 1),
+                oppholdssted = "NOR",
+                forsørgerBarnet = true,
+                kvalifisererTilBarnetillegg = true,
+                barnetilleggFom = LocalDate.of(2020, 1, 1),
+                barnetilleggTom = LocalDate.of(2038, 1, 1),
+                begrunnelse = "Begrunnelse",
+            )
+        val opprinneligOpplysning =
+            QuizOpplysning(
+                beskrivendeId = beskrivendeIdPdlBarn,
+                type = Barn,
+                svar = listOf(opprinneligBarnSvar),
+                ident = "12345678910",
+                søknadId = søknadId,
+            )
+
+        every { opplysningRepository.hentAlle(søknadId) } returns listOf(opprinneligOpplysning)
+        every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
+
+        opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId")
+
+        verify {
+            opplysningRepository.oppdaterBarn(
+                søknadId,
+                match {
+                    it.barnId == barnId &&
+                        it.fornavnOgMellomnavn == "Oppdatert Navn" &&
+                        it.etternavn == "Oppdatert Etternavn" &&
+                        it.fødselsdato == LocalDate.of(2010, 1, 1) &&
+                        it.statsborgerskap == "NOR" &&
+                        it.forsørgerBarnet == true &&
+                        it.kvalifisererTilBarnetillegg == true &&
+                        it.barnetilleggFom == LocalDate.of(2020, 1, 1) &&
+                        it.barnetilleggTom == LocalDate.of(2038, 1, 1) &&
+                        it.begrunnelse == "Begrunnelse" &&
+                        it.endretAv == "saksbehandlerId"
+                },
+            )
+        }
     }
 }

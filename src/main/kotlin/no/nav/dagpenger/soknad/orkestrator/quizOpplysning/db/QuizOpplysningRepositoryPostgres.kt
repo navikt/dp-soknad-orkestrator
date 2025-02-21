@@ -115,6 +115,13 @@ class QuizOpplysningRepositoryPostgres(
             QuizOpplysningTabell.deleteWhere { QuizOpplysningTabell.søknadId eq søknadId }
         }
     }
+
+    override fun oppdaterBarn(
+        søknadId: UUID,
+        oppdatertBarn: BarnSvar,
+    ) {
+        TODO("Not yet implemented")
+    }
 }
 
 private fun opplysningEksisterer(opplysning: QuizOpplysning<*>): Boolean =
