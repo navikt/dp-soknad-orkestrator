@@ -27,9 +27,6 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
 
         authenticate("azureAd") {
             route("/opplysninger/{søknadId}") {
-                get {
-                    call.respond(HttpStatusCode.OK)
-                }
                 route("/barn") {
                     get {
                         val søknadId = validerOgFormaterSøknadIdParam() ?: return@get

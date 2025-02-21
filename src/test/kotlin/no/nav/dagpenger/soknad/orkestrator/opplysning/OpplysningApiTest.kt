@@ -44,18 +44,16 @@ class OpplysningApiTest {
     @Test
     fun `Uautentiserte kall returnerer 401 Unauthorized`() {
         withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
-            client.get("/opplysninger/${UUID.randomUUID()}").status shouldBe HttpStatusCode.Unauthorized
+            client.get("/opplysninger/${UUID.randomUUID()}/barn").status shouldBe HttpStatusCode.Unauthorized
         }
     }
 
     @Test
     fun `Kall med saksbehandlerADgruppe returnerer 200 OK`() {
         withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
-            client.get("/opplysninger/${UUID.randomUUID()}") {
+            client.get("/opplysninger/${UUID.randomUUID()}/barn") {
                 header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
-            }.let { response ->
-                response.status shouldBe HttpStatusCode.OK
-            }
+            }.status shouldBe HttpStatusCode.OK
         }
     }
 
