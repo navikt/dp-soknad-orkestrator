@@ -60,8 +60,6 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                             call.respond(HttpStatusCode.NotModified, "Opplysningen inneholder ingen endringer, kan ikke oppdatere")
                             return@put
                         }
-
-                        call.respond(HttpStatusCode.OK)
                     }
                 }
             }
