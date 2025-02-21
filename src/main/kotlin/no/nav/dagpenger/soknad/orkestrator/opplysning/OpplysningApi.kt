@@ -14,6 +14,7 @@ import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
+import no.nav.dagpenger.soknad.orkestrator.api.auth.saksbehandlerId
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import java.util.UUID
 
@@ -37,6 +38,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                     put("/oppdater") {
                         val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
                         val oppdatertBarn = call.receive<OppdatertBarnRequestDTO>()
+                        val saksbehandlerId = call.saksbehandlerId()
 
                         if (opplysningService.hentBarn(søknadId).find { it.barnId == oppdatertBarn.barnId } == null) {
                             call.respond(HttpStatusCode.NotFound, "Fant ikke barn med id ${oppdatertBarn.barnId} for søknad $søknadId")

@@ -10,7 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import java.util.UUID
 
 class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
-    fun hentBarn(søknadId: UUID): List<no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO> {
+    fun hentBarn(søknadId: UUID): List<BarnResponseDTO> {
         val registerBarn =
             opplysningRepository.hent(
                 beskrivendeId = beskrivendeIdPdlBarn,
