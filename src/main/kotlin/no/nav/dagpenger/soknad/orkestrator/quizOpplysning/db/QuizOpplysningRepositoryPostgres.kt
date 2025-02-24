@@ -537,21 +537,33 @@ private fun hentBarnSvar(it: ResultRow): List<BarnSvar> {
 
     return BarnSvarTabell
         .select(
+            BarnSvarTabell.barnSvarId,
             BarnSvarTabell.fornavnMellomnavn,
             BarnSvarTabell.etternavn,
             BarnSvarTabell.fødselsdato,
             BarnSvarTabell.statsborgerskap,
             BarnSvarTabell.forsørgerBarnet,
             BarnSvarTabell.fraRegister,
+            BarnSvarTabell.kvalifisererTilBarnetillegg,
+            BarnSvarTabell.barnetilleggFom,
+            BarnSvarTabell.barnetilleggTom,
+            BarnSvarTabell.endretAv,
+            BarnSvarTabell.begrunnelse,
         ).where { BarnSvarTabell.barnId eq barnId }
         .map {
             BarnSvar(
+                barnSvarId = it[BarnSvarTabell.barnSvarId],
                 fornavnOgMellomnavn = it[BarnSvarTabell.fornavnMellomnavn],
                 etternavn = it[BarnSvarTabell.etternavn],
                 fødselsdato = it[BarnSvarTabell.fødselsdato],
                 statsborgerskap = it[BarnSvarTabell.statsborgerskap],
                 forsørgerBarnet = it[BarnSvarTabell.forsørgerBarnet],
                 fraRegister = it[BarnSvarTabell.fraRegister],
+                kvalifisererTilBarnetillegg = it[BarnSvarTabell.kvalifisererTilBarnetillegg],
+                barnetilleggFom = it[BarnSvarTabell.barnetilleggFom],
+                barnetilleggTom = it[BarnSvarTabell.barnetilleggTom],
+                endretAv = it[BarnSvarTabell.endretAv],
+                begrunnelse = it[BarnSvarTabell.begrunnelse],
             )
         }
 }
@@ -568,6 +580,7 @@ private fun lagreBarnSvar(
 
     svar.forEach { barn ->
         BarnSvarTabell.insert {
+            it[barnSvarId] = barn.barnSvarId
             it[BarnSvarTabell.barnId] = barnId
             it[fornavnMellomnavn] = barn.fornavnOgMellomnavn
             it[etternavn] = barn.etternavn
@@ -575,7 +588,9 @@ private fun lagreBarnSvar(
             it[statsborgerskap] = barn.statsborgerskap
             it[forsørgerBarnet] = barn.forsørgerBarnet
             it[fraRegister] = barn.fraRegister
-            it[kvalifisererTilBarnetillegg] = barn.forsørgerBarnet
+            it[kvalifisererTilBarnetillegg] = barn.kvalifisererTilBarnetillegg
+            it[barnetilleggFom] = barn.barnetilleggFom
+            it[barnetilleggTom] = barn.barnetilleggTom
         }
     }
 }

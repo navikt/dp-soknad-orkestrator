@@ -24,7 +24,7 @@ class OpplysningServiceTest {
         val søknadId = UUID.randomUUID()
         val registerBarn =
             BarnSvar(
-                barnId = UUID.randomUUID(),
+                barnSvarId = UUID.randomUUID(),
                 fornavnOgMellomnavn = "Kari Register",
                 etternavn = "Nordamm",
                 fødselsdato = LocalDate.of(2020, 1, 1),
@@ -36,7 +36,7 @@ class OpplysningServiceTest {
 
         val egetBarn =
             BarnSvar(
-                barnId = UUID.randomUUID(),
+                barnSvarId = UUID.randomUUID(),
                 fornavnOgMellomnavn = "Kari Eget",
                 etternavn = "Nordmann",
                 fødselsdato = LocalDate.of(2020, 1, 1),
@@ -87,7 +87,7 @@ class OpplysningServiceTest {
 
         val opprinneligBarn =
             BarnSvar(
-                barnId = barnId,
+                barnSvarId = barnId,
                 fornavnOgMellomnavn = "Kari",
                 etternavn = "Nordmann",
                 fødselsdato = LocalDate.of(2020, 1, 1),
@@ -131,7 +131,7 @@ class OpplysningServiceTest {
 
         val opprinneligBarn =
             BarnSvar(
-                barnId = barnId,
+                barnSvarId = barnId,
                 fornavnOgMellomnavn = "Kari",
                 etternavn = "Nordmann",
                 fødselsdato = LocalDate.of(2020, 1, 1),
@@ -172,7 +172,7 @@ class OpplysningServiceTest {
         val barnId = UUID.randomUUID()
         val opprinneligBarnSvar =
             BarnSvar(
-                barnId = barnId,
+                barnSvarId = barnId,
                 fornavnOgMellomnavn = "Opprinnelig Navn",
                 etternavn = "Opprinnelig Etternavn",
                 fødselsdato = LocalDate.of(2010, 1, 1),
@@ -216,7 +216,7 @@ class OpplysningServiceTest {
             opplysningRepository.oppdaterBarn(
                 søknadId,
                 match {
-                    it.barnId == barnId &&
+                    it.barnSvarId == barnId &&
                         it.fornavnOgMellomnavn == "Oppdatert Navn" &&
                         it.etternavn == "Oppdatert Etternavn" &&
                         it.fødselsdato == LocalDate.of(2010, 1, 1) &&

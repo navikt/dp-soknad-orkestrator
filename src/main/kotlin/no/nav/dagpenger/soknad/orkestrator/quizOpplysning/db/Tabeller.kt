@@ -97,9 +97,9 @@ object BarnSvarTabell : IntIdTable("barn_svar") {
     val forsørgerBarnet: Column<Boolean> = bool("forsørger_barnet")
     val fraRegister = bool("fra_register")
     val sistEndret: Column<LocalDateTime?> = datetime("sist_endret").nullable()
-    val endretAv: Column<String?> = text("endret_av").nullable()
-    val begrunnelse: Column<String?> = text("begrunnelse").nullable()
     val kvalifisererTilBarnetillegg: Column<Boolean> = bool("kvalifiserer_til_barnetillegg")
     val barnetilleggFom: Column<LocalDate?> = date("barnetillegg_fom").nullable()
     val barnetilleggTom: Column<LocalDate?> = date("barnetillegg_tom").nullable()
+    val endretAv: Column<String?> = text("endret_av").nullable()
+    val begrunnelse: Column<String?> = text("begrunnelse").nullable()
 }

@@ -51,7 +51,7 @@ class InMemoryQuizOpplysningRepository : QuizOpplysningRepository {
 
         val oppdatertBarnSvarListe: List<BarnSvar> =
             opprinneligBarnOpplysning.svar.asListOf<BarnSvar>().map {
-                if (it.barnId == oppdatertBarn.barnId) oppdatertBarn else it
+                if (it.barnSvarId == oppdatertBarn.barnSvarId) oppdatertBarn else it
             }
 
         val oppdatertOpplysning = opprinneligBarnOpplysning.copy(svar = oppdatertBarnSvarListe)

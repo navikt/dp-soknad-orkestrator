@@ -26,7 +26,7 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
 
         return (registerBarn + egneBarn).map {
             BarnResponseDTO(
-                barnId = it.barnId,
+                barnId = it.barnSvarId,
                 fornavnOgMellomnavn = it.fornavnOgMellomnavn,
                 etternavn = it.etternavn,
                 fødselsdato = it.fødselsdato,
@@ -70,12 +70,12 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
                 ?: throw IllegalArgumentException("Fant ikke opplysning om barn for søknad med id $søknadId")
 
         val opprinneligBarnSvar =
-            opprinneligBarnOpplysning.svar.asListOf<BarnSvar>().find { it.barnId == oppdatering.barnId }
+            opprinneligBarnOpplysning.svar.asListOf<BarnSvar>().find { it.barnSvarId == oppdatering.barnId }
                 ?: throw IllegalArgumentException("Fant ikke barn med id ${oppdatering.barnId}")
 
         val oppdatertBarnSvar =
             BarnSvar(
-                barnId = oppdatering.barnId,
+                barnSvarId = oppdatering.barnId,
                 fornavnOgMellomnavn = oppdatering.fornavnOgMellomnavn,
                 etternavn = oppdatering.etternavn,
                 fødselsdato = oppdatering.fødselsdato,

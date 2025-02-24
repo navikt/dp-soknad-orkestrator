@@ -276,6 +276,8 @@ class QuizOpplysningRepositoryPostgresTest {
 
     @Test
     fun `vi kan lagre og hente opplysning av type generator - barn`() {
+        val barnSvarId1 = UUID.randomUUID()
+        val barnSvarId2 = UUID.randomUUID()
         val opplysning =
             QuizOpplysning(
                 beskrivendeId = beskrivendeId,
@@ -283,20 +285,24 @@ class QuizOpplysningRepositoryPostgresTest {
                 svar =
                     listOf(
                         BarnSvar(
+                            barnSvarId = barnSvarId1,
                             fornavnOgMellomnavn = "Fornavn Mellomnavn",
                             etternavn = "Etternavn",
                             fødselsdato = 1.januar(2024),
                             statsborgerskap = "NOR",
                             forsørgerBarnet = true,
                             fraRegister = false,
+                            kvalifisererTilBarnetillegg = true,
                         ),
                         BarnSvar(
+                            barnSvarId = barnSvarId2,
                             fornavnOgMellomnavn = "Fornavn Mellomnavn Register",
                             etternavn = "Etternavn Register",
                             fødselsdato = 1.januar(2024),
                             statsborgerskap = "NOR",
                             forsørgerBarnet = true,
                             fraRegister = true,
+                            kvalifisererTilBarnetillegg = true,
                         ),
                     ),
                 ident = ident,
@@ -309,8 +315,8 @@ class QuizOpplysningRepositoryPostgresTest {
             opplysningRepository.hent(beskrivendeId, ident, søknadId)!!.also {
                 it.beskrivendeId shouldBe opplysning.beskrivendeId
                 it.type shouldBe opplysning.type
-                it.svar.asListOf<BarnSvar>().first().fraRegister shouldBe false
-                it.svar.asListOf<BarnSvar>().last().fraRegister shouldBe true
+                it.svar.asListOf<BarnSvar>().first().barnSvarId shouldBe barnSvarId1
+                it.svar.asListOf<BarnSvar>().last().barnSvarId shouldBe barnSvarId2
                 it.ident shouldBe opplysning.ident
                 it.søknadId shouldBe opplysning.søknadId
             }

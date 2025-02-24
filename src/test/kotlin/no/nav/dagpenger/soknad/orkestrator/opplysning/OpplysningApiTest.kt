@@ -76,12 +76,14 @@ class OpplysningApiTest {
                 svar =
                     listOf(
                         BarnSvar(
+                            barnSvarId = UUID.randomUUID(),
                             fornavnOgMellomnavn = "Kari",
                             etternavn = "Nordmann",
                             fødselsdato = LocalDate.of(2020, 1, 1),
                             statsborgerskap = "NOR",
                             forsørgerBarnet = false,
                             fraRegister = false,
+                            kvalifisererTilBarnetillegg = false,
                         ),
                     ),
                 ident = ident,
@@ -122,6 +124,7 @@ class OpplysningApiTest {
                 svar =
                     listOf(
                         BarnSvar(
+                            barnSvarId = UUID.randomUUID(),
                             fornavnOgMellomnavn = "Kari",
                             etternavn = "Nordmann",
                             fødselsdato = LocalDate.of(2020, 1, 1),
@@ -143,7 +146,7 @@ class OpplysningApiTest {
                 header(HttpHeaders.ContentType, "application/json")
                 setBody(
                     OppdatertBarnRequestDTO(
-                        barnId = opplysning.svar.first().barnId,
+                        barnId = opplysning.svar.first().barnSvarId,
                         fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
                         etternavn = opplysning.svar.first().etternavn,
                         fødselsdato = opplysning.svar.first().fødselsdato,
@@ -168,6 +171,7 @@ class OpplysningApiTest {
                 svar =
                     listOf(
                         BarnSvar(
+                            barnSvarId = UUID.randomUUID(),
                             fornavnOgMellomnavn = "Kari",
                             etternavn = "Nordmann",
                             fødselsdato = LocalDate.of(2020, 1, 1),
@@ -189,7 +193,7 @@ class OpplysningApiTest {
                 header(HttpHeaders.ContentType, "application/json")
                 setBody(
                     OppdatertBarnRequestDTO(
-                        barnId = opplysning.svar.first().barnId,
+                        barnId = opplysning.svar.first().barnSvarId,
                         fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
                         etternavn = opplysning.svar.first().etternavn,
                         fødselsdato = opplysning.svar.first().fødselsdato,
@@ -214,6 +218,7 @@ class OpplysningApiTest {
                 svar =
                     listOf(
                         BarnSvar(
+                            barnSvarId = UUID.randomUUID(),
                             fornavnOgMellomnavn = "Kari",
                             etternavn = "Nordmann",
                             fødselsdato = LocalDate.of(2020, 1, 1),
@@ -235,7 +240,7 @@ class OpplysningApiTest {
                 header(HttpHeaders.ContentType, "application/json")
                 setBody(
                     OppdatertBarnRequestDTO(
-                        barnId = opplysning.svar.first().barnId,
+                        barnId = opplysning.svar.first().barnSvarId,
                         fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
                         etternavn = opplysning.svar.first().etternavn,
                         fødselsdato = opplysning.svar.first().fødselsdato,
@@ -260,6 +265,7 @@ class OpplysningApiTest {
                 svar =
                     listOf(
                         BarnSvar(
+                            barnSvarId = UUID.randomUUID(),
                             fornavnOgMellomnavn = "Kari",
                             etternavn = "Nordmann",
                             fødselsdato = LocalDate.of(2020, 1, 1),
@@ -281,7 +287,7 @@ class OpplysningApiTest {
                 header(HttpHeaders.ContentType, "application/json")
                 setBody(
                     OppdatertBarnRequestDTO(
-                        barnId = opplysning.svar.first().barnId,
+                        barnId = opplysning.svar.first().barnSvarId,
                         fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
                         etternavn = opplysning.svar.first().etternavn,
                         fødselsdato = opplysning.svar.first().fødselsdato,
