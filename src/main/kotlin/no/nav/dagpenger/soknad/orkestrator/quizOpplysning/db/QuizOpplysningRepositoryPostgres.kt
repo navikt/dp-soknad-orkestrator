@@ -40,7 +40,10 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -97,10 +100,7 @@ class QuizOpplysningRepositoryPostgres(
     override fun hent(
         beskrivendeId: String,
         søknadId: UUID,
-    ): QuizOpplysning<*>? {
-        // TODO: Not yet implemented
-        return null
-    }
+    ): QuizOpplysning<*>? = hentAlle(søknadId).find { it.beskrivendeId == beskrivendeId }
 
     override fun hentAlle(søknadId: UUID): List<QuizOpplysning<*>> =
         transaction {
@@ -120,7 +120,22 @@ class QuizOpplysningRepositoryPostgres(
         søknadId: UUID,
         oppdatertBarn: BarnSvar,
     ) {
-        TODO("Not yet implemented")
+        transaction {
+            BarnSvarTabell.update({ BarnSvarTabell.barnSvarId eq oppdatertBarn.barnSvarId }) {
+                it[fornavnMellomnavn] = oppdatertBarn.fornavnOgMellomnavn
+                it[etternavn] = oppdatertBarn.etternavn
+                it[fødselsdato] = oppdatertBarn.fødselsdato
+                it[statsborgerskap] = oppdatertBarn.statsborgerskap
+                it[forsørgerBarnet] = oppdatertBarn.forsørgerBarnet
+                it[fraRegister] = oppdatertBarn.fraRegister
+                it[kvalifisererTilBarnetillegg] = oppdatertBarn.kvalifisererTilBarnetillegg
+                it[barnetilleggFom] = oppdatertBarn.barnetilleggFom
+                it[barnetilleggTom] = oppdatertBarn.barnetilleggTom
+                it[endretAv] = oppdatertBarn.endretAv
+                it[begrunnelse] = oppdatertBarn.begrunnelse
+                it[sistEndret] = OffsetDateTime.now(ZoneOffset.UTC)
+            }
+        }
     }
 }
 

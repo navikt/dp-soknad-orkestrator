@@ -324,6 +324,21 @@ class QuizOpplysningRepositoryPostgresTest {
     }
 
     @Test
+    fun `Kan hente en opplysning basert på søknadId og beskrivendeId`() {
+        val søknadId = UUID.randomUUID()
+        val beskrivendeId = beskrivendeId
+        val opplysning = opplysning(beskrivendeId = beskrivendeId, søknadId = søknadId)
+
+        withMigratedDb {
+            opplysningRepository.lagre(opplysning)
+
+            val hentetOpplysning = opplysningRepository.hent(beskrivendeId, søknadId)
+
+            hentetOpplysning?.søknadId shouldBe søknadId
+        }
+    }
+
+    @Test
     fun `vi lagrer ikke opplysning dersom den allerede er lagret`() {
         val opplysning1 = opplysning(søknadId = søknadId)
         val opplysning2 = opplysning(søknadId = søknadId)
@@ -366,6 +381,68 @@ class QuizOpplysningRepositoryPostgresTest {
             val antallTekstsvarEtterSletting = transaction { TekstTabell.selectAll().count() }
             antallOpplysningerEtterSletting shouldBe 0
             antallTekstsvarEtterSletting shouldBe 0
+        }
+    }
+
+    @Test
+    fun `Kan oppdatere opplysning om barn`() {
+        val barnSvarId = UUID.randomUUID()
+        val opprinneligOpplysning =
+            QuizOpplysning(
+                beskrivendeId = beskrivendeId,
+                type = Barn,
+                svar =
+                    listOf(
+                        BarnSvar(
+                            barnSvarId = barnSvarId,
+                            fornavnOgMellomnavn = "Ola",
+                            etternavn = "Nordmann",
+                            fødselsdato = LocalDate.of(2020, 1, 1),
+                            statsborgerskap = "NOR",
+                            forsørgerBarnet = false,
+                            fraRegister = false,
+                            kvalifisererTilBarnetillegg = false,
+                        ),
+                    ),
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        val oppdatertBarnSvar =
+            BarnSvar(
+                barnSvarId = barnSvarId,
+                fornavnOgMellomnavn = "Ola",
+                etternavn = "Nordmann",
+                fødselsdato = LocalDate.of(2020, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = true,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = true,
+                barnetilleggFom = LocalDate.of(2020, 1, 1),
+                barnetilleggTom = LocalDate.of(2038, 1, 1),
+                endretAv = "123",
+                begrunnelse = "Begrunnelse",
+            )
+
+        withMigratedDb {
+            opplysningRepository.lagre(opprinneligOpplysning)
+            opplysningRepository.oppdaterBarn(søknadId = søknadId, oppdatertBarn = oppdatertBarnSvar)
+
+            val oppdatertOpplysing = opplysningRepository.hent(beskrivendeId, søknadId)
+
+            oppdatertOpplysing?.svar.asListOf<BarnSvar>().first().also {
+                it.barnSvarId shouldBe barnSvarId
+                it.fornavnOgMellomnavn shouldBe "Ola"
+                it.etternavn shouldBe "Nordmann"
+                it.fødselsdato shouldBe LocalDate.of(2020, 1, 1)
+                it.statsborgerskap shouldBe "NOR"
+                it.forsørgerBarnet shouldBe true
+                it.kvalifisererTilBarnetillegg shouldBe true
+                it.barnetilleggFom shouldBe LocalDate.of(2020, 1, 1)
+                it.barnetilleggTom shouldBe LocalDate.of(2038, 1, 1)
+                it.endretAv shouldBe "123"
+                it.begrunnelse shouldBe "Begrunnelse"
+            }
         }
     }
 }

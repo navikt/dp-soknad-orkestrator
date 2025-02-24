@@ -2,8 +2,10 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.javatime.date
 import org.jetbrains.exposed.sql.javatime.datetime
+import org.jetbrains.exposed.sql.javatime.timestampWithTimeZone
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.OffsetDateTime
 import java.util.UUID
 
 object QuizOpplysningTabell : IntIdTable("quiz_opplysning") {
@@ -96,7 +98,7 @@ object BarnSvarTabell : IntIdTable("barn_svar") {
     val statsborgerskap: Column<String> = text("statsborgerskap")
     val forsørgerBarnet: Column<Boolean> = bool("forsørger_barnet")
     val fraRegister = bool("fra_register")
-    val sistEndret: Column<LocalDateTime?> = datetime("sist_endret").nullable()
+    val sistEndret: Column<OffsetDateTime?> = timestampWithTimeZone("sist_endret").nullable()
     val kvalifisererTilBarnetillegg: Column<Boolean> = bool("kvalifiserer_til_barnetillegg")
     val barnetilleggFom: Column<LocalDate?> = date("barnetillegg_fom").nullable()
     val barnetilleggTom: Column<LocalDate?> = date("barnetillegg_tom").nullable()
