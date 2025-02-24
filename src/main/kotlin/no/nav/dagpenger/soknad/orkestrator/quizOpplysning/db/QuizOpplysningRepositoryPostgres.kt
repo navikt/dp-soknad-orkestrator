@@ -560,6 +560,7 @@ private fun lagreBarnSvar(
             it[statsborgerskap] = barn.statsborgerskap
             it[forsørgerBarnet] = barn.forsørgerBarnet
             it[fraRegister] = barn.fraRegister
+            it[kvalifisererTilBarnetillegg] = barn.forsørgerBarnet
         }
     }
 }

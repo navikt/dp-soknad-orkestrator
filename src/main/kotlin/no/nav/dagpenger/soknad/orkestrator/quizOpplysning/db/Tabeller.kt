@@ -88,6 +88,7 @@ object BarnTabell : IntIdTable("barn") {
 }
 
 object BarnSvarTabell : IntIdTable("barn_svar") {
+    val barnSvarId: Column<UUID> = uuid("barn_svar_id")
     val barnId: Column<Int> = integer("barn_id").references(BarnTabell.id)
     val fornavnMellomnavn: Column<String> = text("fornavn_mellomnavn")
     val etternavn: Column<String> = text("etternavn")
@@ -95,4 +96,10 @@ object BarnSvarTabell : IntIdTable("barn_svar") {
     val statsborgerskap: Column<String> = text("statsborgerskap")
     val forsørgerBarnet: Column<Boolean> = bool("forsørger_barnet")
     val fraRegister = bool("fra_register")
+    val sistEndret: Column<LocalDateTime?> = datetime("sist_endret").nullable()
+    val endretAv: Column<String?> = text("endret_av").nullable()
+    val begrunnelse: Column<String?> = text("begrunnelse").nullable()
+    val kvalifisererTilBarnetillegg: Column<Boolean> = bool("kvalifiserer_til_barnetillegg")
+    val barnetilleggFom: Column<LocalDate?> = date("barnetillegg_fom").nullable()
+    val barnetilleggTom: Column<LocalDate?> = date("barnetillegg_tom").nullable()
 }
