@@ -41,7 +41,7 @@ class BarnetilleggBehovLøser(
                 etternavn = it.etternavn,
                 fødselsdato = it.fødselsdato,
                 statsborgerskap = it.statsborgerskap,
-                kvalifiserer = it.fraRegister && it.forsørgerBarnet,
+                kvalifiserer = it.kvalifisererTilBarnetillegg,
             )
         }
     }

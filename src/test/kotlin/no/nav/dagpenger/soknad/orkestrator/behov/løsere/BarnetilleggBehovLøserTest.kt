@@ -99,7 +99,7 @@ class BarnetilleggBehovLøserTest {
             it["etternavn"].asText() shouldBe "Utland"
             it["fødselsdato"].asText() shouldBe "2000-01-01"
             it["statsborgerskap"].asText() shouldBe "UTL"
-            it["kvalifiserer"].asBoolean() shouldBe false
+            it["kvalifiserer"].asBoolean() shouldBe true
         }
     }
 }
