@@ -3,8 +3,6 @@ package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db
 import QuizOpplysningTabell
 import TekstTabell
 import io.kotest.matchers.shouldBe
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
@@ -337,61 +335,6 @@ class QuizOpplysningRepositoryPostgresTest {
             val hentetOpplysning = opplysningRepository.hent(beskrivendeId, søknadId)
 
             hentetOpplysning?.søknadId shouldBe søknadId
-        }
-    }
-
-    @Test
-    fun `testing`() {
-        val registerBarn =
-            BarnSvar(
-                barnSvarId = UUID.randomUUID(),
-                fornavnOgMellomnavn = "Kari Register",
-                etternavn = "Nordamm",
-                fødselsdato = LocalDate.of(2020, 1, 1),
-                statsborgerskap = "NOR",
-                forsørgerBarnet = false,
-                fraRegister = true,
-                kvalifisererTilBarnetillegg = false,
-            )
-
-        val egetBarn =
-            BarnSvar(
-                barnSvarId = UUID.randomUUID(),
-                fornavnOgMellomnavn = "Kari Eget",
-                etternavn = "Nordmann",
-                fødselsdato = LocalDate.of(2020, 1, 1),
-                statsborgerskap = "NOR",
-                forsørgerBarnet = false,
-                fraRegister = false,
-                kvalifisererTilBarnetillegg = false,
-            )
-
-        val opplysning =
-            QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
-                type = Barn,
-                svar = listOf(registerBarn),
-                ident = ident,
-                søknadId = søknadId,
-            )
-
-        val opplysning2 =
-            QuizOpplysning(
-                beskrivendeId = beskrivendeIdEgneBarn,
-                type = Barn,
-                svar = listOf(egetBarn),
-                ident = ident,
-                søknadId = søknadId,
-            )
-
-        withMigratedDb {
-            opplysningRepository.lagre(opplysning)
-            opplysningRepository.lagre(opplysning2)
-            val pdlBarn = opplysningRepository.hent(beskrivendeIdPdlBarn, søknadId)
-            val egneBarn = opplysningRepository.hent(beskrivendeIdEgneBarn, søknadId)
-
-            pdlBarn?.svar.asListOf<BarnSvar>().first().fornavnOgMellomnavn shouldBe "Kari Register"
-            egneBarn?.svar.asListOf<BarnSvar>().first().fornavnOgMellomnavn shouldBe "Kari Eget"
         }
     }
 

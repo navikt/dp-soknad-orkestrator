@@ -30,7 +30,7 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
                 søknadId = søknadId,
             )?.svar?.asListOf<BarnSvar>() ?: emptyList()
 
-        sikkerlogg.info { "Antall registerbarn hentet: ${registerBarn.size}, antall egne barn hentet: ${egneBarn.size}" }
+        sikkerlogg.info { "Registerbarn hentet: $registerBarn, egne barn hentet: $egneBarn" }
 
         return (registerBarn + egneBarn).map {
             BarnResponseDTO(
