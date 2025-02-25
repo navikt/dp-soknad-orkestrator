@@ -5,7 +5,7 @@ val exposedVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.1.10"
-    id("io.ktor.plugin") version "3.1.0"
+    id("io.ktor.plugin") version "3.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "12.1.2"
     alias(libs.plugins.shadow.jar)
 }
