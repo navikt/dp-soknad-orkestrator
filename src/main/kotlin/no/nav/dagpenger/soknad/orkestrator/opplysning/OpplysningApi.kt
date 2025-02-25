@@ -43,11 +43,25 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
 
                     put("/oppdater") {
                         val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
-                        val oppdatertBarn = call.receive<OppdatertBarnRequestDTO>()
+                        val oppdatertBarn: OppdatertBarnRequestDTO
+
+                        try {
+                            oppdatertBarn = call.receive<OppdatertBarnRequestDTO>()
+                        } catch (e: Exception) {
+                            call.respond(
+                                HttpStatusCode.BadRequest,
+                                "Kunne ikke parse request body til OppdatertBarnRequestDTO. Feilmelding: $e",
+                            )
+                            return@put
+                        }
+
                         val saksbehandlerId = call.saksbehandlerId()
 
                         if (opplysningService.hentBarn(søknadId).find { it.barnId == oppdatertBarn.barnId } == null) {
-                            call.respond(HttpStatusCode.NotFound, "Fant ikke barn med id ${oppdatertBarn.barnId} for søknad $søknadId")
+                            call.respond(
+                                HttpStatusCode.NotFound,
+                                "Fant ikke barn med id ${oppdatertBarn.barnId} for søknad $søknadId"
+                            )
                             return@put
                         }
 
@@ -65,7 +79,10 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                             opplysningService.oppdaterBarn(oppdatertBarn, søknadId, saksbehandlerId)
                             call.respond(HttpStatusCode.OK)
                         } else {
-                            call.respond(HttpStatusCode.NotModified, "Opplysningen inneholder ingen endringer, kan ikke oppdatere")
+                            call.respond(
+                                HttpStatusCode.NotModified,
+                                "Opplysningen inneholder ingen endringer, kan ikke oppdatere"
+                            )
                             return@put
                         }
                     }
