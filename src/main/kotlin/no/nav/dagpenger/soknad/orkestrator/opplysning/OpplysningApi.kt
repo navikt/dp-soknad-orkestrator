@@ -60,7 +60,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                         if (opplysningService.hentBarn(søknadId).find { it.barnId == oppdatertBarn.barnId } == null) {
                             call.respond(
                                 HttpStatusCode.NotFound,
-                                "Fant ikke barn med id ${oppdatertBarn.barnId} for søknad $søknadId"
+                                "Fant ikke barn med id ${oppdatertBarn.barnId} for søknad $søknadId",
                             )
                             return@put
                         }
@@ -81,7 +81,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                         } else {
                             call.respond(
                                 HttpStatusCode.NotModified,
-                                "Opplysningen inneholder ingen endringer, kan ikke oppdatere"
+                                "Opplysningen inneholder ingen endringer, kan ikke oppdatere",
                             )
                             return@put
                         }
