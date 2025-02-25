@@ -13,13 +13,10 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
 import no.nav.dagpenger.soknad.orkestrator.api.auth.saksbehandlerId
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import java.util.UUID
-
-private val sikkerlogg = KotlinLogging.logger("tjenestekall.OpplysningApi")
 
 internal fun Application.opplysningApi(opplysningService: OpplysningService) {
     install(Authentication) {
@@ -35,10 +32,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                     get {
                         val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
 
-                        val barn = opplysningService.hentBarn(søknadId)
-                        sikkerlogg.info { "Responderer med følgende barn: $barn" }
-
-                        call.respond(HttpStatusCode.OK, barn)
+                        call.respond(HttpStatusCode.OK, opplysningService.hentBarn(søknadId))
                     }
 
                     put("/oppdater") {

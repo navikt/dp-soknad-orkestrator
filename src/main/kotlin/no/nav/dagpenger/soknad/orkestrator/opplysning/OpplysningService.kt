@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
@@ -12,11 +11,6 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import java.util.UUID
 
 class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
-    private companion object {
-        private val logger = KotlinLogging.logger {}
-        private val sikkerlogg = KotlinLogging.logger("tjenestekall.OpplysningService")
-    }
-
     fun hentBarn(søknadId: UUID): List<BarnResponseDTO> {
         val registerBarn =
             opplysningRepository.hent(
@@ -29,8 +23,6 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
                 beskrivendeId = beskrivendeIdEgneBarn,
                 søknadId = søknadId,
             )?.svar?.asListOf<BarnSvar>() ?: emptyList()
-
-        sikkerlogg.info { "Registerbarn hentet: $registerBarn, egne barn hentet: $egneBarn" }
 
         return (registerBarn + egneBarn).map {
             BarnResponseDTO(
