@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
@@ -275,6 +276,8 @@ class QuizOpplysningRepositoryPostgresTest {
 
     @Test
     fun `vi kan lagre og hente opplysning av type generator - barn`() {
+        val barnSvarId1 = UUID.randomUUID()
+        val barnSvarId2 = UUID.randomUUID()
         val opplysning =
             QuizOpplysning(
                 beskrivendeId = beskrivendeId,
@@ -282,20 +285,24 @@ class QuizOpplysningRepositoryPostgresTest {
                 svar =
                     listOf(
                         BarnSvar(
+                            barnSvarId = barnSvarId1,
                             fornavnOgMellomnavn = "Fornavn Mellomnavn",
                             etternavn = "Etternavn",
                             fødselsdato = 1.januar(2024),
                             statsborgerskap = "NOR",
                             forsørgerBarnet = true,
                             fraRegister = false,
+                            kvalifisererTilBarnetillegg = true,
                         ),
                         BarnSvar(
+                            barnSvarId = barnSvarId2,
                             fornavnOgMellomnavn = "Fornavn Mellomnavn Register",
                             etternavn = "Etternavn Register",
                             fødselsdato = 1.januar(2024),
                             statsborgerskap = "NOR",
                             forsørgerBarnet = true,
                             fraRegister = true,
+                            kvalifisererTilBarnetillegg = true,
                         ),
                     ),
                 ident = ident,
@@ -305,11 +312,29 @@ class QuizOpplysningRepositoryPostgresTest {
         withMigratedDb {
             opplysningRepository.lagre(opplysning)
 
-            opplysningRepository.hent(
-                beskrivendeId,
-                ident,
-                søknadId,
-            ) shouldBe opplysning
+            opplysningRepository.hent(beskrivendeId, ident, søknadId)!!.also {
+                it.beskrivendeId shouldBe opplysning.beskrivendeId
+                it.type shouldBe opplysning.type
+                it.svar.asListOf<BarnSvar>().first().barnSvarId shouldBe barnSvarId1
+                it.svar.asListOf<BarnSvar>().last().barnSvarId shouldBe barnSvarId2
+                it.ident shouldBe opplysning.ident
+                it.søknadId shouldBe opplysning.søknadId
+            }
+        }
+    }
+
+    @Test
+    fun `Kan hente en opplysning basert på søknadId og beskrivendeId`() {
+        val søknadId = UUID.randomUUID()
+        val beskrivendeId = beskrivendeId
+        val opplysning = opplysning(beskrivendeId = beskrivendeId, søknadId = søknadId)
+
+        withMigratedDb {
+            opplysningRepository.lagre(opplysning)
+
+            val hentetOpplysning = opplysningRepository.hent(beskrivendeId, søknadId)
+
+            hentetOpplysning?.søknadId shouldBe søknadId
         }
     }
 
@@ -356,6 +381,68 @@ class QuizOpplysningRepositoryPostgresTest {
             val antallTekstsvarEtterSletting = transaction { TekstTabell.selectAll().count() }
             antallOpplysningerEtterSletting shouldBe 0
             antallTekstsvarEtterSletting shouldBe 0
+        }
+    }
+
+    @Test
+    fun `Kan oppdatere opplysning om barn`() {
+        val barnSvarId = UUID.randomUUID()
+        val opprinneligOpplysning =
+            QuizOpplysning(
+                beskrivendeId = beskrivendeId,
+                type = Barn,
+                svar =
+                    listOf(
+                        BarnSvar(
+                            barnSvarId = barnSvarId,
+                            fornavnOgMellomnavn = "Ola",
+                            etternavn = "Nordmann",
+                            fødselsdato = LocalDate.of(2020, 1, 1),
+                            statsborgerskap = "NOR",
+                            forsørgerBarnet = false,
+                            fraRegister = false,
+                            kvalifisererTilBarnetillegg = false,
+                        ),
+                    ),
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        val oppdatertBarnSvar =
+            BarnSvar(
+                barnSvarId = barnSvarId,
+                fornavnOgMellomnavn = "Ola",
+                etternavn = "Nordmann",
+                fødselsdato = LocalDate.of(2020, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = true,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = true,
+                barnetilleggFom = LocalDate.of(2020, 1, 1),
+                barnetilleggTom = LocalDate.of(2038, 1, 1),
+                endretAv = "123",
+                begrunnelse = "Begrunnelse",
+            )
+
+        withMigratedDb {
+            opplysningRepository.lagre(opprinneligOpplysning)
+            opplysningRepository.oppdaterBarn(søknadId = søknadId, oppdatertBarn = oppdatertBarnSvar)
+
+            val oppdatertOpplysing = opplysningRepository.hent(beskrivendeId, søknadId)
+
+            oppdatertOpplysing?.svar.asListOf<BarnSvar>().first().also {
+                it.barnSvarId shouldBe barnSvarId
+                it.fornavnOgMellomnavn shouldBe "Ola"
+                it.etternavn shouldBe "Nordmann"
+                it.fødselsdato shouldBe LocalDate.of(2020, 1, 1)
+                it.statsborgerskap shouldBe "NOR"
+                it.forsørgerBarnet shouldBe true
+                it.kvalifisererTilBarnetillegg shouldBe true
+                it.barnetilleggFom shouldBe LocalDate.of(2020, 1, 1)
+                it.barnetilleggTom shouldBe LocalDate.of(2038, 1, 1)
+                it.endretAv shouldBe "123"
+                it.begrunnelse shouldBe "Begrunnelse"
+            }
         }
     }
 }

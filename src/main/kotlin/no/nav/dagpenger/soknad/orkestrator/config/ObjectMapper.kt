@@ -6,8 +6,8 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 
-val objectMapper =
-    ObjectMapper().apply {
+fun ObjectMapper.configure() =
+    this.apply {
         registerModules(
             KotlinModule.Builder()
                 .withReflectionCacheSize(512)
@@ -18,3 +18,5 @@ val objectMapper =
         configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true)
         configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false)
     }
+
+val objectMapper = ObjectMapper().configure()

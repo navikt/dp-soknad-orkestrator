@@ -40,7 +40,10 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.time.LocalDate
+import java.time.OffsetDateTime
+import java.time.ZoneOffset
 import java.util.UUID
 import javax.sql.DataSource
 
@@ -94,6 +97,11 @@ class QuizOpplysningRepositoryPostgres(
                 .firstOrNull()
         }
 
+    override fun hent(
+        beskrivendeId: String,
+        søknadId: UUID,
+    ): QuizOpplysning<*>? = hentAlle(søknadId).find { it.beskrivendeId == beskrivendeId }
+
     override fun hentAlle(søknadId: UUID): List<QuizOpplysning<*>> =
         transaction {
             QuizOpplysningTabell
@@ -105,6 +113,28 @@ class QuizOpplysningRepositoryPostgres(
     override fun slett(søknadId: UUID) {
         transaction {
             QuizOpplysningTabell.deleteWhere { QuizOpplysningTabell.søknadId eq søknadId }
+        }
+    }
+
+    override fun oppdaterBarn(
+        søknadId: UUID,
+        oppdatertBarn: BarnSvar,
+    ) {
+        transaction {
+            BarnSvarTabell.update({ BarnSvarTabell.barnSvarId eq oppdatertBarn.barnSvarId }) {
+                it[fornavnMellomnavn] = oppdatertBarn.fornavnOgMellomnavn
+                it[etternavn] = oppdatertBarn.etternavn
+                it[fødselsdato] = oppdatertBarn.fødselsdato
+                it[statsborgerskap] = oppdatertBarn.statsborgerskap
+                it[forsørgerBarnet] = oppdatertBarn.forsørgerBarnet
+                it[fraRegister] = oppdatertBarn.fraRegister
+                it[kvalifisererTilBarnetillegg] = oppdatertBarn.kvalifisererTilBarnetillegg
+                it[barnetilleggFom] = oppdatertBarn.barnetilleggFom
+                it[barnetilleggTom] = oppdatertBarn.barnetilleggTom
+                it[endretAv] = oppdatertBarn.endretAv
+                it[begrunnelse] = oppdatertBarn.begrunnelse
+                it[sistEndret] = OffsetDateTime.now(ZoneOffset.UTC)
+            }
         }
     }
 }
@@ -522,21 +552,33 @@ private fun hentBarnSvar(it: ResultRow): List<BarnSvar> {
 
     return BarnSvarTabell
         .select(
+            BarnSvarTabell.barnSvarId,
             BarnSvarTabell.fornavnMellomnavn,
             BarnSvarTabell.etternavn,
             BarnSvarTabell.fødselsdato,
             BarnSvarTabell.statsborgerskap,
             BarnSvarTabell.forsørgerBarnet,
             BarnSvarTabell.fraRegister,
+            BarnSvarTabell.kvalifisererTilBarnetillegg,
+            BarnSvarTabell.barnetilleggFom,
+            BarnSvarTabell.barnetilleggTom,
+            BarnSvarTabell.endretAv,
+            BarnSvarTabell.begrunnelse,
         ).where { BarnSvarTabell.barnId eq barnId }
         .map {
             BarnSvar(
+                barnSvarId = it[BarnSvarTabell.barnSvarId],
                 fornavnOgMellomnavn = it[BarnSvarTabell.fornavnMellomnavn],
                 etternavn = it[BarnSvarTabell.etternavn],
                 fødselsdato = it[BarnSvarTabell.fødselsdato],
                 statsborgerskap = it[BarnSvarTabell.statsborgerskap],
                 forsørgerBarnet = it[BarnSvarTabell.forsørgerBarnet],
                 fraRegister = it[BarnSvarTabell.fraRegister],
+                kvalifisererTilBarnetillegg = it[BarnSvarTabell.kvalifisererTilBarnetillegg],
+                barnetilleggFom = it[BarnSvarTabell.barnetilleggFom],
+                barnetilleggTom = it[BarnSvarTabell.barnetilleggTom],
+                endretAv = it[BarnSvarTabell.endretAv],
+                begrunnelse = it[BarnSvarTabell.begrunnelse],
             )
         }
 }
@@ -553,6 +595,7 @@ private fun lagreBarnSvar(
 
     svar.forEach { barn ->
         BarnSvarTabell.insert {
+            it[barnSvarId] = barn.barnSvarId
             it[BarnSvarTabell.barnId] = barnId
             it[fornavnMellomnavn] = barn.fornavnOgMellomnavn
             it[etternavn] = barn.etternavn
@@ -560,7 +603,9 @@ private fun lagreBarnSvar(
             it[statsborgerskap] = barn.statsborgerskap
             it[forsørgerBarnet] = barn.forsørgerBarnet
             it[fraRegister] = barn.fraRegister
-            it[kvalifisererTilBarnetillegg] = barn.forsørgerBarnet
+            it[kvalifisererTilBarnetillegg] = barn.kvalifisererTilBarnetillegg
+            it[barnetilleggFom] = barn.barnetilleggFom
+            it[barnetilleggTom] = barn.barnetilleggTom
         }
     }
 }

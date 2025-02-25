@@ -31,20 +31,24 @@ class BarnetilleggBehovLøserTest {
                 svar =
                     listOf(
                         BarnSvar(
+                            barnSvarId = UUID.randomUUID(),
                             fornavnOgMellomnavn = "Ola",
                             etternavn = "Nordmann",
                             fødselsdato = 1.januar(2000),
                             statsborgerskap = "NOR",
                             forsørgerBarnet = true,
                             fraRegister = true,
+                            kvalifisererTilBarnetillegg = true,
                         ),
                         BarnSvar(
+                            barnSvarId = UUID.randomUUID(),
                             fornavnOgMellomnavn = "Per",
                             etternavn = "Nordmann",
                             fødselsdato = 1.januar(2000),
                             statsborgerskap = "NOR",
                             forsørgerBarnet = false,
                             fraRegister = true,
+                            kvalifisererTilBarnetillegg = false,
                         ),
                     ),
             )
@@ -58,12 +62,14 @@ class BarnetilleggBehovLøserTest {
                 svar =
                     listOf(
                         BarnSvar(
+                            barnSvarId = UUID.randomUUID(),
                             fornavnOgMellomnavn = "Per",
                             etternavn = "Utland",
                             fødselsdato = 1.januar(2000),
                             statsborgerskap = "UTL",
                             forsørgerBarnet = true,
                             fraRegister = false,
+                            kvalifisererTilBarnetillegg = true,
                         ),
                     ),
             )

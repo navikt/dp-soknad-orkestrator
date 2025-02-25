@@ -11,6 +11,50 @@ servers:
   - url: https://dp-soknad-orkestrator.intern.nav.no
     description: prod
 paths:
+  /opplysninger/{søknadId}/barn:
+    get:
+      summary: Hent opplysning om barn
+      parameters:
+        - in: path
+          name: søknadId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BarnResponse'
+        '400':
+          description: SøknadId mangler eller har feil format
+  /opplysninger/{søknadId}/barn/oppdater:
+    put:
+      summary: Oppdater opplysning om barn
+      parameters:
+        - in: path
+          name: søknadId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OppdatertBarnRequest'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: barnetilleggFom og barnetilleggTom må være satt når kvalifisererTilBarnetillegg er true
+        '404':
+            description: Fant ikke opplysningen som skal oppdateres
+        '304':
+          description: Opplysningen inneholder ingen endringer, kan ikke oppdatere
   /inntekt/{søknadId}/minsteinntektGrunnlag:
     get:
       summary: Hent opplysinger om minsteinntektgrunnlag for en gitt søknadId
@@ -96,6 +140,81 @@ paths:
                   $ref: '#/components/schemas/Landgruppe'
 components:
   schemas:
+    BarnResponse:
+      type: object
+      properties:
+        barnId:
+          type: string
+          format: uuid
+        fornavnOgMellomnavn:
+          type: string
+        etternavn:
+          type: string
+        fødselsdato:
+          type: string
+          format: date
+        oppholdssted:
+          type: string
+        forsørgerBarnet:
+          type: boolean
+        fraRegister:
+          type: boolean
+        kvalifisererTilBarnetillegg:
+          type: boolean
+        barnetilleggFom:
+          type: string
+          format: date
+        barnetilleggTom:
+          type: string
+          format: date
+        begrunnelse:
+          type: string
+        endretAv:
+          type: string
+      required:
+        - barnId
+        - fornavnOgMellomnavn
+        - etternavn
+        - fødselsdato
+        - oppholdssted
+        - forsørgerBarnet
+        - fraRegister
+    OppdatertBarnRequest:
+      type: object
+      properties:
+        barnId:
+          type: string
+          format: uuid
+        fornavnOgMellomnavn:
+          type: string
+        etternavn:
+          type: string
+        fødselsdato:
+          type: string
+          format: date
+        oppholdssted:
+          type: string
+        forsørgerBarnet:
+          type: boolean
+        kvalifisererTilBarnetillegg:
+          type: boolean
+        barnetilleggFom:
+          type: string
+          format: date
+        barnetilleggTom:
+          type: string
+          format: date
+        begrunnelse:
+          type: string
+      required:
+        - barnId
+        - fornavnOgMellomnavn
+        - etternavn
+        - fødselsdato
+        - oppholdssted
+        - forsørgerBarnet
+        - kvalifisererTilBarnetillegg
+        - begrunnelse
     Opplysning:
       type: object
       properties:
@@ -210,13 +329,13 @@ components:
         - søknadId
         - bekreftet
     HtmlDokument:
-        type: object
-        properties:
-            html:
-              type: string
-              description: Skjemaet bruker har fylt som html, inkludert styling
-        required:
-            - html
+      type: object
+      properties:
+        html:
+          type: string
+          description: Skjemaet bruker har fylt som html, inkludert styling
+      required:
+        - html
 
 
 
