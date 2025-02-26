@@ -16,6 +16,7 @@ import io.ktor.server.routing.routing
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
 import no.nav.dagpenger.soknad.orkestrator.api.auth.saksbehandlerId
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
+import no.nav.dagpenger.soknad.orkestrator.metrikker.OpplysningMetrikker
 import java.util.UUID
 
 internal fun Application.opplysningApi(opplysningService: OpplysningService) {
@@ -71,6 +72,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
 
                         if (opplysningService.erEndret(oppdatertBarn, søknadId)) {
                             opplysningService.oppdaterBarn(oppdatertBarn, søknadId, saksbehandlerId)
+                            OpplysningMetrikker.endringBarn.inc()
                             call.respond(HttpStatusCode.OK)
                         } else {
                             call.respond(

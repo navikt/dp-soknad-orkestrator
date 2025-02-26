@@ -58,3 +58,12 @@ object BehovMetrikker {
             .labelNames("behov")
             .register()
 }
+
+object OpplysningMetrikker {
+    val endringBarn: Counter =
+        Counter
+            .builder()
+            .name("${NAMESPACE}_antall_endringer_barn")
+            .help("Indikerer antall ganger opplysning om barn er endret")
+            .register()
+}
