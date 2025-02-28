@@ -42,6 +42,10 @@ class BarnetilleggBehovLøser(
                 fødselsdato = it.fødselsdato,
                 statsborgerskap = it.statsborgerskap,
                 kvalifiserer = it.kvalifisererTilBarnetillegg,
+                barnetilleggFom = it.barnetilleggFom,
+                barnetilleggTom = it.barnetilleggTom,
+                endretAv = it.endretAv,
+                begrunnelse = it.begrunnelse,
             )
         }
     }
@@ -58,5 +62,9 @@ class BarnetilleggBehovLøser(
         val fødselsdato: LocalDate,
         val statsborgerskap: String,
         val kvalifiserer: Boolean,
+        val barnetilleggFom: LocalDate?,
+        val barnetilleggTom: LocalDate?,
+        val endretAv: String?,
+        val begrunnelse: String?,
     )
 }

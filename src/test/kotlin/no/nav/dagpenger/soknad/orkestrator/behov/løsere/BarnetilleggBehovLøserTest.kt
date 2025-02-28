@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Barnetillegg
@@ -39,6 +40,10 @@ class BarnetilleggBehovLøserTest {
                             forsørgerBarnet = true,
                             fraRegister = true,
                             kvalifisererTilBarnetillegg = true,
+                            barnetilleggFom = 1.januar(2000),
+                            barnetilleggTom = 1.januar(2018),
+                            endretAv = "123",
+                            begrunnelse = "Begrunnelse for endring",
                         ),
                         BarnSvar(
                             barnSvarId = UUID.randomUUID(),
@@ -86,6 +91,10 @@ class BarnetilleggBehovLøserTest {
             it["fødselsdato"].asText() shouldBe "2000-01-01"
             it["statsborgerskap"].asText() shouldBe "NOR"
             it["kvalifiserer"].asBoolean() shouldBe true
+            it["barnetilleggFom"].asLocalDate() shouldBe 1.januar(2000)
+            it["barnetilleggTom"].asLocalDate() shouldBe 1.januar(2018)
+            it["endretAv"].asText() shouldBe "123"
+            it["begrunnelse"].asText() shouldBe "Begrunnelse for endring"
         }
         løsteBarn[1].also {
             it["fornavnOgMellomnavn"].asText() shouldBe "Per"
