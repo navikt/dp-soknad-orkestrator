@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.land
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import no.nav.dagpenger.soknad.orkestrator.api.models.LandDTO
 import java.io.FileNotFoundException
 
 internal object Landoppslag {
@@ -22,6 +23,12 @@ internal object Landoppslag {
             require(alpha3Code.length == 3) {
                 "ISO 3166-1-alpha3 må være 3 bokstaver lang. Fikk: $alpha3Code"
             }
-            alpha3Code.uppercase()
-        }.toSet()
+            val landkode = alpha3Code.uppercase()
+            val landnavn = it["no"].asText()
+
+            LandDTO(
+                alpha3kode = landkode,
+                navn = landnavn,
+            )
+        }
 }

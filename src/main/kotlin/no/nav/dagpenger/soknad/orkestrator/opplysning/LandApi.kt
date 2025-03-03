@@ -6,13 +6,13 @@ import io.ktor.server.response.respond
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk
+import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.alleLand
 
-internal fun Application.landgruppeApi() {
+internal fun Application.landApi() {
     routing {
-        route("/landgrupper") {
+        route("/land") {
             get {
-                call.respond(HttpStatusCode.OK, Landfabrikk.alleLandgrupper())
+                call.respond(HttpStatusCode.OK, alleLand)
             }
         }
     }

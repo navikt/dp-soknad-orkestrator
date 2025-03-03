@@ -1,7 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner
 
-import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.eøsOgSveits
-import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.hentLandkoder
+import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.landkoder
 import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe
 import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.EØS_OG_SVEITS
 import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.NORGE
@@ -65,7 +64,7 @@ object Bostedsland : Seksjon() {
         opplysningsbehovId: Int,
     ): Opplysningsbehov? =
         when (opplysningsbehovId) {
-            hvilketLandBorDuI.id -> if (svar.verdi in eøsOgSveits) reistTilbakeTilNorge else null
+            hvilketLandBorDuI.id -> if (svar.verdi in EØS_OG_SVEITS.landkoder()) reistTilbakeTilNorge else null
             reistTilbakeTilNorge.id -> if (svar.verdi == true) datoForAvreise else enGangIUken
             datoForAvreise.id -> hvorforReisteFraNorge
             hvorforReisteFraNorge.id -> enGangIUken
@@ -111,7 +110,7 @@ object Bostedsland : Seksjon() {
         if (opplysningsbehovId == hvilketLandBorDuI.id) {
             val gyldigeLand =
                 hvilketLandBorDuI.gyldigeSvar
-                    ?.map { Landgruppe.valueOf(it).hentLandkoder() }
+                    ?.map { Landgruppe.valueOf(it).landkoder() }
                     ?.flatten()
             if (gyldigeLand?.contains(svar.verdi) != true) {
                 throw IllegalArgumentException("$svar er ikke et gyldig svar")

@@ -15,6 +15,7 @@ import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.opplysning.landApi
 import no.nav.dagpenger.soknad.orkestrator.opplysning.opplysningApi
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
@@ -62,6 +63,7 @@ internal class ApplicationBuilder(
                             jackson { configure() }
                         }
                         opplysningApi(opplysningService)
+                        landApi()
                     }
                 },
             ).also { rapidsConnection ->

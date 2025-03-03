@@ -1,12 +1,10 @@
 package no.nav.dagpenger.soknad.orkestrator.land
 
-import no.nav.dagpenger.soknad.orkestrator.api.models.LandgruppeDTO
-
 object Landfabrikk {
     val alleLand = Landoppslag.land.toList()
-    val norge = alleLand.filter { it in listOf("NOR", "SJM") }
-    val storbritannia = alleLand.filter { it in listOf("GBR", "JEY", "IMN") }
-    val eøsOgSveitsLandkoder =
+    private val norge = alleLand.filter { it.alpha3kode in listOf("NOR", "SJM") }
+    private val storbritannia = alleLand.filter { it.alpha3kode in listOf("GBR", "JEY", "IMN") }
+    private val eøsOgSveitsLandkoder =
         listOf(
             "BEL",
             "BGR",
@@ -39,24 +37,15 @@ object Landfabrikk {
             "HUN",
             "AUT",
         )
-    val eøsOgSveits = alleLand.filter { it in eøsOgSveitsLandkoder }
-    val eøsOgSveitsOgStorbritannia = eøsOgSveits + storbritannia
-    val tredjeland = alleLand - norge - storbritannia - eøsOgSveits
+    private val eøsOgSveits = alleLand.filter { it.alpha3kode in eøsOgSveitsLandkoder }
+    private val eøsOgSveitsOgStorbritannia = eøsOgSveits + storbritannia
+    private val tredjeland = alleLand - norge - storbritannia - eøsOgSveits
 
-    fun Landgruppe.hentLandkoder(): List<String> =
+    fun Landgruppe.landkoder(): List<String> =
         when (this) {
-            Landgruppe.NORGE -> norge
-            Landgruppe.STORBRITANNIA -> storbritannia
-            Landgruppe.EØS_OG_SVEITS -> eøsOgSveits
-            Landgruppe.TREDJELAND -> tredjeland
-        }
-
-    fun alleLandgrupper(): List<LandgruppeDTO> =
-        Landgruppe.entries.map {
-            LandgruppeDTO(
-                gruppenavn = LandgruppeDTO.Gruppenavn.valueOf(it.name),
-                land = it.hentLandkoder(),
-                gruppeId = "gruppe.${it.name.lowercase()}",
-            )
+            Landgruppe.NORGE -> norge.map { it.alpha3kode }
+            Landgruppe.STORBRITANNIA -> storbritannia.map { it.alpha3kode }
+            Landgruppe.EØS_OG_SVEITS -> eøsOgSveits.map { it.alpha3kode }
+            Landgruppe.TREDJELAND -> tredjeland.map { it.alpha3kode }
         }
 }

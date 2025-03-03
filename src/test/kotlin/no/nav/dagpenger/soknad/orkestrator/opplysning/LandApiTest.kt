@@ -9,23 +9,23 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.micrometer.prometheusmetrics.PrometheusConfig
 import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
-import no.nav.dagpenger.soknad.orkestrator.api.models.LandgruppeDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.LandDTO
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import kotlin.test.Test
 
-class LandgruppeApiTest {
+class LandApiTest {
     @Test
-    fun `Landgrupper svarer med 200 OK og en liste med LandgruppeDTO`() {
+    fun `Land svarer med 200 OK og en liste med Land`() {
         naisfulTestApp(
-            testApplicationModule = { landgruppeApi() },
+            testApplicationModule = { landApi() },
             meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
             objectMapper = objectMapper,
         ) {
-            val respons = client.get("/landgrupper")
+            val respons = client.get("/land")
 
             respons.status shouldBe HttpStatusCode.OK
             shouldNotThrow<IllegalArgumentException> {
-                objectMapper.readValue<List<LandgruppeDTO>>(respons.bodyAsText())
+                objectMapper.readValue<List<LandDTO>>(respons.bodyAsText())
             }
         }
     }

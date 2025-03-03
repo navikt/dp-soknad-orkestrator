@@ -126,18 +126,18 @@ paths:
       responses:
         '200':
           description: OK
-  /landgrupper:
+  /land:
     get:
-      summary: Hent landlister for alle landgrupper
+      summary: Hent liste med alle land
       responses:
         '200':
-          description: Liste med landgrupper returnert
+          description: Liste med land returnert
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Landgruppe'
+                  $ref: '#/components/schemas/Land'
 components:
   schemas:
     BarnResponse:
@@ -278,28 +278,18 @@ components:
           format: date
       required:
         - fom
-    Landgruppe:
+    Land:
       type: object
       properties:
-        gruppenavn:
+        alpha3kode:
           type: string
-          enum:
-            - NORGE
-            - STORBRITANNIA
-            - EØS_OG_SVEITS
-            - TREDJELAND
-        gruppeId:
+          example: NOR
+        navn:
           type: string
-          example: gupppe.norge
-        land:
-          type: array
-          items:
-            type: string
-          example: [ NOR, SJM ]
+          example: Norge
       required:
-        - gruppenavn
-        - gruppeId
-        - land
+        - alpha3kode
+        - navn
     MinsteinntektGrunnlag:
       type: object
       properties:

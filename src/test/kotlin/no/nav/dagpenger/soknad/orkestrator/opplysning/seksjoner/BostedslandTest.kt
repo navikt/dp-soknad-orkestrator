@@ -3,8 +3,9 @@ package no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
-import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.eøsOgSveits
-import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.tredjeland
+import no.nav.dagpenger.soknad.orkestrator.land.Landfabrikk.landkoder
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.EØS_OG_SVEITS
+import no.nav.dagpenger.soknad.orkestrator.land.Landgruppe.TREDJELAND
 import no.nav.dagpenger.soknad.orkestrator.opplysning.BooleanSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.DatoSvar
 import no.nav.dagpenger.soknad.orkestrator.opplysning.LandSvar
@@ -25,7 +26,7 @@ class BostedslandTest {
 
     @Test
     fun `neste opplysning er null når hvilketLandBorDuI er et tredjeland`() {
-        val svar = LandSvar(opplysningId = UUID.randomUUID(), tredjeland.random())
+        val svar = LandSvar(opplysningId = UUID.randomUUID(), TREDJELAND.landkoder().random())
 
         val nesteOpplysningsbehov = Bostedsland.nesteOpplysningsbehov(svar, Bostedsland.hvilketLandBorDuI.id)
 
@@ -34,7 +35,7 @@ class BostedslandTest {
 
     @Test
     fun `neste opplysning er reistTilbakeTilNorge når hvilketLandBorDuI er et EØS-land eller Sveits`() {
-        val eøsLandSvar = LandSvar(opplysningId = UUID.randomUUID(), eøsOgSveits.random())
+        val eøsLandSvar = LandSvar(opplysningId = UUID.randomUUID(), EØS_OG_SVEITS.landkoder().random())
 
         val nesteOpplysningsbehov = Bostedsland.nesteOpplysningsbehov(eøsLandSvar, Bostedsland.hvilketLandBorDuI.id)
 
