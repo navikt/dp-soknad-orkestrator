@@ -10,7 +10,6 @@ import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigratio
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.config.configure
-import no.nav.dagpenger.soknad.orkestrator.inntekt.InntektService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
@@ -48,8 +47,6 @@ internal class ApplicationBuilder(
         )
 
     private val journalføringService = JournalføringService()
-
-    private val inntektService: InntektService = InntektService(journalføringService)
 
     private val opplysningService: OpplysningService = OpplysningService(quizOpplysningRepositoryPostgres)
 
