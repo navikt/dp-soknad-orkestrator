@@ -69,45 +69,44 @@ paths:
                   $ref: '#/components/schemas/Land'
 components:
   schemas:
+    BarnOpplysning:
+      type: object
+      properties:
+        id:
+          type: string
+          format: string
+        verdi:
+          type: string
+          format: string
+        dataType:
+          type: string
+          enum:
+            - dato
+            - land
+            - boolsk
+            - tekst
+        kilde:
+          type: string
+          enum:
+            - søknad
+            - register
+      required:
+        - id
+        - verdi
+        - dataType
     BarnResponse:
       type: object
       properties:
         barnId:
           type: string
           format: uuid
-        fornavnOgMellomnavn:
-          type: string
-        etternavn:
-          type: string
-        fødselsdato:
-          type: string
-          format: date
-        oppholdssted:
-          type: string
-        forsørgerBarnet:
-          type: boolean
-        fraRegister:
-          type: boolean
-        kvalifisererTilBarnetillegg:
-          type: boolean
-        barnetilleggFom:
-          type: string
-          format: date
-        barnetilleggTom:
-          type: string
-          format: date
-        begrunnelse:
-          type: string
-        endretAv:
-          type: string
+        opplysninger:
+          type: array
+          items:
+            $ref: '#/components/schemas/BarnOpplysning'
       required:
         - barnId
-        - fornavnOgMellomnavn
-        - etternavn
-        - fødselsdato
-        - oppholdssted
-        - forsørgerBarnet
-        - fraRegister
+        - opplysninger
     OppdatertBarnRequest:
       type: object
       properties:
