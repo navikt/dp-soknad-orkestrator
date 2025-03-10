@@ -66,8 +66,8 @@ class OpplysningServiceTest {
         val hentedeBarn = opplysningService.hentBarn(søknadId)
 
         hentedeBarn.size shouldBe 2
-        hentedeBarn.first().fornavnOgMellomnavn shouldBe "Kari Register"
-        hentedeBarn.last().fornavnOgMellomnavn shouldBe "Kari Eget"
+        hentedeBarn.first().opplysninger.find { it.id.equals("fornavnOgMellomnavn") }?.verdi shouldBe "Kari Register"
+        hentedeBarn.last().opplysninger.find { it.id.equals("fornavnOgMellomnavn") }?.verdi shouldBe "Kari Eget"
     }
 
     @Test
