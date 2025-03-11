@@ -1,5 +1,8 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
+import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.DataType
+import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.Kilde
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
@@ -25,21 +28,24 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
             )?.svar?.asListOf<BarnSvar>() ?: emptyList()
 
         return (registerBarn + egneBarn).map {
+            val fraRegister = if (it.fraRegister) Kilde.register else Kilde.søknad
             BarnResponseDTO(
                 barnId = it.barnSvarId,
-                fornavnOgMellomnavn = it.fornavnOgMellomnavn,
-                etternavn = it.etternavn,
-                fødselsdato = it.fødselsdato,
-                oppholdssted = it.statsborgerskap,
-                forsørgerBarnet = it.forsørgerBarnet,
-                fraRegister = it.fraRegister,
-                kvalifisererTilBarnetillegg = it.kvalifisererTilBarnetillegg,
-                barnetilleggFom = it.barnetilleggFom,
-                barnetilleggTom = it.barnetilleggTom,
-                begrunnelse = it.begrunnelse,
-                endretAv = it.endretAv,
+                opplysninger =
+                    listOf(
+                        BarnOpplysningDTO("fornavnOgMellomnavn", it.fornavnOgMellomnavn, DataType.tekst, fraRegister),
+                        BarnOpplysningDTO("etternavn", it.etternavn, DataType.tekst, fraRegister),
+                        BarnOpplysningDTO("fødselsdato", it.fødselsdato.toString(), DataType.dato, fraRegister),
+                        BarnOpplysningDTO("oppholdssted", it.statsborgerskap, DataType.land, fraRegister),
+                        BarnOpplysningDTO("forsørgerBarnet", it.forsørgerBarnet.toString(), DataType.boolsk, Kilde.søknad),
+                        BarnOpplysningDTO("kvalifisererTilBarnetillegg", it.kvalifisererTilBarnetillegg.toString(), DataType.boolsk),
+                        BarnOpplysningDTO("barnetilleggFom", it.barnetilleggFom.toString(), DataType.dato),
+                        BarnOpplysningDTO("barnetilleggTom", it.barnetilleggTom.toString(), DataType.dato),
+                        BarnOpplysningDTO("begrunnelse", it.begrunnelse ?: "", DataType.tekst),
+                        BarnOpplysningDTO("endretAv", it.endretAv ?: "", DataType.tekst),
+                    ),
             )
-        }
+        }.toMutableList()
     }
 
     fun erEndret(
@@ -49,15 +55,16 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
         val opprinneligOpplysning =
             hentBarn(søknadId).find { it.barnId == opplysning.barnId }
                 ?: throw IllegalArgumentException("Fant ikke barn med id ${opplysning.barnId}")
-
-        return opprinneligOpplysning.fornavnOgMellomnavn != opplysning.fornavnOgMellomnavn ||
-            opprinneligOpplysning.etternavn != opplysning.etternavn ||
-            opprinneligOpplysning.fødselsdato != opplysning.fødselsdato ||
-            opprinneligOpplysning.oppholdssted != opplysning.oppholdssted ||
-            opprinneligOpplysning.forsørgerBarnet != opplysning.forsørgerBarnet ||
-            opprinneligOpplysning.kvalifisererTilBarnetillegg != opplysning.kvalifisererTilBarnetillegg ||
-            opprinneligOpplysning.barnetilleggFom != opplysning.barnetilleggFom ||
-            opprinneligOpplysning.barnetilleggTom != opplysning.barnetilleggTom
+        return opprinneligOpplysning.opplysninger.find { it.id == "fornavnOgMellomnavn" }?.verdi != opplysning.fornavnOgMellomnavn ||
+            opprinneligOpplysning.opplysninger.find { it.id == "etternavn" }?.verdi != opplysning.etternavn ||
+            opprinneligOpplysning.opplysninger.find { it.id == "fødselsdato" }?.verdi != opplysning.fødselsdato.toString() ||
+            opprinneligOpplysning.opplysninger.find { it.id == "oppholdssted" }?.verdi != opplysning.oppholdssted ||
+            opprinneligOpplysning.opplysninger.find { it.id == "forsørgerBarnet" }?.verdi != opplysning.forsørgerBarnet.toString() ||
+            opprinneligOpplysning.opplysninger.find {
+                it.id == "kvalifisererTilBarnetillegg"
+            }?.verdi != opplysning.kvalifisererTilBarnetillegg.toString() ||
+            opprinneligOpplysning.opplysninger.find { it.id == "barnetilleggFom" }?.verdi != opplysning.barnetilleggFom.toString() ||
+            opprinneligOpplysning.opplysninger.find { it.id == "barnetilleggTom" }?.verdi != opplysning.barnetilleggTom.toString()
     }
 
     fun oppdaterBarn(
