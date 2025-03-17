@@ -43,7 +43,7 @@ jobs:
   deploy-dev:
     name: Deploy to dev
     needs: [ build ]
-    if: github.ref == 'refs/heads/dependabot/gradle/no.nav.dagpenger-dp-version-catalog-20250313.146.aeb36f'
+    if: github.ref == 'refs/heads/deploy-versjon-katalog-til-dev'
     runs-on: ubuntu-latest
     environment: dev-gcp
     steps:
@@ -71,3 +71,4 @@ jobs:
 #          RESOURCE: .nais/app.yaml
 #          VARS: .nais/vars-prod.yaml
 #          VAR: image=${{ needs.build.outputs.image }}
+
