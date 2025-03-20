@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val exposedVersion: String by project
 
 plugins {
-    kotlin("jvm") version "2.1.10"
+    kotlin("jvm") version "2.1.20"
     id("io.ktor.plugin") version "3.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "12.2.0"
     alias(libs.plugins.shadow.jar)
