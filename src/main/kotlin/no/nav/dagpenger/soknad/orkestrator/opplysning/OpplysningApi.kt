@@ -28,7 +28,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
         get("/") { call.respond(HttpStatusCode.OK) }
 
         authenticate("azureAd") {
-            route("/opplysninger/{søknadId}") {
+            route("/opplysninger/{soknadId}") {
                 route("/barn") {
                     get {
                         val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
@@ -90,7 +90,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
 
 private suspend fun RoutingContext.validerOgFormaterSøknadIdParam(): UUID? {
     val søknadIdParam =
-        call.parameters["søknadId"] ?: run {
+        call.parameters["soknadId"] ?: run {
             call.respond(HttpStatusCode.BadRequest, "Mangler søknadId i parameter")
             return null
         }

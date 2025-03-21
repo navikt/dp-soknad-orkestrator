@@ -11,12 +11,12 @@ servers:
   - url: https://dp-soknad-orkestrator.intern.nav.no
     description: prod
 paths:
-  /opplysninger/{søknadId}/barn:
+  /opplysninger/{soknadId}/barn:
     get:
       summary: Hent opplysning om barn
       parameters:
         - in: path
-          name: søknadId
+          name: soknadId
           required: true
           schema:
             type: string
@@ -30,12 +30,12 @@ paths:
                 $ref: '#/components/schemas/BarnResponse'
         '400':
           description: SøknadId mangler eller har feil format
-  /opplysninger/{søknadId}/barn/oppdater:
+  /opplysninger/{soknadId}/barn/oppdater:
     put:
       summary: Oppdater opplysning om barn
       parameters:
         - in: path
-          name: søknadId
+          name: soknadId
           required: true
           schema:
             type: string
@@ -88,7 +88,7 @@ components:
         kilde:
           type: string
           enum:
-            - søknad
+            - soknad
             - register
       required:
         - id
@@ -117,12 +117,12 @@ components:
           type: string
         etternavn:
           type: string
-        fødselsdato:
+        fodselsdato:
           type: string
           format: date
         oppholdssted:
           type: string
-        forsørgerBarnet:
+        forsorgerBarnet:
           type: boolean
         kvalifisererTilBarnetillegg:
           type: boolean
@@ -138,9 +138,9 @@ components:
         - barnId
         - fornavnOgMellomnavn
         - etternavn
-        - fødselsdato
+        - fodselsdato
         - oppholdssted
-        - forsørgerBarnet
+        - forsorgerBarnet
         - kvalifisererTilBarnetillegg
         - begrunnelse
     Opplysning:

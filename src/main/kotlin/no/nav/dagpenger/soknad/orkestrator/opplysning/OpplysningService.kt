@@ -28,16 +28,16 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
             )?.svar?.asListOf<BarnSvar>() ?: emptyList()
 
         return (registerBarn + egneBarn).map {
-            val fraRegister = if (it.fraRegister) Kilde.register else Kilde.søknad
+            val fraRegister = if (it.fraRegister) Kilde.register else Kilde.soknad
             BarnResponseDTO(
                 barnId = it.barnSvarId,
                 opplysninger =
                     listOf(
                         BarnOpplysningDTO("fornavnOgMellomnavn", it.fornavnOgMellomnavn, DataType.tekst, fraRegister),
                         BarnOpplysningDTO("etternavn", it.etternavn, DataType.tekst, fraRegister),
-                        BarnOpplysningDTO("fødselsdato", it.fødselsdato.toString(), DataType.dato, fraRegister),
+                        BarnOpplysningDTO("fodselsdato", it.fødselsdato.toString(), DataType.dato, fraRegister),
                         BarnOpplysningDTO("oppholdssted", it.statsborgerskap, DataType.land, fraRegister),
-                        BarnOpplysningDTO("forsørgerBarnet", it.forsørgerBarnet.toString(), DataType.boolsk, Kilde.søknad),
+                        BarnOpplysningDTO("forsorgerBarnet", it.forsørgerBarnet.toString(), DataType.boolsk, Kilde.soknad),
                         BarnOpplysningDTO("kvalifisererTilBarnetillegg", it.kvalifisererTilBarnetillegg.toString(), DataType.boolsk),
                         BarnOpplysningDTO("barnetilleggFom", it.barnetilleggFom.toString(), DataType.dato),
                         BarnOpplysningDTO("barnetilleggTom", it.barnetilleggTom.toString(), DataType.dato),
@@ -57,9 +57,9 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
                 ?: throw IllegalArgumentException("Fant ikke barn med id ${opplysning.barnId}")
         return opprinneligOpplysning.opplysninger.find { it.id == "fornavnOgMellomnavn" }?.verdi != opplysning.fornavnOgMellomnavn ||
             opprinneligOpplysning.opplysninger.find { it.id == "etternavn" }?.verdi != opplysning.etternavn ||
-            opprinneligOpplysning.opplysninger.find { it.id == "fødselsdato" }?.verdi != opplysning.fødselsdato.toString() ||
+            opprinneligOpplysning.opplysninger.find { it.id == "fodselsdato" }?.verdi != opplysning.fodselsdato.toString() ||
             opprinneligOpplysning.opplysninger.find { it.id == "oppholdssted" }?.verdi != opplysning.oppholdssted ||
-            opprinneligOpplysning.opplysninger.find { it.id == "forsørgerBarnet" }?.verdi != opplysning.forsørgerBarnet.toString() ||
+            opprinneligOpplysning.opplysninger.find { it.id == "forsorgerBarnet" }?.verdi != opplysning.forsorgerBarnet.toString() ||
             opprinneligOpplysning.opplysninger.find {
                 it.id == "kvalifisererTilBarnetillegg"
             }?.verdi != opplysning.kvalifisererTilBarnetillegg.toString() ||
@@ -85,9 +85,9 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
                 barnSvarId = oppdatering.barnId,
                 fornavnOgMellomnavn = oppdatering.fornavnOgMellomnavn,
                 etternavn = oppdatering.etternavn,
-                fødselsdato = oppdatering.fødselsdato,
+                fødselsdato = oppdatering.fodselsdato,
                 statsborgerskap = oppdatering.oppholdssted,
-                forsørgerBarnet = oppdatering.forsørgerBarnet,
+                forsørgerBarnet = oppdatering.forsorgerBarnet,
                 fraRegister = opprinneligBarnSvar.fraRegister,
                 kvalifisererTilBarnetillegg = oppdatering.kvalifisererTilBarnetillegg,
                 barnetilleggFom = oppdatering.barnetilleggFom,
