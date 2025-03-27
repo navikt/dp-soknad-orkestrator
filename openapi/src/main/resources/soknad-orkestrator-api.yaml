@@ -27,7 +27,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BarnResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/BarnResponse'
         '400':
           description: SøknadId mangler eller har feil format
   /opplysninger/{soknadId}/barn/oppdater:
