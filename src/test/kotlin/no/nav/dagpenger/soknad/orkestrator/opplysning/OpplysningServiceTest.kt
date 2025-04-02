@@ -231,4 +231,95 @@ class OpplysningServiceTest {
             )
         }
     }
+
+    @Test
+    fun `Oppdaterer eget barn`() {
+        val søknadId = UUID.randomUUID()
+        val barnId = UUID.randomUUID()
+        val egetBarnId = UUID.randomUUID()
+        val opprinneligBarnSvar =
+            BarnSvar(
+                barnSvarId = barnId,
+                fornavnOgMellomnavn = "Opprinnelig Navn",
+                etternavn = "Opprinnelig Etternavn",
+                fødselsdato = LocalDate.of(2010, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = true,
+                kvalifisererTilBarnetillegg = false,
+                barnetilleggFom = null,
+                barnetilleggTom = null,
+                begrunnelse = null,
+                endretAv = null,
+            )
+
+        val opprinneligEgetBarnSvar =
+            BarnSvar(
+                barnSvarId = egetBarnId,
+                fornavnOgMellomnavn = "Eget Barn",
+                etternavn = "Etternavn",
+                fødselsdato = LocalDate.of(2010, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = true,
+                kvalifisererTilBarnetillegg = false,
+                barnetilleggFom = null,
+                barnetilleggTom = null,
+                begrunnelse = null,
+                endretAv = null,
+            )
+        val oppdatertBarnRequest =
+            OppdatertBarnRequestDTO(
+                barnId = egetBarnId,
+                fornavnOgMellomnavn = "Oppdatert Eget Navn",
+                etternavn = "Oppdatert Eget Etternavn",
+                fodselsdato = LocalDate.of(2010, 1, 1),
+                oppholdssted = "NOR",
+                forsorgerBarnet = true,
+                kvalifisererTilBarnetillegg = true,
+                barnetilleggFom = LocalDate.of(2020, 1, 1),
+                barnetilleggTom = LocalDate.of(2038, 1, 1),
+                begrunnelse = "Begrunnelse",
+            )
+        val opprinneligOpplysning =
+            QuizOpplysning(
+                beskrivendeId = beskrivendeIdPdlBarn,
+                type = Barn,
+                svar = listOf(opprinneligBarnSvar),
+                ident = "12345678910",
+                søknadId = søknadId,
+            )
+        val opprinneligEgetbarnOpplysning =
+            QuizOpplysning(
+                beskrivendeId = beskrivendeIdEgneBarn,
+                type = Barn,
+                svar = listOf(opprinneligEgetBarnSvar),
+                ident = "12345678910",
+                søknadId = søknadId,
+            )
+
+        every { opplysningRepository.hentAlle(søknadId) } returns listOf(opprinneligOpplysning, opprinneligEgetbarnOpplysning)
+        every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
+
+        opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId")
+
+        verify {
+            opplysningRepository.oppdaterBarn(
+                søknadId,
+                match {
+                    it.barnSvarId == egetBarnId &&
+                        it.fornavnOgMellomnavn == "Oppdatert Eget Navn" &&
+                        it.etternavn == "Oppdatert Eget Etternavn" &&
+                        it.fødselsdato == LocalDate.of(2010, 1, 1) &&
+                        it.statsborgerskap == "NOR" &&
+                        it.forsørgerBarnet == true &&
+                        it.kvalifisererTilBarnetillegg == true &&
+                        it.barnetilleggFom == LocalDate.of(2020, 1, 1) &&
+                        it.barnetilleggTom == LocalDate.of(2038, 1, 1) &&
+                        it.begrunnelse == "Begrunnelse" &&
+                        it.endretAv == "saksbehandlerId"
+                },
+            )
+        }
+    }
 }
