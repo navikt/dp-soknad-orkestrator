@@ -72,12 +72,13 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
         søknadId: UUID,
         saksbehandlerId: String,
     ) {
-        val opprinneligBarnOpplysning =
-            opplysningRepository.hentAlle(søknadId).find { it.type == Barn }
-                ?: throw IllegalArgumentException("Fant ikke opplysning om barn for søknad med id $søknadId")
+        val opprinneligBarnOpplysninger =
+            opplysningRepository.hentAlle(søknadId).filter { it.type == Barn }
+
+        val alleBarnSvar = opprinneligBarnOpplysninger.flatMap { it.svar.asListOf<BarnSvar>() }
 
         val opprinneligBarnSvar =
-            opprinneligBarnOpplysning.svar.asListOf<BarnSvar>().find { it.barnSvarId == oppdatering.barnId }
+            alleBarnSvar.find { it.barnSvarId == oppdatering.barnId }
                 ?: throw IllegalArgumentException("Fant ikke barn med id ${oppdatering.barnId}")
 
         val oppdatertBarnSvar =
