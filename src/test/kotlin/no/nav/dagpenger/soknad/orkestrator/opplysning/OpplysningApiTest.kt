@@ -10,6 +10,7 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
@@ -146,14 +147,19 @@ class OpplysningApiTest {
                 header(HttpHeaders.ContentType, "application/json")
                 setBody(
                     OppdatertBarnRequestDTO(
-                        barnId = opplysning.svar.first().barnSvarId,
-                        fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
-                        etternavn = opplysning.svar.first().etternavn,
-                        fodselsdato = opplysning.svar.first().fødselsdato,
-                        oppholdssted = opplysning.svar.first().statsborgerskap,
-                        forsorgerBarnet = true,
-                        kvalifisererTilBarnetillegg = false,
-                        begrunnelse = "Begrunnelse",
+                        opplysningId = UUID.randomUUID(),
+                        behandlingId = UUID.randomUUID(),
+                        oppdatertBarn =
+                            OppdatertBarnDTO(
+                                barnId = opplysning.svar.first().barnSvarId,
+                                fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
+                                etternavn = opplysning.svar.first().etternavn,
+                                fodselsdato = opplysning.svar.first().fødselsdato,
+                                oppholdssted = opplysning.svar.first().statsborgerskap,
+                                forsorgerBarnet = true,
+                                kvalifisererTilBarnetillegg = false,
+                                begrunnelse = "Begrunnelse",
+                            ),
                     ),
                 )
             }.let { response ->
@@ -193,14 +199,19 @@ class OpplysningApiTest {
                 header(HttpHeaders.ContentType, "application/json")
                 setBody(
                     OppdatertBarnRequestDTO(
-                        barnId = opplysning.svar.first().barnSvarId,
-                        fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
-                        etternavn = opplysning.svar.first().etternavn,
-                        fodselsdato = opplysning.svar.first().fødselsdato,
-                        oppholdssted = opplysning.svar.first().statsborgerskap,
-                        forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
-                        kvalifisererTilBarnetillegg = true,
-                        begrunnelse = "Begrunnelse",
+                        opplysningId = UUID.randomUUID(),
+                        behandlingId = UUID.randomUUID(),
+                        oppdatertBarn =
+                            OppdatertBarnDTO(
+                                barnId = opplysning.svar.first().barnSvarId,
+                                fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
+                                etternavn = opplysning.svar.first().etternavn,
+                                fodselsdato = opplysning.svar.first().fødselsdato,
+                                oppholdssted = opplysning.svar.first().statsborgerskap,
+                                forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
+                                kvalifisererTilBarnetillegg = true,
+                                begrunnelse = "Begrunnelse",
+                            ),
                     ),
                 )
             }.let { response ->
@@ -240,14 +251,19 @@ class OpplysningApiTest {
                 header(HttpHeaders.ContentType, "application/json")
                 setBody(
                     OppdatertBarnRequestDTO(
-                        barnId = opplysning.svar.first().barnSvarId,
-                        fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
-                        etternavn = opplysning.svar.first().etternavn,
-                        fodselsdato = opplysning.svar.first().fødselsdato,
-                        oppholdssted = opplysning.svar.first().statsborgerskap,
-                        forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
-                        kvalifisererTilBarnetillegg = false,
-                        begrunnelse = "Begrunnelse",
+                        opplysningId = UUID.randomUUID(),
+                        behandlingId = UUID.randomUUID(),
+                        oppdatertBarn =
+                            OppdatertBarnDTO(
+                                barnId = opplysning.svar.first().barnSvarId,
+                                fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
+                                etternavn = opplysning.svar.first().etternavn,
+                                fodselsdato = opplysning.svar.first().fødselsdato,
+                                oppholdssted = opplysning.svar.first().statsborgerskap,
+                                forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
+                                kvalifisererTilBarnetillegg = false,
+                                begrunnelse = "Begrunnelse",
+                            ),
                     ),
                 )
             }.let { response ->
@@ -287,16 +303,21 @@ class OpplysningApiTest {
                 header(HttpHeaders.ContentType, "application/json")
                 setBody(
                     OppdatertBarnRequestDTO(
-                        barnId = opplysning.svar.first().barnSvarId,
-                        fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
-                        etternavn = opplysning.svar.first().etternavn,
-                        fodselsdato = opplysning.svar.first().fødselsdato,
-                        oppholdssted = opplysning.svar.first().statsborgerskap,
-                        forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
-                        kvalifisererTilBarnetillegg = true,
-                        barnetilleggFom = LocalDate.of(2020, 1, 1),
-                        barnetilleggTom = LocalDate.of(2038, 1, 1),
-                        begrunnelse = "Begrunnelse",
+                        opplysningId = UUID.randomUUID(),
+                        behandlingId = UUID.randomUUID(),
+                        oppdatertBarn =
+                            OppdatertBarnDTO(
+                                barnId = opplysning.svar.first().barnSvarId,
+                                fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
+                                etternavn = opplysning.svar.first().etternavn,
+                                fodselsdato = opplysning.svar.first().fødselsdato,
+                                oppholdssted = opplysning.svar.first().statsborgerskap,
+                                forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
+                                kvalifisererTilBarnetillegg = true,
+                                barnetilleggFom = LocalDate.of(2020, 1, 1),
+                                barnetilleggTom = LocalDate.of(2038, 1, 1),
+                                begrunnelse = "Begrunnelse",
+                            ),
                     ),
                 )
             }.let { response ->
@@ -308,14 +329,19 @@ class OpplysningApiTest {
 
 val oppdatertBarnRequestDTO =
     OppdatertBarnRequestDTO(
-        barnId = UUID.randomUUID(),
-        fornavnOgMellomnavn = "Ola",
-        etternavn = "Nordmann",
-        fodselsdato = LocalDate.of(2020, 1, 1),
-        oppholdssted = "Norge",
-        forsorgerBarnet = true,
-        kvalifisererTilBarnetillegg = true,
-        barnetilleggFom = LocalDate.of(2020, 1, 1),
-        barnetilleggTom = LocalDate.of(2038, 1, 1),
-        begrunnelse = "Begrunnelse",
+        opplysningId = UUID.randomUUID(),
+        behandlingId = UUID.randomUUID(),
+        oppdatertBarn =
+            OppdatertBarnDTO(
+                barnId = UUID.randomUUID(),
+                fornavnOgMellomnavn = "Ola",
+                etternavn = "Nordmann",
+                fodselsdato = LocalDate.of(2020, 1, 1),
+                oppholdssted = "Norge",
+                forsorgerBarnet = true,
+                kvalifisererTilBarnetillegg = true,
+                barnetilleggFom = LocalDate.of(2020, 1, 1),
+                barnetilleggTom = LocalDate.of(2038, 1, 1),
+                begrunnelse = "Begrunnelse",
+            ),
     )

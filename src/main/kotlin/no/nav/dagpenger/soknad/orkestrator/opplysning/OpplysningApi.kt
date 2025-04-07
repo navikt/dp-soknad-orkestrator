@@ -38,10 +38,10 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
 
                     put("/oppdater") {
                         val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
-                        val oppdatertBarn: OppdatertBarnRequestDTO
+                        val oppdatertBarnRequest: OppdatertBarnRequestDTO
 
                         try {
-                            oppdatertBarn = call.receive<OppdatertBarnRequestDTO>()
+                            oppdatertBarnRequest = call.receive<OppdatertBarnRequestDTO>()
                         } catch (e: Exception) {
                             call.respond(
                                 HttpStatusCode.BadRequest,
@@ -50,6 +50,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                             return@put
                         }
 
+                        val oppdatertBarn = oppdatertBarnRequest.oppdatertBarn
                         val saksbehandlerId = call.saksbehandlerId()
 
                         if (opplysningService.hentBarn(søknadId).find { it.barnId == oppdatertBarn.barnId } == null) {

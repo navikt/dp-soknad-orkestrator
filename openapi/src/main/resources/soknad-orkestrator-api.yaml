@@ -112,6 +112,21 @@ components:
     OppdatertBarnRequest:
       type: object
       properties:
+        opplysningId:
+          type: string
+          format: uuid
+        behandlingId:
+          type: string
+          format: uuid
+        oppdatertBarn:
+            $ref: '#/components/schemas/OppdatertBarn'
+      required:
+        - opplysningId
+        - behandlingId
+        - oppdatertBarn
+    OppdatertBarn:
+      type: object
+      properties:
         barnId:
           type: string
           format: uuid

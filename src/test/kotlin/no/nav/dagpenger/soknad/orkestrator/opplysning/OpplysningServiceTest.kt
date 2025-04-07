@@ -4,7 +4,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
@@ -97,7 +97,7 @@ class OpplysningServiceTest {
                 kvalifisererTilBarnetillegg = false,
             )
         val oppdatertBarn =
-            OppdatertBarnRequestDTO(
+            OppdatertBarnDTO(
                 barnId = barnId,
                 fornavnOgMellomnavn = "Kari",
                 etternavn = "Nordmann",
@@ -141,7 +141,7 @@ class OpplysningServiceTest {
                 kvalifisererTilBarnetillegg = false,
             )
         val oppdatertBarn =
-            OppdatertBarnRequestDTO(
+            OppdatertBarnDTO(
                 barnId = barnId,
                 fornavnOgMellomnavn = "Kari",
                 etternavn = "Nordmann",
@@ -186,7 +186,7 @@ class OpplysningServiceTest {
                 endretAv = null,
             )
         val oppdatertBarnRequest =
-            OppdatertBarnRequestDTO(
+            OppdatertBarnDTO(
                 barnId = barnId,
                 fornavnOgMellomnavn = "Oppdatert Navn",
                 etternavn = "Oppdatert Etternavn",
@@ -269,7 +269,7 @@ class OpplysningServiceTest {
                 endretAv = null,
             )
         val oppdatertBarnRequest =
-            OppdatertBarnRequestDTO(
+            OppdatertBarnDTO(
                 barnId = egetBarnId,
                 fornavnOgMellomnavn = "Oppdatert Eget Navn",
                 etternavn = "Oppdatert Eget Etternavn",

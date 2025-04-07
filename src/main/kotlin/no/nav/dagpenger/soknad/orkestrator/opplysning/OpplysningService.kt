@@ -4,7 +4,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.DataType
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.Kilde
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
@@ -49,26 +49,26 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
     }
 
     fun erEndret(
-        opplysning: OppdatertBarnRequestDTO,
+        oppdatertBarn: OppdatertBarnDTO,
         søknadId: UUID,
     ): Boolean {
         val opprinneligOpplysning =
-            hentBarn(søknadId).find { it.barnId == opplysning.barnId }
-                ?: throw IllegalArgumentException("Fant ikke barn med id ${opplysning.barnId}")
-        return opprinneligOpplysning.opplysninger.find { it.id == "fornavnOgMellomnavn" }?.verdi != opplysning.fornavnOgMellomnavn ||
-            opprinneligOpplysning.opplysninger.find { it.id == "etternavn" }?.verdi != opplysning.etternavn ||
-            opprinneligOpplysning.opplysninger.find { it.id == "fodselsdato" }?.verdi != opplysning.fodselsdato.toString() ||
-            opprinneligOpplysning.opplysninger.find { it.id == "oppholdssted" }?.verdi != opplysning.oppholdssted ||
-            opprinneligOpplysning.opplysninger.find { it.id == "forsorgerBarnet" }?.verdi != opplysning.forsorgerBarnet.toString() ||
+            hentBarn(søknadId).find { it.barnId == oppdatertBarn.barnId }
+                ?: throw IllegalArgumentException("Fant ikke barn med id ${oppdatertBarn.barnId}")
+        return opprinneligOpplysning.opplysninger.find { it.id == "fornavnOgMellomnavn" }?.verdi != oppdatertBarn.fornavnOgMellomnavn ||
+            opprinneligOpplysning.opplysninger.find { it.id == "etternavn" }?.verdi != oppdatertBarn.etternavn ||
+            opprinneligOpplysning.opplysninger.find { it.id == "fodselsdato" }?.verdi != oppdatertBarn.fodselsdato.toString() ||
+            opprinneligOpplysning.opplysninger.find { it.id == "oppholdssted" }?.verdi != oppdatertBarn.oppholdssted ||
+            opprinneligOpplysning.opplysninger.find { it.id == "forsorgerBarnet" }?.verdi != oppdatertBarn.forsorgerBarnet.toString() ||
             opprinneligOpplysning.opplysninger.find {
                 it.id == "kvalifisererTilBarnetillegg"
-            }?.verdi != opplysning.kvalifisererTilBarnetillegg.toString() ||
-            opprinneligOpplysning.opplysninger.find { it.id == "barnetilleggFom" }?.verdi != opplysning.barnetilleggFom.toString() ||
-            opprinneligOpplysning.opplysninger.find { it.id == "barnetilleggTom" }?.verdi != opplysning.barnetilleggTom.toString()
+            }?.verdi != oppdatertBarn.kvalifisererTilBarnetillegg.toString() ||
+            opprinneligOpplysning.opplysninger.find { it.id == "barnetilleggFom" }?.verdi != oppdatertBarn.barnetilleggFom.toString() ||
+            opprinneligOpplysning.opplysninger.find { it.id == "barnetilleggTom" }?.verdi != oppdatertBarn.barnetilleggTom.toString()
     }
 
     fun oppdaterBarn(
-        oppdatering: OppdatertBarnRequestDTO,
+        oppdatertBarn: OppdatertBarnDTO,
         søknadId: UUID,
         saksbehandlerId: String,
     ) {
@@ -78,22 +78,22 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
         val alleBarnSvar = opprinneligBarnOpplysninger.flatMap { it.svar.asListOf<BarnSvar>() }
 
         val opprinneligBarnSvar =
-            alleBarnSvar.find { it.barnSvarId == oppdatering.barnId }
-                ?: throw IllegalArgumentException("Fant ikke barn med id ${oppdatering.barnId}")
+            alleBarnSvar.find { it.barnSvarId == oppdatertBarn.barnId }
+                ?: throw IllegalArgumentException("Fant ikke barn med id ${oppdatertBarn.barnId}")
 
         val oppdatertBarnSvar =
             BarnSvar(
-                barnSvarId = oppdatering.barnId,
-                fornavnOgMellomnavn = oppdatering.fornavnOgMellomnavn,
-                etternavn = oppdatering.etternavn,
-                fødselsdato = oppdatering.fodselsdato,
-                statsborgerskap = oppdatering.oppholdssted,
-                forsørgerBarnet = oppdatering.forsorgerBarnet,
+                barnSvarId = oppdatertBarn.barnId,
+                fornavnOgMellomnavn = oppdatertBarn.fornavnOgMellomnavn,
+                etternavn = oppdatertBarn.etternavn,
+                fødselsdato = oppdatertBarn.fodselsdato,
+                statsborgerskap = oppdatertBarn.oppholdssted,
+                forsørgerBarnet = oppdatertBarn.forsorgerBarnet,
                 fraRegister = opprinneligBarnSvar.fraRegister,
-                kvalifisererTilBarnetillegg = oppdatering.kvalifisererTilBarnetillegg,
-                barnetilleggFom = oppdatering.barnetilleggFom,
-                barnetilleggTom = oppdatering.barnetilleggTom,
-                begrunnelse = oppdatering.begrunnelse,
+                kvalifisererTilBarnetillegg = oppdatertBarn.kvalifisererTilBarnetillegg,
+                barnetilleggFom = oppdatertBarn.barnetilleggFom,
+                barnetilleggTom = oppdatertBarn.barnetilleggTom,
+                begrunnelse = oppdatertBarn.begrunnelse,
                 endretAv = saksbehandlerId,
             )
 
