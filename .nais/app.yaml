@@ -66,6 +66,9 @@ spec:
           namespace: aura
           cluster: dev-gcp
         {{/if}}
+    outbound:
+      rules:
+        - application: dp-behandling
   tokenx:
     enabled: true
   {{#if ingresses}}
