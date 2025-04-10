@@ -44,6 +44,8 @@ spec:
   env:
     - name: GRUPPER_SAKSBEHANDLER
       value: {{azure.grupper.saksbehandler}}
+    - name: DP_BEHANDLING_SCOPE
+      value: {{DP_BEHANDLING_SCOPE}}
   azure:
     application:
       enabled: true

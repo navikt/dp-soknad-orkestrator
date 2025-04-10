@@ -48,7 +48,8 @@ internal class ApplicationBuilder(
 
     private val journalføringService = JournalføringService()
 
-    private val opplysningService: OpplysningService = OpplysningService(quizOpplysningRepositoryPostgres)
+    private val opplysningService: OpplysningService =
+        OpplysningService(opplysningRepository = quizOpplysningRepositoryPostgres)
 
     private val rapidsConnection =
         RapidApplication
