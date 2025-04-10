@@ -28,7 +28,8 @@ import kotlin.test.Test
 
 class OpplysningApiTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
-    val opplysningService = OpplysningService(opplysningRepository)
+    val opplysningService =
+        OpplysningService(opplysningRepository = opplysningRepository)
     val søknadId = UUID.randomUUID()
     val ident = "12345678910"
 
@@ -52,19 +53,21 @@ class OpplysningApiTest {
     @Test
     fun `Kall med saksbehandlerADgruppe returnerer 200 OK`() {
         withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
-            client.get("/opplysninger/${UUID.randomUUID()}/barn") {
-                header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
-            }.status shouldBe HttpStatusCode.OK
+            client
+                .get("/opplysninger/${UUID.randomUUID()}/barn") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                }.status shouldBe HttpStatusCode.OK
         }
     }
 
     @Test
     fun `Hent opplysning med ugyldig søknadId returnerer 400 Bad Request`() {
         withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
-            client.get("/opplysninger/ugyldigSøknadId/barn") {
-                header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
-                header(HttpHeaders.ContentType, "application/json")
-            }.status shouldBe HttpStatusCode.BadRequest
+            client
+                .get("/opplysninger/ugyldigSøknadId/barn") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                    header(HttpHeaders.ContentType, "application/json")
+                }.status shouldBe HttpStatusCode.BadRequest
         }
     }
 
@@ -93,26 +96,28 @@ class OpplysningApiTest {
         )
 
         withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
-            client.get("/opplysninger/$søknadId/barn") {
-                header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
-            }.let { response ->
-                response.status shouldBe HttpStatusCode.OK
-                val barn = objectMapper.readValue<List<BarnResponseDTO>>(response.bodyAsText())
-                barn.size shouldBe 1
-            }
+            client
+                .get("/opplysninger/$søknadId/barn") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                }.let { response ->
+                    response.status shouldBe HttpStatusCode.OK
+                    val barn = objectMapper.readValue<List<BarnResponseDTO>>(response.bodyAsText())
+                    barn.size shouldBe 1
+                }
         }
     }
 
     @Test
     fun `Oppdater opplysning med ugyldig søknadId returnerer 400 Bad Request`() {
         withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
-            client.put("/opplysninger/ugyldigSøknadId/barn/oppdater") {
-                header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
-                header(HttpHeaders.ContentType, "application/json")
-                setBody(oppdatertBarnRequestDTO)
-            }.let { response ->
-                response.status shouldBe HttpStatusCode.BadRequest
-            }
+            client
+                .put("/opplysninger/ugyldigSøknadId/barn/oppdater") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                    header(HttpHeaders.ContentType, "application/json")
+                    setBody(oppdatertBarnRequestDTO)
+                }.let { response ->
+                    response.status shouldBe HttpStatusCode.BadRequest
+                }
         }
     }
 
@@ -142,29 +147,30 @@ class OpplysningApiTest {
         opplysningRepository.lagre(opplysning)
 
         withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
-            client.put("/opplysninger/$søknadId/barn/oppdater") {
-                header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
-                header(HttpHeaders.ContentType, "application/json")
-                setBody(
-                    OppdatertBarnRequestDTO(
-                        opplysningId = UUID.randomUUID(),
-                        behandlingId = UUID.randomUUID(),
-                        oppdatertBarn =
-                            OppdatertBarnDTO(
-                                barnId = opplysning.svar.first().barnSvarId,
-                                fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
-                                etternavn = opplysning.svar.first().etternavn,
-                                fodselsdato = opplysning.svar.first().fødselsdato,
-                                oppholdssted = opplysning.svar.first().statsborgerskap,
-                                forsorgerBarnet = true,
-                                kvalifisererTilBarnetillegg = false,
-                                begrunnelse = "Begrunnelse",
-                            ),
-                    ),
-                )
-            }.let { response ->
-                response.status shouldBe HttpStatusCode.OK
-            }
+            client
+                .put("/opplysninger/$søknadId/barn/oppdater") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                    header(HttpHeaders.ContentType, "application/json")
+                    setBody(
+                        OppdatertBarnRequestDTO(
+                            opplysningId = UUID.randomUUID(),
+                            behandlingId = UUID.randomUUID(),
+                            oppdatertBarn =
+                                OppdatertBarnDTO(
+                                    barnId = opplysning.svar.first().barnSvarId,
+                                    fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
+                                    etternavn = opplysning.svar.first().etternavn,
+                                    fodselsdato = opplysning.svar.first().fødselsdato,
+                                    oppholdssted = opplysning.svar.first().statsborgerskap,
+                                    forsorgerBarnet = true,
+                                    kvalifisererTilBarnetillegg = false,
+                                    begrunnelse = "Begrunnelse",
+                                ),
+                        ),
+                    )
+                }.let { response ->
+                    response.status shouldBe HttpStatusCode.OK
+                }
         }
     }
 
@@ -194,29 +200,30 @@ class OpplysningApiTest {
         opplysningRepository.lagre(opplysning)
 
         withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
-            client.put("/opplysninger/$søknadId/barn/oppdater") {
-                header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
-                header(HttpHeaders.ContentType, "application/json")
-                setBody(
-                    OppdatertBarnRequestDTO(
-                        opplysningId = UUID.randomUUID(),
-                        behandlingId = UUID.randomUUID(),
-                        oppdatertBarn =
-                            OppdatertBarnDTO(
-                                barnId = opplysning.svar.first().barnSvarId,
-                                fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
-                                etternavn = opplysning.svar.first().etternavn,
-                                fodselsdato = opplysning.svar.first().fødselsdato,
-                                oppholdssted = opplysning.svar.first().statsborgerskap,
-                                forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
-                                kvalifisererTilBarnetillegg = true,
-                                begrunnelse = "Begrunnelse",
-                            ),
-                    ),
-                )
-            }.let { response ->
-                response.status shouldBe HttpStatusCode.BadRequest
-            }
+            client
+                .put("/opplysninger/$søknadId/barn/oppdater") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                    header(HttpHeaders.ContentType, "application/json")
+                    setBody(
+                        OppdatertBarnRequestDTO(
+                            opplysningId = UUID.randomUUID(),
+                            behandlingId = UUID.randomUUID(),
+                            oppdatertBarn =
+                                OppdatertBarnDTO(
+                                    barnId = opplysning.svar.first().barnSvarId,
+                                    fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
+                                    etternavn = opplysning.svar.first().etternavn,
+                                    fodselsdato = opplysning.svar.first().fødselsdato,
+                                    oppholdssted = opplysning.svar.first().statsborgerskap,
+                                    forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
+                                    kvalifisererTilBarnetillegg = true,
+                                    begrunnelse = "Begrunnelse",
+                                ),
+                        ),
+                    )
+                }.let { response ->
+                    response.status shouldBe HttpStatusCode.BadRequest
+                }
         }
     }
 
@@ -246,29 +253,30 @@ class OpplysningApiTest {
         opplysningRepository.lagre(opplysning)
 
         withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
-            client.put("/opplysninger/$søknadId/barn/oppdater") {
-                header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
-                header(HttpHeaders.ContentType, "application/json")
-                setBody(
-                    OppdatertBarnRequestDTO(
-                        opplysningId = UUID.randomUUID(),
-                        behandlingId = UUID.randomUUID(),
-                        oppdatertBarn =
-                            OppdatertBarnDTO(
-                                barnId = opplysning.svar.first().barnSvarId,
-                                fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
-                                etternavn = opplysning.svar.first().etternavn,
-                                fodselsdato = opplysning.svar.first().fødselsdato,
-                                oppholdssted = opplysning.svar.first().statsborgerskap,
-                                forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
-                                kvalifisererTilBarnetillegg = false,
-                                begrunnelse = "Begrunnelse",
-                            ),
-                    ),
-                )
-            }.let { response ->
-                response.status shouldBe HttpStatusCode.NotModified
-            }
+            client
+                .put("/opplysninger/$søknadId/barn/oppdater") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                    header(HttpHeaders.ContentType, "application/json")
+                    setBody(
+                        OppdatertBarnRequestDTO(
+                            opplysningId = UUID.randomUUID(),
+                            behandlingId = UUID.randomUUID(),
+                            oppdatertBarn =
+                                OppdatertBarnDTO(
+                                    barnId = opplysning.svar.first().barnSvarId,
+                                    fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
+                                    etternavn = opplysning.svar.first().etternavn,
+                                    fodselsdato = opplysning.svar.first().fødselsdato,
+                                    oppholdssted = opplysning.svar.first().statsborgerskap,
+                                    forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
+                                    kvalifisererTilBarnetillegg = false,
+                                    begrunnelse = "Begrunnelse",
+                                ),
+                        ),
+                    )
+                }.let { response ->
+                    response.status shouldBe HttpStatusCode.NotModified
+                }
         }
     }
 
@@ -298,31 +306,32 @@ class OpplysningApiTest {
         opplysningRepository.lagre(opplysning)
 
         withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
-            client.put("/opplysninger/$søknadId/barn/oppdater") {
-                header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
-                header(HttpHeaders.ContentType, "application/json")
-                setBody(
-                    OppdatertBarnRequestDTO(
-                        opplysningId = UUID.randomUUID(),
-                        behandlingId = UUID.randomUUID(),
-                        oppdatertBarn =
-                            OppdatertBarnDTO(
-                                barnId = opplysning.svar.first().barnSvarId,
-                                fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
-                                etternavn = opplysning.svar.first().etternavn,
-                                fodselsdato = opplysning.svar.first().fødselsdato,
-                                oppholdssted = opplysning.svar.first().statsborgerskap,
-                                forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
-                                kvalifisererTilBarnetillegg = true,
-                                barnetilleggFom = LocalDate.of(2020, 1, 1),
-                                barnetilleggTom = LocalDate.of(2038, 1, 1),
-                                begrunnelse = "Begrunnelse",
-                            ),
-                    ),
-                )
-            }.let { response ->
-                response.status shouldBe HttpStatusCode.OK
-            }
+            client
+                .put("/opplysninger/$søknadId/barn/oppdater") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                    header(HttpHeaders.ContentType, "application/json")
+                    setBody(
+                        OppdatertBarnRequestDTO(
+                            opplysningId = UUID.randomUUID(),
+                            behandlingId = UUID.randomUUID(),
+                            oppdatertBarn =
+                                OppdatertBarnDTO(
+                                    barnId = opplysning.svar.first().barnSvarId,
+                                    fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
+                                    etternavn = opplysning.svar.first().etternavn,
+                                    fodselsdato = opplysning.svar.first().fødselsdato,
+                                    oppholdssted = opplysning.svar.first().statsborgerskap,
+                                    forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
+                                    kvalifisererTilBarnetillegg = true,
+                                    barnetilleggFom = LocalDate.of(2020, 1, 1),
+                                    barnetilleggTom = LocalDate.of(2038, 1, 1),
+                                    begrunnelse = "Begrunnelse",
+                                ),
+                        ),
+                    )
+                }.let { response ->
+                    response.status shouldBe HttpStatusCode.OK
+                }
         }
     }
 }

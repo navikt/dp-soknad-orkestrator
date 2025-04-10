@@ -17,7 +17,8 @@ import kotlin.test.Test
 
 class OpplysningServiceTest {
     private val opplysningRepository = mockk<QuizOpplysningRepository>()
-    private val opplysningService = OpplysningService(opplysningRepository)
+    private val opplysningService =
+        OpplysningService(opplysningRepository = opplysningRepository)
 
     @Test
     fun `hentBarn returnerer en liste med register og egne barn som BarnResponseDTO`() {
@@ -66,8 +67,16 @@ class OpplysningServiceTest {
         val hentedeBarn = opplysningService.hentBarn(søknadId)
 
         hentedeBarn.size shouldBe 2
-        hentedeBarn.first().opplysninger.find { it.id.equals("fornavnOgMellomnavn") }?.verdi shouldBe "Kari Register"
-        hentedeBarn.last().opplysninger.find { it.id.equals("fornavnOgMellomnavn") }?.verdi shouldBe "Kari Eget"
+        hentedeBarn
+            .first()
+            .opplysninger
+            .find { it.id.equals("fornavnOgMellomnavn") }
+            ?.verdi shouldBe "Kari Register"
+        hentedeBarn
+            .last()
+            .opplysninger
+            .find { it.id.equals("fornavnOgMellomnavn") }
+            ?.verdi shouldBe "Kari Eget"
     }
 
     @Test
@@ -298,7 +307,11 @@ class OpplysningServiceTest {
                 søknadId = søknadId,
             )
 
-        every { opplysningRepository.hentAlle(søknadId) } returns listOf(opprinneligOpplysning, opprinneligEgetbarnOpplysning)
+        every { opplysningRepository.hentAlle(søknadId) } returns
+            listOf(
+                opprinneligOpplysning,
+                opprinneligEgetbarnOpplysning,
+            )
         every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
 
         opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId")

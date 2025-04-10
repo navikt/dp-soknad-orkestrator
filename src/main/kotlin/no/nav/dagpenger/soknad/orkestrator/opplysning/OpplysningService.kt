@@ -13,39 +13,46 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import java.util.UUID
 
-class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
+class OpplysningService(
+    val opplysningRepository: QuizOpplysningRepository,
+) {
     fun hentBarn(søknadId: UUID): List<BarnResponseDTO> {
         val registerBarn =
-            opplysningRepository.hent(
-                beskrivendeId = beskrivendeIdPdlBarn,
-                søknadId = søknadId,
-            )?.svar?.asListOf<BarnSvar>() ?: emptyList()
+            opplysningRepository
+                .hent(
+                    beskrivendeId = beskrivendeIdPdlBarn,
+                    søknadId = søknadId,
+                )?.svar
+                ?.asListOf<BarnSvar>() ?: emptyList()
 
         val egneBarn =
-            opplysningRepository.hent(
-                beskrivendeId = beskrivendeIdEgneBarn,
-                søknadId = søknadId,
-            )?.svar?.asListOf<BarnSvar>() ?: emptyList()
+            opplysningRepository
+                .hent(
+                    beskrivendeId = beskrivendeIdEgneBarn,
+                    søknadId = søknadId,
+                )?.svar
+                ?.asListOf<BarnSvar>() ?: emptyList()
 
-        return (registerBarn + egneBarn).map {
-            val fraRegister = if (it.fraRegister) Kilde.register else Kilde.soknad
-            BarnResponseDTO(
-                barnId = it.barnSvarId,
-                opplysninger =
-                    listOf(
-                        BarnOpplysningDTO("fornavnOgMellomnavn", it.fornavnOgMellomnavn, DataType.tekst, fraRegister),
-                        BarnOpplysningDTO("etternavn", it.etternavn, DataType.tekst, fraRegister),
-                        BarnOpplysningDTO("fodselsdato", it.fødselsdato.toString(), DataType.dato, fraRegister),
-                        BarnOpplysningDTO("oppholdssted", it.statsborgerskap, DataType.land, fraRegister),
-                        BarnOpplysningDTO("forsorgerBarnet", it.forsørgerBarnet.toString(), DataType.boolsk, Kilde.soknad),
-                        BarnOpplysningDTO("kvalifisererTilBarnetillegg", it.kvalifisererTilBarnetillegg.toString(), DataType.boolsk),
-                        BarnOpplysningDTO("barnetilleggFom", it.barnetilleggFom.toString(), DataType.dato),
-                        BarnOpplysningDTO("barnetilleggTom", it.barnetilleggTom.toString(), DataType.dato),
-                        BarnOpplysningDTO("begrunnelse", it.begrunnelse ?: "", DataType.tekst),
-                        BarnOpplysningDTO("endretAv", it.endretAv ?: "", DataType.tekst),
-                    ),
-            )
-        }.toMutableList()
+        return (registerBarn + egneBarn)
+            .map {
+                val fraRegister = if (it.fraRegister) Kilde.register else Kilde.soknad
+                BarnResponseDTO(
+                    barnId = it.barnSvarId,
+                    opplysninger =
+                        listOf(
+                            BarnOpplysningDTO("fornavnOgMellomnavn", it.fornavnOgMellomnavn, DataType.tekst, fraRegister),
+                            BarnOpplysningDTO("etternavn", it.etternavn, DataType.tekst, fraRegister),
+                            BarnOpplysningDTO("fodselsdato", it.fødselsdato.toString(), DataType.dato, fraRegister),
+                            BarnOpplysningDTO("oppholdssted", it.statsborgerskap, DataType.land, fraRegister),
+                            BarnOpplysningDTO("forsorgerBarnet", it.forsørgerBarnet.toString(), DataType.boolsk, Kilde.soknad),
+                            BarnOpplysningDTO("kvalifisererTilBarnetillegg", it.kvalifisererTilBarnetillegg.toString(), DataType.boolsk),
+                            BarnOpplysningDTO("barnetilleggFom", it.barnetilleggFom.toString(), DataType.dato),
+                            BarnOpplysningDTO("barnetilleggTom", it.barnetilleggTom.toString(), DataType.dato),
+                            BarnOpplysningDTO("begrunnelse", it.begrunnelse ?: "", DataType.tekst),
+                            BarnOpplysningDTO("endretAv", it.endretAv ?: "", DataType.tekst),
+                        ),
+                )
+            }.toMutableList()
     }
 
     fun erEndret(
@@ -60,9 +67,10 @@ class OpplysningService(val opplysningRepository: QuizOpplysningRepository) {
             opprinneligOpplysning.opplysninger.find { it.id == "fodselsdato" }?.verdi != oppdatertBarn.fodselsdato.toString() ||
             opprinneligOpplysning.opplysninger.find { it.id == "oppholdssted" }?.verdi != oppdatertBarn.oppholdssted ||
             opprinneligOpplysning.opplysninger.find { it.id == "forsorgerBarnet" }?.verdi != oppdatertBarn.forsorgerBarnet.toString() ||
-            opprinneligOpplysning.opplysninger.find {
-                it.id == "kvalifisererTilBarnetillegg"
-            }?.verdi != oppdatertBarn.kvalifisererTilBarnetillegg.toString() ||
+            opprinneligOpplysning.opplysninger
+                .find {
+                    it.id == "kvalifisererTilBarnetillegg"
+                }?.verdi != oppdatertBarn.kvalifisererTilBarnetillegg.toString() ||
             opprinneligOpplysning.opplysninger.find { it.id == "barnetilleggFom" }?.verdi != oppdatertBarn.barnetilleggFom.toString() ||
             opprinneligOpplysning.opplysninger.find { it.id == "barnetilleggTom" }?.verdi != oppdatertBarn.barnetilleggTom.toString()
     }
