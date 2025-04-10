@@ -61,9 +61,9 @@ spec:
         - application: dp-saksbehandling-frontend
         {{#if wonderwalled}}
         - application: tokenx-token-generator
-          namespace: aura
+          namespace: nais
         - application: azure-token-generator
-          namespace: aura
+          namespace: nais
           cluster: dev-gcp
         {{/if}}
     outbound:
