@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
+import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.DataType
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.Kilde
@@ -14,6 +15,9 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import java.util.UUID
 
 class OpplysningService(
+    val azureAdKlient: CachedOauth2Client,
+    val dpBehandlingBaseUrl: String,
+    val dpBehandlingScope: String,
     val opplysningRepository: QuizOpplysningRepository,
 ) {
     fun hentBarn(søknadId: UUID): List<BarnResponseDTO> {

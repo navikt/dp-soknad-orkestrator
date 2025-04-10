@@ -49,7 +49,12 @@ internal class ApplicationBuilder(
     private val journalføringService = JournalføringService()
 
     private val opplysningService: OpplysningService =
-        OpplysningService(opplysningRepository = quizOpplysningRepositoryPostgres)
+        OpplysningService(
+            azureAdKlient = Configuration.azureAdClient,
+            dpBehandlingBaseUrl = Configuration.miljøVariabler.dpBehandlingBaseUrl,
+            dpBehandlingScope = Configuration.miljøVariabler.dpBehandlingScope,
+            opplysningRepository = quizOpplysningRepositoryPostgres,
+        )
 
     private val rapidsConnection =
         RapidApplication

@@ -9,6 +9,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
@@ -29,7 +30,12 @@ import kotlin.test.Test
 class OpplysningApiTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val opplysningService =
-        OpplysningService(opplysningRepository = opplysningRepository)
+        OpplysningService(
+            azureAdKlient = mockk(),
+            dpBehandlingBaseUrl = "http://localhost:8080",
+            dpBehandlingScope = "api://dev-gcp.teamdagpenger.dp-behandling/.default",
+            opplysningRepository = opplysningRepository,
+        )
     val søknadId = UUID.randomUUID()
     val ident = "12345678910"
 

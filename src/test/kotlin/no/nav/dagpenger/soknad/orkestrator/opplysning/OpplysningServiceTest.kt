@@ -18,7 +18,12 @@ import kotlin.test.Test
 class OpplysningServiceTest {
     private val opplysningRepository = mockk<QuizOpplysningRepository>()
     private val opplysningService =
-        OpplysningService(opplysningRepository = opplysningRepository)
+        OpplysningService(
+            azureAdKlient = mockk(),
+            dpBehandlingBaseUrl = "http://localhost:8080",
+            dpBehandlingScope = "api://dev-gcp.teamdagpenger.dp-behandling/.default",
+            opplysningRepository = opplysningRepository,
+        )
 
     @Test
     fun `hentBarn returnerer en liste med register og egne barn som BarnResponseDTO`() {
