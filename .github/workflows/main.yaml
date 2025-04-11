@@ -43,7 +43,7 @@ jobs:
   deploy-dev:
     name: Deploy to dev
     needs: [ build ]
-    if: github.ref == revert_openapi
+    if: github.ref == 'refs/heads/revert_openapi'
     runs-on: ubuntu-latest
     environment: dev-gcp
     steps:
