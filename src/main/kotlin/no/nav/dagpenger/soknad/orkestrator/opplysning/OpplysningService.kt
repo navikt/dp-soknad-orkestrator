@@ -1,13 +1,16 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import no.nav.dagpenger.oauth2.CachedOauth2Client
+import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.DataType
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.Kilde
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Løsningsbarn
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
@@ -15,10 +18,8 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import java.util.UUID
 
 class OpplysningService(
-    val azureAdKlient: CachedOauth2Client,
-    val dpBehandlingBaseUrl: String,
-    val dpBehandlingScope: String,
     val opplysningRepository: QuizOpplysningRepository,
+    val dpBehandlingKlient: DpBehandlingKlient,
 ) {
     fun hentBarn(søknadId: UUID): List<BarnResponseDTO> {
         val registerBarn =
@@ -80,10 +81,13 @@ class OpplysningService(
     }
 
     fun oppdaterBarn(
-        oppdatertBarn: OppdatertBarnDTO,
+        oppdatertBarnRequest: OppdatertBarnRequestDTO,
         søknadId: UUID,
         saksbehandlerId: String,
+        token: String,
     ) {
+        val oppdatertBarn = oppdatertBarnRequest.oppdatertBarn
+
         val opprinneligBarnOpplysninger =
             opplysningRepository.hentAlle(søknadId).filter { it.type == Barn }
 
@@ -109,6 +113,73 @@ class OpplysningService(
                 endretAv = saksbehandlerId,
             )
 
+        val uendredeBarn = alleBarnSvar.filter { it.barnSvarId != oppdatertBarn.barnId }
+
+        try {
+            sendbarnTilDpBehandling(
+                oppdatertBarnRequest = oppdatertBarnRequest,
+                token = token,
+                uendredeBarn = uendredeBarn,
+                oppdatertBarnEndretAv = saksbehandlerId,
+            )
+        } catch (e: Exception) {
+            logger.error { e.message }
+            throw IllegalStateException("Feil ved oppdatering av barn mot dp-behandling", e)
+        }
+
         opplysningRepository.oppdaterBarn(søknadId, oppdatertBarnSvar)
+    }
+
+    fun sendbarnTilDpBehandling(
+        oppdatertBarnRequest: OppdatertBarnRequestDTO,
+        token: String,
+        uendredeBarn: List<BarnSvar>,
+        oppdatertBarnEndretAv: String,
+    ) {
+        val oppdatertBarn = oppdatertBarnRequest.oppdatertBarn
+        val løsningsbarn =
+            uendredeBarn
+                .map {
+                    Løsningsbarn(
+                        fornavnOgMellomnavn = it.fornavnOgMellomnavn,
+                        etternavn = it.etternavn,
+                        fødselsdato = it.fødselsdato,
+                        statsborgerskap = it.statsborgerskap,
+                        kvalifiserer = it.kvalifisererTilBarnetillegg,
+                        barnetilleggFom = it.barnetilleggFom,
+                        barnetilleggTom = it.barnetilleggTom,
+                        endretAv = it.endretAv,
+                        begrunnelse = it.begrunnelse,
+                    )
+                }.toMutableList()
+                .plus(
+                    Løsningsbarn(
+                        fornavnOgMellomnavn = oppdatertBarn.fornavnOgMellomnavn,
+                        etternavn = oppdatertBarn.etternavn,
+                        fødselsdato = oppdatertBarn.fodselsdato,
+                        statsborgerskap = oppdatertBarn.oppholdssted,
+                        kvalifiserer = oppdatertBarn.kvalifisererTilBarnetillegg,
+                        barnetilleggFom = oppdatertBarn.barnetilleggFom,
+                        barnetilleggTom = oppdatertBarn.barnetilleggTom,
+                        endretAv = oppdatertBarnEndretAv,
+                        begrunnelse = oppdatertBarn.begrunnelse,
+                    ),
+                )
+
+        val dpBehandlingOpplysning =
+            DpBehandlingOpplysning(
+                verdi = objectMapper.writeValueAsString(løsningsbarn),
+                begrunnelse = oppdatertBarnRequest.oppdatertBarn.begrunnelse,
+            )
+
+        dpBehandlingKlient.oppdaterBarnOpplysning(
+            oppdatertBarnRequest = oppdatertBarnRequest,
+            dpBehandlingOpplysning = dpBehandlingOpplysning,
+            token = token,
+        )
+    }
+
+    private companion object {
+        private val logger = KotlinLogging.logger {}
     }
 }
