@@ -1,17 +1,38 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.accept
+import io.ktor.client.request.header
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
+import io.ktor.serialization.jackson.jackson
+import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.DataType
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.Kilde
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Løsningsbarn
+import no.nav.dagpenger.soknad.orkestrator.config.configure
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 
 class OpplysningService(
@@ -80,12 +101,17 @@ class OpplysningService(
     }
 
     fun oppdaterBarn(
-        oppdatertBarn: OppdatertBarnDTO,
+        oppdatertBarnRequest: OppdatertBarnRequestDTO,
         søknadId: UUID,
         saksbehandlerId: String,
+        token: String,
     ) {
+        val oppdatertBarn = oppdatertBarnRequest.oppdatertBarn
+
         val opprinneligBarnOpplysninger =
             opplysningRepository.hentAlle(søknadId).filter { it.type == Barn }
+
+        val ident = opprinneligBarnOpplysninger.first().ident
 
         val alleBarnSvar = opprinneligBarnOpplysninger.flatMap { it.svar.asListOf<BarnSvar>() }
 
@@ -109,6 +135,101 @@ class OpplysningService(
                 endretAv = saksbehandlerId,
             )
 
-        opplysningRepository.oppdaterBarn(søknadId, oppdatertBarnSvar)
+        transaction {
+            opplysningRepository.oppdaterBarn(søknadId, oppdatertBarnSvar)
+
+            sendbarnTilDpBehandling(
+                oppdatertBarnRequest = oppdatertBarnRequest,
+                søknadId = søknadId,
+                ident = ident,
+                token = token,
+            )
+        }
     }
+
+    fun sendbarnTilDpBehandling(
+        oppdatertBarnRequest: OppdatertBarnRequestDTO,
+        søknadId: UUID,
+        ident: String,
+        token: String,
+    ) {
+        val løsningsbarn =
+            finnBarn(
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        val httpKlient: HttpClient =
+            HttpClient(CIO) {
+                expectSuccess = true
+                defaultRequest {
+                    header("Authorization", "Bearer ${azureAdKlient.onBehalfOf(token, dpBehandlingScope)}")
+                }
+                install(ContentNegotiation) {
+                    jackson { configure() }
+                }
+                install(Logging) {
+                    level = LogLevel.INFO
+                }
+            }
+
+        val behandlingId = oppdatertBarnRequest.behandlingId
+        val opplysningId = oppdatertBarnRequest.opplysningId
+        val dpBehandlingBarn =
+            DpBehandlingOpplysning(
+                verdi = objectMapper.writeValueAsString(løsningsbarn),
+                begrunnelse = oppdatertBarnRequest.oppdatertBarn.begrunnelse,
+            )
+
+        runBlocking {
+            val response: HttpResponse =
+                httpKlient.put("$dpBehandlingBaseUrl/$behandlingId/opplysning/$opplysningId") {
+                    accept(ContentType.Application.Json)
+                    contentType(ContentType.Application.Json)
+                    setBody(dpBehandlingBarn)
+                }
+
+            if (response.status != HttpStatusCode.OK) {
+                throw IllegalStateException(
+                    "Feil ved oppdatering av barn i DP behandling. " +
+                        "Statuskode: ${response.status} " +
+                        "BehandlingId: $behandlingId " +
+                        "OpplysningId: $opplysningId",
+                )
+            }
+        }
+    }
+
+    private fun finnBarn(
+        ident: String,
+        søknadId: UUID,
+    ): List<Løsningsbarn> {
+        val pdlBarnSvar = hentBarnSvar(beskrivendeIdPdlBarn, ident, søknadId)
+        val egneBarnSvar = hentBarnSvar(beskrivendeIdEgneBarn, ident, søknadId)
+
+        return (pdlBarnSvar + egneBarnSvar).map {
+            Løsningsbarn(
+                fornavnOgMellomnavn = it.fornavnOgMellomnavn,
+                etternavn = it.etternavn,
+                fødselsdato = it.fødselsdato,
+                statsborgerskap = it.statsborgerskap,
+                kvalifiserer = it.kvalifisererTilBarnetillegg,
+                barnetilleggFom = it.barnetilleggFom,
+                barnetilleggTom = it.barnetilleggTom,
+                endretAv = it.endretAv,
+                begrunnelse = it.begrunnelse,
+            )
+        }
+    }
+
+    private fun hentBarnSvar(
+        beskrivendeId: String,
+        ident: String,
+        søknadId: UUID,
+    ) = opplysningRepository.hent(beskrivendeId, ident, søknadId)?.svar?.asListOf<BarnSvar>() ?: emptyList()
 }
+
+data class DpBehandlingOpplysning(
+    val verdi: String,
+    val begrunnelse: String,
+)

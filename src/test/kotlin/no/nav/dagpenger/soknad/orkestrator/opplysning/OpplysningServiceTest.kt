@@ -4,22 +4,26 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.Test
 
 class OpplysningServiceTest {
     private val opplysningRepository = mockk<QuizOpplysningRepository>()
+    private val azureAdKlient = mockk<CachedOauth2Client>(relaxed = true)
     private val opplysningService =
         OpplysningService(
-            azureAdKlient = mockk(),
+            azureAdKlient = azureAdKlient,
             dpBehandlingBaseUrl = "http://localhost:8080",
             dpBehandlingScope = "api://dev-gcp.teamdagpenger.dp-behandling/.default",
             opplysningRepository = opplysningRepository,
@@ -200,17 +204,22 @@ class OpplysningServiceTest {
                 endretAv = null,
             )
         val oppdatertBarnRequest =
-            OppdatertBarnDTO(
-                barnId = barnId,
-                fornavnOgMellomnavn = "Oppdatert Navn",
-                etternavn = "Oppdatert Etternavn",
-                fodselsdato = LocalDate.of(2010, 1, 1),
-                oppholdssted = "NOR",
-                forsorgerBarnet = true,
-                kvalifisererTilBarnetillegg = true,
-                barnetilleggFom = LocalDate.of(2020, 1, 1),
-                barnetilleggTom = LocalDate.of(2038, 1, 1),
-                begrunnelse = "Begrunnelse",
+            OppdatertBarnRequestDTO(
+                opplysningId = UUID.randomUUID(),
+                behandlingId = UUID.randomUUID(),
+                oppdatertBarn =
+                    OppdatertBarnDTO(
+                        barnId = barnId,
+                        fornavnOgMellomnavn = "Oppdatert Navn",
+                        etternavn = "Oppdatert Etternavn",
+                        fodselsdato = LocalDate.of(2010, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        barnetilleggFom = LocalDate.of(2020, 1, 1),
+                        barnetilleggTom = LocalDate.of(2038, 1, 1),
+                        begrunnelse = "Begrunnelse",
+                    ),
             )
         val opprinneligOpplysning =
             QuizOpplysning(
@@ -224,7 +233,7 @@ class OpplysningServiceTest {
         every { opplysningRepository.hentAlle(søknadId) } returns listOf(opprinneligOpplysning)
         every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
 
-        opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId")
+        opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId", "token")
 
         verify {
             opplysningRepository.oppdaterBarn(
@@ -283,17 +292,22 @@ class OpplysningServiceTest {
                 endretAv = null,
             )
         val oppdatertBarnRequest =
-            OppdatertBarnDTO(
-                barnId = egetBarnId,
-                fornavnOgMellomnavn = "Oppdatert Eget Navn",
-                etternavn = "Oppdatert Eget Etternavn",
-                fodselsdato = LocalDate.of(2010, 1, 1),
-                oppholdssted = "NOR",
-                forsorgerBarnet = true,
-                kvalifisererTilBarnetillegg = true,
-                barnetilleggFom = LocalDate.of(2020, 1, 1),
-                barnetilleggTom = LocalDate.of(2038, 1, 1),
-                begrunnelse = "Begrunnelse",
+            OppdatertBarnRequestDTO(
+                opplysningId = UUID.randomUUID(),
+                behandlingId = UUID.randomUUID(),
+                oppdatertBarn =
+                    OppdatertBarnDTO(
+                        barnId = egetBarnId,
+                        fornavnOgMellomnavn = "Oppdatert Eget Navn",
+                        etternavn = "Oppdatert Eget Etternavn",
+                        fodselsdato = LocalDate.of(2010, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        barnetilleggFom = LocalDate.of(2020, 1, 1),
+                        barnetilleggTom = LocalDate.of(2038, 1, 1),
+                        begrunnelse = "Begrunnelse",
+                    ),
             )
         val opprinneligOpplysning =
             QuizOpplysning(
@@ -319,7 +333,107 @@ class OpplysningServiceTest {
             )
         every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
 
-        opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId")
+        opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId", "token")
+
+        verify {
+            opplysningRepository.oppdaterBarn(
+                søknadId,
+                match {
+                    it.barnSvarId == egetBarnId &&
+                        it.fornavnOgMellomnavn == "Oppdatert Eget Navn" &&
+                        it.etternavn == "Oppdatert Eget Etternavn" &&
+                        it.fødselsdato == LocalDate.of(2010, 1, 1) &&
+                        it.statsborgerskap == "NOR" &&
+                        it.forsørgerBarnet == true &&
+                        it.kvalifisererTilBarnetillegg == true &&
+                        it.barnetilleggFom == LocalDate.of(2020, 1, 1) &&
+                        it.barnetilleggTom == LocalDate.of(2038, 1, 1) &&
+                        it.begrunnelse == "Begrunnelse" &&
+                        it.endretAv == "saksbehandlerId"
+                },
+            )
+        }
+    }
+
+    fun `Oppdater barn og send til dp-behandling`() {
+        val søknadId = UUID.randomUUID()
+        val barnId = UUID.randomUUID()
+        val egetBarnId = UUID.randomUUID()
+        val opprinneligBarnSvar =
+            BarnSvar(
+                barnSvarId = barnId,
+                fornavnOgMellomnavn = "Opprinnelig Navn",
+                etternavn = "Opprinnelig Etternavn",
+                fødselsdato = LocalDate.of(2010, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = true,
+                kvalifisererTilBarnetillegg = false,
+                barnetilleggFom = null,
+                barnetilleggTom = null,
+                begrunnelse = null,
+                endretAv = null,
+            )
+
+        val opprinneligEgetBarnSvar =
+            BarnSvar(
+                barnSvarId = egetBarnId,
+                fornavnOgMellomnavn = "Eget Barn",
+                etternavn = "Etternavn",
+                fødselsdato = LocalDate.of(2010, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = true,
+                kvalifisererTilBarnetillegg = false,
+                barnetilleggFom = null,
+                barnetilleggTom = null,
+                begrunnelse = null,
+                endretAv = null,
+            )
+        val oppdatertBarnRequest =
+            OppdatertBarnRequestDTO(
+                opplysningId = UUID.randomUUID(),
+                behandlingId = UUID.randomUUID(),
+                oppdatertBarn =
+                    OppdatertBarnDTO(
+                        barnId = egetBarnId,
+                        fornavnOgMellomnavn = "Oppdatert Eget Navn",
+                        etternavn = "Oppdatert Eget Etternavn",
+                        fodselsdato = LocalDate.of(2010, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        barnetilleggFom = LocalDate.of(2020, 1, 1),
+                        barnetilleggTom = LocalDate.of(2038, 1, 1),
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+        val opprinneligOpplysning =
+            QuizOpplysning(
+                beskrivendeId = beskrivendeIdPdlBarn,
+                type = Barn,
+                svar = listOf(opprinneligBarnSvar),
+                ident = "12345678910",
+                søknadId = søknadId,
+            )
+        val opprinneligEgetbarnOpplysning =
+            QuizOpplysning(
+                beskrivendeId = beskrivendeIdEgneBarn,
+                type = Barn,
+                svar = listOf(opprinneligEgetBarnSvar),
+                ident = "12345678910",
+                søknadId = søknadId,
+            )
+
+        every { opplysningRepository.hentAlle(søknadId) } returns
+            listOf(
+                opprinneligOpplysning,
+                opprinneligEgetbarnOpplysning,
+            )
+        every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
+        every { azureAdKlient.onBehalfOf(any(), any()) } returns OAuth2AccessTokenResponse(access_token = "obotoken")
+
+        opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId", "token")
 
         verify {
             opplysningRepository.oppdaterBarn(

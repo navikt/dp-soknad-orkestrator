@@ -39,6 +39,9 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                     put("/oppdater") {
                         val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
                         val oppdatertBarnRequest: OppdatertBarnRequestDTO
+                        val token =
+                            call.request.headers["Authorization"]?.removePrefix("Bearer ")
+                                ?: throw IllegalArgumentException("Fant ikke token i request header")
 
                         try {
                             oppdatertBarnRequest = call.receive<OppdatertBarnRequestDTO>()
@@ -72,7 +75,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                         }
 
                         if (opplysningService.erEndret(oppdatertBarn, søknadId)) {
-                            opplysningService.oppdaterBarn(oppdatertBarn, søknadId, saksbehandlerId)
+                            opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, saksbehandlerId, token)
                             OpplysningMetrikker.endringBarn.inc()
                             call.respond(HttpStatusCode.OK)
                         } else {
