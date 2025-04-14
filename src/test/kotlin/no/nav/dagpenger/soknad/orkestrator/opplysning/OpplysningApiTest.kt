@@ -9,6 +9,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.testing.testApplication
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
@@ -31,10 +32,8 @@ class OpplysningApiTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val opplysningService =
         OpplysningService(
-            azureAdKlient = mockk(),
-            dpBehandlingBaseUrl = "http://localhost:8080",
-            dpBehandlingScope = "api://dev-gcp.teamdagpenger.dp-behandling/.default",
             opplysningRepository = opplysningRepository,
+            dpBehandlingKlient = mockk(relaxed = true),
         )
     val søknadId = UUID.randomUUID()
     val ident = "12345678910"
@@ -287,59 +286,63 @@ class OpplysningApiTest {
     }
 
     @Test
-    fun `Oppdater opplysning svarer med 200 OK`() {
-        val opplysning =
-            QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
-                type = Barn,
-                svar =
-                    listOf(
-                        BarnSvar(
-                            barnSvarId = UUID.randomUUID(),
-                            fornavnOgMellomnavn = "Kari",
-                            etternavn = "Nordmann",
-                            fødselsdato = LocalDate.of(2020, 1, 1),
-                            statsborgerskap = "NOR",
-                            forsørgerBarnet = false,
-                            fraRegister = false,
-                            kvalifisererTilBarnetillegg = false,
-                        ),
-                    ),
-                ident = ident,
-                søknadId = søknadId,
-            )
+    fun `Oppdater opplysning svarer med 200 OK`() =
+        testApplication {
+            val behandlingId = UUID.randomUUID()
+            val opplysningId = UUID.randomUUID()
 
-        opplysningRepository.lagre(opplysning)
-
-        withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
-            client
-                .put("/opplysninger/$søknadId/barn/oppdater") {
-                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
-                    header(HttpHeaders.ContentType, "application/json")
-                    setBody(
-                        OppdatertBarnRequestDTO(
-                            opplysningId = UUID.randomUUID(),
-                            behandlingId = UUID.randomUUID(),
-                            oppdatertBarn =
-                                OppdatertBarnDTO(
-                                    barnId = opplysning.svar.first().barnSvarId,
-                                    fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
-                                    etternavn = opplysning.svar.first().etternavn,
-                                    fodselsdato = opplysning.svar.first().fødselsdato,
-                                    oppholdssted = opplysning.svar.first().statsborgerskap,
-                                    forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
-                                    kvalifisererTilBarnetillegg = true,
-                                    barnetilleggFom = LocalDate.of(2020, 1, 1),
-                                    barnetilleggTom = LocalDate.of(2038, 1, 1),
-                                    begrunnelse = "Begrunnelse",
-                                ),
+            val opplysning =
+                QuizOpplysning(
+                    beskrivendeId = beskrivendeIdPdlBarn,
+                    type = Barn,
+                    svar =
+                        listOf(
+                            BarnSvar(
+                                barnSvarId = UUID.randomUUID(),
+                                fornavnOgMellomnavn = "Kari",
+                                etternavn = "Nordmann",
+                                fødselsdato = LocalDate.of(2020, 1, 1),
+                                statsborgerskap = "NOR",
+                                forsørgerBarnet = false,
+                                fraRegister = false,
+                                kvalifisererTilBarnetillegg = false,
+                            ),
                         ),
-                    )
-                }.let { response ->
-                    response.status shouldBe HttpStatusCode.OK
-                }
+                    ident = ident,
+                    søknadId = søknadId,
+                )
+
+            opplysningRepository.lagre(opplysning)
+
+            withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
+                client
+                    .put("/opplysninger/$søknadId/barn/oppdater") {
+                        header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                        header(HttpHeaders.ContentType, "application/json")
+                        setBody(
+                            OppdatertBarnRequestDTO(
+                                opplysningId = opplysningId,
+                                behandlingId = behandlingId,
+                                oppdatertBarn =
+                                    OppdatertBarnDTO(
+                                        barnId = opplysning.svar.first().barnSvarId,
+                                        fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
+                                        etternavn = opplysning.svar.first().etternavn,
+                                        fodselsdato = opplysning.svar.first().fødselsdato,
+                                        oppholdssted = opplysning.svar.first().statsborgerskap,
+                                        forsorgerBarnet = opplysning.svar.first().forsørgerBarnet,
+                                        kvalifisererTilBarnetillegg = true,
+                                        barnetilleggFom = LocalDate.of(2020, 1, 1),
+                                        barnetilleggTom = LocalDate.of(2038, 1, 1),
+                                        begrunnelse = "Begrunnelse",
+                                    ),
+                            ),
+                        )
+                    }.let { response ->
+                        response.status shouldBe HttpStatusCode.OK
+                    }
+            }
         }
-    }
 }
 
 val oppdatertBarnRequestDTO =

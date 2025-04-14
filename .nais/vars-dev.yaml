@@ -15,3 +15,4 @@ ingresses:
   - https://dp-soknad-orkestrator.intern.dev.nav.no
 
 DP_BEHANDLING_SCOPE: "api://dev-gcp.teamdagpenger.dp-behandling/.default"
+DP_BEHANDLING_BASE_URL: "http://dp-behandling"
