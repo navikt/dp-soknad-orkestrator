@@ -1,11 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.accept
 import io.ktor.client.request.header
 import io.ktor.client.request.put
@@ -14,8 +9,8 @@ import io.ktor.client.statement.HttpResponse
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.runBlocking
+import mu.KotlinLogging
 import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.DataType
@@ -26,19 +21,19 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Løsningsbarn
-import no.nav.dagpenger.soknad.orkestrator.config.configure
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
-import org.jetbrains.exposed.sql.transactions.transaction
+import no.nav.dagpenger.soknad.orkestrator.utils.configureHttpClient
 import java.util.UUID
 
 class OpplysningService(
     val azureAdKlient: CachedOauth2Client,
     val dpBehandlingBaseUrl: String,
     val dpBehandlingScope: String,
+    val httpKlient: HttpClient = configureHttpClient(),
     val opplysningRepository: QuizOpplysningRepository,
 ) {
     fun hentBarn(søknadId: UUID): List<BarnResponseDTO> {
@@ -135,16 +130,19 @@ class OpplysningService(
                 endretAv = saksbehandlerId,
             )
 
-        transaction {
-            opplysningRepository.oppdaterBarn(søknadId, oppdatertBarnSvar)
-
+        try {
             sendbarnTilDpBehandling(
                 oppdatertBarnRequest = oppdatertBarnRequest,
                 søknadId = søknadId,
                 ident = ident,
                 token = token,
             )
+        } catch (e: Exception) {
+            logger.error { e.message }
+            throw IllegalStateException("Feil ved oppdatering av barn mot dp-behandling", e)
         }
+
+        opplysningRepository.oppdaterBarn(søknadId, oppdatertBarnSvar)
     }
 
     fun sendbarnTilDpBehandling(
@@ -158,21 +156,7 @@ class OpplysningService(
                 ident = ident,
                 søknadId = søknadId,
             )
-
-        val httpKlient: HttpClient =
-            HttpClient(CIO) {
-                expectSuccess = true
-                defaultRequest {
-                    header("Authorization", "Bearer ${azureAdKlient.onBehalfOf(token, dpBehandlingScope)}")
-                }
-                install(ContentNegotiation) {
-                    jackson { configure() }
-                }
-                install(Logging) {
-                    level = LogLevel.INFO
-                }
-            }
-
+        val oboToken = azureAdKlient.onBehalfOf(token, dpBehandlingScope)
         val behandlingId = oppdatertBarnRequest.behandlingId
         val opplysningId = oppdatertBarnRequest.opplysningId
         val dpBehandlingBarn =
@@ -185,6 +169,7 @@ class OpplysningService(
             val response: HttpResponse =
                 httpKlient.put("$dpBehandlingBaseUrl/$behandlingId/opplysning/$opplysningId") {
                     accept(ContentType.Application.Json)
+                    header("Authorization", "Bearer $oboToken")
                     contentType(ContentType.Application.Json)
                     setBody(dpBehandlingBarn)
                 }
@@ -227,6 +212,10 @@ class OpplysningService(
         ident: String,
         søknadId: UUID,
     ) = opplysningRepository.hent(beskrivendeId, ident, søknadId)?.svar?.asListOf<BarnSvar>() ?: emptyList()
+
+    private companion object {
+        private val logger = KotlinLogging.logger {}
+    }
 }
 
 data class DpBehandlingOpplysning(
