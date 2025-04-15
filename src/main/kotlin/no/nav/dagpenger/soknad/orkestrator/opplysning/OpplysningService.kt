@@ -1,17 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import io.ktor.client.HttpClient
-import io.ktor.client.request.accept
-import io.ktor.client.request.header
-import io.ktor.client.request.put
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.HttpResponse
-import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
-import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
-import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.DataType
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.Kilde
@@ -26,15 +15,11 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
-import no.nav.dagpenger.soknad.orkestrator.utils.configureHttpClient
 import java.util.UUID
 
 class OpplysningService(
-    val azureAdKlient: CachedOauth2Client,
-    val dpBehandlingBaseUrl: String,
-    val dpBehandlingScope: String,
-    val httpKlient: HttpClient = configureHttpClient(),
     val opplysningRepository: QuizOpplysningRepository,
+    val dpBehandlingKlient: DpBehandlingKlient,
 ) {
     fun hentBarn(søknadId: UUID): List<BarnResponseDTO> {
         val registerBarn =
@@ -106,8 +91,6 @@ class OpplysningService(
         val opprinneligBarnOpplysninger =
             opplysningRepository.hentAlle(søknadId).filter { it.type == Barn }
 
-        val ident = opprinneligBarnOpplysninger.first().ident
-
         val alleBarnSvar = opprinneligBarnOpplysninger.flatMap { it.svar.asListOf<BarnSvar>() }
 
         val opprinneligBarnSvar =
@@ -133,9 +116,8 @@ class OpplysningService(
         try {
             sendbarnTilDpBehandling(
                 oppdatertBarnRequest = oppdatertBarnRequest,
-                søknadId = søknadId,
-                ident = ident,
                 token = token,
+                alleBarnSvar = alleBarnSvar,
             )
         } catch (e: Exception) {
             logger.error { e.message }
@@ -147,78 +129,38 @@ class OpplysningService(
 
     fun sendbarnTilDpBehandling(
         oppdatertBarnRequest: OppdatertBarnRequestDTO,
-        søknadId: UUID,
-        ident: String,
         token: String,
+        alleBarnSvar: List<BarnSvar>,
     ) {
         val løsningsbarn =
-            finnBarn(
-                ident = ident,
-                søknadId = søknadId,
-            )
-        val oboToken = azureAdKlient.onBehalfOf(token, dpBehandlingScope)
-        val behandlingId = oppdatertBarnRequest.behandlingId
-        val opplysningId = oppdatertBarnRequest.opplysningId
-        val dpBehandlingBarn =
+            alleBarnSvar.map {
+                Løsningsbarn(
+                    fornavnOgMellomnavn = it.fornavnOgMellomnavn,
+                    etternavn = it.etternavn,
+                    fødselsdato = it.fødselsdato,
+                    statsborgerskap = it.statsborgerskap,
+                    kvalifiserer = it.kvalifisererTilBarnetillegg,
+                    barnetilleggFom = it.barnetilleggFom,
+                    barnetilleggTom = it.barnetilleggTom,
+                    endretAv = it.endretAv,
+                    begrunnelse = it.begrunnelse,
+                )
+            }
+
+        val dpBehandlingOpplysning =
             DpBehandlingOpplysning(
                 verdi = objectMapper.writeValueAsString(løsningsbarn),
                 begrunnelse = oppdatertBarnRequest.oppdatertBarn.begrunnelse,
             )
 
-        runBlocking {
-            val response: HttpResponse =
-                httpKlient.put("$dpBehandlingBaseUrl/$behandlingId/opplysning/$opplysningId") {
-                    accept(ContentType.Application.Json)
-                    header("Authorization", "Bearer $oboToken")
-                    contentType(ContentType.Application.Json)
-                    setBody(dpBehandlingBarn)
-                }
-
-            if (response.status != HttpStatusCode.OK) {
-                throw IllegalStateException(
-                    "Feil ved oppdatering av barn i DP behandling. " +
-                        "Statuskode: ${response.status} " +
-                        "BehandlingId: $behandlingId " +
-                        "OpplysningId: $opplysningId",
-                )
-            }
-        }
+        dpBehandlingKlient.oppdaterBarnOpplysning(
+            oppdatertBarnRequest = oppdatertBarnRequest,
+            dpBehandlingOpplysning = dpBehandlingOpplysning,
+            token = token,
+        )
     }
-
-    private fun finnBarn(
-        ident: String,
-        søknadId: UUID,
-    ): List<Løsningsbarn> {
-        val pdlBarnSvar = hentBarnSvar(beskrivendeIdPdlBarn, ident, søknadId)
-        val egneBarnSvar = hentBarnSvar(beskrivendeIdEgneBarn, ident, søknadId)
-
-        return (pdlBarnSvar + egneBarnSvar).map {
-            Løsningsbarn(
-                fornavnOgMellomnavn = it.fornavnOgMellomnavn,
-                etternavn = it.etternavn,
-                fødselsdato = it.fødselsdato,
-                statsborgerskap = it.statsborgerskap,
-                kvalifiserer = it.kvalifisererTilBarnetillegg,
-                barnetilleggFom = it.barnetilleggFom,
-                barnetilleggTom = it.barnetilleggTom,
-                endretAv = it.endretAv,
-                begrunnelse = it.begrunnelse,
-            )
-        }
-    }
-
-    private fun hentBarnSvar(
-        beskrivendeId: String,
-        ident: String,
-        søknadId: UUID,
-    ) = opplysningRepository.hent(beskrivendeId, ident, søknadId)?.svar?.asListOf<BarnSvar>() ?: emptyList()
 
     private companion object {
         private val logger = KotlinLogging.logger {}
     }
 }
-
-data class DpBehandlingOpplysning(
-    val verdi: String,
-    val begrunnelse: String,
-)

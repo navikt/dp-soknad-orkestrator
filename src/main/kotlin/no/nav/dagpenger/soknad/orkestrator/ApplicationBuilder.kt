@@ -12,6 +12,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.config.configure
 import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
+import no.nav.dagpenger.soknad.orkestrator.opplysning.DpBehandlingKlient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.landApi
@@ -48,12 +49,17 @@ internal class ApplicationBuilder(
 
     private val journalføringService = JournalføringService()
 
-    private val opplysningService: OpplysningService =
-        OpplysningService(
+    private val dpBehandlingKlient =
+        DpBehandlingKlient(
             azureAdKlient = Configuration.azureAdClient,
             dpBehandlingBaseUrl = Configuration.miljøVariabler.dpBehandlingBaseUrl,
             dpBehandlingScope = Configuration.miljøVariabler.dpBehandlingScope,
+        )
+
+    private val opplysningService: OpplysningService =
+        OpplysningService(
             opplysningRepository = quizOpplysningRepositoryPostgres,
+            dpBehandlingKlient = dpBehandlingKlient,
         )
 
     private val rapidsConnection =

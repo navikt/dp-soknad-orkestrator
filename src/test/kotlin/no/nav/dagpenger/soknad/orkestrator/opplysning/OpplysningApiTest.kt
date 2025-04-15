@@ -2,7 +2,6 @@ package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.matchers.shouldBe
-import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.put
@@ -10,14 +9,8 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.jackson.jackson
-import io.ktor.server.response.respond
-import io.ktor.server.routing.put
-import io.ktor.server.routing.routing
 import io.ktor.server.testing.testApplication
-import io.mockk.every
 import io.mockk.mockk
-import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
@@ -29,7 +22,6 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.testAzureADToken
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.withMockAuthServerAndTestApplication
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDate
@@ -38,15 +30,10 @@ import kotlin.test.Test
 
 class OpplysningApiTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
-    val httpClientMock = mockk<HttpClient>(relaxed = true)
-    val azureAdKlientMock = mockk<CachedOauth2Client>(relaxed = true)
     val opplysningService =
         OpplysningService(
-            azureAdKlient = azureAdKlientMock,
-            dpBehandlingBaseUrl = "http://localhost:8080",
-            dpBehandlingScope = "api://dev-gcp.teamdagpenger.dp-behandling/.default",
-            httpKlient = httpClientMock,
             opplysningRepository = opplysningRepository,
+            dpBehandlingKlient = mockk(relaxed = true),
         )
     val søknadId = UUID.randomUUID()
     val ident = "12345678910"
@@ -301,8 +288,6 @@ class OpplysningApiTest {
     @Test
     fun `Oppdater opplysning svarer med 200 OK`() =
         testApplication {
-            every { azureAdKlientMock.onBehalfOf(any<String>(), any<String>()) } returns
-                OAuth2AccessTokenResponse(access_token = "dummyToken")
             val behandlingId = UUID.randomUUID()
             val opplysningId = UUID.randomUUID()
 
@@ -328,19 +313,6 @@ class OpplysningApiTest {
                 )
 
             opplysningRepository.lagre(opplysning)
-
-            externalServices {
-                hosts("http://localhost:8080") {
-                    routing {
-                        install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
-                            jackson()
-                        }
-                        put("{behandlingId}/opplysning/{opplysningId}") {
-                            call.respond(HttpStatusCode.OK)
-                        }
-                    }
-                }
-            }
 
             withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
                 client

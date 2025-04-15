@@ -4,7 +4,6 @@ import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.dagpenger.oauth2.CachedOauth2Client
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
@@ -13,20 +12,16 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
-import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.Test
 
 class OpplysningServiceTest {
     private val opplysningRepository = mockk<QuizOpplysningRepository>()
-    private val azureAdKlient = mockk<CachedOauth2Client>(relaxed = true)
     private val opplysningService =
         OpplysningService(
-            azureAdKlient = azureAdKlient,
-            dpBehandlingBaseUrl = "http://localhost:8080",
-            dpBehandlingScope = "api://dev-gcp.teamdagpenger.dp-behandling/.default",
             opplysningRepository = opplysningRepository,
+            dpBehandlingKlient = mockk(relaxed = true),
         )
 
     @Test
@@ -431,7 +426,6 @@ class OpplysningServiceTest {
                 opprinneligEgetbarnOpplysning,
             )
         every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
-        every { azureAdKlient.onBehalfOf(any(), any()) } returns OAuth2AccessTokenResponse(access_token = "obotoken")
 
         opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId", "token")
 
