@@ -28,7 +28,7 @@ class DpBehandlingKlient(
         val behandlingId = oppdatertBarnRequest.behandlingId
         val opplysningId = oppdatertBarnRequest.opplysningId
 
-        val oboToken = azureAdKlient.onBehalfOf(token, dpBehandlingScope)
+        val oboToken = azureAdKlient.onBehalfOf(token, dpBehandlingScope).access_token
 
         runBlocking {
             val response: HttpResponse =
