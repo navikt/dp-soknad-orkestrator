@@ -32,7 +32,7 @@ class DpBehandlingKlient(
 
         runBlocking {
             val response: HttpResponse =
-                httpKlient.put("$dpBehandlingBaseUrl/$behandlingId/opplysning/$opplysningId") {
+                httpKlient.put("$dpBehandlingBaseUrl/behandling/$behandlingId/opplysning/$opplysningId") {
                     accept(ContentType.Application.Json)
                     header("Authorization", "Bearer $oboToken")
                     contentType(ContentType.Application.Json)

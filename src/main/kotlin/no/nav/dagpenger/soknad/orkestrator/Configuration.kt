@@ -16,7 +16,7 @@ internal object Configuration {
     private val defaultProperties =
         ConfigurationMap(
             mapOf(
-                "DP_BEHANDLING_BASE_URL" to "http://dp-behandling/arbeid/dagpenger/behandling",
+                "DP_BEHANDLING_BASE_URL" to "http://dp-behandling",
                 "DP_BEHANDLING_SCOPE" to "api://dev-gcp.teamdagpenger.dp-behandling/.default",
             ),
         )
