@@ -55,7 +55,7 @@ dependencies {
     implementation("de.slub-dresden:urnlib:2.0.1")
     implementation("io.prometheus:prometheus-metrics-core:1.3.6")
     implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.28")
-    implementation("io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.24")
+    implementation("io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.28")
     implementation("no.nav.dagpenger:oauth2-klient:2025.03.31-22.36.fc954bf09c91")
 
     implementation("io.ktor:ktor-server-netty:${libs.versions.ktor.get()}")
