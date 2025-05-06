@@ -1,5 +1,7 @@
 # dp-soknad-orkestrator
 
+Dette er en bra app!
+
 Mottar dagpengesøknader og lagrer opplysningene i database.
 Får informasjonsbehov på kafka og svarer de ut basert på søknadsdataene.
 
