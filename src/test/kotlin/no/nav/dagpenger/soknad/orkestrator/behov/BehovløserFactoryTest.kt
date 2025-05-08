@@ -47,6 +47,7 @@ class BehovløserFactoryTest {
             "AndreØkonomiskeYtelser",
             "ØnsketArbeidstid",
             "HarTilleggsopplysninger",
+            "BostedslandErNorge",
         )
     }
 }

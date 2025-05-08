@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.AndreØkonomiskeYtelser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Barnetillegg
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BostedslandErNorge
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EØSArbeid
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.HarTilleggsopplysninger
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.HelseTilAlleTyperJobb
@@ -22,6 +23,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Ønske
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnsketArbeidstid
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.AndreØkonomiskeYtelserBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BostedslandErNorgeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EØSArbeidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HarTilleggsopplysningerBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HelseTilAlleTyperJobbBehovløser
@@ -66,6 +68,7 @@ class BehovløserFactory(
             AndreØkonomiskeYtelser to AndreØkonomiskeYtelserBehovløser(rapidsConnection, opplysningRepository),
             ØnsketArbeidstid to ØnsketArbeidstidBehovløser(rapidsConnection, opplysningRepository),
             HarTilleggsopplysninger to HarTilleggsopplysningerBehovløser(rapidsConnection, opplysningRepository),
+            BostedslandErNorge to BostedslandErNorgeBehovløser(rapidsConnection, opplysningRepository),
         )
 
     fun behovløserFor(behov: Behov): Behovløser =
@@ -93,5 +96,6 @@ class BehovløserFactory(
         AndreØkonomiskeYtelser,
         ØnsketArbeidstid,
         HarTilleggsopplysninger,
+        BostedslandErNorge,
     }
 }
