@@ -15,6 +15,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Oppgit
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Ordinær
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Permittert
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertFiskeforedling
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertGrensearbeider
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdato
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.TarUtdanningEllerOpplæring
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Verneplikt
@@ -35,6 +36,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.OppgittAndreYtelserUten
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.OrdinærBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertGrensearbeiderBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.UtdanningEllerOpplæringBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
@@ -69,6 +71,7 @@ class BehovløserFactory(
             ØnsketArbeidstid to ØnsketArbeidstidBehovløser(rapidsConnection, opplysningRepository),
             HarTilleggsopplysninger to HarTilleggsopplysningerBehovløser(rapidsConnection, opplysningRepository),
             BostedslandErNorge to BostedslandErNorgeBehovløser(rapidsConnection, opplysningRepository),
+            PermittertGrensearbeider to PermittertGrensearbeiderBehovløser(rapidsConnection, opplysningRepository),
         )
 
     fun behovløserFor(behov: Behov): Behovløser =
@@ -97,5 +100,6 @@ class BehovløserFactory(
         ØnsketArbeidstid,
         HarTilleggsopplysninger,
         BostedslandErNorge,
+        PermittertGrensearbeider,
     }
 }
