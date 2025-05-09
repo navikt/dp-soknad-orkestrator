@@ -48,6 +48,7 @@ class BehovløserFactoryTest {
             "ØnsketArbeidstid",
             "HarTilleggsopplysninger",
             "BostedslandErNorge",
+            "PermittertGrensearbeider",
         )
     }
 }
