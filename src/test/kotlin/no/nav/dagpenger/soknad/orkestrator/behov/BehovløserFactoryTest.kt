@@ -49,6 +49,8 @@ class BehovløserFactoryTest {
             "HarTilleggsopplysninger",
             "BostedslandErNorge",
             "PermittertGrensearbeider",
+            "EgetGårdsbruk",
+            "EgenNæringsvirksomhet",
         )
     }
 }
