@@ -33,6 +33,10 @@ spec:
           - name: pgaudit.log
             value: 'write'
   observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
     autoInstrumentation:
       enabled: true
       runtime: java
