@@ -37,8 +37,10 @@ data class Arbeidsforhold(
 data class Arbeidsgiver(
     val navn: String,
     val organisasjonsnummer: String,
-    val sluttårsak: String, // enum?
-    val dokumentasjonskrav: String, // Hvordan løser vi dette?
+    // enum?
+    val sluttårsak: String,
+    // Hvordan løser vi dette?
+    val dokumentasjonskrav: String,
 )
 
 enum class Seksjonnavn {
@@ -65,10 +67,10 @@ class Endepunkter {
     ) {
         if (seksjonnavn == Seksjonnavn.BOSTEDSLAND) {
             val bostedslandData = objectMapper.readValue<Bostedsland>(data)
-            db.lagreBostedsland(
+            /*db.lagreBostedsland( Bare kommenterte ut denne så ting skal kompilere
                 søknadId = søknadId,
                 bostedslandData,
-            )
+            )*/
         } else if (seksjonnavn == Seksjonnavn.ARBEIDSFORHOLD) {
             // lagre Arbeidsforhold
         }
