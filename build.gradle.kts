@@ -69,7 +69,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:5.13.1")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation(libs.rapids.and.rivers.test)
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.05.27-07.38-d5cd9804")
+    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.06.20-13.05-40af2647")
 }
 
 tasks.withType<ShadowJar> {
