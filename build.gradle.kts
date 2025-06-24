@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val exposedVersion: String by project
 
 plugins {
-    kotlin("jvm") version "2.1.21"
+    kotlin("jvm") version "2.2.0"
     id("io.ktor.plugin") version "3.2.0"
     id("org.jlleitschuh.gradle.ktlint") version "12.3.0"
     alias(libs.plugins.shadow.jar)
@@ -66,7 +66,7 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.bundles.postgres.test)
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.13.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.13.2")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation(libs.rapids.and.rivers.test)
     testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.06.20-13.05-40af2647")
