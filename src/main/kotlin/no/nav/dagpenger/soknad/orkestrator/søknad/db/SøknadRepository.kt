@@ -12,7 +12,6 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.json.jsonb
 import org.jetbrains.exposed.sql.selectAll
@@ -45,15 +44,14 @@ class SøknadRepository(
         }
     }
 
-    fun lagre(søknad: Søknad) {
+    fun lagre(søknad: Søknad): UUID =
         transaction {
-            SøknadTabell.insertIgnore {
+            SøknadTabell.insert {
                 it[søknadId] = søknad.søknadId
                 it[ident] = søknad.ident
                 it[tilstand] = søknad.tilstand.name
-            }
+            }[SøknadTabell.søknadId]
         }
-    }
 
     fun hent(søknadId: UUID): Søknad? =
         transaction {
@@ -106,14 +104,13 @@ class SøknadRepository(
                 ?.get(SøknadDataTabell.soknadData)
         }
 
-    fun slett(søknadId: UUID): Int {
-        return transaction {
+    fun slett(søknadId: UUID): Int =
+        transaction {
             val antallSlettedeRader = SøknadTabell.deleteWhere { SøknadTabell.søknadId eq søknadId }
             quizOpplysningRepository.slett(søknadId)
 
             antallSlettedeRader
         }
-    }
 }
 
 object SøknadTabell : IntIdTable("soknad") {

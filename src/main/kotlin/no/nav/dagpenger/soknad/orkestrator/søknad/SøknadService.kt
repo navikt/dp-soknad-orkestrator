@@ -99,6 +99,10 @@ class SøknadService(
         }
     }
 
+    fun opprett(ident: String): UUID {
+        søknadRepository.lagre(Søknad(ident = ident))
+    }
+
     private companion object {
         private val logger = KotlinLogging.logger {}
         private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadService")

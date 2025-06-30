@@ -3,13 +3,13 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 import java.util.UUID
 
 class SeksjonService(
-    seksjonRepository: SeksjonRepository,
+    val seksjonRepository: SeksjonRepository,
 ) {
     fun lagre(
         søknadId: UUID,
         seksjonId: String,
-        receive: String,
+        json: String,
     ) {
-        TODO("Not yet implemented")
+        seksjonRepository.lagre(søknadId, seksjonId, json)
     }
 }
