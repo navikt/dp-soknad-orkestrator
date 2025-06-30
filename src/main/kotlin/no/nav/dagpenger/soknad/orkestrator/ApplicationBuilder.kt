@@ -22,6 +22,9 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadSlettetMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonService
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.seksjonApi
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.name
@@ -40,6 +43,9 @@ internal class ApplicationBuilder(
             quizOpplysningRepository = quizOpplysningRepositoryPostgres,
         )
     private val opplysningRepository = OpplysningRepository(dataSource)
+
+    private val seksjonRepository = SeksjonRepository(dataSource)
+    private val seksjonService = SeksjonService(seksjonRepository)
 
     private val søknadService: SøknadService =
         SøknadService(
@@ -72,6 +78,7 @@ internal class ApplicationBuilder(
                             jackson { configure() }
                         }
                         opplysningApi(opplysningService)
+                        seksjonApi(seksjonService)
                         landApi()
                     }
                 },
