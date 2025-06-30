@@ -25,6 +25,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonService
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.seksjonApi
+import no.nav.dagpenger.soknad.orkestrator.søknad.søknadApi
 import no.nav.helse.rapids_rivers.RapidApplication
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.name
@@ -44,7 +45,7 @@ internal class ApplicationBuilder(
         )
     private val opplysningRepository = OpplysningRepository(dataSource)
 
-    private val seksjonRepository = SeksjonRepository(dataSource)
+    private val seksjonRepository = SeksjonRepository(dataSource, søknadRepository)
     private val seksjonService = SeksjonService(seksjonRepository)
 
     private val søknadService: SøknadService =
@@ -78,6 +79,7 @@ internal class ApplicationBuilder(
                             jackson { configure() }
                         }
                         opplysningApi(opplysningService)
+                        søknadApi(søknadService)
                         seksjonApi(seksjonService)
                         landApi()
                     }
