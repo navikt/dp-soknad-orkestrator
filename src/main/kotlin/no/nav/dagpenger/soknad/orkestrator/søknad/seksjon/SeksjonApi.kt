@@ -15,7 +15,7 @@ import java.util.UUID
 internal fun Application.seksjonApi(seksjonService: SeksjonService) {
     routing {
         authenticate("azureAd") {
-            route("/{søknadId}/{seksjonId}") {
+            route("/seksjon/{søknadId}/{seksjonId}") {
                 put {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
                     val seksjonId = validerSeksjonIdParam() ?: return@put
@@ -25,16 +25,6 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
             }
         }
     }
-}
-
-private suspend fun RoutingContext.validerSeksjonIdParam(): String? {
-    val seksjonId =
-        call.parameters["seksjonId"] ?: run {
-            call.respond(BadRequest, "Mangler seksjonId i parameter")
-            return null
-        }
-
-    return seksjonId
 }
 
 private suspend fun RoutingContext.validerOgFormaterSøknadIdParam(): UUID? {
@@ -53,4 +43,14 @@ private suspend fun RoutingContext.validerOgFormaterSøknadIdParam(): UUID? {
         )
         return null
     }
+}
+
+private suspend fun RoutingContext.validerSeksjonIdParam(): String? {
+    val seksjonId =
+        call.parameters["seksjonId"] ?: run {
+            call.respond(BadRequest, "Mangler seksjonId i parameter")
+            return null
+        }
+
+    return seksjonId
 }
