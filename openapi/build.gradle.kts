@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm") version "2.2.0"
-    id("org.openapi.generator") version "7.13.0"
+    id("org.openapi.generator") version "7.14.0"
     id("org.jlleitschuh.gradle.ktlint") version "12.3.0"
 }
 
