@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.upsert
@@ -33,4 +34,31 @@ class SeksjonRepository(
             }
         }
     }
+
+    fun hent(
+        søknadId: UUID,
+        seksjonId: String,
+    ): String? =
+        transaction {
+            SeksjonTabell
+                .select(SeksjonTabell.json)
+                .where {
+                    SeksjonTabell.søknadId eq søknadId and (SeksjonTabell.seksjonId eq seksjonId)
+                }.map {
+                    it[SeksjonTabell.json]
+                }.firstOrNull()
+        }
+
+    fun hentSeksjoner(søknadId: UUID): List<Seksjon> =
+        transaction {
+            SeksjonTabell
+                .select(SeksjonTabell.json)
+                .where { SeksjonTabell.søknadId eq søknadId }
+                .map {
+                    Seksjon(
+                        seksjonId = it[SeksjonTabell.seksjonId],
+                        data = it[SeksjonTabell.json],
+                    )
+                }.toList()
+        }
 }

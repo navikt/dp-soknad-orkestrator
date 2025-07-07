@@ -12,4 +12,16 @@ class SeksjonService(
     ) {
         seksjonRepository.lagre(søknadId, seksjonId, json)
     }
+
+    fun hent(
+        søknadId: UUID,
+        seksjonId: String,
+    ): String? = seksjonRepository.hent(søknadId, seksjonId)
+
+    fun hentAlle(søknadId: UUID): List<Seksjon> = seksjonRepository.hentSeksjoner(søknadId)
 }
+
+data class Seksjon(
+    val seksjonId: String,
+    val data: String,
+)
