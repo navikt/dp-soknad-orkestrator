@@ -23,14 +23,14 @@ class SeksjonRepository(
         transaction {
             requireNotNull(søknadRepository.hent(søknadId)) { "Fant ikke søknad med ID {søknadId}." }
 
-            SeksjonTabell.upsert(
-                SeksjonTabell.søknadId,
-                SeksjonTabell.seksjonId,
-                onUpdate = listOf(Pair(SeksjonTabell.json, stringLiteral(json))),
+            SeksjonV2Tabell.upsert(
+                SeksjonV2Tabell.søknadId,
+                SeksjonV2Tabell.seksjonId,
+                onUpdate = listOf(Pair(SeksjonV2Tabell.json, stringLiteral(json))),
             ) {
-                it[SeksjonTabell.søknadId] = søknadId
-                it[SeksjonTabell.seksjonId] = seksjonId
-                it[SeksjonTabell.json] = json
+                it[SeksjonV2Tabell.søknadId] = søknadId
+                it[SeksjonV2Tabell.seksjonId] = seksjonId
+                it[SeksjonV2Tabell.json] = json
             }
         }
     }
@@ -40,24 +40,24 @@ class SeksjonRepository(
         seksjonId: String,
     ): String? =
         transaction {
-            SeksjonTabell
-                .select(SeksjonTabell.json)
+            SeksjonV2Tabell
+                .select(SeksjonV2Tabell.json)
                 .where {
-                    SeksjonTabell.søknadId eq søknadId and (SeksjonTabell.seksjonId eq seksjonId)
+                    SeksjonV2Tabell.søknadId eq søknadId and (SeksjonV2Tabell.seksjonId eq seksjonId)
                 }.map {
-                    it[SeksjonTabell.json]
+                    it[SeksjonV2Tabell.json]
                 }.firstOrNull()
         }
 
     fun hentSeksjoner(søknadId: UUID): List<Seksjon> =
         transaction {
-            SeksjonTabell
-                .select(SeksjonTabell.json)
-                .where { SeksjonTabell.søknadId eq søknadId }
+            SeksjonV2Tabell
+                .select(SeksjonV2Tabell.json)
+                .where { SeksjonV2Tabell.søknadId eq søknadId }
                 .map {
                     Seksjon(
-                        seksjonId = it[SeksjonTabell.seksjonId],
-                        data = it[SeksjonTabell.json],
+                        seksjonId = it[SeksjonV2Tabell.seksjonId],
+                        data = it[SeksjonV2Tabell.json],
                     )
                 }.toList()
         }
