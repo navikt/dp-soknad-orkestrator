@@ -11,7 +11,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
 
 internal fun Application.søknadApi(søknadService: SøknadService) {
     routing {
-        authenticate("tokenX") {
+        authenticate("azureAd") {
             route("/soknad") {
                 post {
                     call.respond(HttpStatusCode.Created, søknadService.opprett(call.ident()))
