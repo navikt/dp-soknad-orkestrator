@@ -5,7 +5,7 @@ val exposedVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.2.0"
-    id("io.ktor.plugin") version "3.2.0"
+    id("io.ktor.plugin") version "3.2.2"
     id("org.jlleitschuh.gradle.ktlint") version "12.3.0"
     alias(libs.plugins.shadow.jar)
 }
@@ -53,7 +53,7 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-json:$exposedVersion")
     implementation("io.github.microutils:kotlin-logging:3.0.5")
     implementation("de.slub-dresden:urnlib:2.0.1")
-    implementation("io.prometheus:prometheus-metrics-core:1.3.8")
+    implementation("io.prometheus:prometheus-metrics-core:1.3.10")
     implementation("io.github.openhtmltopdf:openhtmltopdf-pdfbox:1.1.28")
     implementation("io.github.openhtmltopdf:openhtmltopdf-svg-support:1.1.28")
     implementation("no.nav.dagpenger:oauth2-klient:2025.04.26-14.51.bbf9ece5f5ec")
@@ -66,7 +66,7 @@ dependencies {
     testImplementation(libs.mockk)
     testImplementation(libs.mock.oauth2.server)
     testImplementation(libs.bundles.postgres.test)
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.13.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.13.3")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation(libs.rapids.and.rivers.test)
     testImplementation("com.github.navikt.tbd-libs:naisful-test-app:2025.06.20-13.05-40af2647")
