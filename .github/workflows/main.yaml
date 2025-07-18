@@ -43,7 +43,7 @@ jobs:
   deploy-dev:
     name: Deploy to dev
     needs: [ build ]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/legg-til-tokenX-auth-soknad-api'
     runs-on: ubuntu-latest
     environment: dev-gcp
     steps:
