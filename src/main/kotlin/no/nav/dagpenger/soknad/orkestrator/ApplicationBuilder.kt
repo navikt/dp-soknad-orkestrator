@@ -3,10 +3,14 @@ package no.nav.dagpenger.soknad.orkestrator
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import mu.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
+import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
+import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.config.configure
@@ -77,6 +81,14 @@ internal class ApplicationBuilder(
                     withKtorModule {
                         install(ContentNegotiation) {
                             jackson { configure() }
+                        }
+                        install(Authentication) {
+                            jwt("azureAd") {
+                                azureAd()
+                            }
+                            jwt("tokenX") {
+                                tokenX()
+                            }
                         }
                         opplysningApi(opplysningService)
                         søknadApi(søknadService)

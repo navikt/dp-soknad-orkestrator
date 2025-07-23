@@ -2,10 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
-import io.ktor.server.application.install
-import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.authenticate
-import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.RoutingContext
@@ -13,17 +10,12 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
 import no.nav.dagpenger.soknad.orkestrator.api.auth.saksbehandlerId
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.metrikker.OpplysningMetrikker
 import java.util.UUID
 
 internal fun Application.opplysningApi(opplysningService: OpplysningService) {
-    install(Authentication) {
-        jwt("azureAd") { azureAd() }
-    }
-
     routing {
         get("/") { call.respond(HttpStatusCode.OK) }
 
