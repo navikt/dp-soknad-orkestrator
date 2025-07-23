@@ -9,8 +9,13 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
+import io.ktor.server.application.Application
+import io.ktor.server.application.install
+import io.ktor.server.auth.Authentication
+import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.testing.testApplication
 import io.mockk.mockk
+import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
@@ -38,6 +43,15 @@ class OpplysningApiTest {
     val søknadId = UUID.randomUUID()
     val ident = "12345678910"
 
+    val testModuleFunction: Application.() -> Unit = {
+        install(Authentication) {
+            jwt("azureAd") {
+                azureAd()
+            }
+        }
+        opplysningApi(opplysningService)
+    }
+
     @BeforeEach
     fun setup() {
         System.setProperty("Grupper.saksbehandler", "saksbehandler")
@@ -50,14 +64,14 @@ class OpplysningApiTest {
 
     @Test
     fun `Uautentiserte kall returnerer 401 Unauthorized`() {
-        withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             client.get("/opplysninger/${UUID.randomUUID()}/barn").status shouldBe HttpStatusCode.Unauthorized
         }
     }
 
     @Test
     fun `Kall med saksbehandlerADgruppe returnerer 200 OK`() {
-        withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             client
                 .get("/opplysninger/${UUID.randomUUID()}/barn") {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
@@ -67,7 +81,7 @@ class OpplysningApiTest {
 
     @Test
     fun `Hent opplysning med ugyldig søknadId returnerer 400 Bad Request`() {
-        withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             client
                 .get("/opplysninger/ugyldigSøknadId/barn") {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
@@ -100,7 +114,7 @@ class OpplysningApiTest {
             ),
         )
 
-        withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             client
                 .get("/opplysninger/$søknadId/barn") {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
@@ -114,7 +128,7 @@ class OpplysningApiTest {
 
     @Test
     fun `Oppdater opplysning med ugyldig søknadId returnerer 400 Bad Request`() {
-        withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             client
                 .put("/opplysninger/ugyldigSøknadId/barn/oppdater") {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
@@ -151,7 +165,7 @@ class OpplysningApiTest {
 
         opplysningRepository.lagre(opplysning)
 
-        withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             client
                 .put("/opplysninger/$søknadId/barn/oppdater") {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
@@ -204,7 +218,7 @@ class OpplysningApiTest {
 
         opplysningRepository.lagre(opplysning)
 
-        withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             client
                 .put("/opplysninger/$søknadId/barn/oppdater") {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
@@ -257,7 +271,7 @@ class OpplysningApiTest {
 
         opplysningRepository.lagre(opplysning)
 
-        withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             client
                 .put("/opplysninger/$søknadId/barn/oppdater") {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
@@ -314,7 +328,7 @@ class OpplysningApiTest {
 
             opplysningRepository.lagre(opplysning)
 
-            withMockAuthServerAndTestApplication(moduleFunction = { opplysningApi(opplysningService) }) {
+            withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
                 client
                     .put("/opplysninger/$søknadId/barn/oppdater") {
                         header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
