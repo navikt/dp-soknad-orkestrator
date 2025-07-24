@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
+import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
@@ -31,7 +32,7 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                     val seksjon =
                         seksjonService.hent(søknadId, seksjonId)
                             ?: run {
-                                call.respond(BadRequest, "Fant ikke seksjon med id $seksjonId for søknad $søknadId")
+                                call.respond(NotFound, "Fant ikke seksjon med id $seksjonId for søknad $søknadId")
                                 return@get
                             }
 
@@ -45,7 +46,7 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                     val seksjoner = seksjonService.hentAlle(søknadId)
 
                     if (seksjoner.isEmpty()) {
-                        call.respond(BadRequest, "Fant ingen seksjoner for søknad $søknadId")
+                        call.respond(NotFound, "Fant ingen seksjoner for søknad $søknadId")
                         return@get
                     }
 
