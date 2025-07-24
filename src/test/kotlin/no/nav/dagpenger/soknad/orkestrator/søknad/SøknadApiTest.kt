@@ -49,7 +49,7 @@ class SøknadApiTest {
                     }
 
             response.status shouldBe HttpStatusCode.Created
-            response.body() as UUID shouldBe søknadId
+            response.body() as String shouldBe søknadId.toString()
         }
     }
 
