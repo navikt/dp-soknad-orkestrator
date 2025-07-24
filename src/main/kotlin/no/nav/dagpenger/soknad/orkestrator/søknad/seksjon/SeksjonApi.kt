@@ -15,7 +15,7 @@ import java.util.UUID
 
 internal fun Application.seksjonApi(seksjonService: SeksjonService) {
     routing {
-        authenticate("azureAd") {
+        authenticate("tokenX") {
             route("/seksjon/{søknadId}/{seksjonId}") {
                 put {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
