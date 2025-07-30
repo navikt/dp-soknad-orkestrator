@@ -7,6 +7,8 @@ import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import mu.KotlinLogging
+import no.nav.dagpenger.pdl.createPersonOppslag
+import no.nav.dagpenger.soknad.orkestrator.Configuration.tokenXClient
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
@@ -21,6 +23,10 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
 import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.landApi
 import no.nav.dagpenger.soknad.orkestrator.opplysning.opplysningApi
+import no.nav.dagpenger.soknad.orkestrator.personalia.KontonummerService
+import no.nav.dagpenger.soknad.orkestrator.personalia.PersonService
+import no.nav.dagpenger.soknad.orkestrator.personalia.PersonaliaService
+import no.nav.dagpenger.soknad.orkestrator.personalia.personaliaApi
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
@@ -51,6 +57,19 @@ internal class ApplicationBuilder(
 
     private val seksjonRepository = SeksjonRepository(dataSource, søknadRepository)
     private val seksjonService = SeksjonService(seksjonRepository)
+    private val personaliaService =
+        PersonaliaService(
+            personService =
+                PersonService(
+                    personOppslag = createPersonOppslag(url = Configuration.pdlApiUrl),
+                    tokenProvider = tokenXClient(audience = Configuration.pdlApiScope),
+                ),
+            kontonummerService =
+                KontonummerService(
+                    kontoRegisterUrl = Configuration.personKontoRegisterUrl,
+                    tokenProvider = tokenXClient(audience = Configuration.personKontoRegisterScope),
+                ),
+        )
 
     private val søknadService: SøknadService =
         SøknadService(
@@ -93,6 +112,7 @@ internal class ApplicationBuilder(
                         opplysningApi(opplysningService)
                         søknadApi(søknadService)
                         seksjonApi(seksjonService)
+                        personaliaApi(personaliaService)
                         landApi()
                     }
                 },
