@@ -50,6 +50,12 @@ spec:
       value: {{azure.grupper.saksbehandler}}
     - name: DP_BEHANDLING_SCOPE
       value: {{DP_BEHANDLING_SCOPE}}
+    - name: PDL_API_HOST
+      value: {{PDL_API_HOST}}
+    - name: PDL_API_SCOPE
+      value: {{PDL_API_SCOPE}}
+    - name: PERSON_KONTO_REGISTER_SCOPE
+      value: {{PERSON_KONTO_REGISTER_SCOPE}}
   azure:
     application:
       enabled: true
@@ -75,6 +81,10 @@ spec:
     outbound:
       rules:
         - application: dp-behandling
+        - application: sokos-kontoregister-person
+          namespace: okonomi
+      external:
+        - host: {{PDL_API_HOST}}
   tokenx:
     enabled: true
   {{#if ingresses}}
