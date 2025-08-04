@@ -9,7 +9,7 @@ import java.time.LocalDate.now
 
 class PersonaliaServiceTest {
     @Test
-    fun `getPersonalia returnerer forventet respons`() {
+    fun `hentPersonalia returnerer forventet respons`() {
         val personService = mockk<PersonService>()
         val kontonummerService = mockk<KontonummerService>()
         val personaliaService = PersonaliaService(personService, kontonummerService)
@@ -18,7 +18,7 @@ class PersonaliaServiceTest {
         coEvery { kontonummerService.hentKontonummer(any()) } returns KontonummerDto("51823888914")
 
         runBlocking {
-            val personalia = personaliaService.getPersonalia("15230252251", "subjectToken")
+            val personalia = personaliaService.hentPersonalia("15230252251", "subjectToken")
 
             personalia.person shouldBe personDto
             personalia.kontonummer shouldBe "51823888914"

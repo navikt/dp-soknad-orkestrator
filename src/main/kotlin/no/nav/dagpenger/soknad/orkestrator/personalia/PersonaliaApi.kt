@@ -15,7 +15,7 @@ internal fun Application.personaliaApi(personaliaService: PersonaliaService) {
             route("/personalia") {
                 get {
                     call.respond(
-                        personaliaService.getPersonalia(call.ident(), call.request.jwt()),
+                        personaliaService.hentPersonalia(call.ident(), call.request.jwt()),
                     )
                 }
             }
