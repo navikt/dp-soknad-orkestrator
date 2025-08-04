@@ -4,7 +4,7 @@ class PersonaliaService(
     val personService: PersonService,
     val kontonummerService: KontonummerService,
 ) {
-    suspend fun getPersonalia(
+    suspend fun hentPersonalia(
         fnr: String,
         subjectToken: String,
     ): PersonaliaDto =

@@ -14,7 +14,7 @@ class PersonServiceTest {
     @Test
     fun `hentPerson returnerer forventet respons hvis PDL returnerer en person`() {
         val personOppslag = mockk<PersonOppslag>()
-        val personService = PersonService(personOppslag, { "token" })
+        val personService = PersonService(personOppslag) { "token" }
         val pdlPerson = mockk<PDLPerson>(relaxed = true)
         every { pdlPerson.fornavn } returns "OLA"
         every { pdlPerson.mellomnavn } returns "PETTER"

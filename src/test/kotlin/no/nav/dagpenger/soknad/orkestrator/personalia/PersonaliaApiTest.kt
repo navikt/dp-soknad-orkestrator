@@ -40,7 +40,7 @@ class PersonaliaApiTest {
 
     @Test
     fun `GET personalia returnerer 200 OK med forventet body hvis klient er autentisert`() {
-        coEvery { personaliaService.getPersonalia(fnr = any(), subjectToken = any()) } returns
+        coEvery { personaliaService.hentPersonalia(fnr = any(), subjectToken = any()) } returns
             PersonaliaDto(
                 PersonDto(
                     fornavn = "",
