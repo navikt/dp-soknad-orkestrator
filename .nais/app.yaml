@@ -52,8 +52,10 @@ spec:
       value: {{DP_BEHANDLING_SCOPE}}
     - name: PDL_API_HOST
       value: {{PDL_API_HOST}}
-    - name: PDL_API_SCOPE
-      value: {{PDL_API_SCOPE}}
+    - name: PDL_API_USER_SCOPE
+      value: {{PDL_API_USER_SCOPE}}
+    - name: PDL_API_SYSTEM_SCOPE
+      value: {{PDL_API_SYSTEM_SCOPE}}
     - name: PERSON_KONTO_REGISTER_SCOPE
       value: {{PERSON_KONTO_REGISTER_SCOPE}}
   azure:

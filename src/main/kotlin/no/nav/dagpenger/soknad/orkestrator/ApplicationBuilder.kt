@@ -8,11 +8,15 @@ import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import mu.KotlinLogging
 import no.nav.dagpenger.pdl.createPersonOppslag
+import no.nav.dagpenger.pdl.createPersonOppslagBolk
+import no.nav.dagpenger.soknad.orkestrator.Configuration.azureAdClient
 import no.nav.dagpenger.soknad.orkestrator.Configuration.tokenXClient
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
+import no.nav.dagpenger.soknad.orkestrator.barn.BarnService
+import no.nav.dagpenger.soknad.orkestrator.barn.barnApi
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.config.configure
@@ -62,13 +66,23 @@ internal class ApplicationBuilder(
             personService =
                 PersonService(
                     personOppslag = createPersonOppslag(url = Configuration.pdlApiUrl),
-                    tokenProvider = tokenXClient(audience = Configuration.pdlApiScope),
+                    tokenProvider = tokenXClient(audience = Configuration.pdlApiUserScope),
                 ),
             kontonummerService =
                 KontonummerService(
                     kontoRegisterUrl = Configuration.personKontoRegisterUrl,
                     tokenProvider = tokenXClient(audience = Configuration.personKontoRegisterScope),
                 ),
+        )
+    private val barnService =
+        BarnService(
+            personOppslagBolk = createPersonOppslagBolk(url = Configuration.pdlApiUrl),
+            tokenProvider = {
+                azureAdClient
+                    .clientCredentials(
+                        scope = Configuration.pdlApiSystemScope,
+                    ).access_token ?: throw RuntimeException("Kunne ikke hente token")
+            },
         )
 
     private val søknadService: SøknadService =
@@ -81,7 +95,7 @@ internal class ApplicationBuilder(
 
     private val dpBehandlingKlient =
         DpBehandlingKlient(
-            azureAdKlient = Configuration.azureAdClient,
+            azureAdKlient = azureAdClient,
             dpBehandlingBaseUrl = Configuration.miljøVariabler.dpBehandlingBaseUrl,
             dpBehandlingScope = Configuration.miljøVariabler.dpBehandlingScope,
         )
@@ -113,6 +127,7 @@ internal class ApplicationBuilder(
                         søknadApi(søknadService)
                         seksjonApi(seksjonService)
                         personaliaApi(personaliaService)
+                        barnApi(barnService)
                         landApi()
                     }
                 },

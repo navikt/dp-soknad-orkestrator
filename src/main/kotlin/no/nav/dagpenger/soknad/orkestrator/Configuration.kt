@@ -30,7 +30,8 @@ internal object Configuration {
             "https://$it/graphql"
         }
     }
-    val pdlApiScope by lazy { properties[Key("PDL_API_SCOPE", stringType)] }
+    val pdlApiUserScope by lazy { properties[Key("PDL_API_USER_SCOPE", stringType)] }
+    val pdlApiSystemScope by lazy { properties[Key("PDL_API_SYSTEM_SCOPE", stringType)] }
     val personKontoRegisterUrl by lazy { properties[Key("PERSON_KONTO_REGISTER_URL", stringType)] }
     val personKontoRegisterScope by lazy { properties[Key("PERSON_KONTO_REGISTER_SCOPE", stringType)] }
 

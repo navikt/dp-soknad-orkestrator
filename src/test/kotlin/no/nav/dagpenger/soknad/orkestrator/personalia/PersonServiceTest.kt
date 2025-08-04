@@ -2,11 +2,10 @@ package no.nav.dagpenger.soknad.orkestrator.personalia
 
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
-import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
-import no.nav.dagpenger.pdl.PDLPerson
 import no.nav.dagpenger.pdl.PersonOppslag
+import no.nav.dagpenger.soknad.orkestrator.utils.PdlTestUtil
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -15,13 +14,14 @@ class PersonServiceTest {
     fun `hentPerson returnerer forventet respons hvis PDL returnerer en person`() {
         val personOppslag = mockk<PersonOppslag>()
         val personService = PersonService(personOppslag) { "token" }
-        val pdlPerson = mockk<PDLPerson>(relaxed = true)
-        every { pdlPerson.fornavn } returns "OLA"
-        every { pdlPerson.mellomnavn } returns "PETTER"
-        every { pdlPerson.etternavn } returns "DUNK"
-        every { pdlPerson.fodselsdato } returns LocalDate.of(2020, 1, 1)
-        every { pdlPerson.fodselnummer } returns "30212018224"
-        coEvery { personOppslag.hentPerson(any(), any()) } returns pdlPerson
+        coEvery { personOppslag.hentPerson(any(), any()) } returns
+            PdlTestUtil().lagPdlPerson(
+                "OLA",
+                "PETTER",
+                "DUNK",
+                LocalDate.of(2020, 1, 1),
+                "30212018224",
+            )
 
         runBlocking {
             val person = personService.hentPerson("27279320064", "subjectToken")
