@@ -13,4 +13,5 @@ azure:
 DP_BEHANDLING_SCOPE: "api://prod-gcp.teamdagpenger.dp-behandling/.default"
 PERSON_KONTO_REGISTER_SCOPE: "prod-gcp:okonomi:sokos-kontoregister-person"
 PDL_API_HOST: "pdl-api.prod-fss-pub.nais.io"
-PDL_API_SCOPE: "prod-fss:pdl:pdl-api"
+PDL_API_USER_SCOPE: "prod-fss:pdl:pdl-api"
+PDL_API_SYSTEM_SCOPE: "api://prod-fss.pdl.pdl-api/.default"
