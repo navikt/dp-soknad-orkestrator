@@ -75,7 +75,7 @@ internal class KontonummerServiceTest {
                     },
             )
         runBlocking {
-            service.hentKontonummer(subjectToken = "utenlandsKkonto") shouldBe
+            service.hentKontonummer(subjectToken = "utenlandskKonto") shouldBe
                 KontonummerDto(
                     kontonummer = "456",
                     banknavn = "banknavn",
