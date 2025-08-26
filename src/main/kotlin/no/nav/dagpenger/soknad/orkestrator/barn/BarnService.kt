@@ -37,14 +37,13 @@ class BarnService(
                 fornavn = pdlPerson.fornavn,
                 mellomnavn = pdlPerson.mellomnavn ?: "",
                 etternavn = pdlPerson.etternavn,
-                fodselsdato = pdlPerson.fodselsdato,
+                fødselsdato = pdlPerson.fodselsdato,
                 bostedsland =
                     AdresseVisitor(pdlPerson).bostedsadresse?.let { bostedsAdresse ->
                         Iso3LandkodeMapper.formatertAdresse(
                             bostedsAdresse,
                         )
                     } ?: UKJENT,
-                hentetFraPdl = true,
             )
         } catch (e: PDLPerson.PDLException) {
             if (e.message == "Ingen fodselsnummer funnet") {
