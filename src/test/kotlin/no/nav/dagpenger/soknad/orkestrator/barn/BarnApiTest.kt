@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.barn
 
+import io.kotest.inspectors.forExactly
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.ktor.client.call.body
@@ -46,17 +47,15 @@ class BarnApiTest {
                     fornavn = "fornavn1",
                     mellomnavn = "mellomnavn1",
                     etternavn = "etternavn1",
-                    fodselsdato = now(),
+                    fødselsdato = now(),
                     bostedsland = "bostedsland1",
-                    hentetFraPdl = true,
                 ),
                 BarnDto(
                     fornavn = "fornavn2",
                     mellomnavn = "mellomnavn2",
                     etternavn = "etternavn2",
-                    fodselsdato = now(),
+                    fødselsdato = now(),
                     bostedsland = "bostedsland2",
-                    hentetFraPdl = true,
                 ),
             )
 
@@ -67,8 +66,11 @@ class BarnApiTest {
                         header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     }
 
+            val barnDtoer = response.body() as List<BarnDto>
             response.status shouldBe OK
-            response.body() as List<BarnDto> shouldHaveSize 2
+            barnDtoer shouldHaveSize 2
+            barnDtoer.forExactly(1) { it.fornavnOgMellomnavn shouldBe "fornavn1 mellomnavn1" }
+            barnDtoer.forExactly(1) { it.fornavnOgMellomnavn shouldBe "fornavn2 mellomnavn2" }
             response.headers["Content-Type"] shouldBe "application/json; charset=UTF-8"
         }
     }

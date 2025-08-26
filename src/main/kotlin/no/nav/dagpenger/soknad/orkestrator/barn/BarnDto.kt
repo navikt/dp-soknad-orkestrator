@@ -9,9 +9,8 @@ data class BarnDto(
     val mellomnavn: String = "",
     val fornavnOgMellomnavn: String = listOf(fornavn, mellomnavn).filterNot(String?::isNullOrBlank).joinToString(" "),
     val etternavn: String = "",
-    val fodselsdato: LocalDate,
+    val fødselsdato: LocalDate,
     val bostedsland: String = "",
-    val hentetFraPdl: Boolean,
 ) {
-    fun alder(): Int = YEARS.between(this.fodselsdato, now()).toInt()
+    fun alder(): Int = YEARS.between(this.fødselsdato, now()).toInt()
 }

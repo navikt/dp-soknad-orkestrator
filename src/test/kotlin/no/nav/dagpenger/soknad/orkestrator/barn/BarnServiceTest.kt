@@ -45,10 +45,9 @@ class BarnServiceTest {
                 barn.mellomnavn shouldBe barnUnder18År.mellomnavn
                 barn.fornavnOgMellomnavn shouldBe "${barn.fornavn} ${barn.mellomnavn}"
                 barn.etternavn shouldBe barnUnder18År.etternavn
-                barn.fodselsdato shouldBe barnUnder18År.fodselsdato
+                barn.fødselsdato shouldBe barnUnder18År.fodselsdato
                 barn.bostedsland shouldBe "XUK"
                 barn.alder() shouldBe 7
-                barn.hentetFraPdl shouldBe true
             }
         }
     }
