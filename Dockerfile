@@ -2,6 +2,6 @@ FROM gcr.io/distroless/java21
 
 ENV TZ="Europe/Oslo"
 
-COPY build/libs/*-all.jar app.jar
+COPY build/install/dp-soknad-orkestrator/lib /app/lib
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-cp", "/app/lib/*", "no.nav.dagpenger.soknad.orkestrator.ApplicationKt"]
