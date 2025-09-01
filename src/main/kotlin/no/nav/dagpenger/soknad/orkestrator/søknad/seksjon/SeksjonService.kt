@@ -19,6 +19,8 @@ class SeksjonService(
     ): String? = seksjonRepository.hent(søknadId, seksjonId)
 
     fun hentAlle(søknadId: UUID): List<Seksjon> = seksjonRepository.hentSeksjoner(søknadId)
+
+    fun hentFullførteSeksjoner(søknadId: UUID): List<String> = seksjonRepository.hentFullførteSeksjoner(søknadId)
 }
 
 data class Seksjon(
