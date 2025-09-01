@@ -1,4 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val exposedVersion: String by project
@@ -17,7 +16,6 @@ plugins {
     kotlin("jvm") version "2.2.0"
     id("io.ktor.plugin") version "3.2.3"
     id("org.jlleitschuh.gradle.ktlint") version "12.3.0"
-    alias(libs.plugins.shadow.jar)
 }
 
 group = "no.nav"
@@ -83,8 +81,4 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation(libs.rapids.and.rivers.test)
     testImplementation("com.github.navikt.tbd-libs:naisful-test-app:$naisfulTestAppVersion")
-}
-
-tasks.withType<ShadowJar> {
-    mergeServiceFiles()
 }
