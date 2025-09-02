@@ -53,14 +53,14 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                     call.respond(OK, seksjoner)
                 }
             }
-        }
-        route("/soknad/{søknadId}/progress") {
-            get {
-                val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
-                val progress =
-                    seksjonService.hentFullførteSeksjoner(søknadId)
+            route("/soknad/{søknadId}/progress") {
+                get {
+                    val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
+                    val progress =
+                        seksjonService.hentFullførteSeksjoner(søknadId)
 
-                call.respond(OK, mapOf("seksjoner" to progress))
+                    call.respond(OK, mapOf("seksjoner" to progress))
+                }
             }
         }
     }
