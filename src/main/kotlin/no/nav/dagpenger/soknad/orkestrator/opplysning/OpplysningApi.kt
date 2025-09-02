@@ -20,16 +20,19 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
         get("/") { call.respond(HttpStatusCode.OK) }
 
         authenticate("azureAd") {
-            route("/opplysninger/{soknadId}") {
-                route("/barn") {
+            route("/opplysninger") {
+                route("/barn/{soknadbarnId") {
                     get {
-                        val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
+                        val søknadbarnId = validerOgFormaterSøknadbarnIdParam() ?: return@get
+                        val søknadId = opplysningService.hentSøknadId(søknadbarnId)
 
                         call.respond(HttpStatusCode.OK, opplysningService.hentBarn(søknadId))
                     }
 
                     put("/oppdater") {
-                        val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
+                        val søknadbarnId = validerOgFormaterSøknadbarnIdParam() ?: return@put
+                        val søknadId = opplysningService.hentSøknadId(søknadbarnId)
+
                         val oppdatertBarnRequest: OppdatertBarnRequestDTO
                         val token =
                             call.request.headers["Authorization"]?.removePrefix("Bearer ")
@@ -84,7 +87,26 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
     }
 }
 
+// TODO: Erstatt bruk av denne med den nye for søknadbarnid
 private suspend fun RoutingContext.validerOgFormaterSøknadIdParam(): UUID? {
+    val søknadIdParam =
+        call.parameters["soknadId"] ?: run {
+            call.respond(HttpStatusCode.BadRequest, "Mangler søknadId i parameter")
+            return null
+        }
+
+    return try {
+        UUID.fromString(søknadIdParam)
+    } catch (e: Exception) {
+        call.respond<String>(
+            HttpStatusCode.BadRequest,
+            "Kunne ikke parse søknadId parameter $søknadIdParam til UUID. Feilmelding: $e",
+        )
+        return null
+    }
+}
+
+private suspend fun RoutingContext.validerOgFormaterSøknadbarnIdParam(): UUID? {
     val søknadIdParam =
         call.parameters["soknadId"] ?: run {
             call.respond(HttpStatusCode.BadRequest, "Mangler søknadId i parameter")

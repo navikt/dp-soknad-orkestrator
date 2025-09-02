@@ -141,6 +141,8 @@ class OpplysningService(
             uendredeBarn
                 .map {
                     Løsningsbarn(
+                        // TODO: Bruk ekte id (dette var bare for at det skal kompilere)
+                        søknadbarnId = UUID.randomUUID(),
                         fornavnOgMellomnavn = it.fornavnOgMellomnavn,
                         etternavn = it.etternavn,
                         fødselsdato = it.fødselsdato,
@@ -154,6 +156,8 @@ class OpplysningService(
                 }.toMutableList()
                 .plus(
                     Løsningsbarn(
+                        // TODO: Bruk ekte id (dette var bare for at det skal kompilere)
+                        søknadbarnId = UUID.randomUUID(),
                         fornavnOgMellomnavn = oppdatertBarn.fornavnOgMellomnavn,
                         etternavn = oppdatertBarn.etternavn,
                         fødselsdato = oppdatertBarn.fodselsdato,
@@ -178,6 +182,8 @@ class OpplysningService(
             token = token,
         )
     }
+
+    fun hentSøknadId(søknadbarnId: UUID): UUID = opplysningRepository.hentSøknadIdFraSøknadbarnId(søknadbarnId)
 
     private companion object {
         private val logger = KotlinLogging.logger {}

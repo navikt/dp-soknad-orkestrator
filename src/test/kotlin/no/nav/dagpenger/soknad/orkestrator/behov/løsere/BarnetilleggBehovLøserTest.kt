@@ -86,6 +86,7 @@ class BarnetilleggBehovLøserTest {
         val løsteBarn = testRapid.inspektør.field(0, "@løsning")[Barnetillegg.name]["verdi"]
         løsteBarn.size() shouldBe 3
         løsteBarn[0].also {
+            it["søknadbarnId"].isNull shouldBe false
             it["fornavnOgMellomnavn"].asText() shouldBe "Ola"
             it["etternavn"].asText() shouldBe "Nordmann"
             it["fødselsdato"].asText() shouldBe "2000-01-01"
@@ -97,6 +98,7 @@ class BarnetilleggBehovLøserTest {
             it["begrunnelse"].asText() shouldBe "Begrunnelse for endring"
         }
         løsteBarn[1].also {
+            it["søknadbarnId"].isNull shouldBe false
             it["fornavnOgMellomnavn"].asText() shouldBe "Per"
             it["etternavn"].asText() shouldBe "Nordmann"
             it["fødselsdato"].asText() shouldBe "2000-01-01"
@@ -104,6 +106,7 @@ class BarnetilleggBehovLøserTest {
             it["kvalifiserer"].asBoolean() shouldBe false
         }
         løsteBarn[2].also {
+            it["søknadbarnId"].isNull shouldBe false
             it["fornavnOgMellomnavn"].asText() shouldBe "Per"
             it["etternavn"].asText() shouldBe "Utland"
             it["fødselsdato"].asText() shouldBe "2000-01-01"
