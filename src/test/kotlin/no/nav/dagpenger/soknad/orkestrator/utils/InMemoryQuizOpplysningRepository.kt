@@ -9,6 +9,7 @@ import java.util.UUID
 
 class InMemoryQuizOpplysningRepository : QuizOpplysningRepository {
     private val opplysninger = mutableListOf<QuizOpplysning<*>>()
+    private val barnSøknadMapper = mutableMapOf<UUID, UUID>()
 
     override fun lagre(opplysning: QuizOpplysning<*>) {
         opplysninger.add(opplysning)
@@ -55,4 +56,16 @@ class InMemoryQuizOpplysningRepository : QuizOpplysningRepository {
         opplysninger.remove(opprinneligBarnOpplysning)
         opplysninger.add(oppdatertOpplysning)
     }
+
+    override fun lagreBarnSøknadMapping(
+        søknadId: UUID,
+        søknadbarnId: UUID,
+    ) {
+        barnSøknadMapper[søknadId] = søknadbarnId
+    }
+
+    override fun hentSøknadbarnIdFraSøknadId(søknadId: UUID): UUID = barnSøknadMapper[søknadId] ?: UUID.randomUUID()
+
+    override fun hentSøknadIdFraSøknadbarnId(søknadBarnId: UUID): UUID =
+        barnSøknadMapper.entries.find { it.value == søknadBarnId }?.key ?: UUID.randomUUID()
 }

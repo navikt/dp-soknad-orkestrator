@@ -35,8 +35,11 @@ class BarnetilleggBehovLøser(
         val pdlBarnSvar = hentBarnSvar(beskrivendeIdPdlBarn, ident, søknadId)
         val egneBarnSvar = hentBarnSvar(beskrivendeIdEgneBarn, ident, søknadId)
 
+        val søknadBarnId = opplysningRepository.hentSøknadbarnIdFraSøknadId(søknadId)
+
         return (pdlBarnSvar + egneBarnSvar).map {
             Løsningsbarn(
+                søknadbarnId = søknadBarnId,
                 fornavnOgMellomnavn = it.fornavnOgMellomnavn,
                 etternavn = it.etternavn,
                 fødselsdato = it.fødselsdato,
@@ -57,6 +60,7 @@ class BarnetilleggBehovLøser(
     ) = opplysningRepository.hent(beskrivendeId, ident, søknadId)?.svar?.asListOf<BarnSvar>() ?: emptyList()
 
     internal data class Løsningsbarn(
+        val søknadbarnId: UUID,
         val fornavnOgMellomnavn: String,
         val etternavn: String,
         val fødselsdato: LocalDate,
