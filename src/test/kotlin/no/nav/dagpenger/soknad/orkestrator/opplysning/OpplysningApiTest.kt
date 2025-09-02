@@ -41,6 +41,7 @@ class OpplysningApiTest {
             dpBehandlingKlient = mockk(relaxed = true),
         )
     val søknadId = UUID.randomUUID()
+    val søknadbarnId = UUID.randomUUID()
     val ident = "12345678910"
 
     val testModuleFunction: Application.() -> Unit = {
@@ -113,6 +114,8 @@ class OpplysningApiTest {
                 søknadId = søknadId,
             ),
         )
+
+        opplysningRepository.lagreBarnSøknadMapping(søknadId, søknadbarnId)
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             client
