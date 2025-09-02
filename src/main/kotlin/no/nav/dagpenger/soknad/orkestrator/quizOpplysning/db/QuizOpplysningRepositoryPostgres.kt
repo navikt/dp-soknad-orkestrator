@@ -137,6 +137,28 @@ class QuizOpplysningRepositoryPostgres(
             }
         }
     }
+
+    override fun lagreBarnSøknadMapping(
+        søknadId: UUID,
+        søknadbarnId: UUID,
+    ) {
+        BarnSøknadMappingTabell.insert {
+            it[BarnSøknadMappingTabell.søknadId] = søknadId
+            it[BarnSøknadMappingTabell.søknadbarnId] = søknadbarnId
+        }
+    }
+
+    override fun hentSøknadbarnIdFraSøknadId(søknadId: UUID): UUID =
+        BarnSøknadMappingTabell
+            .select(FlervalgTabell.id)
+            .where { BarnSøknadMappingTabell.søknadId eq søknadId }
+            .first()[BarnSøknadMappingTabell.søknadbarnId]
+
+    override fun hentSøknadIdFraSøknadbarnId(søknadBarnId: UUID): UUID =
+        BarnSøknadMappingTabell
+            .select(FlervalgTabell.id)
+            .where { BarnSøknadMappingTabell.søknadbarnId eq søknadBarnId }
+            .first()[BarnSøknadMappingTabell.søknadId]
 }
 
 private fun opplysningEksisterer(opplysning: QuizOpplysning<*>): Boolean =
