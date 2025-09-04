@@ -30,7 +30,7 @@ class SeksjonRepository(
             ) {
                 it[SeksjonV2Tabell.søknadId] = søknadId
                 it[SeksjonV2Tabell.seksjonId] = seksjonId
-                it[SeksjonV2Tabell.json] = json
+                it[SeksjonV2Tabell.json] = stringLiteral(json)
             }
         }
     }
