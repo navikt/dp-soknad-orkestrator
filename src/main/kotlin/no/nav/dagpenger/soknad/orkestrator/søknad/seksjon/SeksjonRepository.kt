@@ -61,4 +61,14 @@ class SeksjonRepository(
                     )
                 }.toList()
         }
+
+    fun hentFullførteSeksjoner(søknadId: UUID): List<String> =
+        transaction {
+            SeksjonV2Tabell
+                .select(SeksjonV2Tabell.seksjonId)
+                .where { SeksjonV2Tabell.søknadId eq søknadId }
+                .map {
+                    it[SeksjonV2Tabell.seksjonId]
+                }.toList()
+        }
 }
