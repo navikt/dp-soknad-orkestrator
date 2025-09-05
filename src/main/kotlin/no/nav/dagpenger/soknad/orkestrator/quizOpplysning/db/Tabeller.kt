@@ -85,7 +85,7 @@ object EgenNæringSvarTabell : IntIdTable("egen_næring_svar") {
     val organisasjonsnummer = integer("organisasjonsnummer")
 }
 
-object BarnSøknadMappingTabell : IntIdTable("barn_søknad") {
+object BarnSøknadMappingTabell : IntIdTable("barn_søknad_mapping") {
     val søknadId: Column<UUID> = uuid("soknad_id")
     val søknadbarnId: Column<UUID> = uuid("soknadbarn_id")
 }

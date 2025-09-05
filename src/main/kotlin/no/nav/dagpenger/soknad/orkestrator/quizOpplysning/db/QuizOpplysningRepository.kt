@@ -32,8 +32,7 @@ interface QuizOpplysningRepository {
         søknadbarnId: UUID,
     )
 
-    // TODO: Burde vi ha value class for søknadId og søknadbarnId? Disse får jo samme signatur nå
-    fun hentSøknadbarnIdFraSøknadId(søknadId: UUID): UUID
+    fun mapTilSøknadbarnId(søknadId: UUID): UUID
 
-    fun hentSøknadIdFraSøknadbarnId(søknadBarnId: UUID): UUID
+    fun mapTilSøknadId(søknadbarnId: UUID): UUID
 }

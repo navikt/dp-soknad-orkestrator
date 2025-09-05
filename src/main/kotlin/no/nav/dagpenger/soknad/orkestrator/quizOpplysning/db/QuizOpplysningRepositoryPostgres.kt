@@ -148,16 +148,16 @@ class QuizOpplysningRepositoryPostgres(
         }
     }
 
-    override fun hentSøknadbarnIdFraSøknadId(søknadId: UUID): UUID =
+    override fun mapTilSøknadbarnId(søknadId: UUID): UUID =
         BarnSøknadMappingTabell
-            .select(FlervalgTabell.id)
+            .select(BarnSøknadMappingTabell.id)
             .where { BarnSøknadMappingTabell.søknadId eq søknadId }
             .first()[BarnSøknadMappingTabell.søknadbarnId]
 
-    override fun hentSøknadIdFraSøknadbarnId(søknadBarnId: UUID): UUID =
+    override fun mapTilSøknadId(søknadbarnId: UUID): UUID =
         BarnSøknadMappingTabell
-            .select(FlervalgTabell.id)
-            .where { BarnSøknadMappingTabell.søknadbarnId eq søknadBarnId }
+            .select(BarnSøknadMappingTabell.id)
+            .where { BarnSøknadMappingTabell.søknadbarnId eq søknadbarnId }
             .first()[BarnSøknadMappingTabell.søknadId]
 }
 
