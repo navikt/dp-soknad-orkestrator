@@ -3,7 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Barnetillegg
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BarnetilleggV2
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
@@ -15,10 +15,10 @@ import no.nav.dagpenger.soknad.orkestrator.utils.januar
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
-class BarnetilleggBehovLøserTest {
+class BarnetilleggV2BehovLøserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
-    val behovløser = BarnetilleggBehovLøser(testRapid, opplysningRepository)
+    val behovløser = BarnetilleggV2BehovLøser(testRapid, opplysningRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
     val søknadbarnId = UUID.randomUUID()
@@ -84,12 +84,14 @@ class BarnetilleggBehovLøserTest {
         opplysningRepository.lagre(pdlBarn)
         opplysningRepository.lagre(egetBarn)
         opplysningRepository.lagreBarnSøknadMapping(søknadId = søknadId, søknadbarnId = søknadbarnId)
-        behovløser.løs(lagBehovmelding(ident, søknadId, Barnetillegg))
+        behovløser.løs(lagBehovmelding(ident, søknadId, BarnetilleggV2))
 
-        val løsteBarn = testRapid.inspektør.field(0, "@løsning")[Barnetillegg.name]["verdi"]
+        val barnetilleggV2Løsning = testRapid.inspektør.field(0, "@løsning")[BarnetilleggV2.name]["verdi"]
+        val løsteBarn = barnetilleggV2Løsning["barn"]
+
+        barnetilleggV2Løsning["søknadbarnId"].asUUID() shouldBe søknadbarnId
         løsteBarn.size() shouldBe 3
         løsteBarn[0].also {
-            it["søknadbarnId"].asUUID() shouldBe søknadbarnId
             it["fornavnOgMellomnavn"].asText() shouldBe "Ola"
             it["etternavn"].asText() shouldBe "Nordmann"
             it["fødselsdato"].asText() shouldBe "2000-01-01"
@@ -101,7 +103,6 @@ class BarnetilleggBehovLøserTest {
             it["begrunnelse"].asText() shouldBe "Begrunnelse for endring"
         }
         løsteBarn[1].also {
-            it["søknadbarnId"].asUUID() shouldBe søknadbarnId
             it["fornavnOgMellomnavn"].asText() shouldBe "Per"
             it["etternavn"].asText() shouldBe "Nordmann"
             it["fødselsdato"].asText() shouldBe "2000-01-01"
@@ -109,7 +110,6 @@ class BarnetilleggBehovLøserTest {
             it["kvalifiserer"].asBoolean() shouldBe false
         }
         løsteBarn[2].also {
-            it["søknadbarnId"].asUUID() shouldBe søknadbarnId
             it["fornavnOgMellomnavn"].asText() shouldBe "Per"
             it["etternavn"].asText() shouldBe "Utland"
             it["fødselsdato"].asText() shouldBe "2000-01-01"

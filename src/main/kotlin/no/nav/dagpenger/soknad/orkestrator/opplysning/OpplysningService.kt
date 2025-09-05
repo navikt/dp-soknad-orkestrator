@@ -183,7 +183,7 @@ class OpplysningService(
         )
     }
 
-    fun hentSøknadId(søknadbarnId: UUID): UUID = opplysningRepository.hentSøknadIdFraSøknadbarnId(søknadbarnId)
+    fun mapTilSøknadId(søknadbarnId: UUID): UUID = opplysningRepository.mapTilSøknadId(søknadbarnId)
 
     private companion object {
         private val logger = KotlinLogging.logger {}
