@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.AndreØkonomiskeYtelser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Barnetillegg
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BarnetilleggV2
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BostedslandErNorge
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EgenNæringsvirksomhet
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EgetGårdsbruk
@@ -26,6 +27,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Ønske
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnsketArbeidstid
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.AndreØkonomiskeYtelserBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggV2BehovLøser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BostedslandErNorgeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EgenNæringsvirksomhetBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EgetGårdsbrukBehovløser
@@ -71,6 +73,7 @@ class BehovløserFactory(
             Søknadsdato to SøknadsdatoBehovløser(rapidsConnection, opplysningRepository),
             TarUtdanningEllerOpplæring to UtdanningEllerOpplæringBehovløser(rapidsConnection, opplysningRepository),
             Barnetillegg to BarnetilleggBehovLøser(rapidsConnection, opplysningRepository),
+            BarnetilleggV2 to BarnetilleggV2BehovLøser(rapidsConnection, opplysningRepository),
             AndreØkonomiskeYtelser to AndreØkonomiskeYtelserBehovløser(rapidsConnection, opplysningRepository),
             ØnsketArbeidstid to ØnsketArbeidstidBehovløser(rapidsConnection, opplysningRepository),
             HarTilleggsopplysninger to HarTilleggsopplysningerBehovløser(rapidsConnection, opplysningRepository),
@@ -102,6 +105,7 @@ class BehovløserFactory(
         Søknadsdato,
         TarUtdanningEllerOpplæring,
         Barnetillegg,
+        BarnetilleggV2,
         AndreØkonomiskeYtelser,
         ØnsketArbeidstid,
         HarTilleggsopplysninger,

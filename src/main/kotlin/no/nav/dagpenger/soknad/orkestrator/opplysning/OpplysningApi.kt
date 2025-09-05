@@ -21,17 +21,17 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
 
         authenticate("azureAd") {
             route("/opplysninger") {
-                route("/barn/{soknadbarnId") {
+                route("/barn/{soknadbarnId}") {
                     get {
                         val søknadbarnId = validerOgFormaterSøknadbarnIdParam() ?: return@get
-                        val søknadId = opplysningService.hentSøknadId(søknadbarnId)
+                        val søknadId = opplysningService.mapTilSøknadId(søknadbarnId)
 
                         call.respond(HttpStatusCode.OK, opplysningService.hentBarn(søknadId))
                     }
 
                     put("/oppdater") {
                         val søknadbarnId = validerOgFormaterSøknadbarnIdParam() ?: return@put
-                        val søknadId = opplysningService.hentSøknadId(søknadbarnId)
+                        val søknadId = opplysningService.mapTilSøknadId(søknadbarnId)
 
                         val oppdatertBarnRequest: OppdatertBarnRequestDTO
                         val token =
@@ -87,38 +87,19 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
     }
 }
 
-// TODO: Erstatt bruk av denne med den nye for søknadbarnid
-private suspend fun RoutingContext.validerOgFormaterSøknadIdParam(): UUID? {
-    val søknadIdParam =
-        call.parameters["soknadId"] ?: run {
-            call.respond(HttpStatusCode.BadRequest, "Mangler søknadId i parameter")
-            return null
-        }
-
-    return try {
-        UUID.fromString(søknadIdParam)
-    } catch (e: Exception) {
-        call.respond<String>(
-            HttpStatusCode.BadRequest,
-            "Kunne ikke parse søknadId parameter $søknadIdParam til UUID. Feilmelding: $e",
-        )
-        return null
-    }
-}
-
 private suspend fun RoutingContext.validerOgFormaterSøknadbarnIdParam(): UUID? {
-    val søknadIdParam =
-        call.parameters["soknadId"] ?: run {
-            call.respond(HttpStatusCode.BadRequest, "Mangler søknadId i parameter")
+    val soknadbarnIdParam =
+        call.parameters["soknadbarnId"] ?: run {
+            call.respond(HttpStatusCode.BadRequest, "Mangler soknadbarnId i parameter")
             return null
         }
 
     return try {
-        UUID.fromString(søknadIdParam)
+        UUID.fromString(soknadbarnIdParam)
     } catch (e: Exception) {
         call.respond<String>(
             HttpStatusCode.BadRequest,
-            "Kunne ikke parse søknadId parameter $søknadIdParam til UUID. Feilmelding: $e",
+            "Kunne ikke parse soknadbarnId parameter $soknadbarnIdParam til UUID. Feilmelding: $e",
         )
         return null
     }

@@ -7,6 +7,8 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
@@ -15,6 +17,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import org.jetbrains.exposed.exceptions.ExposedSQLException
+import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.UUID
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -58,11 +61,41 @@ class SøknadRepositoryTest {
 
         søknadRepository.lagreQuizSøknad(søknad)
         val hentetSøknad = søknadRepository.hent(søknadId)
+        val søknadbarnId =
+            transaction {
+                opplysningRepository.mapTilSøknadbarnId(søknadId)
+            }
 
         hentetSøknad?.ident shouldBe søknad.ident
         hentetSøknad?.søknadId shouldBe søknad.søknadId
         hentetSøknad?.tilstand shouldBe søknad.tilstand
         hentetSøknad?.opplysninger?.size shouldBe 1
+        søknadbarnId shouldBe null
+    }
+
+    // TODO: Gjør ferdig denne testen
+    @Test
+    fun `lagrer søknadbarnId når det finnes barn-opplysning i søknaden`() {
+        val søknadId = UUID.randomUUID()
+        val søknad =
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = INNSENDT,
+                opplysninger =
+                    listOf(
+                        QuizOpplysning(
+                            beskrivendeId = "faktum.barn-liste",
+                            type = Barn,
+                            svar = listOf<BarnSvar>(),
+                            ident = ident,
+                            søknadId = søknadId,
+                        ),
+                    ),
+            )
+
+        søknadRepository.lagreQuizSøknad(søknad)
+        val hentetSøknad = søknadRepository.hent(søknadId)
     }
 
     @Test
