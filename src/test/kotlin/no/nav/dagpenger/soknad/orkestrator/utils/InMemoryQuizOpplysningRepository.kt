@@ -64,8 +64,10 @@ class InMemoryQuizOpplysningRepository : QuizOpplysningRepository {
         barnSøknadMapper[søknadId] = søknadbarnId
     }
 
-    override fun hentSøknadbarnIdFraSøknadId(søknadId: UUID): UUID = barnSøknadMapper[søknadId] ?: UUID.randomUUID()
+    override fun mapTilSøknadbarnId(søknadId: UUID): UUID =
+        barnSøknadMapper[søknadId] ?: throw Exception("Fant ikke mapping for søknadId $søknadId")
 
-    override fun hentSøknadIdFraSøknadbarnId(søknadBarnId: UUID): UUID =
-        barnSøknadMapper.entries.find { it.value == søknadBarnId }?.key ?: UUID.randomUUID()
+    override fun mapTilSøknadId(søknadbarnId: UUID): UUID =
+        barnSøknadMapper.entries.find { it.value == søknadbarnId }?.key
+            ?: throw Exception("Fant ikke mapping for søknadbarnId $søknadbarnId")
 }
