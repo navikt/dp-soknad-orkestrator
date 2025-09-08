@@ -1,12 +1,12 @@
 package no.nav.dagpenger.soknad.orkestrator
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import mu.KotlinLogging
 import no.nav.dagpenger.pdl.createPersonOppslag
 import no.nav.dagpenger.pdl.createPersonOppslagBolk
 import no.nav.dagpenger.soknad.orkestrator.Configuration.azureAdClient

@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.DataType
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.Kilde
