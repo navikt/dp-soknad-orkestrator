@@ -9,7 +9,8 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 fun ObjectMapper.configure() =
     this.apply {
         registerModules(
-            KotlinModule.Builder()
+            KotlinModule
+                .Builder()
                 .withReflectionCacheSize(512)
                 .build(),
         )

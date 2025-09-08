@@ -12,8 +12,7 @@ import java.util.UUID
 class JobbetUtenforNorgeBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
-) :
-    Behovløser(rapidsConnection, opplysningRepository) {
+) : Behovløser(rapidsConnection, opplysningRepository) {
     override val behov = JobbetUtenforNorge.name
     override val beskrivendeId = "faktum.arbeidsforhold"
     private val landkodeNorge = "NOR"

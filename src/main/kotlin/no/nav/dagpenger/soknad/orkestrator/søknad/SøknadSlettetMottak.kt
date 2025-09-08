@@ -15,15 +15,16 @@ class SøknadSlettetMottak(
     private val søknadService: SøknadService,
 ) : River.PacketListener {
     init {
-        River(rapidsConnection).apply {
-            precondition {
-                it.requireValue("@event_name", "søknad_slettet")
-            }
-            validate {
-                it.requireKey("søknad_uuid", "ident")
-                it.interestedIn("@id", "@opprettet")
-            }
-        }.register(this)
+        River(rapidsConnection)
+            .apply {
+                precondition {
+                    it.requireValue("@event_name", "søknad_slettet")
+                }
+                validate {
+                    it.requireKey("søknad_uuid", "ident")
+                    it.interestedIn("@id", "@opprettet")
+                }
+            }.register(this)
     }
 
     override fun onPacket(

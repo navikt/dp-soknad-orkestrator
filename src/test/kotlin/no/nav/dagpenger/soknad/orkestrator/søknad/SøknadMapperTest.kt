@@ -150,7 +150,8 @@ class SøknadMapperTest {
     @Test
     fun `kan mappe svar på generatorfaktum - Egen næring`() {
         val søknad = SøknadMapper(søknadsDataMedEgenNæring).søknad
-        søknad.opplysninger.single { it.beskrivendeId == "faktum.egen-naering-organisasjonsnummer-liste" }
+        søknad.opplysninger
+            .single { it.beskrivendeId == "faktum.egen-naering-organisasjonsnummer-liste" }
             .also { opplysning ->
                 opplysning.søknadId shouldBe søknadId
                 opplysning.ident shouldBe ident

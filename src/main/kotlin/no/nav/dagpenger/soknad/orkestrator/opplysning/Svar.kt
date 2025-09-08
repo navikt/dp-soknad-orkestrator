@@ -25,11 +25,14 @@ abstract class Svar<T>(
     var verdi: T,
 )
 
-class LandSvar(opplysningId: UUID, verdi: String) : Svar<String>(
-    opplysningId = opplysningId,
-    type = Opplysningstype.LAND,
-    verdi = verdi,
-) {
+class LandSvar(
+    opplysningId: UUID,
+    verdi: String,
+) : Svar<String>(
+        opplysningId = opplysningId,
+        type = Opplysningstype.LAND,
+        verdi = verdi,
+    ) {
     init {
         require(verdi.length == 3) {
             "ISO 3166-1-alpha3 må være 3 bokstaver lang. Fikk: $verdi"
@@ -37,26 +40,38 @@ class LandSvar(opplysningId: UUID, verdi: String) : Svar<String>(
     }
 }
 
-class BooleanSvar(opplysningId: UUID, verdi: Boolean) : Svar<Boolean>(
-    opplysningId = opplysningId,
-    type = Opplysningstype.BOOLEAN,
-    verdi = verdi,
-)
+class BooleanSvar(
+    opplysningId: UUID,
+    verdi: Boolean,
+) : Svar<Boolean>(
+        opplysningId = opplysningId,
+        type = Opplysningstype.BOOLEAN,
+        verdi = verdi,
+    )
 
-class DatoSvar(opplysningId: UUID, verdi: LocalDate) : Svar<LocalDate>(
-    opplysningId = opplysningId,
-    type = Opplysningstype.DATO,
-    verdi = verdi,
-)
+class DatoSvar(
+    opplysningId: UUID,
+    verdi: LocalDate,
+) : Svar<LocalDate>(
+        opplysningId = opplysningId,
+        type = Opplysningstype.DATO,
+        verdi = verdi,
+    )
 
-class TekstSvar(opplysningId: UUID, verdi: String) : Svar<String>(
-    opplysningId = opplysningId,
-    type = Opplysningstype.TEKST,
-    verdi = verdi,
-)
+class TekstSvar(
+    opplysningId: UUID,
+    verdi: String,
+) : Svar<String>(
+        opplysningId = opplysningId,
+        type = Opplysningstype.TEKST,
+        verdi = verdi,
+    )
 
-class PeriodesvarSvar(opplysningId: UUID, verdi: PeriodeSvar) : Svar<PeriodeSvar>(
-    opplysningId = opplysningId,
-    type = Opplysningstype.PERIODE,
-    verdi = verdi,
-)
+class PeriodesvarSvar(
+    opplysningId: UUID,
+    verdi: PeriodeSvar,
+) : Svar<PeriodeSvar>(
+        opplysningId = opplysningId,
+        type = Opplysningstype.PERIODE,
+        verdi = verdi,
+    )

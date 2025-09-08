@@ -21,7 +21,8 @@ internal object Configuration {
         ConfigurationProperties.systemProperties() overriding EnvironmentVariables() overriding defaultProperties
 
     val config: Map<String, String> =
-        properties.list()
+        properties
+            .list()
             .reversed()
             .fold(emptyMap()) { map, pair ->
                 map + pair.second

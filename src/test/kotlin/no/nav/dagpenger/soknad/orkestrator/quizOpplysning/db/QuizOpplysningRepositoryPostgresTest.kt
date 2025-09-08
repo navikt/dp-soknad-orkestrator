@@ -315,8 +315,14 @@ class QuizOpplysningRepositoryPostgresTest {
             opplysningRepository.hent(beskrivendeId, ident, søknadId)!!.also {
                 it.beskrivendeId shouldBe opplysning.beskrivendeId
                 it.type shouldBe opplysning.type
-                it.svar.asListOf<BarnSvar>().first().barnSvarId shouldBe barnSvarId1
-                it.svar.asListOf<BarnSvar>().last().barnSvarId shouldBe barnSvarId2
+                it.svar
+                    .asListOf<BarnSvar>()
+                    .first()
+                    .barnSvarId shouldBe barnSvarId1
+                it.svar
+                    .asListOf<BarnSvar>()
+                    .last()
+                    .barnSvarId shouldBe barnSvarId2
                 it.ident shouldBe opplysning.ident
                 it.søknadId shouldBe opplysning.søknadId
             }

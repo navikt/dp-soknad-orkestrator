@@ -28,7 +28,11 @@ internal object Postgres {
     }
 
     private fun withCleanDb(block: () -> Unit) {
-        flyWayBuilder.cleanDisabled(false).dataSource(dataSource).load().clean()
+        flyWayBuilder
+            .cleanDisabled(false)
+            .dataSource(dataSource)
+            .load()
+            .clean()
         block()
     }
 
