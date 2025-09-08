@@ -131,4 +131,60 @@ class SeksjonApiTest {
             response.status shouldBe InternalServerError
         }
     }
+
+    @Test
+    fun `GET søknad fremgang returnerer 200 OK og liste av seksjoner lagret`() {
+        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any()) } returns
+            listOf(
+                "din-situasjon",
+                "utdanning",
+                "barnetillegg",
+            )
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/progress") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe OK
+            response.body() as String shouldBe "{\"seksjoner\":[\"din-situasjon\",\"utdanning\",\"barnetillegg\"]}"
+        }
+    }
+
+    @Test
+    fun `GET søknad fremgang returnerer 404 Not Found hvis det ikke er lagret `() {
+        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any()) } returns
+            listOf()
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/progress") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe NotFound
+            response.body() as String shouldBe "{\"seksjoner\":[]}"
+        }
+    }
+
+    @Test
+    fun `GET søknad fremgang returnerer 500 Internal Server Error hvis kall fra repository kaster IllegalStateException`() {
+        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any()) } throws IllegalStateException()
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/progress") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe InternalServerError
+        }
+    }
+
+    @Test
+    fun `GET progress returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/progress").status shouldBe Unauthorized
+        }
+    }
 }
