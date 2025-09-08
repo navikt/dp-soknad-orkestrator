@@ -10,8 +10,10 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import java.util.UUID
 
-class OrdinærBehovløser(rapidsConnection: RapidsConnection, opplysningRepository: QuizOpplysningRepository) :
-    Behovløser(rapidsConnection, opplysningRepository) {
+class OrdinærBehovløser(
+    rapidsConnection: RapidsConnection,
+    opplysningRepository: QuizOpplysningRepository,
+) : Behovløser(rapidsConnection, opplysningRepository) {
     override val behov = Ordinær.name
     override val beskrivendeId = "faktum.arbeidsforhold"
 

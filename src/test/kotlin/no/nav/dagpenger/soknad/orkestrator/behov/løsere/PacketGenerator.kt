@@ -11,13 +11,14 @@ fun lagBehovmelding(
     behov: BehovløserFactory.Behov,
 ): Behovmelding =
     Behovmelding(
-        JsonMessage.newMessage(
-            eventName = "behov",
-            map =
-                mapOf(
-                    "ident" to ident,
-                    "søknadId" to søknadId,
-                    "@behov" to listOf(behov),
-                ),
-        ).apply { this.requireKey("ident", "søknadId", "@behov") },
+        JsonMessage
+            .newMessage(
+                eventName = "behov",
+                map =
+                    mapOf(
+                        "ident" to ident,
+                        "søknadId" to søknadId,
+                        "@behov" to listOf(behov),
+                    ),
+            ).apply { this.requireKey("ident", "søknadId", "@behov") },
     )

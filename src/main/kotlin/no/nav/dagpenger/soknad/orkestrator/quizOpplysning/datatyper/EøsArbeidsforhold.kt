@@ -20,17 +20,20 @@ data object EøsArbeidsforhold : Datatype<List<EøsArbeidsforholdSvar>>(
                 val arbeidsgivernavnSvar =
                     eøsArbeidsforhold
                         .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.arbeidsgivernavn" }
-                        ?.get("svar")?.asText() ?: ""
+                        ?.get("svar")
+                        ?.asText() ?: ""
 
                 val landSvar =
                     eøsArbeidsforhold
                         .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.land" }
-                        ?.get("svar")?.asText() ?: ""
+                        ?.get("svar")
+                        ?.asText() ?: ""
 
                 val personnummerSvar =
                     eøsArbeidsforhold
                         .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.personnummer" }
-                        ?.get("svar")?.asText() ?: ""
+                        ?.get("svar")
+                        ?.asText() ?: ""
 
                 val varighet =
                     eøsArbeidsforhold

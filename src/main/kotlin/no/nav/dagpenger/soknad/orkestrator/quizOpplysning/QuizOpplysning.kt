@@ -11,6 +11,4 @@ data class QuizOpplysning<T>(
     val søknadId: UUID,
 )
 
-inline fun <reified T> Any?.asListOf(): List<T> {
-    return (this as? List<*>)?.filterIsInstance<T>() ?: emptyList()
-}
+inline fun <reified T> Any?.asListOf(): List<T> = (this as? List<*>)?.filterIsInstance<T>() ?: emptyList()

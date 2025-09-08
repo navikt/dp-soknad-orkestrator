@@ -48,21 +48,21 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
     private fun erPermittering(arbeidsforhold: JsonNode) =
         arbeidsforhold.any { it["svar"].asText() == "faktum.arbeidsforhold.endret.svar.permittert" }
 
-    private fun JsonNode.harPåkrevdFelt(påkrevdFelt: String): Boolean {
-        return this.any { it["beskrivendeId"].asText() == påkrevdFelt }
-    }
+    private fun JsonNode.harPåkrevdFelt(påkrevdFelt: String): Boolean = this.any { it["beskrivendeId"].asText() == påkrevdFelt }
 
     private fun hentArbeidsforholdSvar(kompletteArbeidsforhold: List<JsonNode>) =
         kompletteArbeidsforhold.map { arbeidsforhold ->
             val navnSvar =
                 arbeidsforhold
                     .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.navn-bedrift" }
-                    .get("svar").asText()
+                    .get("svar")
+                    .asText()
 
             val landFaktum =
                 arbeidsforhold
                     .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.land" }
-                    .get("svar").asText()
+                    .get("svar")
+                    .asText()
 
             val sluttårsak = finnSluttårsak(arbeidsforhold)
 
@@ -73,9 +73,12 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
             )
         }
 
-    internal fun finnSluttårsak(arbeidsforhold: JsonNode): Sluttårsak {
-        return arbeidsforhold.single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.endret" }
-            .get("svar").asText().let {
+    internal fun finnSluttårsak(arbeidsforhold: JsonNode): Sluttårsak =
+        arbeidsforhold
+            .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.endret" }
+            .get("svar")
+            .asText()
+            .let {
                 when (it) {
                     "faktum.arbeidsforhold.endret.svar.arbeidsgiver-konkurs" -> ARBEIDSGIVER_KONKURS
                     "faktum.arbeidsforhold.endret.svar.permittert" -> finnSluttårsakVedPermittering(arbeidsforhold)
@@ -88,7 +91,6 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
                     else -> throw IllegalArgumentException("Ukjent sluttårsak: $it")
                 }
             }
-    }
 
     private fun finnSluttårsakVedPermittering(arbeidsforhold: JsonNode): Sluttårsak {
         val permittertFraFiskeriFaktum =

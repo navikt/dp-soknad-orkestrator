@@ -18,24 +18,20 @@ class InMemoryQuizOpplysningRepository : QuizOpplysningRepository {
         beskrivendeId: String,
         ident: String,
         søknadId: UUID,
-    ): QuizOpplysning<*>? {
-        return opplysninger.find {
+    ): QuizOpplysning<*>? =
+        opplysninger.find {
             it.beskrivendeId == beskrivendeId && it.ident == ident && it.søknadId == søknadId
         }
-    }
 
     override fun hent(
         beskrivendeId: String,
         søknadId: UUID,
-    ): QuizOpplysning<*>? {
-        return opplysninger.find {
+    ): QuizOpplysning<*>? =
+        opplysninger.find {
             it.beskrivendeId == beskrivendeId && it.søknadId == søknadId
         }
-    }
 
-    override fun hentAlle(søknadId: UUID): List<QuizOpplysning<*>> {
-        return opplysninger.filter { it.søknadId == søknadId }
-    }
+    override fun hentAlle(søknadId: UUID): List<QuizOpplysning<*>> = opplysninger.filter { it.søknadId == søknadId }
 
     override fun slett(søknadId: UUID) {
         opplysninger.removeIf { it.søknadId == søknadId }
