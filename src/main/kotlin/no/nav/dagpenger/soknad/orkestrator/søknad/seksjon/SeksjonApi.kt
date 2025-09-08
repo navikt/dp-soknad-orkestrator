@@ -56,8 +56,14 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
             route("/soknad/{søknadId}/progress") {
                 get {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
+
                     val progress =
-                        seksjonService.hentFullførteSeksjoner(søknadId)
+                        seksjonService.hentLagredeSeksjonerForGittSøknadId(søknadId)
+
+                    if (progress.isEmpty()) {
+                        call.respond(NotFound, mapOf("seksjoner" to progress))
+                        return@get
+                    }
 
                     call.respond(OK, mapOf("seksjoner" to progress))
                 }
