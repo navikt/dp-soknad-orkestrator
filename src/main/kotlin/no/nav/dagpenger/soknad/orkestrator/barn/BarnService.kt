@@ -1,7 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.barn
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpHeaders
-import mu.KotlinLogging
 import no.nav.dagpenger.pdl.PDLPerson
 import no.nav.dagpenger.pdl.PersonOppslagBolk
 import no.nav.dagpenger.pdl.adresse.AdresseMapper
