@@ -21,65 +21,36 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
 
         authenticate("azureAd") {
             route("/opplysninger") {
+                route("/{soknadId}") {
+                    route("/barn") {
+                        val parameternavn = "soknadId"
+                        get {
+                            val søknadId = validerOgFormaterUuidParameter(parameternavn) ?: return@get
+
+                            call.respond(HttpStatusCode.OK, opplysningService.hentBarn(søknadId))
+                        }
+
+                        put("/oppdater") {
+                            val søknadId = validerOgFormaterUuidParameter(parameternavn) ?: return@put
+
+                            oppdaterBarn(opplysningService, søknadId)
+                        }
+                    }
+                }
                 route("/barn/{soknadbarnId}") {
+                    val parameternavn = "soknadbarnId"
                     get {
-                        val søknadbarnId = validerOgFormaterSøknadbarnIdParam() ?: return@get
+                        val søknadbarnId = validerOgFormaterUuidParameter(parameternavn) ?: return@get
                         val søknadId = opplysningService.mapTilSøknadId(søknadbarnId)
 
                         call.respond(HttpStatusCode.OK, opplysningService.hentBarn(søknadId))
                     }
 
-                    put("/oppdater") {
-                        val søknadbarnId = validerOgFormaterSøknadbarnIdParam() ?: return@put
+                    put {
+                        val søknadbarnId = validerOgFormaterUuidParameter("søknadbarnId") ?: return@put
                         val søknadId = opplysningService.mapTilSøknadId(søknadbarnId)
 
-                        val oppdatertBarnRequest: OppdatertBarnRequestDTO
-                        val token =
-                            call.request.headers["Authorization"]?.removePrefix("Bearer ")
-                                ?: throw IllegalArgumentException("Fant ikke token i request header")
-
-                        try {
-                            oppdatertBarnRequest = call.receive<OppdatertBarnRequestDTO>()
-                        } catch (e: Exception) {
-                            call.respond(
-                                HttpStatusCode.BadRequest,
-                                "Kunne ikke parse request body til OppdatertBarnRequestDTO. Feilmelding: $e",
-                            )
-                            return@put
-                        }
-
-                        val oppdatertBarn = oppdatertBarnRequest.oppdatertBarn
-                        val saksbehandlerId = call.saksbehandlerId()
-
-                        if (opplysningService.hentBarn(søknadId).find { it.barnId == oppdatertBarn.barnId } == null) {
-                            call.respond(
-                                HttpStatusCode.NotFound,
-                                "Fant ikke barn med id ${oppdatertBarn.barnId} for søknad $søknadId",
-                            )
-                            return@put
-                        }
-
-                        if (oppdatertBarn.kvalifisererTilBarnetillegg) {
-                            if (oppdatertBarn.barnetilleggFom == null || oppdatertBarn.barnetilleggTom == null) {
-                                call.respond(
-                                    HttpStatusCode.BadRequest,
-                                    "barnetilleggFom og barnetilleggTom må være satt når kvalifisererTilBarnetillegg er true",
-                                )
-                                return@put
-                            }
-                        }
-
-                        if (opplysningService.erEndret(oppdatertBarn, søknadId)) {
-                            opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, saksbehandlerId, token)
-                            OpplysningMetrikker.endringBarn.inc()
-                            call.respond(HttpStatusCode.OK)
-                        } else {
-                            call.respond(
-                                HttpStatusCode.NotModified,
-                                "Opplysningen inneholder ingen endringer, kan ikke oppdatere",
-                            )
-                            return@put
-                        }
+                        oppdaterBarn(opplysningService, søknadId)
                     }
                 }
             }
@@ -87,19 +58,70 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
     }
 }
 
-private suspend fun RoutingContext.validerOgFormaterSøknadbarnIdParam(): UUID? {
-    val soknadbarnIdParam =
-        call.parameters["soknadbarnId"] ?: run {
-            call.respond(HttpStatusCode.BadRequest, "Mangler soknadbarnId i parameter")
+private suspend fun RoutingContext.oppdaterBarn(
+    opplysningService: OpplysningService,
+    søknadId: UUID,
+) {
+    val oppdatertBarnRequest: OppdatertBarnRequestDTO
+    val token =
+        call.request.headers["Authorization"]?.removePrefix("Bearer ")
+            ?: throw IllegalArgumentException("Fant ikke token i request header")
+
+    try {
+        oppdatertBarnRequest = call.receive<OppdatertBarnRequestDTO>()
+    } catch (e: Exception) {
+        call.respond(
+            HttpStatusCode.BadRequest,
+            "Kunne ikke parse request body til OppdatertBarnRequestDTO. Feilmelding: $e",
+        )
+        return
+    }
+
+    val oppdatertBarn = oppdatertBarnRequest.oppdatertBarn
+    val saksbehandlerId = call.saksbehandlerId()
+
+    if (opplysningService.hentBarn(søknadId).none { it.barnId == oppdatertBarn.barnId }) {
+        call.respond(
+            HttpStatusCode.NotFound,
+            "Fant ikke barn med id ${oppdatertBarn.barnId} for søknad $søknadId",
+        )
+        return
+    }
+
+    if (oppdatertBarn.kvalifisererTilBarnetillegg && (oppdatertBarn.barnetilleggFom == null || oppdatertBarn.barnetilleggTom == null)) {
+        call.respond(
+            HttpStatusCode.BadRequest,
+            "barnetilleggFom og barnetilleggTom må være satt når kvalifisererTilBarnetillegg er true",
+        )
+        return
+    }
+
+    if (opplysningService.erEndret(oppdatertBarn, søknadId)) {
+        opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, saksbehandlerId, token)
+        OpplysningMetrikker.endringBarn.inc()
+        call.respond(HttpStatusCode.OK)
+    } else {
+        call.respond(
+            HttpStatusCode.NotModified,
+            "Opplysningen inneholder ingen endringer, kan ikke oppdatere",
+        )
+        return
+    }
+}
+
+private suspend fun RoutingContext.validerOgFormaterUuidParameter(parameternavn: String): UUID? {
+    val parameterverdi =
+        call.parameters[parameternavn] ?: run {
+            call.respond(HttpStatusCode.BadRequest, "Mangler $parameternavn i requesten")
             return null
         }
 
     return try {
-        UUID.fromString(soknadbarnIdParam)
+        UUID.fromString(parameterverdi)
     } catch (e: Exception) {
         call.respond<String>(
             HttpStatusCode.BadRequest,
-            "Kunne ikke parse soknadbarnId parameter $soknadbarnIdParam til UUID. Feilmelding: $e",
+            "Kunne ikke parse $parameternavn parameter $parameterverdi til UUID. Feilmelding: $e",
         )
         return null
     }
