@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.personalia
 import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
 import com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.HttpClientEngine
@@ -18,7 +19,6 @@ import io.ktor.http.HttpHeaders.Accept
 import io.ktor.http.HttpHeaders.Authorization
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.serialization.jackson.jackson
-import mu.KotlinLogging
 
 private val logger = KotlinLogging.logger {}
 

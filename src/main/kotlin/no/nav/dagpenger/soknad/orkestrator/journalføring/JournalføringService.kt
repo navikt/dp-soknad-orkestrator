@@ -2,7 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.journalføring
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import mu.KotlinLogging
+import io.github.oshai.kotlinlogging.KotlinLogging
 import java.util.Base64
 import java.util.UUID
 
