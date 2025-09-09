@@ -52,7 +52,7 @@ class SeksjonRepository(
     fun hentSeksjoner(søknadId: UUID): List<Seksjon> =
         transaction {
             SeksjonV2Tabell
-                .select(SeksjonV2Tabell.json)
+                .select(SeksjonV2Tabell.json, SeksjonV2Tabell.seksjonId)
                 .where { SeksjonV2Tabell.søknadId eq søknadId }
                 .map {
                     Seksjon(
