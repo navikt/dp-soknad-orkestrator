@@ -18,6 +18,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -87,7 +88,19 @@ class SøknadRepositoryTest {
                         QuizOpplysning(
                             beskrivendeId = "faktum.barn-liste",
                             type = Barn,
-                            svar = listOf<BarnSvar>(),
+                            svar =
+                                listOf(
+                                    BarnSvar(
+                                        barnSvarId = UUID.randomUUID(),
+                                        fornavnOgMellomnavn = "Test",
+                                        etternavn = "Testesen",
+                                        fødselsdato = LocalDate.now(),
+                                        statsborgerskap = "NOR",
+                                        forsørgerBarnet = true,
+                                        fraRegister = true,
+                                        kvalifisererTilBarnetillegg = true,
+                                    ),
+                                ),
                             ident = ident,
                             søknadId = søknadId,
                         ),
@@ -96,6 +109,16 @@ class SøknadRepositoryTest {
 
         søknadRepository.lagreQuizSøknad(søknad)
         val hentetSøknad = søknadRepository.hent(søknadId)
+        val søknadbarnId =
+            transaction {
+                opplysningRepository.mapTilSøknadbarnId(søknadId)
+            }
+
+        hentetSøknad?.ident shouldBe søknad.ident
+        hentetSøknad?.søknadId shouldBe søknad.søknadId
+        hentetSøknad?.tilstand shouldBe søknad.tilstand
+        hentetSøknad?.opplysninger?.size shouldBe 1
+        søknadbarnId shouldNotBe null
     }
 
     @Test

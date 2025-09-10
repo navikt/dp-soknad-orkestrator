@@ -44,6 +44,7 @@ class BehovløserFactoryTest {
             "Søknadsdato",
             "TarUtdanningEllerOpplæring",
             "Barnetillegg",
+            "BarnetilleggV2",
             "AndreØkonomiskeYtelser",
             "ØnsketArbeidstid",
             "HarTilleggsopplysninger",
