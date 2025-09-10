@@ -32,7 +32,7 @@ interface QuizOpplysningRepository {
         søknadbarnId: UUID,
     )
 
-    fun mapTilSøknadbarnId(søknadId: UUID): UUID
+    fun mapTilSøknadbarnId(søknadId: UUID): UUID?
 
-    fun mapTilSøknadId(søknadbarnId: UUID): UUID
+    fun mapTilSøknadId(søknadbarnId: UUID): UUID?
 }

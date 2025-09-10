@@ -183,7 +183,9 @@ class OpplysningService(
         )
     }
 
-    fun mapTilSøknadId(søknadbarnId: UUID): UUID = opplysningRepository.mapTilSøknadId(søknadbarnId)
+    fun mapTilSøknadId(søknadbarnId: UUID): UUID =
+        opplysningRepository.mapTilSøknadId(søknadbarnId)
+            ?: throw IllegalArgumentException("Fant ikke søknadId for søknadbarnId $søknadbarnId")
 
     private companion object {
         private val logger = KotlinLogging.logger {}
