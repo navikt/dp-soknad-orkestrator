@@ -167,6 +167,7 @@ class OpplysningApiTest {
             )
 
         opplysningRepository.lagre(opplysning)
+        opplysningRepository.lagreBarnSøknadMapping(søknadId, søknadbarnId)
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             client
@@ -330,6 +331,7 @@ class OpplysningApiTest {
                 )
 
             opplysningRepository.lagre(opplysning)
+            opplysningRepository.lagreBarnSøknadMapping(søknadId, søknadbarnId)
 
             withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
                 client
