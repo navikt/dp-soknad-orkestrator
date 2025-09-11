@@ -74,7 +74,6 @@ class SøknadRepositoryTest {
         søknadbarnId shouldBe null
     }
 
-    // TODO: Gjør ferdig denne testen
     @Test
     fun `lagrer søknadbarnId når det finnes barn-opplysning i søknaden`() {
         val søknadId = UUID.randomUUID()
