@@ -115,10 +115,16 @@ class OpplysningService(
 
         val uendredeBarn = alleBarnSvar.filter { it.barnSvarId != oppdatertBarn.barnId }
 
+        // TODO: Vi må håndtere at søknadbarnId ikke finnes enda
+        val søknadbarnId =
+            opplysningRepository.mapTilSøknadbarnId(søknadId)
+                ?: throw IllegalArgumentException("Fant ikke søknadbarnId for søknadId $søknadId")
+
         try {
             sendbarnTilDpBehandling(
                 oppdatertBarnRequest = oppdatertBarnRequest,
                 token = token,
+                søknadbarnId = søknadbarnId,
                 uendredeBarn = uendredeBarn,
                 oppdatertBarnEndretAv = saksbehandlerId,
             )
@@ -135,14 +141,14 @@ class OpplysningService(
         token: String,
         uendredeBarn: List<BarnSvar>,
         oppdatertBarnEndretAv: String,
+        søknadbarnId: UUID,
     ) {
         val oppdatertBarn = oppdatertBarnRequest.oppdatertBarn
         val løsningsbarn =
             uendredeBarn
                 .map {
                     Løsningsbarn(
-                        // TODO: Bruk ekte id (dette var bare for at det skal kompilere)
-                        søknadbarnId = UUID.randomUUID(),
+                        søknadbarnId = søknadbarnId,
                         fornavnOgMellomnavn = it.fornavnOgMellomnavn,
                         etternavn = it.etternavn,
                         fødselsdato = it.fødselsdato,
@@ -156,8 +162,7 @@ class OpplysningService(
                 }.toMutableList()
                 .plus(
                     Løsningsbarn(
-                        // TODO: Bruk ekte id (dette var bare for at det skal kompilere)
-                        søknadbarnId = UUID.randomUUID(),
+                        søknadbarnId = søknadbarnId,
                         fornavnOgMellomnavn = oppdatertBarn.fornavnOgMellomnavn,
                         etternavn = oppdatertBarn.etternavn,
                         fødselsdato = oppdatertBarn.fodselsdato,
