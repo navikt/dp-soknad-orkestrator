@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db
 import QuizOpplysningTabell
 import TekstTabell
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
@@ -466,9 +467,26 @@ class QuizOpplysningRepositoryPostgresTest {
 
     @Test
     fun `mapTilSøknadbarnId lager, lagrer og returnerer en ny søknadbarnId hvis den ikke eksisterer i databasen`() {
-        TODO("Not yet implemented")
+        withMigratedDb {
+            val søknadId = randomUUID()
+
+            mapTilSøknadbarnIdUtenÅOppretteNy(søknadId) shouldBe null
+            val søknadbarnId = opplysningRepository.mapTilSøknadbarnId(søknadId)
+
+            søknadbarnId shouldNotBe null
+            mapTilSøknadbarnIdUtenÅOppretteNy(søknadId) shouldBe søknadbarnId
+        }
     }
 }
+
+fun mapTilSøknadbarnIdUtenÅOppretteNy(søknadId: UUID): UUID? =
+    transaction {
+        BarnSøknadMappingTabell
+            .select(BarnSøknadMappingTabell.id, BarnSøknadMappingTabell.søknadbarnId)
+            .where { BarnSøknadMappingTabell.søknadId eq søknadId }
+            .firstOrNull()
+            ?.get(BarnSøknadMappingTabell.søknadbarnId)
+    }
 
 fun opplysning(
     beskrivendeId: String = "beskrivendeId",
