@@ -45,6 +45,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID
+import java.util.UUID.randomUUID
 import javax.sql.DataSource
 
 class QuizOpplysningRepositoryPostgres(
@@ -142,18 +143,30 @@ class QuizOpplysningRepositoryPostgres(
         søknadId: UUID,
         søknadbarnId: UUID,
     ) {
-        BarnSøknadMappingTabell.insert {
-            it[BarnSøknadMappingTabell.søknadId] = søknadId
-            it[BarnSøknadMappingTabell.søknadbarnId] = søknadbarnId
+        transaction {
+            BarnSøknadMappingTabell.insert {
+                it[BarnSøknadMappingTabell.søknadId] = søknadId
+                it[BarnSøknadMappingTabell.søknadbarnId] = søknadbarnId
+            }
         }
     }
 
     override fun mapTilSøknadbarnId(søknadId: UUID): UUID? =
-        BarnSøknadMappingTabell
-            .select(BarnSøknadMappingTabell.id, BarnSøknadMappingTabell.søknadbarnId)
-            .where { BarnSøknadMappingTabell.søknadId eq søknadId }
-            .firstOrNull()
-            ?.get(BarnSøknadMappingTabell.søknadbarnId)
+        transaction {
+            var søknadbarnId =
+                BarnSøknadMappingTabell
+                    .select(BarnSøknadMappingTabell.id, BarnSøknadMappingTabell.søknadbarnId)
+                    .where { BarnSøknadMappingTabell.søknadId eq søknadId }
+                    .firstOrNull()
+                    ?.get(BarnSøknadMappingTabell.søknadbarnId)
+
+            if (søknadbarnId == null) {
+                søknadbarnId = randomUUID()
+                lagreBarnSøknadMapping(søknadId, søknadbarnId)
+            }
+
+            søknadbarnId
+        }
 
     override fun mapTilSøknadId(søknadbarnId: UUID): UUID? =
         BarnSøknadMappingTabell
