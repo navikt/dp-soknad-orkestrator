@@ -62,10 +62,7 @@ class SøknadRepositoryTest {
 
         søknadRepository.lagreQuizSøknad(søknad)
         val hentetSøknad = søknadRepository.hent(søknadId)
-        val søknadbarnId =
-            transaction {
-                opplysningRepository.mapTilSøknadbarnId(søknadId)
-            }
+        val søknadbarnId = mapTilSøknadbarnIdUtenÅOppretteNy(søknadId)
 
         hentetSøknad?.ident shouldBe søknad.ident
         hentetSøknad?.søknadId shouldBe søknad.søknadId
@@ -108,10 +105,7 @@ class SøknadRepositoryTest {
 
         søknadRepository.lagreQuizSøknad(søknad)
         val hentetSøknad = søknadRepository.hent(søknadId)
-        val søknadbarnId =
-            transaction {
-                opplysningRepository.mapTilSøknadbarnId(søknadId)
-            }
+        val søknadbarnId = mapTilSøknadbarnIdUtenÅOppretteNy(søknadId)
 
         hentetSøknad?.ident shouldBe søknad.ident
         hentetSøknad?.søknadId shouldBe søknad.søknadId
@@ -244,6 +238,15 @@ class SøknadRepositoryTest {
         }
     }
 }
+
+fun mapTilSøknadbarnIdUtenÅOppretteNy(søknadId: UUID): UUID? =
+    transaction {
+        BarnSøknadMappingTabell
+            .select(BarnSøknadMappingTabell.id, BarnSøknadMappingTabell.søknadbarnId)
+            .where { BarnSøknadMappingTabell.søknadId eq søknadId }
+            .firstOrNull()
+            ?.get(BarnSøknadMappingTabell.søknadbarnId)
+    }
 
 private val komplettSøknaddata =
     objectMapper.readTree(
