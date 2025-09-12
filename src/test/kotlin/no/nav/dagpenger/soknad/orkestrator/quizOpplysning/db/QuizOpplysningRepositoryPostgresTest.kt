@@ -29,12 +29,13 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 import java.util.UUID
+import java.util.UUID.randomUUID
 
 class QuizOpplysningRepositoryPostgresTest {
     private var opplysningRepository = QuizOpplysningRepositoryPostgres(dataSource)
     private val beskrivendeId = "beskrivendeId"
     private val ident = "12345678901"
-    private val søknadId = UUID.randomUUID()
+    private val søknadId = randomUUID()
 
     @Test
     fun `vi kan lagre og hente opplysning av type tekst`() {
@@ -276,8 +277,8 @@ class QuizOpplysningRepositoryPostgresTest {
 
     @Test
     fun `vi kan lagre og hente opplysning av type generator - barn`() {
-        val barnSvarId1 = UUID.randomUUID()
-        val barnSvarId2 = UUID.randomUUID()
+        val barnSvarId1 = randomUUID()
+        val barnSvarId2 = randomUUID()
         val opplysning =
             QuizOpplysning(
                 beskrivendeId = beskrivendeId,
@@ -331,7 +332,7 @@ class QuizOpplysningRepositoryPostgresTest {
 
     @Test
     fun `Kan hente en opplysning basert på søknadId og beskrivendeId`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         val beskrivendeId = beskrivendeId
         val opplysning = opplysning(beskrivendeId = beskrivendeId, søknadId = søknadId)
 
@@ -366,7 +367,7 @@ class QuizOpplysningRepositoryPostgresTest {
             opplysningRepository.hent(
                 beskrivendeId = "random",
                 ident = "123",
-                søknadId = UUID.randomUUID(),
+                søknadId = randomUUID(),
             ) shouldBe null
         }
     }
@@ -392,7 +393,7 @@ class QuizOpplysningRepositoryPostgresTest {
 
     @Test
     fun `Kan oppdatere opplysning om barn`() {
-        val barnSvarId = UUID.randomUUID()
+        val barnSvarId = randomUUID()
         val opprinneligOpplysning =
             QuizOpplysning(
                 beskrivendeId = beskrivendeId,
@@ -451,12 +452,28 @@ class QuizOpplysningRepositoryPostgresTest {
             }
         }
     }
+
+    @Test
+    fun `mapTilSøknadbarnId returnerer søknadbarnId fra databasen hvis den eksisterer`() {
+        withMigratedDb {
+            val søknadId = randomUUID()
+            val søknadbarnId = randomUUID()
+            opplysningRepository.lagreBarnSøknadMapping(søknadId, søknadbarnId)
+
+            opplysningRepository.mapTilSøknadbarnId(søknadId) shouldBe søknadbarnId
+        }
+    }
+
+    @Test
+    fun `mapTilSøknadbarnId lager, lagrer og returnerer en ny søknadbarnId hvis den ikke eksisterer i databasen`() {
+        TODO("Not yet implemented")
+    }
 }
 
 fun opplysning(
     beskrivendeId: String = "beskrivendeId",
     ident: String = "12345678901",
-    søknadId: UUID = UUID.randomUUID(),
+    søknadId: UUID = randomUUID(),
 ) = QuizOpplysning(
     beskrivendeId = beskrivendeId,
     type = Tekst,
