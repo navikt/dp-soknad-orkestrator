@@ -35,11 +35,7 @@ class BarnetilleggBehovLøser(
         val pdlBarnSvar = hentBarnSvar(beskrivendeIdPdlBarn, ident, søknadId)
         val egneBarnSvar = hentBarnSvar(beskrivendeIdEgneBarn, ident, søknadId)
 
-        // TODO: Skal vi bare godta at den er null?
-        //  Det kan jo komme behov for en søknad som ble lagret før denne koden kom i produksjon
-        val søknadbarnId =
-            opplysningRepository.mapTilSøknadbarnId(søknadId)
-                ?: throw RuntimeException("Fant ikke søknadbarnId for søknad $søknadId, selv om barn finnes i søknaden")
+        val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
 
         return (pdlBarnSvar + egneBarnSvar).map {
             Løsningsbarn(

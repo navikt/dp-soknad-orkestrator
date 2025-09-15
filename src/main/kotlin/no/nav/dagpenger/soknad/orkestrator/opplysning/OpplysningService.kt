@@ -115,10 +115,7 @@ class OpplysningService(
 
         val uendredeBarn = alleBarnSvar.filter { it.barnSvarId != oppdatertBarn.barnId }
 
-        // TODO: Vi må håndtere at søknadbarnId ikke finnes enda
-        val søknadbarnId =
-            opplysningRepository.mapTilSøknadbarnId(søknadId)
-                ?: throw IllegalArgumentException("Fant ikke søknadbarnId for søknadId $søknadId")
+        val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
 
         try {
             sendbarnTilDpBehandling(

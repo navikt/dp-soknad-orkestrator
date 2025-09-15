@@ -64,7 +64,13 @@ class InMemoryQuizOpplysningRepository : QuizOpplysningRepository {
         barnSøknadMapper[søknadId] = søknadbarnId
     }
 
-    override fun mapTilSøknadbarnId(søknadId: UUID): UUID? = barnSøknadMapper[søknadId]
+    override fun hentEllerOpprettSøknadbarnId(søknadId: UUID): UUID =
+        barnSøknadMapper.getOrElse(søknadId) {
+            val nySøknadbarnId = UUID.randomUUID()
+            barnSøknadMapper[søknadId] = nySøknadbarnId
+
+            nySøknadbarnId
+        }
 
     override fun mapTilSøknadId(søknadbarnId: UUID): UUID? = barnSøknadMapper.entries.find { it.value == søknadbarnId }?.key
 }
