@@ -461,7 +461,7 @@ class QuizOpplysningRepositoryPostgresTest {
             val søknadbarnId = randomUUID()
             opplysningRepository.lagreBarnSøknadMapping(søknadId, søknadbarnId)
 
-            opplysningRepository.mapTilSøknadbarnId(søknadId) shouldBe søknadbarnId
+            opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) shouldBe søknadbarnId
         }
     }
 
@@ -470,16 +470,16 @@ class QuizOpplysningRepositoryPostgresTest {
         withMigratedDb {
             val søknadId = randomUUID()
 
-            mapTilSøknadbarnIdUtenÅOppretteNy(søknadId) shouldBe null
-            val søknadbarnId = opplysningRepository.mapTilSøknadbarnId(søknadId)
+            hentSøknadbarnIdUtenÅOppretteNy(søknadId) shouldBe null
+            val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
 
             søknadbarnId shouldNotBe null
-            mapTilSøknadbarnIdUtenÅOppretteNy(søknadId) shouldBe søknadbarnId
+            hentSøknadbarnIdUtenÅOppretteNy(søknadId) shouldBe søknadbarnId
         }
     }
 }
 
-fun mapTilSøknadbarnIdUtenÅOppretteNy(søknadId: UUID): UUID? =
+fun hentSøknadbarnIdUtenÅOppretteNy(søknadId: UUID): UUID? =
     transaction {
         BarnSøknadMappingTabell
             .select(BarnSøknadMappingTabell.id, BarnSøknadMappingTabell.søknadbarnId)

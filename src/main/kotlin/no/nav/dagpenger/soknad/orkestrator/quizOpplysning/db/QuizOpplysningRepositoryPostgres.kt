@@ -151,7 +151,7 @@ class QuizOpplysningRepositoryPostgres(
         }
     }
 
-    override fun mapTilSøknadbarnId(søknadId: UUID): UUID? =
+    override fun hentEllerOpprettSøknadbarnId(søknadId: UUID): UUID =
         transaction {
             var søknadbarnId =
                 BarnSøknadMappingTabell
