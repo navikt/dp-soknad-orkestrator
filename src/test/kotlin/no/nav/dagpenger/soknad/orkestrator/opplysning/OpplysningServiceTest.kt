@@ -234,7 +234,7 @@ class OpplysningServiceTest {
 
         every { opplysningRepository.hentAlle(søknadId) } returns listOf(opprinneligOpplysning)
         every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
-        every { opplysningRepository.mapTilSøknadbarnId(søknadId) } returns søknadbarnId
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
 
         opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId", "token")
 
@@ -336,7 +336,7 @@ class OpplysningServiceTest {
                 opprinneligEgetbarnOpplysning,
             )
         every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
-        every { opplysningRepository.mapTilSøknadbarnId(søknadId) } returns søknadbarnId
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
 
         opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId", "token")
 
@@ -414,7 +414,7 @@ class OpplysningServiceTest {
                 opprinneligEgetbarnOpplysning,
             )
         every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
-        every { opplysningRepository.mapTilSøknadbarnId(søknadId) } returns søknadbarnId
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
         every { dpBehandlingKlient.oppdaterBarnOpplysning(any(), capture(dpBehandlingOpplysningSlot), any()) } returns Unit
 
         opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId", "token")

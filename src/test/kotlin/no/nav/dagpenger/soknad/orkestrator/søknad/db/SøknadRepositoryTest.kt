@@ -62,7 +62,7 @@ class SøknadRepositoryTest {
 
         søknadRepository.lagreQuizSøknad(søknad)
         val hentetSøknad = søknadRepository.hent(søknadId)
-        val søknadbarnId = mapTilSøknadbarnIdUtenÅOppretteNy(søknadId)
+        val søknadbarnId = hentSøknadbarnIdUtenÅOppretteNy(søknadId)
 
         hentetSøknad?.ident shouldBe søknad.ident
         hentetSøknad?.søknadId shouldBe søknad.søknadId
@@ -105,7 +105,7 @@ class SøknadRepositoryTest {
 
         søknadRepository.lagreQuizSøknad(søknad)
         val hentetSøknad = søknadRepository.hent(søknadId)
-        val søknadbarnId = mapTilSøknadbarnIdUtenÅOppretteNy(søknadId)
+        val søknadbarnId = hentSøknadbarnIdUtenÅOppretteNy(søknadId)
 
         hentetSøknad?.ident shouldBe søknad.ident
         hentetSøknad?.søknadId shouldBe søknad.søknadId
@@ -239,7 +239,7 @@ class SøknadRepositoryTest {
     }
 }
 
-fun mapTilSøknadbarnIdUtenÅOppretteNy(søknadId: UUID): UUID? =
+fun hentSøknadbarnIdUtenÅOppretteNy(søknadId: UUID): UUID? =
     transaction {
         BarnSøknadMappingTabell
             .select(BarnSøknadMappingTabell.id, BarnSøknadMappingTabell.søknadbarnId)

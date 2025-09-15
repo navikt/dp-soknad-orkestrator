@@ -35,9 +35,7 @@ class BarnetilleggV2BehovLøser(
         val pdlBarnSvar = hentBarnSvar(beskrivendeIdPdlBarn, ident, søknadId)
         val egneBarnSvar = hentBarnSvar(beskrivendeIdEgneBarn, ident, søknadId)
 
-        val søknadbarnId =
-            opplysningRepository.mapTilSøknadbarnId(søknadId)
-                ?: throw RuntimeException("Fant ikke søknadbarnId for søknad $søknadId, selv om barn finnes i søknaden")
+        val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
 
         val alleBarn =
             (pdlBarnSvar + egneBarnSvar).map {
