@@ -24,38 +24,44 @@ class BarnetilleggV2BehovLøser(
     }
 
     companion object {
-        val beskrivendeIdPdlBarn = "faktum.register.barn-liste"
-        val beskrivendeIdEgneBarn = "faktum.barn-liste"
+        const val BESKRIVENDE_ID_PDL_BARN = "faktum.register.barn-liste"
+        const val BESKRIVENDE_ID_EGNE_BARN = "faktum.barn-liste"
     }
 
     private fun finnBarn(
         ident: String,
         søknadId: UUID,
     ): BarnetilleggV2Løsning {
-        val pdlBarnSvar = hentBarnSvar(beskrivendeIdPdlBarn, ident, søknadId)
-        val egneBarnSvar = hentBarnSvar(beskrivendeIdEgneBarn, ident, søknadId)
+        val pdlBarnSvar = hentBarnSvar(BESKRIVENDE_ID_PDL_BARN, ident, søknadId)
+        val egneBarnSvar = hentBarnSvar(BESKRIVENDE_ID_EGNE_BARN, ident, søknadId)
 
-        val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
+        if ((pdlBarnSvar + egneBarnSvar).isNotEmpty()) {
+            val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
 
-        val alleBarn =
-            (pdlBarnSvar + egneBarnSvar).map {
-                Løsningsbarn(
-                    søknadbarnId = søknadbarnId,
-                    fornavnOgMellomnavn = it.fornavnOgMellomnavn,
-                    etternavn = it.etternavn,
-                    fødselsdato = it.fødselsdato,
-                    statsborgerskap = it.statsborgerskap,
-                    kvalifiserer = it.kvalifisererTilBarnetillegg,
-                    barnetilleggFom = it.barnetilleggFom,
-                    barnetilleggTom = it.barnetilleggTom,
-                    endretAv = it.endretAv,
-                    begrunnelse = it.begrunnelse,
-                )
-            }
+            val alleBarn =
+                (pdlBarnSvar + egneBarnSvar).map {
+                    LøsningsbarnV2(
+                        fornavnOgMellomnavn = it.fornavnOgMellomnavn,
+                        etternavn = it.etternavn,
+                        fødselsdato = it.fødselsdato,
+                        statsborgerskap = it.statsborgerskap,
+                        kvalifiserer = it.kvalifisererTilBarnetillegg,
+                        barnetilleggFom = it.barnetilleggFom,
+                        barnetilleggTom = it.barnetilleggTom,
+                        endretAv = it.endretAv,
+                        begrunnelse = it.begrunnelse,
+                    )
+                }
 
+            return BarnetilleggV2Løsning(
+                søknadbarnId = søknadbarnId,
+                barn = alleBarn,
+            )
+        }
+        // TODO: Hør med PJs om hele burde vært null hvis det ikke finnes barn
         return BarnetilleggV2Løsning(
-            søknadbarnId = søknadbarnId,
-            barn = alleBarn,
+            søknadbarnId = null,
+            barn = emptyList(),
         )
     }
 
@@ -66,12 +72,11 @@ class BarnetilleggV2BehovLøser(
     ) = opplysningRepository.hent(beskrivendeId, ident, søknadId)?.svar?.asListOf<BarnSvar>() ?: emptyList()
 
     internal data class BarnetilleggV2Løsning(
-        val søknadbarnId: UUID,
-        val barn: List<Løsningsbarn>,
+        val søknadbarnId: UUID?,
+        val barn: List<LøsningsbarnV2>,
     )
 
-    internal data class Løsningsbarn(
-        val søknadbarnId: UUID,
+    internal data class LøsningsbarnV2(
         val fornavnOgMellomnavn: String,
         val etternavn: String,
         val fødselsdato: LocalDate,

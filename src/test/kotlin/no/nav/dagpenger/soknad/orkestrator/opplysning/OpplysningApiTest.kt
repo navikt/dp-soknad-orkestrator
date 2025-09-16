@@ -19,7 +19,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
@@ -95,7 +95,7 @@ class OpplysningApiTest {
     fun `Hent opplysning returnerer 200 OK`() {
         opplysningRepository.lagre(
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                 type = Barn,
                 svar =
                     listOf(
@@ -147,7 +147,7 @@ class OpplysningApiTest {
     fun `Oppdater opplysning som ikke finnes svarer med 404 Not Found`() {
         val opplysning =
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                 type = Barn,
                 svar =
                     listOf(
@@ -201,7 +201,7 @@ class OpplysningApiTest {
     fun `Oppdater opplysning returnerer 400 Bad Request hvis fom og tom ikke er satt når kvalifisererTilBarnetillegg er true`() {
         val opplysning =
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                 type = Barn,
                 svar =
                     listOf(
@@ -254,7 +254,7 @@ class OpplysningApiTest {
     fun `Oppdater opplysning uten at gitt opplysning inneholder endringer returnerer 304 Not Modified`() {
         val opplysning =
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                 type = Barn,
                 svar =
                     listOf(
@@ -311,7 +311,7 @@ class OpplysningApiTest {
 
             val opplysning =
                 QuizOpplysning(
-                    beskrivendeId = beskrivendeIdPdlBarn,
+                    beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                     type = Barn,
                     svar =
                         listOf(
