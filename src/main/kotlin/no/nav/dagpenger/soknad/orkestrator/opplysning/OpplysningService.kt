@@ -7,8 +7,8 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.Kilde
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Løsningsbarn
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
@@ -25,7 +25,7 @@ class OpplysningService(
         val registerBarn =
             opplysningRepository
                 .hent(
-                    beskrivendeId = beskrivendeIdPdlBarn,
+                    beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                     søknadId = søknadId,
                 )?.svar
                 ?.asListOf<BarnSvar>() ?: emptyList()
@@ -33,7 +33,7 @@ class OpplysningService(
         val egneBarn =
             opplysningRepository
                 .hent(
-                    beskrivendeId = beskrivendeIdEgneBarn,
+                    beskrivendeId = BESKRIVENDE_ID_EGNE_BARN,
                     søknadId = søknadId,
                 )?.svar
                 ?.asListOf<BarnSvar>() ?: emptyList()

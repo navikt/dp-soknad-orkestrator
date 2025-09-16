@@ -2,39 +2,45 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
+import io.mockk.spyk
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Barnetillegg
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
 import org.junit.jupiter.api.Test
 import java.util.UUID
+import java.util.UUID.randomUUID
 
 class BarnetilleggBehovLøserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
+    val quizOpplysningRepositorySpy = spyk<QuizOpplysningRepository>(opplysningRepository)
     val testRapid = TestRapid()
-    val behovløser = BarnetilleggBehovLøser(testRapid, opplysningRepository)
+    val behovløser = BarnetilleggBehovLøser(testRapid, quizOpplysningRepositorySpy)
     val ident = "12345678910"
-    val søknadId = UUID.randomUUID()
-    val søknadbarnId = UUID.randomUUID()
+    val søknadId: UUID = randomUUID()
+    val søknadbarnId: UUID = randomUUID()
 
     @Test
-    fun `løser behov om barn`() {
+    fun `løser behov om barn hvis søknaden har barn`() {
         val pdlBarn =
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                 type = Barn,
                 ident = ident,
                 søknadId = søknadId,
                 svar =
                     listOf(
                         BarnSvar(
-                            barnSvarId = UUID.randomUUID(),
+                            barnSvarId = randomUUID(),
                             fornavnOgMellomnavn = "Ola",
                             etternavn = "Nordmann",
                             fødselsdato = 1.januar(2000),
@@ -48,7 +54,7 @@ class BarnetilleggBehovLøserTest {
                             begrunnelse = "Begrunnelse for endring",
                         ),
                         BarnSvar(
-                            barnSvarId = UUID.randomUUID(),
+                            barnSvarId = randomUUID(),
                             fornavnOgMellomnavn = "Per",
                             etternavn = "Nordmann",
                             fødselsdato = 1.januar(2000),
@@ -59,17 +65,16 @@ class BarnetilleggBehovLøserTest {
                         ),
                     ),
             )
-
         val egetBarn =
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdEgneBarn,
+                beskrivendeId = BESKRIVENDE_ID_EGNE_BARN,
                 type = Barn,
                 ident = ident,
                 søknadId = søknadId,
                 svar =
                     listOf(
                         BarnSvar(
-                            barnSvarId = UUID.randomUUID(),
+                            barnSvarId = randomUUID(),
                             fornavnOgMellomnavn = "Per",
                             etternavn = "Utland",
                             fødselsdato = 1.januar(2000),
@@ -80,12 +85,13 @@ class BarnetilleggBehovLøserTest {
                         ),
                     ),
             )
-
         opplysningRepository.lagre(pdlBarn)
         opplysningRepository.lagre(egetBarn)
         opplysningRepository.lagreBarnSøknadMapping(søknadId = søknadId, søknadbarnId = søknadbarnId)
+
         behovløser.løs(lagBehovmelding(ident, søknadId, Barnetillegg))
 
+        verify(exactly = 1) { quizOpplysningRepositorySpy.hentEllerOpprettSøknadbarnId(any()) }
         val løsteBarn = testRapid.inspektør.field(0, "@løsning")[Barnetillegg.name]["verdi"]
         løsteBarn.size() shouldBe 3
         løsteBarn[0].also {
@@ -116,5 +122,14 @@ class BarnetilleggBehovLøserTest {
             it["statsborgerskap"].asText() shouldBe "UTL"
             it["kvalifiserer"].asBoolean() shouldBe true
         }
+    }
+
+    @Test
+    fun `løser behov om barn som forventet hvis søknaden ikke har barn`() {
+        behovløser.løs(lagBehovmelding(ident, søknadId, Barnetillegg))
+
+        val løsteBarn = testRapid.inspektør.field(0, "@løsning")[Barnetillegg.name]["verdi"]
+        verify(exactly = 0) { quizOpplysningRepositorySpy.hentEllerOpprettSøknadbarnId(any()) }
+        løsteBarn.shouldBeEmpty()
     }
 }

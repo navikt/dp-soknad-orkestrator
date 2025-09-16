@@ -24,33 +24,36 @@ class BarnetilleggBehovLøser(
     }
 
     companion object {
-        val beskrivendeIdPdlBarn = "faktum.register.barn-liste"
-        val beskrivendeIdEgneBarn = "faktum.barn-liste"
+        const val BESKRIVENDE_ID_PDL_BARN = "faktum.register.barn-liste"
+        const val BESKRIVENDE_ID_EGNE_BARN = "faktum.barn-liste"
     }
 
     private fun finnBarn(
         ident: String,
         søknadId: UUID,
     ): List<Løsningsbarn> {
-        val pdlBarnSvar = hentBarnSvar(beskrivendeIdPdlBarn, ident, søknadId)
-        val egneBarnSvar = hentBarnSvar(beskrivendeIdEgneBarn, ident, søknadId)
+        val pdlBarnSvar = hentBarnSvar(BESKRIVENDE_ID_PDL_BARN, ident, søknadId)
+        val egneBarnSvar = hentBarnSvar(BESKRIVENDE_ID_EGNE_BARN, ident, søknadId)
 
-        val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
+        if ((pdlBarnSvar + egneBarnSvar).isNotEmpty()) {
+            val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
 
-        return (pdlBarnSvar + egneBarnSvar).map {
-            Løsningsbarn(
-                søknadbarnId = søknadbarnId,
-                fornavnOgMellomnavn = it.fornavnOgMellomnavn,
-                etternavn = it.etternavn,
-                fødselsdato = it.fødselsdato,
-                statsborgerskap = it.statsborgerskap,
-                kvalifiserer = it.kvalifisererTilBarnetillegg,
-                barnetilleggFom = it.barnetilleggFom,
-                barnetilleggTom = it.barnetilleggTom,
-                endretAv = it.endretAv,
-                begrunnelse = it.begrunnelse,
-            )
+            return (pdlBarnSvar + egneBarnSvar).map {
+                Løsningsbarn(
+                    søknadbarnId = søknadbarnId,
+                    fornavnOgMellomnavn = it.fornavnOgMellomnavn,
+                    etternavn = it.etternavn,
+                    fødselsdato = it.fødselsdato,
+                    statsborgerskap = it.statsborgerskap,
+                    kvalifiserer = it.kvalifisererTilBarnetillegg,
+                    barnetilleggFom = it.barnetilleggFom,
+                    barnetilleggTom = it.barnetilleggTom,
+                    endretAv = it.endretAv,
+                    begrunnelse = it.begrunnelse,
+                )
+            }
         }
+        return emptyList()
     }
 
     private fun hentBarnSvar(
