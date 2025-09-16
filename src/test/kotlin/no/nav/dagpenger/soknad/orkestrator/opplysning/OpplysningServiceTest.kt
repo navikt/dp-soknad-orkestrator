@@ -9,8 +9,8 @@ import io.mockk.slot
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdEgneBarn
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.beskrivendeIdPdlBarn
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Løsningsbarn
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
@@ -56,18 +56,18 @@ class OpplysningServiceTest {
                 fraRegister = false,
                 kvalifisererTilBarnetillegg = false,
             )
-        every { opplysningRepository.hent(beskrivendeIdPdlBarn, søknadId) } returns
+        every { opplysningRepository.hent(BESKRIVENDE_ID_PDL_BARN, søknadId) } returns
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                 type = Barn,
                 svar = listOf(registerBarn),
                 ident = "12345678910",
                 søknadId = søknadId,
             )
 
-        every { opplysningRepository.hent(beskrivendeIdEgneBarn, søknadId) } returns
+        every { opplysningRepository.hent(BESKRIVENDE_ID_EGNE_BARN, søknadId) } returns
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                 type = Barn,
                 svar = listOf(egetBarn),
                 ident = "12345678910",
@@ -129,16 +129,16 @@ class OpplysningServiceTest {
                 begrunnelse = "Begrunnelse",
             )
 
-        every { opplysningRepository.hent(beskrivendeIdPdlBarn, søknadId) } returns
+        every { opplysningRepository.hent(BESKRIVENDE_ID_PDL_BARN, søknadId) } returns
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                 type = Barn,
                 svar = listOf(opprinneligBarn),
                 ident = "12345678910",
                 søknadId = søknadId,
             )
 
-        every { opplysningRepository.hent(beskrivendeIdEgneBarn, søknadId) } returns null
+        every { opplysningRepository.hent(BESKRIVENDE_ID_EGNE_BARN, søknadId) } returns null
 
         opplysningService.erEndret(oppdatertBarn, søknadId) shouldBe true
     }
@@ -171,16 +171,16 @@ class OpplysningServiceTest {
                 begrunnelse = "Begrunnelse",
             )
 
-        every { opplysningRepository.hent(beskrivendeIdPdlBarn, søknadId) } returns
+        every { opplysningRepository.hent(BESKRIVENDE_ID_PDL_BARN, søknadId) } returns
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                 type = Barn,
                 svar = listOf(opprinneligBarn),
                 ident = "12345678910",
                 søknadId = søknadId,
             )
 
-        every { opplysningRepository.hent(beskrivendeIdEgneBarn, søknadId) } returns null
+        every { opplysningRepository.hent(BESKRIVENDE_ID_EGNE_BARN, søknadId) } returns null
 
         opplysningService.erEndret(oppdatertBarn, søknadId) shouldBe false
     }
@@ -225,7 +225,7 @@ class OpplysningServiceTest {
             )
         val opprinneligOpplysning =
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                 type = Barn,
                 svar = listOf(opprinneligBarnSvar),
                 ident = "12345678910",
@@ -315,7 +315,7 @@ class OpplysningServiceTest {
             )
         val opprinneligOpplysning =
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdPdlBarn,
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
                 type = Barn,
                 svar = listOf(opprinneligBarnSvar),
                 ident = "12345678910",
@@ -323,7 +323,7 @@ class OpplysningServiceTest {
             )
         val opprinneligEgetbarnOpplysning =
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdEgneBarn,
+                beskrivendeId = BESKRIVENDE_ID_EGNE_BARN,
                 type = Barn,
                 svar = listOf(opprinneligEgetBarnSvar),
                 ident = "12345678910",
@@ -402,7 +402,7 @@ class OpplysningServiceTest {
             )
         val opprinneligEgetbarnOpplysning =
             QuizOpplysning(
-                beskrivendeId = beskrivendeIdEgneBarn,
+                beskrivendeId = BESKRIVENDE_ID_EGNE_BARN,
                 type = Barn,
                 svar = listOf(opprinneligEgetBarnSvar),
                 ident = "12345678910",
