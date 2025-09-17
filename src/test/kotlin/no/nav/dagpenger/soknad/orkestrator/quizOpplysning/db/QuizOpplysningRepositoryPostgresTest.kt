@@ -477,6 +477,26 @@ class QuizOpplysningRepositoryPostgresTest {
             hentSøknadbarnIdUtenÅOppretteNy(søknadId) shouldBe søknadbarnId
         }
     }
+
+    @Test
+    fun `mapTilSøknadId returnerer null hvis mapping ikke eksisterer`() {
+        withMigratedDb {
+            val søknadbarnId = randomUUID()
+
+            opplysningRepository.mapTilSøknadId(søknadbarnId) shouldBe null
+        }
+    }
+
+    @Test
+    fun `mapTilSøknadId returnerer søknadId basert på søknadbarnId`() {
+        withMigratedDb {
+            val søknadId = randomUUID()
+            val søknadbarnId = randomUUID()
+            opplysningRepository.lagreBarnSøknadMapping(søknadId, søknadbarnId)
+
+            opplysningRepository.mapTilSøknadId(søknadbarnId) shouldBe søknadId
+        }
+    }
 }
 
 fun hentSøknadbarnIdUtenÅOppretteNy(søknadId: UUID): UUID? =
