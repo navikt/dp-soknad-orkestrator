@@ -3,7 +3,7 @@ name: Publiser OpenAPI docs
 on:
   push:
     branches:
-      - barneopplysning-enum-id
+      - main
     paths:
       - openapi/src/main/resources/*
   workflow_dispatch:
