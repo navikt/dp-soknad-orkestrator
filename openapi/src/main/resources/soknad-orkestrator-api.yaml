@@ -76,7 +76,16 @@ components:
       properties:
         id:
           type: string
-          format: string
+          enum:
+            - fornavnOgMellomnavn
+            - etternavn
+            - fodselsdato
+            - oppholdssted
+            - forsorgerBarnet
+            - kvalifisererTilBarnetillegg
+            - barnetilleggFom
+            - barnetilleggTom
+            - begrunnelse
         verdi:
           type: string
           format: string

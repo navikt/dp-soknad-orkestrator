@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
@@ -80,12 +81,12 @@ class OpplysningServiceTest {
         hentedeBarn
             .first()
             .opplysninger
-            .find { it.id.equals("fornavnOgMellomnavn") }
+            .find { it.id == BarnOpplysningDTO.Id.fornavnOgMellomnavn }
             ?.verdi shouldBe "Kari Register"
         hentedeBarn
             .last()
             .opplysninger
-            .find { it.id.equals("fornavnOgMellomnavn") }
+            .find { it.id == BarnOpplysningDTO.Id.fornavnOgMellomnavn }
             ?.verdi shouldBe "Kari Eget"
     }
 
