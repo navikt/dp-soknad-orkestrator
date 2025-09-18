@@ -47,7 +47,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                     }
 
                     put {
-                        val søknadbarnId = validerOgFormaterUuidParameter("søknadbarnId") ?: return@put
+                        val søknadbarnId = validerOgFormaterUuidParameter(parameternavn) ?: return@put
                         val søknadId = opplysningService.mapTilSøknadId(søknadbarnId)
 
                         oppdaterBarn(opplysningService, søknadId)
