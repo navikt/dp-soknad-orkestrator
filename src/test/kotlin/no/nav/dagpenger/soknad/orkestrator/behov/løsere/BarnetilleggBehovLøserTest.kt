@@ -27,7 +27,6 @@ class BarnetilleggBehovLøserTest {
     val behovløser = BarnetilleggBehovLøser(testRapid, quizOpplysningRepositorySpy)
     val ident = "12345678910"
     val søknadId: UUID = randomUUID()
-    val søknadbarnId: UUID = randomUUID()
 
     @Test
     fun `løser behov om barn hvis søknaden har barn`() {
@@ -87,7 +86,7 @@ class BarnetilleggBehovLøserTest {
             )
         opplysningRepository.lagre(pdlBarn)
         opplysningRepository.lagre(egetBarn)
-        opplysningRepository.lagreBarnSøknadMapping(søknadId = søknadId, søknadbarnId = søknadbarnId)
+        val lagretSøknadbarnId = opplysningRepository.lagreBarnSøknadMapping(søknadId = søknadId)
 
         behovløser.løs(lagBehovmelding(ident, søknadId, Barnetillegg))
 
@@ -95,7 +94,7 @@ class BarnetilleggBehovLøserTest {
         val løsteBarn = testRapid.inspektør.field(0, "@løsning")[Barnetillegg.name]["verdi"]
         løsteBarn.size() shouldBe 3
         løsteBarn[0].also {
-            it["søknadbarnId"].asUUID() shouldBe søknadbarnId
+            it["søknadbarnId"].asUUID() shouldBe lagretSøknadbarnId
             it["fornavnOgMellomnavn"].asText() shouldBe "Ola"
             it["etternavn"].asText() shouldBe "Nordmann"
             it["fødselsdato"].asText() shouldBe "2000-01-01"
@@ -107,7 +106,7 @@ class BarnetilleggBehovLøserTest {
             it["begrunnelse"].asText() shouldBe "Begrunnelse for endring"
         }
         løsteBarn[1].also {
-            it["søknadbarnId"].asUUID() shouldBe søknadbarnId
+            it["søknadbarnId"].asUUID() shouldBe lagretSøknadbarnId
             it["fornavnOgMellomnavn"].asText() shouldBe "Per"
             it["etternavn"].asText() shouldBe "Nordmann"
             it["fødselsdato"].asText() shouldBe "2000-01-01"
@@ -115,7 +114,7 @@ class BarnetilleggBehovLøserTest {
             it["kvalifiserer"].asBoolean() shouldBe false
         }
         løsteBarn[2].also {
-            it["søknadbarnId"].asUUID() shouldBe søknadbarnId
+            it["søknadbarnId"].asUUID() shouldBe lagretSøknadbarnId
             it["fornavnOgMellomnavn"].asText() shouldBe "Per"
             it["etternavn"].asText() shouldBe "Utland"
             it["fødselsdato"].asText() shouldBe "2000-01-01"
