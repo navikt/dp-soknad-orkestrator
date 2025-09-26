@@ -152,7 +152,6 @@ private fun opprettBarnSøknadMappingHvisBarnEksistererISøknaden(
     if (barnEksistererISøknad) {
         quizOpplysningRepository.lagreBarnSøknadMapping(
             søknadId = søknad.søknadId,
-            søknadbarnId = UUID.randomUUID(),
         )
     }
 }

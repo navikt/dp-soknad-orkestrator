@@ -458,10 +458,9 @@ class QuizOpplysningRepositoryPostgresTest {
     fun `mapTilSøknadbarnId returnerer søknadbarnId fra databasen hvis den eksisterer`() {
         withMigratedDb {
             val søknadId = randomUUID()
-            val søknadbarnId = randomUUID()
-            opplysningRepository.lagreBarnSøknadMapping(søknadId, søknadbarnId)
+            val lagretSøknadbarnId = opplysningRepository.lagreBarnSøknadMapping(søknadId)
 
-            opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) shouldBe søknadbarnId
+            opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) shouldBe lagretSøknadbarnId
         }
     }
 
@@ -491,10 +490,9 @@ class QuizOpplysningRepositoryPostgresTest {
     fun `mapTilSøknadId returnerer søknadId basert på søknadbarnId`() {
         withMigratedDb {
             val søknadId = randomUUID()
-            val søknadbarnId = randomUUID()
-            opplysningRepository.lagreBarnSøknadMapping(søknadId, søknadbarnId)
+            val lagretSøknadbarnId = opplysningRepository.lagreBarnSøknadMapping(søknadId)
 
-            opplysningRepository.mapTilSøknadId(søknadbarnId) shouldBe søknadId
+            opplysningRepository.mapTilSøknadId(lagretSøknadbarnId) shouldBe søknadId
         }
     }
 }
