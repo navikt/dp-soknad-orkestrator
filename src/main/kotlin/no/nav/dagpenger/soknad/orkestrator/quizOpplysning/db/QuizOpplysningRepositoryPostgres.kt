@@ -38,6 +38,7 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -144,7 +145,7 @@ class QuizOpplysningRepositoryPostgres(
         søknadbarnId: UUID,
     ) {
         transaction {
-            BarnSøknadMappingTabell.insert {
+            BarnSøknadMappingTabell.insertIgnore {
                 it[BarnSøknadMappingTabell.søknadId] = søknadId
                 it[BarnSøknadMappingTabell.søknadbarnId] = søknadbarnId
             }
