@@ -6,6 +6,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import java.util.UUID
+import java.util.UUID.randomUUID
 
 class InMemoryQuizOpplysningRepository : QuizOpplysningRepository {
     private val opplysninger = mutableListOf<QuizOpplysning<*>>()
@@ -57,16 +58,16 @@ class InMemoryQuizOpplysningRepository : QuizOpplysningRepository {
         opplysninger.add(oppdatertOpplysning)
     }
 
-    override fun lagreBarnSøknadMapping(
-        søknadId: UUID,
-        søknadbarnId: UUID,
-    ) {
+    override fun lagreBarnSøknadMapping(søknadId: UUID): UUID {
+        val søknadbarnId = randomUUID()
         barnSøknadMapper[søknadId] = søknadbarnId
+
+        return søknadbarnId
     }
 
     override fun hentEllerOpprettSøknadbarnId(søknadId: UUID): UUID =
         barnSøknadMapper.getOrElse(søknadId) {
-            val nySøknadbarnId = UUID.randomUUID()
+            val nySøknadbarnId = randomUUID()
             barnSøknadMapper[søknadId] = nySøknadbarnId
 
             nySøknadbarnId
