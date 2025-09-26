@@ -38,7 +38,6 @@ import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.insertAndGetId
-import org.jetbrains.exposed.sql.insertIgnore
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
@@ -140,17 +139,7 @@ class QuizOpplysningRepositoryPostgres(
         }
     }
 
-    override fun lagreBarnSøknadMapping(
-        søknadId: UUID,
-        søknadbarnId: UUID,
-    ) {
-        transaction {
-            BarnSøknadMappingTabell.insertIgnore {
-                it[BarnSøknadMappingTabell.søknadId] = søknadId
-                it[BarnSøknadMappingTabell.søknadbarnId] = søknadbarnId
-            }
-        }
-    }
+    override fun lagreBarnSøknadMapping(søknadId: UUID) = hentEllerOpprettSøknadbarnId(søknadId)
 
     override fun hentEllerOpprettSøknadbarnId(søknadId: UUID): UUID =
         transaction {
@@ -163,7 +152,11 @@ class QuizOpplysningRepositoryPostgres(
 
             if (søknadbarnId == null) {
                 søknadbarnId = randomUUID()
-                lagreBarnSøknadMapping(søknadId, søknadbarnId)
+
+                BarnSøknadMappingTabell.insert {
+                    it[BarnSøknadMappingTabell.søknadId] = søknadId
+                    it[BarnSøknadMappingTabell.søknadbarnId] = søknadbarnId
+                }
             }
 
             søknadbarnId

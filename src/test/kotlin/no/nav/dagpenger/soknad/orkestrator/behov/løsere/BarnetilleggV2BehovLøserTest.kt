@@ -27,7 +27,6 @@ class BarnetilleggV2BehovLøserTest {
     val behovløser = BarnetilleggV2BehovLøser(testRapid, quizOpplysningRepositorySpy)
     val ident = "12345678910"
     val søknadId: UUID = randomUUID()
-    val søknadbarnId: UUID = randomUUID()
 
     @Test
     fun `løser behov om barn som forventet hvis søknaden har barn`() {
@@ -87,14 +86,14 @@ class BarnetilleggV2BehovLøserTest {
             )
         opplysningRepository.lagre(pdlBarn)
         opplysningRepository.lagre(egetBarn)
-        opplysningRepository.lagreBarnSøknadMapping(søknadId = søknadId, søknadbarnId = søknadbarnId)
+        val lagretSøknadbarnId = opplysningRepository.lagreBarnSøknadMapping(søknadId = søknadId)
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BarnetilleggV2))
 
         val barnetilleggV2Løsning = testRapid.inspektør.field(0, "@løsning")[BarnetilleggV2.name]["verdi"]
         val løsteBarn = barnetilleggV2Løsning["barn"]
         verify(exactly = 1) { quizOpplysningRepositorySpy.hentEllerOpprettSøknadbarnId(any()) }
-        barnetilleggV2Løsning["søknadbarnId"].asUUID() shouldBe søknadbarnId
+        barnetilleggV2Løsning["søknadbarnId"].asUUID() shouldBe lagretSøknadbarnId
         løsteBarn.size() shouldBe 3
         løsteBarn[0].also {
             it["fornavnOgMellomnavn"].asText() shouldBe "Ola"

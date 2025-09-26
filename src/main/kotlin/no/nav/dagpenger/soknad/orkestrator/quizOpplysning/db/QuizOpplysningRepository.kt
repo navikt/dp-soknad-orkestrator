@@ -27,10 +27,7 @@ interface QuizOpplysningRepository {
         oppdatertBarn: BarnSvar,
     )
 
-    fun lagreBarnSøknadMapping(
-        søknadId: UUID,
-        søknadbarnId: UUID,
-    )
+    fun lagreBarnSøknadMapping(søknadId: UUID): UUID
 
     fun hentEllerOpprettSøknadbarnId(søknadId: UUID): UUID
 
