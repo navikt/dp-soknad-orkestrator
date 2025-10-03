@@ -4,33 +4,23 @@ import org.junit.jupiter.api.Test
 
 class PdfBuilderTest {
     @Test
-    fun `Generate pdf based on html`() {
-        val pdf = genererPdfFraHtml(inntektSkjemaHtml)
+    fun `Generer PDF fra html`() {
+        val html = Html(inntektSkjemaHtml)
+
+        val pdf = genererPdfFraHtml(html)
 
         assert(pdf.isNotEmpty())
     }
 
     @Test
-    fun `Lukk self closing tags og fjern nbsp fra html-strengen`() {
-        // language=HTML
-        val forventetHtml =
-            """
-            <p>Hei, verden<br /></p>
-            <img src='nav.no' />
-            """.trimIndent()
+    fun `Generer PDF fra HTML uten style`() {
+        val html = Html("<html><head></head><body><h1>Hello</h1></body></html>")
 
-        val cleanedHtml = vaskHtml(dårligHtml)
+        val pdf = genererPdfFraHtml(html)
 
-        assert(cleanedHtml == forventetHtml)
+        assert(pdf.isNotEmpty())
     }
 }
-
-// language=HTML
-val dårligHtml =
-    """
-    <p>Hei,&nbsp;verden<br></p>
-    <img src='nav.no'>
-    """.trimIndent()
 
 // language=HTML
 val inntektSkjemaHtml =
