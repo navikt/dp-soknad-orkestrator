@@ -7,6 +7,9 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell.innsendtTidspunkt
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell.journalførtTidspunkt
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell.journalpostId
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
@@ -19,6 +22,7 @@ import org.jetbrains.exposed.sql.json.jsonb
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsert
 import java.time.LocalDateTime
 import java.util.UUID
@@ -68,6 +72,9 @@ class SøknadRepository(
                         ident = it[SøknadTabell.ident],
                         tilstand = Tilstand.valueOf(it[SøknadTabell.tilstand]),
                         opplysninger = quizOpplysningRepository.hentAlle(søknadId),
+                        innsendtTidspunkt = it[innsendtTidspunkt],
+                        journalpostId = it[journalpostId],
+                        journalførtTidspunkt = it[journalførtTidspunkt],
                     )
                 }.firstOrNull()
         }
@@ -115,6 +122,32 @@ class SøknadRepository(
 
             antallSlettedeRader
         }
+
+    fun markerSøknadSomInnsendt(
+        søknadId: UUID,
+        innsendtTidspunkt: LocalDateTime,
+    ) {
+        transaction {
+            SøknadTabell.update({ SøknadTabell.søknadId eq søknadId }) {
+                it[tilstand] = Tilstand.INNSENDT.name
+                it[SøknadTabell.innsendtTidspunkt] = innsendtTidspunkt
+            }
+        }
+    }
+
+    fun markerSøknadSomJournalført(
+        søknadId: UUID,
+        journalpostId: String,
+        journalførtTidspunkt: LocalDateTime,
+    ) {
+        transaction {
+            SøknadTabell.update({ SøknadTabell.søknadId eq søknadId }) {
+                it[tilstand] = Tilstand.JOURNALFØRT.name
+                it[SøknadTabell.journalpostId] = journalpostId
+                it[SøknadTabell.journalførtTidspunkt] = journalførtTidspunkt
+            }
+        }
+    }
 }
 
 object SøknadTabell : IntIdTable("soknad") {
@@ -122,6 +155,9 @@ object SøknadTabell : IntIdTable("soknad") {
     val søknadId: Column<UUID> = uuid("soknad_id")
     val ident: Column<String> = varchar("ident", 11)
     val tilstand: Column<String> = text("tilstand").default(Tilstand.PÅBEGYNT.name)
+    val innsendtTidspunkt: Column<LocalDateTime> = datetime("innsendt_tidspunkt")
+    val journalpostId: Column<String> = varchar("journalpost_id", 32)
+    val journalførtTidspunkt: Column<LocalDateTime> = datetime("journalfort_tidspunkt")
 }
 
 object SøknadDataTabell : IntIdTable("soknad_data") {
@@ -147,7 +183,8 @@ private fun opprettBarnSøknadMappingHvisBarnEksistererISøknaden(
     søknad: Søknad,
     quizOpplysningRepository: QuizOpplysningRepository,
 ) {
-    val barnEksistererISøknad = søknad.opplysninger.find { it.type == Barn && (it.svar as List<BarnSvar>).isNotEmpty() } != null
+    val barnEksistererISøknad =
+        søknad.opplysninger.find { it.type == Barn && (it.svar as List<BarnSvar>).isNotEmpty() } != null
 
     if (barnEksistererISøknad) {
         quizOpplysningRepository.lagreBarnSøknadMapping(

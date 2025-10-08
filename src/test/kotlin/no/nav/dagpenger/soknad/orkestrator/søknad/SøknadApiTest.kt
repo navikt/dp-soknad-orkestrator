@@ -6,7 +6,7 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.HttpStatusCode.Companion.Created
 import io.ktor.http.HttpStatusCode.Companion.InternalServerError
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
@@ -55,7 +55,7 @@ class SøknadApiTest {
                         header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     }
 
-            response.status shouldBe HttpStatusCode.Created
+            response.status shouldBe Created
             response.body() as String shouldBe søknadId.toString()
         }
     }
@@ -68,6 +68,41 @@ class SøknadApiTest {
             val response =
                 client
                     .post("/soknad") {
+                        header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    }
+
+            response.status shouldBe InternalServerError
+        }
+    }
+
+    @Test
+    fun `POST søknad med søknadId returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client.post("/soknad/${UUID.randomUUID()}").status shouldBe Unauthorized
+        }
+    }
+
+    @Test
+    fun `POST søknad med søknadId returnerer 200 OK hvis markering av søknaden som innsendt går bra`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client
+                    .post("/soknad/${UUID.randomUUID()}") {
+                        header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    }
+
+            response.status shouldBe OK
+        }
+    }
+
+    @Test
+    fun `POST søknad med søknadId returnerer 500 Internal Server Error hvis markering av søknaden som innsendt feiler`() {
+        every { søknadService.sendInn(any(), any()) } throws IllegalStateException()
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client
+                    .post("/soknad/${UUID.randomUUID()}") {
                         header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     }
 
