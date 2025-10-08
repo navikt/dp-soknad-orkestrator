@@ -124,7 +124,7 @@ internal class ApplicationBuilder(
                             }
                         }
                         opplysningApi(opplysningService)
-                        søknadApi(søknadService)
+                        søknadApi(søknadService, seksjonService)
                         seksjonApi(seksjonService)
                         personaliaApi(personaliaService)
                         barnApi(barnService)

@@ -12,7 +12,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
-import java.util.UUID
+import no.nav.dagpenger.soknad.orkestrator.utils.validerOgFormaterSøknadIdParam
 
 internal fun Application.seksjonApi(seksjonService: SeksjonService) {
     routing {
@@ -53,40 +53,7 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                     call.respond(OK, seksjoner)
                 }
             }
-            route("/soknad/{søknadId}/progress") {
-                get {
-                    val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
-
-                    val progress =
-                        seksjonService.hentLagredeSeksjonerForGittSøknadId(søknadId)
-
-                    if (progress.isEmpty()) {
-                        call.respond(NotFound, mapOf("seksjoner" to progress))
-                        return@get
-                    }
-
-                    call.respond(OK, mapOf("seksjoner" to progress))
-                }
-            }
         }
-    }
-}
-
-private suspend fun RoutingContext.validerOgFormaterSøknadIdParam(): UUID? {
-    val søknadIdParam =
-        call.parameters["søknadId"] ?: run {
-            call.respond(BadRequest, "Mangler søknadId i parameter")
-            return null
-        }
-
-    return try {
-        UUID.fromString(søknadIdParam)
-    } catch (e: Exception) {
-        call.respond<String>(
-            BadRequest,
-            "Kunne ikke parse søknadId parameter $søknadIdParam til UUID. Feilmelding: $e",
-        )
-        return null
     }
 }
 
