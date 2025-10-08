@@ -24,7 +24,6 @@ import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
 import no.nav.dagpenger.soknad.orkestrator.opplysning.DpBehandlingKlient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
-import no.nav.dagpenger.soknad.orkestrator.opplysning.db.OpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.opplysning.landApi
 import no.nav.dagpenger.soknad.orkestrator.opplysning.opplysningApi
 import no.nav.dagpenger.soknad.orkestrator.personalia.KontonummerService
@@ -57,7 +56,6 @@ internal class ApplicationBuilder(
             dataSource = dataSource,
             quizOpplysningRepository = quizOpplysningRepositoryPostgres,
         )
-    private val opplysningRepository = OpplysningRepository(dataSource)
 
     private val seksjonRepository = SeksjonRepository(dataSource, søknadRepository)
     private val seksjonService = SeksjonService(seksjonRepository)
@@ -88,7 +86,6 @@ internal class ApplicationBuilder(
     private val søknadService: SøknadService =
         SøknadService(
             søknadRepository = søknadRepository,
-            opplysningRepository = opplysningRepository,
         )
 
     private val journalføringService = JournalføringService()
