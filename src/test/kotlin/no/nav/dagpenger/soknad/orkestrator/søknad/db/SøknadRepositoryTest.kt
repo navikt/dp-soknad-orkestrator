@@ -269,24 +269,7 @@ private val komplettSøknaddata =
                 "beskrivendeId": "bostedsland"
               }
             ]
-          },
-          "orkestratorSeksjoner": [
-            {
-              "seksjonsnavn": "BOSTEDSLAND",
-              "opplysninger": [
-                {
-                  "opplysningId": "a34beb9c-0fa6-48a8-a9b6-0b0dde283ae5",
-                  "tekstnøkkel": "tekstnøkkel.periode",
-                  "type": "PERIODE",
-                  "svar": {
-                    "fom": "2024-11-11",
-                    "tom": "2024-11-11"
-                  },
-                  "gyldigeSvar": null
-                }
-              ]
-            }
-          ]
+          }
         }
         """.trimIndent(),
     )

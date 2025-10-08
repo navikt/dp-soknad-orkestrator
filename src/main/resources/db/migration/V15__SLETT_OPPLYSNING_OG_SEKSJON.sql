@@ -1,0 +1,3 @@
+DROP TABLE IF EXISTS opplysning;
+
+DROP TABLE IF EXISTS seksjon;
