@@ -1,0 +1,6 @@
+ALTER TABLE soknad
+    ADD COLUMN innsendt_tidspunkt TIMESTAMP WITH TIME ZONE NULL;
+ALTER TABLE soknad
+    ADD COLUMN journalpost_id VARCHAR(32) NULL;
+ALTER TABLE soknad
+    ADD COLUMN journalfort_tidspunkt TIMESTAMP WITH TIME ZONE NULL;

@@ -31,7 +31,10 @@ import no.nav.dagpenger.soknad.orkestrator.personalia.PersonService
 import no.nav.dagpenger.soknad.orkestrator.personalia.PersonaliaService
 import no.nav.dagpenger.soknad.orkestrator.personalia.personaliaApi
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
+import no.nav.dagpenger.soknad.orkestrator.søknad.MeldingOmSøknadKlarTilJournalføringMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadPdfGenerertOgMellomlagretMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadPdfOgVedleggJournalførtMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadSlettetMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -132,6 +135,9 @@ internal class ApplicationBuilder(
                 søknadService.setRapidsConnection(rapidsConnection)
                 journalføringService.setRapidsConnection(rapidsConnection)
                 SøknadMottak(rapidsConnection, søknadService, søknadRepository)
+                MeldingOmSøknadKlarTilJournalføringMottak(rapidsConnection, søknadRepository)
+                SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection)
+                SøknadPdfOgVedleggJournalførtMottak(rapidsConnection, søknadRepository)
                 MinidialogJournalførtMottak(rapidsConnection)
                 BehovMottak(
                     rapidsConnection = rapidsConnection,

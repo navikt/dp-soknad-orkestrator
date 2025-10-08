@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
+import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
@@ -15,7 +16,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.getSeksjon
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
-import java.util.UUID
+import java.util.UUID.randomUUID
 import kotlin.test.Test
 
 class SøknadServiceTest {
@@ -59,13 +60,13 @@ class SøknadServiceTest {
             søknadRepository.hent(any())
         } returns null
 
-        søknadService.søknadFinnes(UUID.randomUUID()) shouldBe false
+        søknadService.søknadFinnes(randomUUID()) shouldBe false
     }
 
     @Test
     fun `Kan opprette komplett søknadData med quiz-seksjoner`() {
         val ident = "12345678901"
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         val seksjoner = objectMapper.readTree(quizSeksjoner)
 
         val søknadData =
@@ -79,7 +80,7 @@ class SøknadServiceTest {
 
     @Test
     fun `vi kan sende ut melding om ny søknad på rapiden`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
 
         søknadService.publiserMeldingOmSøknadInnsendt(søknadId, ident)
 
@@ -90,35 +91,60 @@ class SøknadServiceTest {
             field(0, "ident").asText() shouldBe ident
         }
     }
-}
 
-private val quizSeksjoner =
-    //language=json
-    """
-    {
-      "seksjoner": [
-        {
-          "fakta": [
-            {
-              "id": "6001",
-              "svar": "NOR",
-              "type": "land",
-              "beskrivendeId": "faktum.hvilket-land-bor-du-i"
-            }
-          ],
-          "beskrivendeId": "bostedsland"
-        },
-        {
-          "fakta": [
-            {
-              "id": "7001",
-              "svar": "true",
-              "type": "boolean",
-              "beskrivendeId": "faktum.avtjent-militaer-sivilforsvar-tjeneste-siste-12-mnd"
-            }
-          ],
-          "beskrivendeId": "verneplikt"
-        }
-      ]
+    @Test
+    fun `slett gjør kall til repository med forventet søknadId`() {
+        val søknadId = randomUUID()
+
+        søknadService.slett(søknadId, "ident")
+
+        verify { søknadRepository.slett(søknadId) }
     }
-    """.trimIndent()
+
+    @Test
+    fun `opprett returnerer UUID fra repository`() {
+        val søknadId = randomUUID()
+        coEvery { søknadRepository.lagre(any()) } returns søknadId
+
+        søknadService.opprett("ident") shouldBe søknadId
+    }
+
+    @Test
+    fun `sendInn publiserer forventet melding på rapidsConnection`() {
+        søknadService.sendInn(randomUUID(), "ident")
+
+        testRapid.inspektør.size shouldBe 1
+        testRapid.inspektør.message(0)["@event_name"].asText() shouldBe "søknad_klar_til_journalføring"
+    }
+
+    private val quizSeksjoner =
+        //language=json
+        """
+        {
+          "seksjoner": [
+            {
+              "fakta": [
+                {
+                  "id": "6001",
+                  "svar": "NOR",
+                  "type": "land",
+                  "beskrivendeId": "faktum.hvilket-land-bor-du-i"
+                }
+              ],
+              "beskrivendeId": "bostedsland"
+            },
+            {
+              "fakta": [
+                {
+                  "id": "7001",
+                  "svar": "true",
+                  "type": "boolean",
+                  "beskrivendeId": "faktum.avtjent-militaer-sivilforsvar-tjeneste-siste-12-mnd"
+                }
+              ],
+              "beskrivendeId": "verneplikt"
+            }
+          ]
+        }
+        """.trimIndent()
+}

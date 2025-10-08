@@ -43,7 +43,7 @@ class SøknadService(
         rapidsConnection.publish(ident, MeldingOmSøknadInnsendt(søknadId, ident).asMessage().toJson())
         SøknadMetrikker.varslet.inc()
 
-        logger.info { "Publiserte melding om ny søknad med søknadId: $søknadId" }
+        logg.info { "Publiserte melding om ny søknad med søknadId: $søknadId" }
         sikkerlogg.info { "Publiserte melding om ny søknad med søknadId: $søknadId og ident: $ident" }
     }
 
@@ -55,15 +55,36 @@ class SøknadService(
 
         if (antallSøknaderSlettet > 0) {
             SøknadMetrikker.slettet.inc()
-            logger.info { "Slettet søknad med søknadId: $søknadId" }
+            logg.info { "Slettet søknad med søknadId: $søknadId" }
             sikkerlogg.info { "Slettet søknad med søknadId: $søknadId og ident: $ident" }
         }
     }
 
-    fun opprett(ident: String): UUID = søknadRepository.lagre(Søknad(ident = ident))
+    fun opprett(ident: String): UUID {
+        val søknadId = søknadRepository.lagre(Søknad(ident = ident))
+        logg.info { "Opprettet søknad med søknadId $søknadId" }
+        sikkerlogg.info { "Opprettet søknad med søknadId $søknadId for $ident" }
+        return søknadId
+    }
+
+    fun sendInn(
+        søknadId: UUID,
+        ident: String,
+    ) {
+        logg.info { "Søknad $søknadId sendt inn" }
+        sikkerlogg.info { "Søknad $søknadId sendt inn av $ident" }
+        SøknadMetrikker.mottatt.inc()
+
+        val melding = MeldingOmSøknadKlarTilJournalføring(søknadId, ident)
+
+        rapidsConnection.publish(ident, melding.asMessage().toJson())
+
+        logg.info { "Publiserte melding om søknad klar til journalføring med søknadId: $søknadId" }
+        sikkerlogg.info { "Publiserte melding om søknad klar til journalføring med søknadId: $søknadId og ident: $ident" }
+    }
 
     private companion object {
-        private val logger = KotlinLogging.logger {}
+        private val logg = KotlinLogging.logger {}
         private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadService")
     }
 }
