@@ -11,6 +11,7 @@ class PdlTestUtil {
         mellomnavn: String,
         etternavn: String,
         fodselsdato: LocalDate,
+        alder: Long,
         fodseslnummer: String,
     ): PDLPerson {
         val pdlPerson = mockk<PDLPerson>(relaxed = true)
@@ -19,6 +20,7 @@ class PdlTestUtil {
         every { pdlPerson.etternavn } returns etternavn
         every { pdlPerson.fodselsdato } returns fodselsdato
         every { pdlPerson.fodselnummer } returns fodseslnummer
+        every { pdlPerson.alder } returns alder
         return pdlPerson
     }
 }

@@ -7,6 +7,7 @@ data class PersonDto(
     val mellomnavn: String = "",
     val etternavn: String = "",
     val fodselsDato: LocalDate,
+    val alder: Long = 0,
     val ident: String,
     val postAdresse: AdresseDto?,
     val folkeregistrertAdresse: AdresseDto?,
