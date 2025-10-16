@@ -20,6 +20,7 @@ class PersonServiceTest {
                 "PETTER",
                 "DUNK",
                 LocalDate.of(2020, 1, 1),
+                71,
                 "30212018224",
             )
 
@@ -30,6 +31,7 @@ class PersonServiceTest {
             person.mellomnavn shouldBe "PETTER"
             person.etternavn shouldBe "DUNK"
             person.fodselsDato shouldBe LocalDate.of(2020, 1, 1)
+            person.alder shouldBe 71
             person.ident shouldBe "30212018224"
         }
     }

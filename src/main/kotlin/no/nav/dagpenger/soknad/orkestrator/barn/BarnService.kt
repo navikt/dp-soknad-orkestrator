@@ -25,7 +25,7 @@ class BarnService(
                         "behandlingsnummer" to "B286",
                     ),
                 ).map { mapToBarn(it) }
-                .filter { it.alder() < 18 }
+                .filter { it.alder < 18 }
         } catch (e: Exception) {
             sikkerLogg.error(e) { "Feil under utehenting av barn fra PDL for fnr $fnr." }
             throw e
@@ -38,6 +38,7 @@ class BarnService(
                 mellomnavn = pdlPerson.mellomnavn ?: "",
                 etternavn = pdlPerson.etternavn,
                 fødselsdato = pdlPerson.fodselsdato,
+                alder = pdlPerson.alder,
                 bostedsland =
                     AdresseVisitor(pdlPerson).bostedsadresse?.let { bostedsAdresse ->
                         Iso3LandkodeMapper.formatertAdresse(

@@ -32,6 +32,7 @@ class PersonService(
                 mellomnavn = person.mellomnavn ?: "",
                 etternavn = person.etternavn,
                 fodselsDato = person.fodselsdato,
+                alder = person.alder,
                 ident = person.fodselnummer,
                 postAdresse = adresseMapper.postAdresse,
                 folkeregistrertAdresse = adresseMapper.folkeregistertAdresse,

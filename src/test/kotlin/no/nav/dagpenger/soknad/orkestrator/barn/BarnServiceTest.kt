@@ -24,6 +24,7 @@ class BarnServiceTest {
                 mellomnavn = "mellomnavn1",
                 etternavn = "etternavn1",
                 fodselsdato = now().minusYears(7),
+                alder = 7,
                 fodseslnummer = "24225505906",
             )
         val barnOver18År =
@@ -32,6 +33,7 @@ class BarnServiceTest {
                 mellomnavn = "mellomnavn1",
                 etternavn = "etternavn1",
                 fodselsdato = now().minusYears(18),
+                alder = 19,
                 fodseslnummer = "24225505906",
             )
         coEvery { personOppslagBolk.hentBarn(any(), any()) } returns listOf(barnUnder18År, barnOver18År, barnUnder18År)
@@ -47,7 +49,7 @@ class BarnServiceTest {
                 barn.etternavn shouldBe barnUnder18År.etternavn
                 barn.fødselsdato shouldBe barnUnder18År.fodselsdato
                 barn.bostedsland shouldBe "XUK"
-                barn.alder() shouldBe 7
+                barn.alder shouldBe barnUnder18År.alder
             }
         }
     }
