@@ -22,12 +22,47 @@ class ØnskerDagpengerFraDatoBehovløserTest {
     val søknadId = UUID.randomUUID()
 
     @Test
-    fun `Behovløser publiserer løsning på behov ØnskerDagpengerFraDato med verdi og gjelderFra`() {
+    fun `Behovløser publiserer løsning på behov ØnskerDagpengerFraDato med verdi og gjelderFra hvis søknadsdato finnes`() {
         val svar = 1.januar(2021)
 
         val opplysning =
             QuizOpplysning(
-                beskrivendeId = behovløser.beskrivendeId,
+                beskrivendeId = behovløser.beskrivendeIdSøknadsdato,
+                type = Dato,
+                svar = svar,
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        opplysningRepository.lagre(opplysning)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.ØnskerDagpengerFraDato))
+
+        testRapid.inspektør.message(0)["@løsning"]["ØnskerDagpengerFraDato"].also { løsning ->
+            løsning["verdi"].asLocalDate() shouldBe svar
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
+    @Test
+    @Suppress("ktlint:standard:max-line-length")
+    fun `Behovløser publiserer løsning på behov ØnskerDagpengerFraDato med verdi og gjelderFra hvis søknadsdato ikke finnes, men vi har genopptaksdato`() {
+        val svar = 1.januar(2021)
+
+        val opplysning =
+            QuizOpplysning(
+                beskrivendeId = behovløser.beskrivendeIdGjenopptaksdato,
                 type = Dato,
                 svar = svar,
                 ident = ident,
