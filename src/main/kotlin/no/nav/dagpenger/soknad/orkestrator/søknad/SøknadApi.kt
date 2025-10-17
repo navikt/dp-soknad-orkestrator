@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.HttpStatusCode.Companion.Created
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.server.application.Application
@@ -23,19 +24,33 @@ internal fun Application.søknadApi(
         authenticate("tokenX") {
             route("/soknad") {
                 post {
-                    call.respondText(status = HttpStatusCode.Created, text = søknadService.opprett(call.ident()).toString())
+                    call.respondText(
+                        status = Created,
+                        text = søknadService.opprett(call.ident()).toString(),
+                    )
+                }
+            }
+            route("/soknad/{søknadId}") {
+                post {
+                    val søknadId =
+                        validerOgFormaterSøknadIdParam() ?: return@post call.respond(HttpStatusCode.BadRequest)
+
+                    call.respondText(
+                        status = OK,
+                        text = søknadService.sendInn(søknadId, call.ident()).toString(),
+                    )
                 }
             }
             route("/soknad/{søknadId}/progress") {
                 get {
-                    val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
+                    val søknadId =
+                        validerOgFormaterSøknadIdParam() ?: return@get call.respond(HttpStatusCode.BadRequest)
 
                     val progress =
                         seksjonService.hentLagredeSeksjonerForGittSøknadId(søknadId)
 
                     if (progress.isEmpty()) {
-                        call.respond(NotFound, mapOf("seksjoner" to progress))
-                        return@get
+                        return@get call.respond(NotFound, mapOf("seksjoner" to progress))
                     }
 
                     call.respond(OK, mapOf("seksjoner" to progress))

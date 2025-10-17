@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
+import BarnSøknadMappingTabell
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
@@ -16,10 +17,13 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.JOURNALFØRT
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDate
+import java.time.LocalDateTime.now
 import java.util.UUID
+import java.util.UUID.randomUUID
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -42,7 +46,7 @@ class SøknadRepositoryTest {
 
     @Test
     fun `kan lagre og hente søknad`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         val søknad =
             Søknad(
                 søknadId = søknadId,
@@ -73,7 +77,7 @@ class SøknadRepositoryTest {
 
     @Test
     fun `lagrer søknadbarnId når det finnes barn-opplysning i søknaden`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         val søknad =
             Søknad(
                 søknadId = søknadId,
@@ -87,7 +91,7 @@ class SøknadRepositoryTest {
                             svar =
                                 listOf(
                                     BarnSvar(
-                                        barnSvarId = UUID.randomUUID(),
+                                        barnSvarId = randomUUID(),
                                         fornavnOgMellomnavn = "Test",
                                         etternavn = "Testesen",
                                         fødselsdato = LocalDate.now(),
@@ -116,7 +120,7 @@ class SøknadRepositoryTest {
 
     @Test
     fun `oppdaterer bare tilstand når vi lagrer en søknad som allerede er lagret`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         val søknad = Søknad(søknadId, "123456780")
         søknadRepository.lagre(søknad)
         val sammeSøknadMedNyTilstand = Søknad(søknadId, "123456780", tilstand = INNSENDT)
@@ -128,7 +132,7 @@ class SøknadRepositoryTest {
 
     @Test
     fun `hentPåbegynt henter påbegynt søknad for en gitt ident`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         val søknad = Søknad(søknadId = søknadId, ident = ident, tilstand = Tilstand.PÅBEGYNT)
 
         søknadRepository.lagre(søknad)
@@ -149,7 +153,7 @@ class SøknadRepositoryTest {
 
     @Test
     fun `Kan lagre og hente komplett søknaddata`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId = søknadId, ident = "1234567891"))
 
         søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
@@ -160,7 +164,7 @@ class SøknadRepositoryTest {
 
     @Test
     fun `Kan ikke lagre komplett søknaddata for én søknad flere ganger`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId = søknadId, ident = "1234567891"))
 
         søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
@@ -172,7 +176,7 @@ class SøknadRepositoryTest {
 
     @Test
     fun `kan slette søknad`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         val søknad =
             Søknad(
                 søknadId = søknadId,
@@ -199,7 +203,7 @@ class SøknadRepositoryTest {
 
     @Test
     fun `sletting av søknad sletter også tilhørende opplysninger`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         val søknad =
             Søknad(
                 søknadId = søknadId,
@@ -234,7 +238,39 @@ class SøknadRepositoryTest {
     @Test
     fun `vi returnerer null dersom det ikke finnes en søknad med gitt id`() {
         withMigratedDb {
-            søknadRepository.hent(UUID.randomUUID()) shouldBe null
+            søknadRepository.hent(randomUUID()) shouldBe null
+        }
+    }
+
+    @Test
+    fun `markerSøknadSomInnsendt markerer søknaden som innsendt`() {
+        val søknadId = randomUUID()
+        val innsendtTidspunkt = now().withNano(0)
+        søknadRepository.lagre(Søknad(søknadId, "ident"))
+
+        søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt)
+
+        with(søknadRepository.hent(søknadId)) {
+            this shouldNotBe null
+            this?.tilstand shouldBe INNSENDT
+            this?.innsendtTidspunkt shouldBe innsendtTidspunkt
+        }
+    }
+
+    @Test
+    fun `markerSøknadSomJournalført markerer søknaden som journalført`() {
+        val søknadId = randomUUID()
+        val journalpostId = "239874323"
+        val journalførtTidspunkt = now().withNano(0)
+        søknadRepository.lagre(Søknad(søknadId, "ident"))
+
+        søknadRepository.markerSøknadSomJournalført(søknadId, journalpostId, journalførtTidspunkt)
+
+        with(søknadRepository.hent(søknadId)) {
+            this shouldNotBe null
+            this?.tilstand shouldBe JOURNALFØRT
+            this?.journalpostId shouldBe journalpostId
+            this?.journalførtTidspunkt shouldBe journalførtTidspunkt
         }
     }
 }
