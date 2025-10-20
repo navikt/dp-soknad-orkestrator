@@ -73,11 +73,11 @@ class SøknadService(
     ) {
         logg.info { "Søknad $søknadId sendt inn" }
         sikkerlogg.info { "Søknad $søknadId sendt inn av $ident" }
-        SøknadMetrikker.mottatt.inc()
 
         val melding = MeldingOmSøknadKlarTilJournalføring(søknadId, ident)
 
         rapidsConnection.publish(ident, melding.asMessage().toJson())
+        SøknadMetrikker.mottatt.inc()
 
         logg.info { "Publiserte melding om søknad klar til journalføring med søknadId: $søknadId" }
         sikkerlogg.info { "Publiserte melding om søknad klar til journalføring med søknadId: $søknadId og ident: $ident" }
