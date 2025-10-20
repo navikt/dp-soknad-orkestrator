@@ -65,30 +65,32 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                         }
                         return@withMDC
                     }
-                    if (it.ident == ident) {
-                        søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt)
-                        logg.info { "Søknad $søknadId markert som innsendt" }
-                        sikkerLogg.info { "Søknad $søknadId innsendt av $ident markert som innsendt" }
-                        rapidsConnection.publish(
-                            ident,
-                            BehovForGenereringOgMellomlagringAvSøknadPdf(
-                                søknadId,
-                                ident,
-                                "<html><head><title>brutto</title></head><body><p>brutto</p></body></html>",
-                                "<html><head><title>netto</title></head><body><p>netto</p></body></html>",
-                            ).asMessage().toJson(),
-                        )
-                        logg.info { "Publiserte melding om behov for generering av søknad-PDF for søknad $søknadId " }
-                        sikkerLogg.info {
-                            "Publiserte melding om behov for generering av søknad-PDF for søknad $søknadId innsendt av $ident "
-                        }
-                    } else {
+
+                    if (it.ident != ident) {
                         logg.warn {
                             "Søknad $søknadId har ikke samme registrerte ident som ident i mottatt melding, meldingen behandles ikke."
                         }
                         sikkerLogg.warn {
                             "Søknad $søknadId har ikke samme registrerte ident (${it.ident}) som ident i mottatt melding ($ident), meldingen behandles ikke"
                         }
+                        return@withMDC
+                    }
+
+                    søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt)
+                    logg.info { "Søknad $søknadId markert som innsendt" }
+                    sikkerLogg.info { "Søknad $søknadId innsendt av $ident markert som innsendt" }
+                    rapidsConnection.publish(
+                        ident,
+                        BehovForGenereringOgMellomlagringAvSøknadPdf(
+                            søknadId,
+                            ident,
+                            "<html><head><title>brutto</title></head><body><p>brutto</p></body></html>",
+                            "<html><head><title>netto</title></head><body><p>netto</p></body></html>",
+                        ).asMessage().toJson(),
+                    )
+                    logg.info { "Publiserte melding om behov for generering av søknad-PDF for søknad $søknadId " }
+                    sikkerLogg.info {
+                        "Publiserte melding om behov for generering av søknad-PDF for søknad $søknadId innsendt av $ident "
                     }
                 } ?: also {
                 logg.warn { "Fant ikke søknad $søknadId" }
