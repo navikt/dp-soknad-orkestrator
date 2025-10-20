@@ -33,7 +33,10 @@ internal fun Application.søknadApi(
             route("/soknad/{søknadId}") {
                 post {
                     val søknadId =
-                        validerOgFormaterSøknadIdParam() ?: return@post call.respond(HttpStatusCode.BadRequest)
+                        validerOgFormaterSøknadIdParam() ?: let {
+                            call.respond(HttpStatusCode.BadRequest)
+                            return@post
+                        }
 
                     call.respondText(
                         status = OK,
@@ -44,13 +47,17 @@ internal fun Application.søknadApi(
             route("/soknad/{søknadId}/progress") {
                 get {
                     val søknadId =
-                        validerOgFormaterSøknadIdParam() ?: return@get call.respond(HttpStatusCode.BadRequest)
+                        validerOgFormaterSøknadIdParam() ?: let {
+                            call.respond(HttpStatusCode.BadRequest)
+                            return@get
+                        }
 
                     val progress =
                         seksjonService.hentLagredeSeksjonerForGittSøknadId(søknadId)
 
                     if (progress.isEmpty()) {
-                        return@get call.respond(NotFound, mapOf("seksjoner" to progress))
+                        call.respond(NotFound, mapOf("seksjoner" to progress))
+                        return@get
                     }
 
                     call.respond(OK, mapOf("seksjoner" to progress))
