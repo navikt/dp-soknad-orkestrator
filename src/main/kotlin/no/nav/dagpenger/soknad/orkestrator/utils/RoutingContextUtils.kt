@@ -22,3 +22,12 @@ suspend fun RoutingContext.validerOgFormaterSøknadIdParam(): UUID? {
         return null
     }
 }
+
+suspend fun RoutingContext.validerSeksjonIdParam(): String? {
+    return run {
+        call.parameters["seksjonId"] ?: run {
+            call.respond(BadRequest, "Mangler seksjonId i parameter")
+            return null
+        }
+    }
+}

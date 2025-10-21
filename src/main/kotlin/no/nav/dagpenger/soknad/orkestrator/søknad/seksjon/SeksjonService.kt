@@ -6,21 +6,29 @@ class SeksjonService(
     val seksjonRepository: SeksjonRepository,
 ) {
     fun lagre(
+        ident: String,
         søknadId: UUID,
         seksjonId: String,
         json: String,
     ) {
-        seksjonRepository.lagre(søknadId, seksjonId, json)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, json)
     }
 
     fun hent(
+        ident: String,
         søknadId: UUID,
         seksjonId: String,
-    ): String? = seksjonRepository.hent(søknadId, seksjonId)
+    ): String? = seksjonRepository.hent(ident, søknadId, seksjonId)
 
-    fun hentAlle(søknadId: UUID): List<Seksjon> = seksjonRepository.hentSeksjoner(søknadId)
+    fun hentAlle(
+        ident: String,
+        søknadId: UUID,
+    ): List<Seksjon> = seksjonRepository.hentSeksjoner(ident, søknadId)
 
-    fun hentLagredeSeksjonerForGittSøknadId(søknadId: UUID): List<String> = seksjonRepository.hentFullførteSeksjoner(søknadId)
+    fun hentLagredeSeksjonerForGittSøknadId(
+        ident: String,
+        søknadId: UUID,
+    ): List<String> = seksjonRepository.hentFullførteSeksjoner(ident, søknadId)
 }
 
 data class Seksjon(

@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.stringLiteral
@@ -10,18 +11,21 @@ import java.util.UUID
 import javax.sql.DataSource
 
 class SeksjonRepository(
-    val dataSource: DataSource,
+    dataSource: DataSource,
     val søknadRepository: SøknadRepository,
 ) {
     val database = Database.connect(dataSource)
 
     fun lagre(
+        ident: String,
         søknadId: UUID,
         seksjonId: String,
         json: String,
     ) {
         transaction {
-            requireNotNull(søknadRepository.hent(søknadId)) { "Fant ikke søknad med ID {søknadId}." }
+            val søknad = søknadRepository.hent(søknadId)
+            requireNotNull(søknad) { "Fant ikke søknad med ID $søknadId." }
+            require(søknad.ident == ident) { "Søknad $søknadId tilhører ikke identen som prøver å lagre seksjonen" }
 
             SeksjonV2Tabell.upsert(
                 SeksjonV2Tabell.søknadId,
@@ -36,24 +40,30 @@ class SeksjonRepository(
     }
 
     fun hent(
+        ident: String,
         søknadId: UUID,
         seksjonId: String,
     ): String? =
         transaction {
             SeksjonV2Tabell
+                .innerJoin(SøknadTabell)
                 .select(SeksjonV2Tabell.json)
                 .where {
-                    SeksjonV2Tabell.søknadId eq søknadId and (SeksjonV2Tabell.seksjonId eq seksjonId)
+                    SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) and (SeksjonV2Tabell.seksjonId eq seksjonId)
                 }.map {
                     it[SeksjonV2Tabell.json]
                 }.firstOrNull()
         }
 
-    fun hentSeksjoner(søknadId: UUID): List<Seksjon> =
+    fun hentSeksjoner(
+        ident: String,
+        søknadId: UUID,
+    ): List<Seksjon> =
         transaction {
             SeksjonV2Tabell
+                .innerJoin(SøknadTabell)
                 .select(SeksjonV2Tabell.json, SeksjonV2Tabell.seksjonId)
-                .where { SeksjonV2Tabell.søknadId eq søknadId }
+                .where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
                 .map {
                     Seksjon(
                         seksjonId = it[SeksjonV2Tabell.seksjonId],
@@ -62,11 +72,15 @@ class SeksjonRepository(
                 }.toList()
         }
 
-    fun hentFullførteSeksjoner(søknadId: UUID): List<String> =
+    fun hentFullførteSeksjoner(
+        ident: String,
+        søknadId: UUID,
+    ): List<String> =
         transaction {
             SeksjonV2Tabell
+                .innerJoin(SøknadTabell)
                 .select(SeksjonV2Tabell.seksjonId)
-                .where { SeksjonV2Tabell.søknadId eq søknadId }
+                .where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
                 .map {
                     it[SeksjonV2Tabell.seksjonId]
                 }.toList()
