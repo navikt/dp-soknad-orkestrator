@@ -53,7 +53,7 @@ internal fun Application.søknadApi(
                         }
 
                     val progress =
-                        seksjonService.hentLagredeSeksjonerForGittSøknadId(søknadId)
+                        seksjonService.hentLagredeSeksjonerForGittSøknadId(call.ident(), søknadId)
 
                     if (progress.isEmpty()) {
                         call.respond(NotFound, mapOf("seksjoner" to progress))

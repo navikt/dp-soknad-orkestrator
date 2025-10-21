@@ -1,11 +1,13 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.http.HttpStatusCode.Companion.Created
 import io.ktor.http.HttpStatusCode.Companion.InternalServerError
 import io.ktor.http.HttpStatusCode.Companion.NotFound
@@ -112,7 +114,7 @@ class SøknadApiTest {
 
     @Test
     fun `GET søknad progress returnerer 200 OK og liste av seksjoner lagret`() {
-        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any()) } returns
+        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any(), any()) } returns
             listOf(
                 "din-situasjon",
                 "utdanning",
@@ -132,7 +134,7 @@ class SøknadApiTest {
 
     @Test
     fun `GET søknad progress returnerer 404 Not Found ingen seksjoner er lagret`() {
-        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any()) } returns
+        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any(), any()) } returns
             listOf()
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
@@ -148,7 +150,7 @@ class SøknadApiTest {
 
     @Test
     fun `GET søknad progress returnerer 500 Internal Server Error hvis kall fra repository kaster IllegalStateException`() {
-        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any()) } throws IllegalStateException()
+        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any(), any()) } throws IllegalStateException()
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/progress") {
@@ -163,6 +165,19 @@ class SøknadApiTest {
     fun `GET søknad progress returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/progress").status shouldBe Unauthorized
+        }
+    }
+
+    @Test
+    fun `GET søknad progress returnerer 400 Bad Request hvis søknadId ikke er en UUID`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/ikke-en-uuid/progress") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe BadRequest
+            response.body() as String shouldContain "Kunne ikke parse søknadId parameter ikke-en-uuid til UUID"
         }
     }
 }
