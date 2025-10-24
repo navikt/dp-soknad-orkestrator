@@ -114,7 +114,7 @@ class SøknadApiTest {
 
     @Test
     fun `GET søknad progress returnerer 200 OK og liste av seksjoner lagret`() {
-        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any(), any()) } returns
+        every { seksjonService.hentSeksjonIdForAlleLagredeSeksjoner(any(), any()) } returns
             listOf(
                 "din-situasjon",
                 "utdanning",
@@ -134,7 +134,7 @@ class SøknadApiTest {
 
     @Test
     fun `GET søknad progress returnerer 404 Not Found ingen seksjoner er lagret`() {
-        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any(), any()) } returns
+        every { seksjonService.hentSeksjonIdForAlleLagredeSeksjoner(any(), any()) } returns
             listOf()
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
@@ -150,7 +150,7 @@ class SøknadApiTest {
 
     @Test
     fun `GET søknad progress returnerer 500 Internal Server Error hvis kall fra repository kaster IllegalStateException`() {
-        every { seksjonService.hentLagredeSeksjonerForGittSøknadId(any(), any()) } throws IllegalStateException()
+        every { seksjonService.hentSeksjonIdForAlleLagredeSeksjoner(any(), any()) } throws IllegalStateException()
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/progress") {

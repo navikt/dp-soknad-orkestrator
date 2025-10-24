@@ -6,12 +6,15 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.http.HttpStatusCode.Companion.InternalServerError
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.http.HttpStatusCode.Companion.Unauthorized
+import io.ktor.http.contentType
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
@@ -37,7 +40,7 @@ class SeksjonApiTest {
     @Test
     fun `PUT seksjon returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
-            client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon").status shouldBe Unauthorized
+            client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon").status shouldBe Unauthorized
         }
     }
 
@@ -45,7 +48,7 @@ class SeksjonApiTest {
     fun `PUT seksjon returnerer 400 Bad Request hvis søknadId ikke er en UUID`() {
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.put("/seksjon/ikke-en-uuid/din-situasjon") {
+                client.put("/seksjon/v2/ikke-en-uuid/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                 }
 
@@ -55,13 +58,15 @@ class SeksjonApiTest {
     }
 
     @Test
-    fun `PUT søknad returnerer 200 OK hvis lagring av seksjon er vellykket`() {
-        every { seksjonService.lagre(any(), any(), any(), any()) } answers {}
+    fun `PUT seksjon returnerer 200 OK hvis lagring av seksjon er vellykket`() {
+        every { seksjonService.lagre(any(), any(), any(), any(), any()) } answers {}
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
+                client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    setBody(PutSeksjonRequest("{\"seksjonsvar\": true}", "{\"pdfgrunnlag\": true}"))
+                    contentType(ContentType.Application.Json)
                 }
 
             response.status shouldBe OK
@@ -69,13 +74,15 @@ class SeksjonApiTest {
     }
 
     @Test
-    fun `PUT søknad returnerer 500 Internal Server Error hvis lagring av seksjon feiler`() {
-        every { seksjonService.lagre(any(), any(), any(), any()) } throws IllegalStateException()
+    fun `PUT seksjon returnerer 500 Internal Server Error hvis lagring av seksjon feiler`() {
+        every { seksjonService.lagre(any(), any(), any(), any(), any()) } throws IllegalStateException()
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    setBody(PutSeksjonRequest("{\"seksjonsvar\": true}", "{\"pdfgrunnlag\": true}"))
+                    contentType(ContentType.Application.Json)
                 }
 
             response.status shouldBe InternalServerError
@@ -91,7 +98,7 @@ class SeksjonApiTest {
 
     @Test
     fun `GET gitt søknadId og seksjonId returnerer 200 OK og forventet repsons hvis kombinasjonen av soknadId og seksjonId eksisterer`() {
-        every { seksjonService.hent(any(), any(), any()) } returns "{ seksjonId: \"din-situasjon\" }"
+        every { seksjonService.hentSeksjonsvar(any(), any(), any()) } returns "{ seksjonId: \"din-situasjon\" }"
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
@@ -106,7 +113,7 @@ class SeksjonApiTest {
 
     @Test
     fun `GET gitt søknadId og seksjonId returnerer 404 Not Found hvis kombinasjonen av soknadId og seksjonId ikke eksisterer`() {
-        every { seksjonService.hent(any(), any(), any()) } returns null
+        every { seksjonService.hentSeksjonsvar(any(), any(), any()) } returns null
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
@@ -121,7 +128,7 @@ class SeksjonApiTest {
     @Test
     @Suppress("ktlint:standard:max-line-length")
     fun `GET gitt søknadId og seksjonId returnerer 500 Internal Server Error dersom uthenting av seksjoner feiler`() {
-        every { seksjonService.hent(any(), any(), any()) } throws IllegalStateException()
+        every { seksjonService.hentSeksjonsvar(any(), any(), any()) } throws IllegalStateException()
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
@@ -148,7 +155,7 @@ class SeksjonApiTest {
 
     @Test
     fun `GET alle seksjoner gitt søknadId returnerer 200 OK og forventet respons hvis søknadId har seksjoner`() {
-        every { seksjonService.hentAlle(any(), any()) } returns
+        every { seksjonService.hentAlleSeksjonsvar(any(), any()) } returns
             listOf(
                 Seksjon("seksjon-id", "{\"key\": \"value\"}"),
                 Seksjon("seksjon-id-2", "{\"key2\": \"value2\"}"),
@@ -170,7 +177,7 @@ class SeksjonApiTest {
 
     @Test
     fun `GET alle seksjoner gitt søknadId returnerer 404 Not Found hvis soknadId ikke har noen seksjoner`() {
-        every { seksjonService.hentAlle(any(), any()) } returns emptyList()
+        every { seksjonService.hentAlleSeksjonsvar(any(), any()) } returns emptyList()
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
@@ -184,7 +191,7 @@ class SeksjonApiTest {
 
     @Test
     fun `GET alle seksjoner gitt søknadId returnerer 500 Internal Server Error hvis uthenting av seksjoner feiler`() {
-        every { seksjonService.hentAlle(any(), any()) } throws IllegalStateException()
+        every { seksjonService.hentAlleSeksjonsvar(any(), any()) } throws IllegalStateException()
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =

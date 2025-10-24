@@ -17,11 +17,28 @@ import no.nav.dagpenger.soknad.orkestrator.utils.validerSeksjonIdParam
 internal fun Application.seksjonApi(seksjonService: SeksjonService) {
     routing {
         authenticate("tokenX") {
+            // TODO: Versjonert så vi ikke skal brekke hele frontend før den er skrevet om. Siden vi ikke er i prod enda,
+            // TODO: så kan vi vurdere å fjerne versjonsnummeret igjen når frontend bruker V2 til lagring av seksjon.
+            route("/seksjon/v2/{søknadId}/{seksjonId}") {
+                put {
+                    val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
+                    val seksjonId = validerSeksjonIdParam() ?: return@put
+                    val putSeksjonRequest = call.receive<PutSeksjonRequest>()
+                    seksjonService.lagre(
+                        call.ident(),
+                        søknadId,
+                        seksjonId,
+                        putSeksjonRequest.seksjonsvar,
+                        putSeksjonRequest.pdfGrunnlag,
+                    )
+                    call.respond(OK)
+                }
+            }
             route("/seksjon/{søknadId}/{seksjonId}") {
                 put {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
                     val seksjonId = validerSeksjonIdParam() ?: return@put
-                    seksjonService.lagre(call.ident(), søknadId, seksjonId, call.receive<String>())
+                    seksjonService.lagre(call.ident(), søknadId, seksjonId, call.receive<String>(), "{}")
                     call.respond(OK, "Søknad API is up and running")
                 }
 
@@ -30,7 +47,7 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                     val seksjonId = validerSeksjonIdParam() ?: return@get
 
                     val seksjon =
-                        seksjonService.hent(call.ident(), søknadId, seksjonId)
+                        seksjonService.hentSeksjonsvar(call.ident(), søknadId, seksjonId)
                             ?: run {
                                 call.respond(NotFound, "Fant ikke seksjon med id $seksjonId for søknad $søknadId")
                                 return@get
@@ -43,7 +60,7 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                 get {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
 
-                    val seksjoner = seksjonService.hentAlle(call.ident(), søknadId)
+                    val seksjoner = seksjonService.hentAlleSeksjonsvar(call.ident(), søknadId)
 
                     if (seksjoner.isEmpty()) {
                         call.respond(NotFound, "Fant ingen seksjoner for søknad $søknadId")
@@ -56,3 +73,8 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
         }
     }
 }
+
+data class PutSeksjonRequest(
+    val seksjonsvar: String,
+    val pdfGrunnlag: String,
+)

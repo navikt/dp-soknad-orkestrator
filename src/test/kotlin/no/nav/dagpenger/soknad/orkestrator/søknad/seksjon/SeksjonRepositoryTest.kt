@@ -19,8 +19,10 @@ class SeksjonRepositoryTest {
     private lateinit var søknadRepository: SøknadRepository
 
     private val ident = "1234567890"
-    private val json = "{\"key\": \"value\"}"
-    private val json2 = "{\"key2\": \"value2\"}"
+    private val seksjonsvar = "{\"key\": \"value\"}"
+    private val seksjonsvar2 = "{\"key2\": \"value2\"}"
+    private val pdfGrunnlag = "{\"pdfGrunnlagKey\": \"pdfGrunnlagValue\"}"
+    private val pdfGrunnlag2 = "{\"pdfGrunnlagKey2\": \"pdfGrunnlagValue2\"}"
     private val seksjonId = "seksjon-id"
     private val seksjonId2 = "seksjon-id-2"
 
@@ -42,8 +44,9 @@ class SeksjonRepositoryTest {
         søknadRepository.lagre(Søknad(søknadId, ident))
 
         shouldNotThrowAny {
-            seksjonRepository.lagre(ident, søknadId, seksjonId, json)
+            seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
         }
+        seksjonRepository.hentSeksjonsvar(ident, søknadId, seksjonId) shouldBe seksjonsvar
     }
 
     @Test
@@ -52,7 +55,7 @@ class SeksjonRepositoryTest {
         søknadRepository.lagre(Søknad(søknadId, ident))
 
         shouldThrow<IllegalArgumentException> {
-            seksjonRepository.lagre(ident, randomUUID(), seksjonId, json)
+            seksjonRepository.lagre(ident, randomUUID(), seksjonId, seksjonsvar, pdfGrunnlag)
         }
     }
 
@@ -62,50 +65,60 @@ class SeksjonRepositoryTest {
         søknadRepository.lagre(Søknad(søknadId, ident))
 
         shouldThrow<IllegalArgumentException> {
-            seksjonRepository.lagre("en-annen-ident", søknadId, seksjonId, json)
+            seksjonRepository.lagre("en-annen-ident", søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
         }
     }
 
     @Test
-    fun `hent returnerer forventet seksjon hvis seksjonen tilhører en søknad som tilhører bruker som gjør kallet`() {
+    fun `lagre gjør UPDATE dersom gitt søknadId og seksjonId eksisterer`() {
         val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId, ident))
-        seksjonRepository.lagre(ident, søknadId, seksjonId, json)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar2, pdfGrunnlag2)
 
-        seksjonRepository.hent(ident, søknadId, seksjonId) shouldBe json
+        seksjonRepository.hentSeksjonsvar(ident, søknadId, seksjonId) shouldBe seksjonsvar2
     }
 
     @Test
-    fun `hent returnerer null hvis seksjonen tilhører en søknad som tilhører en annen bruker enn den som gjør kallet`() {
+    fun `hentSeksjonsvar returnerer forventet seksjon hvis seksjonen tilhører en søknad som tilhører bruker som gjør kallet`() {
         val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId, ident))
-        seksjonRepository.lagre(ident, søknadId, seksjonId, json)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
 
-        seksjonRepository.hent("en-annen-ident", søknadId, seksjonId) shouldBe null
+        seksjonRepository.hentSeksjonsvar(ident, søknadId, seksjonId) shouldBe seksjonsvar
     }
 
     @Test
-    fun `hent returnerer null hvis seksjonen tilhører en søknad som ikke eksisterer`() {
+    fun `hentSeksjonsvar returnerer null hvis seksjonen tilhører en søknad som tilhører en annen bruker enn den som gjør kallet`() {
         val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId, ident))
-        seksjonRepository.lagre(ident, søknadId, seksjonId, json)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
 
-        seksjonRepository.hent(ident, randomUUID(), seksjonId) shouldBe null
+        seksjonRepository.hentSeksjonsvar("en-annen-ident", søknadId, seksjonId) shouldBe null
+    }
+
+    @Test
+    fun `hentSeksjonsvar returnerer null hvis seksjonen tilhører en søknad som ikke eksisterer`() {
+        val søknadId = randomUUID()
+        søknadRepository.lagre(Søknad(søknadId, ident))
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
+
+        seksjonRepository.hentSeksjonsvar(ident, randomUUID(), seksjonId) shouldBe null
     }
 
     @Test
     fun `hentSeksjoner returnerer forventede seksjoner hvis søknaden tilhører bruker som gjør kallet`() {
         val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId, ident))
-        seksjonRepository.lagre(ident, søknadId, seksjonId, json)
-        seksjonRepository.lagre(ident, søknadId, seksjonId2, json2)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
+        seksjonRepository.lagre(ident, søknadId, seksjonId2, seksjonsvar2, pdfGrunnlag2)
 
         val seksjoner = seksjonRepository.hentSeksjoner(ident, søknadId)
 
         seksjoner shouldContainExactlyInAnyOrder
             listOf(
-                Seksjon(seksjonId, json),
-                Seksjon(seksjonId2, json2),
+                Seksjon(seksjonId, seksjonsvar),
+                Seksjon(seksjonId2, seksjonsvar2),
             )
     }
 
@@ -113,7 +126,7 @@ class SeksjonRepositoryTest {
     fun `hentSeksjoner returnerer tom liste hvis søknaden tilhører en annen bruker enn den som gjør kallet`() {
         val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId, ident))
-        seksjonRepository.lagre(ident, søknadId, seksjonId, json)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
 
         seksjonRepository.hentSeksjoner("en-annen-ident", søknadId) shouldBe emptyList()
     }
@@ -122,40 +135,42 @@ class SeksjonRepositoryTest {
     fun `hentSeksjoner returnerer tom liste hvis søknaden ikke eksisterer`() {
         val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId, ident))
-        seksjonRepository.lagre(ident, søknadId, seksjonId, json)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
 
         seksjonRepository.hentSeksjoner(ident, randomUUID()) shouldBe emptyList()
     }
 
     @Test
-    fun `hentFullførteSeksjoner returnerer forventede seksjoner hvis søknaden eksisterer og tilhører bruker som gjør kallet`() {
+    @Suppress("ktlint:standard:max-line-length")
+    fun `hentSeksjonIdForAlleLagredeSeksjoner returnerer forventede seksjoner hvis søknaden eksisterer og tilhører bruker som gjør kallet`() {
         val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId, ident))
-        seksjonRepository.lagre(ident, søknadId, seksjonId, json)
-        seksjonRepository.lagre(ident, søknadId, seksjonId2, json)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
+        seksjonRepository.lagre(ident, søknadId, seksjonId2, seksjonsvar, pdfGrunnlag2)
 
-        val seksjoner = seksjonRepository.hentFullførteSeksjoner(ident, søknadId)
+        val seksjoner = seksjonRepository.hentSeksjonIdForAlleLagredeSeksjoner(ident, søknadId)
 
         seksjoner shouldContainExactlyInAnyOrder listOf(seksjonId, seksjonId2)
     }
 
     @Test
-    fun `hentFullførteSeksjoner returnerer tom liste hvis søknaden eksisterer, men tilhører en annen bruker enn den som gjør kallet`() {
+    @Suppress("ktlint:standard:max-line-length")
+    fun `hentSeksjonIdForAlleLagredeSeksjoner returnerer tom liste hvis søknaden eksisterer, men tilhører en annen bruker enn den som gjør kallet`() {
         val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId, ident))
-        seksjonRepository.lagre(ident, søknadId, seksjonId, json)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
 
-        val seksjoner = seksjonRepository.hentFullførteSeksjoner("en-annen-ident", søknadId)
+        val seksjoner = seksjonRepository.hentSeksjonIdForAlleLagredeSeksjoner("en-annen-ident", søknadId)
 
         seksjoner shouldBe emptyList()
     }
 
     @Test
-    fun `hentFullførteSeksjoner returnerer tom liste hvis søknaden ikke eksisterer`() {
+    fun `hentSeksjonIdForAlleLagredeSeksjoner returnerer tom liste hvis søknaden ikke eksisterer`() {
         val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId, ident))
-        seksjonRepository.lagre(ident, søknadId, seksjonId, json)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
 
-        seksjonRepository.hentFullførteSeksjoner(ident, randomUUID()) shouldBe emptyList()
+        seksjonRepository.hentSeksjonIdForAlleLagredeSeksjoner(ident, randomUUID()) shouldBe emptyList()
     }
 }
