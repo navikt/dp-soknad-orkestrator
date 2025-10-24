@@ -12,7 +12,8 @@ import java.util.UUID
 object SeksjonV2Tabell : IntIdTable("seksjon_v2") {
     val seksjonId: Column<String> = text("seksjon_id")
     val søknadId: Column<UUID> = uuid("soknad_id").references(SøknadTabell.søknadId)
-    val json: Column<String> = json("json", { serializeSøknadData(it) }, { it })
+    val seksjonsvar: Column<String> = json("seksjonsvar", { serializeSøknadData(it) }, { it })
+    val pdfGunnlag: Column<String> = json("pdf_grunnlag", { serializeSøknadData(it) }, { it })
     val opprettet: Column<LocalDateTime> = datetime("opprettet").default(LocalDateTime.now())
 }
 
