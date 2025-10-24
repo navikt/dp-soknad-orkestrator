@@ -12,11 +12,13 @@ import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.pdf.PdfService
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 
 class MeldingOmSøknadKlarTilJournalføringMottak(
     private val rapidsConnection: RapidsConnection,
     private val søknadRepository: SøknadRepository,
+    private val pdfService: PdfService,
 ) : River.PacketListener {
     companion object {
         private val logg = KotlinLogging.logger {}
@@ -84,8 +86,8 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                         BehovForGenereringOgMellomlagringAvSøknadPdf(
                             søknadId,
                             ident,
-                            "<html><head><title>brutto</title></head><body><p>brutto</p></body></html>",
-                            "<html><head><title>netto</title></head><body><p>netto</p></body></html>",
+                            pdfService.genererBruttoPdf("{}"),
+                            pdfService.genererNettoPdf("{}"),
                         ).asMessage().toJson(),
                     )
                     logg.info { "Publiserte melding om behov for generering av søknad-PDF for søknad $søknadId " }

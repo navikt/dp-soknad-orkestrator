@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.pdf.PdfService
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDateTime
 import java.util.UUID
@@ -20,7 +21,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
 
     init {
-        MeldingOmSøknadKlarTilJournalføringMottak(rapidsConnection, søknadRepository)
+        MeldingOmSøknadKlarTilJournalføringMottak(rapidsConnection, søknadRepository, mockk<PdfService>(relaxed = true))
     }
 
     @BeforeEach

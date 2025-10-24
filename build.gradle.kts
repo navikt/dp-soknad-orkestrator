@@ -67,6 +67,7 @@ dependencies {
     implementation("no.nav.dagpenger:oauth2-klient:$dagpengerOauth2KlientVersion")
     implementation("no.nav.pam.geography:pam-geography:$pamGeographyVersion")
     implementation("no.nav.dagpenger:pdl-klient:$pdlVersion")
+    implementation("org.freemarker:freemarker:2.3.34")
 
     implementation("io.ktor:ktor-server-netty:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-server-config-yaml:${libs.versions.ktor.get()}")
