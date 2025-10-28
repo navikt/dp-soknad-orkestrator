@@ -30,6 +30,8 @@ class SeksjonService(
         ident: String,
         søknadId: UUID,
     ): List<String> = seksjonRepository.hentSeksjonIdForAlleLagredeSeksjoner(ident, søknadId)
+
+    fun slettAlleSeksjoner(søknadId: UUID) = seksjonRepository.slettAlleSeksjoner(søknadId)
 }
 
 data class Seksjon(

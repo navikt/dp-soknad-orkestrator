@@ -3,7 +3,9 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.upsert
@@ -91,4 +93,13 @@ class SeksjonRepository(
                     it[SeksjonV2Tabell.seksjonId]
                 }.toList()
         }
+
+    fun slettAlleSeksjoner(søknadId: UUID) {
+        transaction {
+            SeksjonV2Tabell
+                .deleteWhere {
+                    (SeksjonV2Tabell.søknadId eq søknadId)
+                }
+        }
+    }
 }
