@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
@@ -178,6 +179,62 @@ class SøknadApiTest {
 
             response.status shouldBe BadRequest
             response.body() as String shouldContain "Kunne ikke parse søknadId parameter ikke-en-uuid til UUID"
+        }
+    }
+
+    @Test
+    fun `DELETE søknad med søknadId returnerer 200 OK hvis sletting av seksjoner går bra`() {
+        val søknadId = UUID.randomUUID()
+        every {
+            seksjonService.slettAlleSeksjoner(søknadId)
+        } returns Unit
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.delete("/soknad/$søknadId") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe OK
+        }
+    }
+
+    @Test
+    fun `DELETE søknad med søknadId returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
+        val søknadId = UUID.randomUUID()
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.delete("/soknad/$søknadId")
+
+            response.status shouldBe Unauthorized
+        }
+    }
+
+    @Test
+    fun `DELETE søknad med søknadId returnerer 400 Bad Request hvis søknadId ikke er en UUID`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.delete("/soknad/ikke-en-uuid") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe BadRequest
+            response.body() as String shouldContain "Kunne ikke parse søknadId parameter ikke-en-uuid til UUID"
+        }
+    }
+
+    @Test
+    fun `DELETE søknad med søknadId returnerer 500 Internal Server Error hvis sletting av seksjoner feiler`() {
+        val søknadId = UUID.randomUUID()
+        every {
+            seksjonService.slettAlleSeksjoner(søknadId)
+        } throws IllegalStateException()
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.delete("/soknad/$søknadId") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe InternalServerError
         }
     }
 }
