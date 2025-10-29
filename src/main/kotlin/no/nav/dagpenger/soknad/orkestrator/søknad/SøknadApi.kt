@@ -47,7 +47,7 @@ internal fun Application.søknadApi(
                 delete {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@delete
 
-                    seksjonService.slettAlleSeksjoner(søknadId)
+                    søknadService.slett(søknadId, call.ident())
 
                     call.respond(OK, "Seksjoner for søknad $søknadId er slettet")
                 }

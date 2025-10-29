@@ -176,7 +176,7 @@ class SeksjonRepositoryTest {
     }
 
     @Test
-    fun `slettAlleSeksjoner sletter alle seksjoner for en gitt søknadId`() {
+    fun `søknadRepository sin slett() sletter alle seksjoner for en gitt søknadId i seksjonstabellen`() {
         val søknadId = randomUUID()
         val søknadId2 = randomUUID()
 
@@ -189,14 +189,14 @@ class SeksjonRepositoryTest {
         var seksjonerEtterSletting = seksjonRepository.hentSeksjoner(ident, søknadId)
         seksjonerEtterSletting shouldNotBeEqual emptyList()
 
-        seksjonRepository.slettAlleSeksjoner(søknadId)
+        søknadRepository.slett(søknadId, ident)
         seksjonerEtterSletting = seksjonRepository.hentSeksjoner(ident, søknadId)
         seksjonerEtterSletting shouldBe emptyList()
 
         val seksjonerPåAnnenSøknad = seksjonRepository.hentSeksjoner(ident, søknadId2)
         seksjonerPåAnnenSøknad shouldNotBeEqual emptyList()
 
-        seksjonRepository.slettAlleSeksjoner(søknadId2)
+        søknadRepository.slett(søknadId2, ident)
         val seksjonerEtterSlettingAnnenSøknad = seksjonRepository.hentSeksjoner(ident, søknadId2)
         seksjonerEtterSlettingAnnenSøknad shouldBe emptyList()
     }

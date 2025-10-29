@@ -14,6 +14,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
@@ -115,9 +116,15 @@ class SøknadRepository(
                 ?.get(SøknadDataTabell.soknadData)
         }
 
-    fun slett(søknadId: UUID): Int =
+    fun slett(
+        søknadId: UUID,
+        ident: String,
+    ): Int =
         transaction {
-            val antallSlettedeRader = SøknadTabell.deleteWhere { SøknadTabell.søknadId eq søknadId }
+            val antallSlettedeRader =
+                SøknadTabell.deleteWhere {
+                    (SøknadTabell.søknadId eq søknadId) and (SøknadTabell.ident eq ident)
+                }
             quizOpplysningRepository.slett(søknadId)
 
             antallSlettedeRader
