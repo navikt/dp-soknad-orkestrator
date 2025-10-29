@@ -223,7 +223,7 @@ class SøknadApiTest {
     }
 
     @Test
-    fun `DELETE søknad med søknadId returnerer 500 Internal Server Error hvis sletting av seksjoner feiler`() {
+    fun `DELETE søknad returnerer 500 Internal Server Error hvis sletting av seksjoner feiler`() {
         val søknadId = UUID.randomUUID()
         every {
             søknadService.slett(søknadId, any())

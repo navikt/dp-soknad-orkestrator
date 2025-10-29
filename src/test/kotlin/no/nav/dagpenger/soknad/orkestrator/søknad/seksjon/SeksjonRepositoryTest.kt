@@ -186,11 +186,11 @@ class SeksjonRepositoryTest {
         seksjonRepository.lagre(ident, søknadId, seksjonId2, seksjonsvar2, pdfGrunnlag2)
         seksjonRepository.lagre(ident, søknadId2, seksjonId, seksjonsvar, pdfGrunnlag)
 
-        var seksjonerEtterSletting = seksjonRepository.hentSeksjoner(ident, søknadId)
-        seksjonerEtterSletting shouldNotBeEqual emptyList()
+        val seksjonerFørSletting = seksjonRepository.hentSeksjoner(ident, søknadId)
+        seksjonerFørSletting shouldNotBeEqual emptyList()
 
         søknadRepository.slett(søknadId, ident)
-        seksjonerEtterSletting = seksjonRepository.hentSeksjoner(ident, søknadId)
+        val seksjonerEtterSletting = seksjonRepository.hentSeksjoner(ident, søknadId)
         seksjonerEtterSletting shouldBe emptyList()
 
         val seksjonerPåAnnenSøknad = seksjonRepository.hentSeksjoner(ident, søknadId2)

@@ -49,7 +49,7 @@ internal fun Application.søknadApi(
 
                     søknadService.slett(søknadId, call.ident())
 
-                    call.respond(OK, "Seksjoner for søknad $søknadId er slettet")
+                    call.respond(OK, "Søknad $søknadId er slettet")
                 }
             }
             route("/soknad/{søknadId}/progress") {
