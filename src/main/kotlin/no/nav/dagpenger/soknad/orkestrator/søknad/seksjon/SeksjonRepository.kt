@@ -91,4 +91,18 @@ class SeksjonRepository(
                     it[SeksjonV2Tabell.seksjonId]
                 }.toList()
         }
+
+    fun hentPdfGrunnlag(
+        ident: String,
+        søknadId: UUID,
+    ): List<String> =
+        transaction {
+            SeksjonV2Tabell
+                .innerJoin(SøknadTabell)
+                .select(SeksjonV2Tabell.seksjonId)
+                .where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
+                .map {
+                    it[SeksjonV2Tabell.pdfGunnlag]
+                }.toList()
+        }
 }
