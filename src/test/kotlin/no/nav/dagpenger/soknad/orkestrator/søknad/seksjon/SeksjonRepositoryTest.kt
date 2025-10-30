@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.equals.shouldNotBeEqual
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
@@ -172,5 +173,31 @@ class SeksjonRepositoryTest {
         seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
 
         seksjonRepository.hentSeksjonIdForAlleLagredeSeksjoner(ident, randomUUID()) shouldBe emptyList()
+    }
+
+    @Test
+    fun `søknadRepository sin slett() sletter alle seksjoner for en gitt søknadId i seksjonstabellen`() {
+        val søknadId = randomUUID()
+        val søknadId2 = randomUUID()
+
+        søknadRepository.lagre(Søknad(søknadId, ident))
+        søknadRepository.lagre(Søknad(søknadId2, ident))
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
+        seksjonRepository.lagre(ident, søknadId, seksjonId2, seksjonsvar2, pdfGrunnlag2)
+        seksjonRepository.lagre(ident, søknadId2, seksjonId, seksjonsvar, pdfGrunnlag)
+
+        val seksjonerFørSletting = seksjonRepository.hentSeksjoner(ident, søknadId)
+        seksjonerFørSletting shouldNotBeEqual emptyList()
+
+        søknadRepository.slett(søknadId, ident)
+        val seksjonerEtterSletting = seksjonRepository.hentSeksjoner(ident, søknadId)
+        seksjonerEtterSletting shouldBe emptyList()
+
+        val seksjonerPåAnnenSøknad = seksjonRepository.hentSeksjoner(ident, søknadId2)
+        seksjonerPåAnnenSøknad shouldNotBeEqual emptyList()
+
+        søknadRepository.slett(søknadId2, ident)
+        val seksjonerEtterSlettingAnnenSøknad = seksjonRepository.hentSeksjoner(ident, søknadId2)
+        seksjonerEtterSlettingAnnenSøknad shouldBe emptyList()
     }
 }

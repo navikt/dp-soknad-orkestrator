@@ -98,7 +98,7 @@ class SøknadServiceTest {
 
         søknadService.slett(søknadId, "ident")
 
-        verify { søknadRepository.slett(søknadId) }
+        verify { søknadRepository.slett(søknadId, "ident") }
     }
 
     @Test

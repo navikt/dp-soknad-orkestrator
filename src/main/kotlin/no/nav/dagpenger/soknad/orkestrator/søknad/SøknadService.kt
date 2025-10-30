@@ -51,7 +51,7 @@ class SøknadService(
         søknadId: UUID,
         ident: String,
     ) {
-        val antallSøknaderSlettet = søknadRepository.slett(søknadId)
+        val antallSøknaderSlettet = søknadRepository.slett(søknadId, ident)
 
         if (antallSøknaderSlettet > 0) {
             SøknadMetrikker.slettet.inc()

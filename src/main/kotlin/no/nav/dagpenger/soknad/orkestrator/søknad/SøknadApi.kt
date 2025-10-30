@@ -8,6 +8,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
+import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -42,6 +43,13 @@ internal fun Application.søknadApi(
                         status = OK,
                         text = søknadService.sendInn(søknadId, call.ident()).toString(),
                     )
+                }
+                delete {
+                    val søknadId = validerOgFormaterSøknadIdParam() ?: return@delete
+
+                    søknadService.slett(søknadId, call.ident())
+
+                    call.respond(OK, "Søknad $søknadId er slettet")
                 }
             }
             route("/soknad/{søknadId}/progress") {

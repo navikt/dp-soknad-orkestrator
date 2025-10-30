@@ -197,8 +197,35 @@ class SøknadRepositoryTest {
         søknadRepository.lagreQuizSøknad(søknad)
         søknadRepository.hent(søknadId) shouldNotBe null
 
-        søknadRepository.slett(søknadId)
+        søknadRepository.slett(søknadId, ident)
         søknadRepository.hent(søknadId) shouldBe null
+    }
+
+    @Test
+    fun `kan ikke slette søknad siden ident er ulik`() {
+        val søknadId = randomUUID()
+        val søknad =
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = INNSENDT,
+                opplysninger =
+                    listOf(
+                        QuizOpplysning(
+                            beskrivendeId = "beskrivendeId",
+                            type = Tekst,
+                            svar = "Svar",
+                            ident = ident,
+                            søknadId = søknadId,
+                        ),
+                    ),
+            )
+
+        søknadRepository.lagreQuizSøknad(søknad)
+        søknadRepository.hent(søknadId) shouldNotBe null
+
+        søknadRepository.slett(søknadId, "en-annen-ident")
+        søknadRepository.hent(søknadId) shouldNotBe null
     }
 
     @Test
@@ -231,7 +258,7 @@ class SøknadRepositoryTest {
         søknadRepository.lagreQuizSøknad(søknad)
         opplysningRepository.hentAlle(søknadId).size shouldBe 2
 
-        søknadRepository.slett(søknadId)
+        søknadRepository.slett(søknadId, ident)
         opplysningRepository.hentAlle(søknadId).size shouldBe 0
     }
 
