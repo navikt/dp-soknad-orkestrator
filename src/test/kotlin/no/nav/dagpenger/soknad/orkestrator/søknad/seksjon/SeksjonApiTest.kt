@@ -59,13 +59,40 @@ class SeksjonApiTest {
 
     @Test
     fun `PUT seksjon returnerer 200 OK hvis lagring av seksjon er vellykket`() {
-        every { seksjonService.lagre(any(), any(), any(), any(), any()) } answers {}
+        every { seksjonService.lagre(any(), any(), any(), any(), any(), any()) } answers {}
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
-                    setBody(PutSeksjonRequest("{\"seksjonsvar\": true}", "{\"pdfgrunnlag\": true}"))
+                    setBody(
+                        PutSeksjonRequest(
+                            "{\"seksjonsvar\": true}",
+                            "{\"dokumentasjonskrav\": true}",
+                            "{\"pdfgrunnlag\": true}",
+                        ),
+                    )
+                    contentType(ContentType.Application.Json)
+                }
+
+            response.status shouldBe OK
+        }
+    }
+
+    @Test
+    fun `PUT seksjon returnerer 200 OK hvis lagring av seksjon uten dokumentasjonskrav er vellykket`() {
+        every { seksjonService.lagre(any(), any(), any(), any(), any(), any()) } answers {}
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    setBody(
+                        PutSeksjonRequest(
+                            seksjonsvar = "{\"seksjonsvar\": true}",
+                            pdfGrunnlag = "{\"pdfgrunnlag\": true}",
+                        ),
+                    )
                     contentType(ContentType.Application.Json)
                 }
 
@@ -75,13 +102,19 @@ class SeksjonApiTest {
 
     @Test
     fun `PUT seksjon returnerer 500 Internal Server Error hvis lagring av seksjon feiler`() {
-        every { seksjonService.lagre(any(), any(), any(), any(), any()) } throws IllegalStateException()
+        every { seksjonService.lagre(any(), any(), any(), any(), any(), any()) } throws IllegalStateException()
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
+                client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
-                    setBody(PutSeksjonRequest("{\"seksjonsvar\": true}", "{\"pdfgrunnlag\": true}"))
+                    setBody(
+                        PutSeksjonRequest(
+                            "{\"seksjonsvar\": true}",
+                            "{\"dokumentasjonskrav\": true}",
+                            "{\"pdfgrunnlag\": true}",
+                        ),
+                    )
                     contentType(ContentType.Application.Json)
                 }
 
