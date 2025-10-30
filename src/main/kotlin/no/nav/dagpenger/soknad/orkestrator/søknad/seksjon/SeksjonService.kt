@@ -10,9 +10,10 @@ class SeksjonService(
         søknadId: UUID,
         seksjonId: String,
         seksjonsvar: String,
+        dokumentasjonskrav: String? = null,
         pdfGrunnlag: String,
     ) {
-        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, pdfGrunnlag)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
     }
 
     fun hentSeksjonsvar(
@@ -30,6 +31,18 @@ class SeksjonService(
         ident: String,
         søknadId: UUID,
     ): List<String> = seksjonRepository.hentSeksjonIdForAlleLagredeSeksjoner(ident, søknadId)
+
+    fun lagreDokumentasjonskrav(
+        ident: String,
+        søknadId: UUID,
+        seksjonId: String,
+        dokumentasjonskrav: String,
+    ) = seksjonRepository.lagreDokumentasjonskrav(ident, søknadId, seksjonId, dokumentasjonskrav)
+
+    fun hentDokumentasjonskrav(
+        ident: String,
+        søknadId: UUID,
+    ) = seksjonRepository.hentDokumentasjonskrav(ident, søknadId)
 }
 
 data class Seksjon(

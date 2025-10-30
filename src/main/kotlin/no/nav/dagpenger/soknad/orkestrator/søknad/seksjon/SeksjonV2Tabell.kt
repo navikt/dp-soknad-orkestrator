@@ -13,8 +13,10 @@ object SeksjonV2Tabell : IntIdTable("seksjon_v2") {
     val seksjonId: Column<String> = text("seksjon_id")
     val søknadId: Column<UUID> = uuid("soknad_id").references(SøknadTabell.søknadId)
     val seksjonsvar: Column<String> = json("seksjonsvar", { serializeSøknadData(it) }, { it })
+    val dokumentasjonskrav: Column<String?> = json("dokumentasjonskrav", { serializeSøknadData(it) }, { it }).nullable()
     val pdfGunnlag: Column<String> = json("pdf_grunnlag", { serializeSøknadData(it) }, { it })
     val opprettet: Column<LocalDateTime> = datetime("opprettet").default(LocalDateTime.now())
+    val oppdatert: Column<LocalDateTime?> = datetime("oppdatert").nullable()
 }
 
 private fun serializeSøknadData(søknadData: String): String = objectMapper.writeValueAsString(søknadData)
