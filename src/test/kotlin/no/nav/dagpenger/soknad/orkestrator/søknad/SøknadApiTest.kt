@@ -99,6 +99,19 @@ class SøknadApiTest {
     }
 
     @Test
+    fun `POST søknad med søknadId returnerer 400 BAD REQUEST hvis søknadId ikke er en UUID`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client
+                    .post("/soknad/ikke-en-uuid") {
+                        header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    }
+
+            response.status shouldBe BadRequest
+        }
+    }
+
+    @Test
     fun `POST søknad med søknadId returnerer 500 Internal Server Error hvis markering av søknaden som innsendt feiler`() {
         every { søknadService.sendInn(any(), any()) } throws IllegalStateException()
 
@@ -174,6 +187,72 @@ class SøknadApiTest {
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client.get("/soknad/ikke-en-uuid/progress") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe BadRequest
+            response.body() as String shouldContain "Kunne ikke parse søknadId parameter ikke-en-uuid til UUID"
+        }
+    }
+
+    @Test
+    fun `GET dokumentasjonskrav returnerer 200 OK og liste med dokumentasjonskrav på søknaden`() {
+        every { seksjonService.hentDokumentasjonskrav(any(), any()) } returns
+            listOf(
+                "{\"dokumentasjonskrav\": true}",
+                "{\"dokumentasjonskrav2\": true}",
+            )
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/dokumentasjonskrav") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+            response.status shouldBe OK
+            response.body() as String shouldBe """["{\"dokumentasjonskrav\": true}","{\"dokumentasjonskrav2\": true}"]"""
+        }
+    }
+
+    @Test
+    fun `GET dokumentasjonskrav returnerer 404 Not Found hvis søknaden ikke har dokumentasjonskrav`() {
+        every { seksjonService.hentDokumentasjonskrav(any(), any()) } returns
+            listOf()
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/dokumentasjonskrav") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe NotFound
+        }
+    }
+
+    @Test
+    fun `GET dokumentasjonskrav returnerer 500 Internal Server Error hvis kall fra repository kaster IllegalStateException`() {
+        every { seksjonService.hentDokumentasjonskrav(any(), any()) } throws IllegalStateException()
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/dokumentasjonskrav") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe InternalServerError
+        }
+    }
+
+    @Test
+    fun `GET dokumentasjonskrav returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/dokumentasjonskrav").status shouldBe Unauthorized
+        }
+    }
+
+    @Test
+    fun `GET dokumentasjonskrav returnerer 400 Bad Request hvis søknadId ikke er en UUID`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/ikke-en-uuid/dokumentasjonskrav") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                 }
 

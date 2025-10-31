@@ -29,6 +29,7 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                         søknadId,
                         seksjonId,
                         putSeksjonRequest.seksjonsvar,
+                        putSeksjonRequest.dokumentasjonskrav,
                         putSeksjonRequest.pdfGrunnlag,
                     )
                     call.respond(OK)
@@ -38,8 +39,14 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                 put {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
                     val seksjonId = validerSeksjonIdParam() ?: return@put
-                    seksjonService.lagre(call.ident(), søknadId, seksjonId, call.receive<String>(), "{}")
-                    call.respond(OK, "Søknad API is up and running")
+                    seksjonService.lagre(
+                        ident = call.ident(),
+                        søknadId = søknadId,
+                        seksjonId = seksjonId,
+                        seksjonsvar = call.receive<String>(),
+                        pdfGrunnlag = "{}",
+                    )
+                    call.respond(OK)
                 }
 
                 get {
@@ -54,6 +61,20 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                             }
 
                     call.respond(OK, seksjon)
+                }
+
+                route("/dokumentasjonskrav") {
+                    put {
+                        val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
+                        val seksjonId = validerSeksjonIdParam() ?: return@put
+                        seksjonService.lagreDokumentasjonskrav(
+                            call.ident(),
+                            søknadId,
+                            seksjonId,
+                            call.receive<String>(),
+                        )
+                        call.respond(OK)
+                    }
                 }
             }
             route("/seksjon/{søknadId}") {
@@ -76,5 +97,6 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
 
 data class PutSeksjonRequest(
     val seksjonsvar: String,
+    val dokumentasjonskrav: String? = null,
     val pdfGrunnlag: String,
 )

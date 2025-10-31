@@ -52,23 +52,44 @@ internal fun Application.søknadApi(
                     call.respond(OK, "Søknad $søknadId er slettet")
                 }
             }
-            route("/soknad/{søknadId}/progress") {
-                get {
-                    val søknadId =
-                        validerOgFormaterSøknadIdParam() ?: let {
-                            call.respond(HttpStatusCode.BadRequest)
+            route("/soknad/{søknadId}") {
+                route("/progress") {
+                    get {
+                        val søknadId =
+                            validerOgFormaterSøknadIdParam() ?: let {
+                                call.respond(HttpStatusCode.BadRequest)
+                                return@get
+                            }
+
+                        val progress =
+                            seksjonService.hentSeksjonIdForAlleLagredeSeksjoner(call.ident(), søknadId)
+
+                        if (progress.isEmpty()) {
+                            call.respond(NotFound, mapOf("seksjoner" to progress))
                             return@get
                         }
 
-                    val progress =
-                        seksjonService.hentSeksjonIdForAlleLagredeSeksjoner(call.ident(), søknadId)
-
-                    if (progress.isEmpty()) {
-                        call.respond(NotFound, mapOf("seksjoner" to progress))
-                        return@get
+                        call.respond(OK, mapOf("seksjoner" to progress))
                     }
+                }
+                route("/dokumentasjonskrav") {
+                    get {
+                        val søknadId =
+                            validerOgFormaterSøknadIdParam() ?: let {
+                                call.respond(HttpStatusCode.BadRequest)
+                                return@get
+                            }
 
-                    call.respond(OK, mapOf("seksjoner" to progress))
+                        val dokumentasjonskrav =
+                            seksjonService.hentDokumentasjonskrav(call.ident(), søknadId)
+
+                        if (dokumentasjonskrav.isEmpty()) {
+                            call.respond(NotFound)
+                            return@get
+                        }
+
+                        call.respond(OK, dokumentasjonskrav)
+                    }
                 }
             }
         }
