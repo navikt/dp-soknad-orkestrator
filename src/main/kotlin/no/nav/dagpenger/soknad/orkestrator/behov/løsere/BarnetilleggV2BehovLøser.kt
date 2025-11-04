@@ -58,7 +58,7 @@ class BarnetilleggV2BehovLøser(
                 barn = alleBarn,
             )
         }
-        // TODO: Hør med PJs om hele burde vært null hvis det ikke finnes barn
+
         return BarnetilleggV2Løsning(
             søknadbarnId = null,
             barn = emptyList(),
