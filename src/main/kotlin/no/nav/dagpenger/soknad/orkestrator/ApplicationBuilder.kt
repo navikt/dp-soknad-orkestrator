@@ -153,6 +153,7 @@ internal class ApplicationBuilder(
                         BehovløserFactory(
                             rapidsConnection,
                             QuizOpplysningRepositoryPostgres(dataSource),
+                            seksjonRepository,
                         ),
                     søknadService = søknadService,
                 )

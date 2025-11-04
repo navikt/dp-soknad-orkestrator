@@ -50,10 +50,12 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBeh
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnskerDagpengerFraDatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnsketArbeidstidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 
 class BehovløserFactory(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepositoryPostgres,
+    seksjonRepository: SeksjonRepository,
 ) {
     private val behovløsere: Map<Behov, Behovløser> =
         mapOf(
@@ -65,7 +67,7 @@ class BehovløserFactory(
             KanJobbeHvorSomHelst to KanJobbeHvorSomHelstBehovløser(rapidsConnection, opplysningRepository),
             VilligTilÅBytteYrke to VilligTilÅBytteYrkeBehovløser(rapidsConnection, opplysningRepository),
             JobbetUtenforNorge to JobbetUtenforNorgeBehovløser(rapidsConnection, opplysningRepository),
-            Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository),
+            Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository, seksjonRepository),
             Lønnsgaranti to LønnsgarantiBehovløser(rapidsConnection, opplysningRepository),
             Permittert to PermittertBehovløser(rapidsConnection, opplysningRepository),
             PermittertFiskeforedling to PermittertFiskeforedlingBehovløser(rapidsConnection, opplysningRepository),
