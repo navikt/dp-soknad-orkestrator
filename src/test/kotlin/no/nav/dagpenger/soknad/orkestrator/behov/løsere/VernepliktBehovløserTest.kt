@@ -57,6 +57,7 @@ class VernepliktBehovløserTest {
             )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        // github.com/navikt/dp-soknad/blob/53c7a36d199e207dca01ede6d1b0ceebc18debff/mediator/src/main/kotlin/no/nav/dagpenger/soknad/livssyklus/ferdigstilling/FerdigstillingRoute.kt#L28
         val søknadstidspunkt = ZonedDateTime.now()
         val søknadstidpsunktOpplysning =
             QuizOpplysning(
@@ -80,23 +81,19 @@ class VernepliktBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov Verneplikt med verdi og gjelderFra fra seksjonRepository`() {
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
-        // github.com/navikt/dp-soknad/blob/53c7a36d199e207dca01ede6d1b0ceebc18debff/mediator/src/main/kotlin/no/nav/dagpenger/soknad/livssyklus/ferdigstilling/FerdigstillingRoute.kt#L28
         val søknadstidspunkt = ZonedDateTime.now()
-        val søknadstidpsunktOpplysning =
-            QuizOpplysning(
-                beskrivendeId = "søknadstidspunkt",
-                type = Tekst,
-                svar = søknadstidspunkt.toString(),
-                ident = ident,
-                søknadId = søknadId,
-            )
-        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+        println("søknadid: $søknadId")
 
         seksjonRepository.søknadRepository.lagre(
             Søknad(
                 søknadId = søknadId,
                 ident = ident,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             ),
+        )
+        seksjonRepository.søknadRepository.markerSøknadSomInnsendt(
+            søknadId = søknadId,
+            innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
         )
         seksjonRepository.lagre(
             ident,

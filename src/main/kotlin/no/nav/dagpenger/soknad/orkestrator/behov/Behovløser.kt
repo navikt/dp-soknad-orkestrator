@@ -5,6 +5,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -13,6 +14,7 @@ import java.util.UUID
 abstract class Behovløser(
     val rapidsConnection: RapidsConnection,
     val opplysningRepository: QuizOpplysningRepository,
+    val seksjonRepository: SeksjonRepository? = null,
 ) {
     abstract val behov: String
     abstract val beskrivendeId: String
@@ -44,7 +46,22 @@ abstract class Behovløser(
         behovmelding: Behovmelding,
         svarPåBehov: Any,
     ) {
-        val gjelderFra: LocalDate? = finnGjelderFraDato(behovmelding.søknadId, behovmelding.ident)
+        var gjelderFra: LocalDate? = finnGjelderFraDato(behovmelding.søknadId, behovmelding.ident)
+        if (gjelderFra == null) {
+            val søknad =
+                seksjonRepository
+                    ?.søknadRepository
+                    ?.hent(behovmelding.søknadId)
+
+            gjelderFra =
+                søknad
+                    ?.innsendtTidspunkt
+                    ?.toLocalDate()
+                    ?: throw IllegalStateException(
+                        "Fant ingen opplysning om innsendt dato med beskrivendeId " +
+                            "og kan ikke svare på behov $behov for søknad med id: ${behovmelding.søknadId}",
+                    )
+        }
         behovmelding.innkommendePacket["@løsning"] =
             mapOf(
                 behov to
