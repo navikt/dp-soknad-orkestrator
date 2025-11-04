@@ -7,6 +7,9 @@ import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
+import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType.Application.Json
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.http.HttpStatusCode.Companion.Created
@@ -14,6 +17,7 @@ import io.ktor.http.HttpStatusCode.Companion.InternalServerError
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.http.HttpStatusCode.Companion.Unauthorized
+import io.ktor.http.contentType
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
@@ -25,7 +29,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonService
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.testTokenXToken
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.withMockAuthServerAndTestApplication
 import org.junit.jupiter.api.Test
-import java.util.UUID
+import java.util.UUID.randomUUID
 
 class SøknadApiTest {
     val søknadService = mockk<SøknadService>(relaxed = true)
@@ -48,7 +52,7 @@ class SøknadApiTest {
 
     @Test
     fun `POST søknad returnerer 201 Created og søknadId hvis oppretting av søknad er vellykket`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         every { søknadService.opprett(any()) } returns søknadId
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
@@ -81,7 +85,7 @@ class SøknadApiTest {
     @Test
     fun `POST søknad med søknadId returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
-            client.post("/soknad/${UUID.randomUUID()}").status shouldBe Unauthorized
+            client.post("/soknad/${randomUUID()}").status shouldBe Unauthorized
         }
     }
 
@@ -90,7 +94,7 @@ class SøknadApiTest {
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client
-                    .post("/soknad/${UUID.randomUUID()}") {
+                    .post("/soknad/${randomUUID()}") {
                         header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     }
 
@@ -118,7 +122,7 @@ class SøknadApiTest {
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client
-                    .post("/soknad/${UUID.randomUUID()}") {
+                    .post("/soknad/${randomUUID()}") {
                         header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     }
 
@@ -137,7 +141,7 @@ class SøknadApiTest {
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/progress") {
+                client.get("/soknad/${randomUUID()}/progress") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                 }
 
@@ -153,7 +157,7 @@ class SøknadApiTest {
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/progress") {
+                client.get("/soknad/${randomUUID()}/progress") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                 }
 
@@ -167,7 +171,7 @@ class SøknadApiTest {
         every { seksjonService.hentSeksjonIdForAlleLagredeSeksjoner(any(), any()) } throws IllegalStateException()
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/progress") {
+                client.get("/soknad/${randomUUID()}/progress") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                 }
 
@@ -178,7 +182,7 @@ class SøknadApiTest {
     @Test
     fun `GET søknad progress returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
-            client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/progress").status shouldBe Unauthorized
+            client.get("/soknad/${randomUUID()}/progress").status shouldBe Unauthorized
         }
     }
 
@@ -205,7 +209,7 @@ class SøknadApiTest {
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/dokumentasjonskrav") {
+                client.get("/soknad/${randomUUID()}/dokumentasjonskrav") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                 }
             response.status shouldBe OK
@@ -220,7 +224,7 @@ class SøknadApiTest {
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/dokumentasjonskrav") {
+                client.get("/soknad/${randomUUID()}/dokumentasjonskrav") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                 }
 
@@ -233,7 +237,7 @@ class SøknadApiTest {
         every { seksjonService.hentDokumentasjonskrav(any(), any()) } throws IllegalStateException()
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/dokumentasjonskrav") {
+                client.get("/soknad/${randomUUID()}/dokumentasjonskrav") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                 }
 
@@ -244,7 +248,7 @@ class SøknadApiTest {
     @Test
     fun `GET dokumentasjonskrav returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
-            client.get("/soknad/e857fa6d-b004-4e11-84df-ed7a17801ff7/dokumentasjonskrav").status shouldBe Unauthorized
+            client.get("/soknad/${randomUUID()}/dokumentasjonskrav").status shouldBe Unauthorized
         }
     }
 
@@ -263,7 +267,7 @@ class SøknadApiTest {
 
     @Test
     fun `DELETE søknad med søknadId returnerer 200 OK hvis sletting av seksjoner går bra`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         every {
             søknadService.slett(søknadId, any())
         } returns Unit
@@ -279,7 +283,7 @@ class SøknadApiTest {
 
     @Test
     fun `DELETE søknad med søknadId returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client.delete("/soknad/$søknadId")
@@ -303,7 +307,7 @@ class SøknadApiTest {
 
     @Test
     fun `DELETE søknad returnerer 500 Internal Server Error hvis sletting av seksjoner feiler`() {
-        val søknadId = UUID.randomUUID()
+        val søknadId = randomUUID()
         every {
             søknadService.slett(søknadId, any())
         } throws IllegalStateException()
@@ -312,6 +316,56 @@ class SøknadApiTest {
                 client.delete("/soknad/$søknadId") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                 }
+
+            response.status shouldBe InternalServerError
+        }
+    }
+
+    @Test
+    fun `PUT søknadpersonalia returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client.put("/soknad/${randomUUID()}/personalia").status shouldBe Unauthorized
+        }
+    }
+
+    @Test
+    fun `PUT søknadPersonalia returnerer 200 OK hvis lagring av søknadpersonalia er vellykket`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.put("/soknad/${randomUUID()}/personalia") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    contentType(Json)
+                    setBody(
+                        PutSøknadPersonaliaRequestBody(
+                            fornavn = "fornavn",
+                            etternavn = "etternavn",
+                            alder = "26",
+                        ),
+                    )
+                }
+
+            response.status shouldBe OK
+        }
+    }
+
+    @Test
+    fun `PUT søknadPersonalia returnerer 500 Internal Server Error hvis lagring av søknadpersonalia feiler`() {
+        every { søknadService.lagrePersonalia(any()) } throws IllegalStateException()
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client
+                    .put("/soknad/${randomUUID()}/personalia") {
+                        header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                        contentType(Json)
+                        setBody(
+                            PutSøknadPersonaliaRequestBody(
+                                fornavn = "fornavn",
+                                etternavn = "etternavn",
+                                alder = "26",
+                            ),
+                        )
+                    }
 
             response.status shouldBe InternalServerError
         }

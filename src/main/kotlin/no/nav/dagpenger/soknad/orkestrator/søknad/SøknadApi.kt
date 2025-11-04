@@ -1,16 +1,18 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import io.ktor.http.HttpStatusCode
+import io.ktor.http.HttpStatusCode.Companion.BadRequest
 import io.ktor.http.HttpStatusCode.Companion.Created
 import io.ktor.http.HttpStatusCode.Companion.NotFound
 import io.ktor.http.HttpStatusCode.Companion.OK
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
+import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondText
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
+import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
@@ -35,7 +37,7 @@ internal fun Application.søknadApi(
                 post {
                     val søknadId =
                         validerOgFormaterSøknadIdParam() ?: let {
-                            call.respond(HttpStatusCode.BadRequest)
+                            call.respond(BadRequest)
                             return@post
                         }
 
@@ -51,13 +53,11 @@ internal fun Application.søknadApi(
 
                     call.respond(OK, "Søknad $søknadId er slettet")
                 }
-            }
-            route("/soknad/{søknadId}") {
                 route("/progress") {
                     get {
                         val søknadId =
                             validerOgFormaterSøknadIdParam() ?: let {
-                                call.respond(HttpStatusCode.BadRequest)
+                                call.respond(BadRequest)
                                 return@get
                             }
 
@@ -76,7 +76,7 @@ internal fun Application.søknadApi(
                     get {
                         val søknadId =
                             validerOgFormaterSøknadIdParam() ?: let {
-                                call.respond(HttpStatusCode.BadRequest)
+                                call.respond(BadRequest)
                                 return@get
                             }
 
@@ -89,6 +89,37 @@ internal fun Application.søknadApi(
                         }
 
                         call.respond(OK, dokumentasjonskrav)
+                    }
+                }
+                route("/personalia") {
+                    put {
+                        val søknadId =
+                            validerOgFormaterSøknadIdParam() ?: let {
+                                call.respond(BadRequest)
+                                return@put
+                            }
+
+                        val putSøknadPersonaliaRequestBody = call.receive<PutSøknadPersonaliaRequestBody>()
+                        søknadService.lagrePersonalia(
+                            SøknadPersonalia(
+                                søknadId,
+                                call.ident(),
+                                putSøknadPersonaliaRequestBody.fornavn,
+                                putSøknadPersonaliaRequestBody.mellomnavn,
+                                putSøknadPersonaliaRequestBody.etternavn,
+                                putSøknadPersonaliaRequestBody.alder,
+                                putSøknadPersonaliaRequestBody.adresselinje1,
+                                putSøknadPersonaliaRequestBody.adresselinje2,
+                                putSøknadPersonaliaRequestBody.adresselinje3,
+                                putSøknadPersonaliaRequestBody.postnummer,
+                                putSøknadPersonaliaRequestBody.poststed,
+                                putSøknadPersonaliaRequestBody.landkode,
+                                putSøknadPersonaliaRequestBody.land,
+                                putSøknadPersonaliaRequestBody.kontonummer,
+                            ),
+                        )
+
+                        call.respond(OK)
                     }
                 }
             }

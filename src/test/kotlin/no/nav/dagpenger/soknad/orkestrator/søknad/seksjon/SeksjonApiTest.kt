@@ -66,7 +66,7 @@ class SeksjonApiTest {
                 client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     setBody(
-                        PutSeksjonRequest(
+                        PutSeksjonRequestBody(
                             "{\"seksjonsvar\": true}",
                             "{\"dokumentasjonskrav\": true}",
                             "{\"pdfgrunnlag\": true}",
@@ -88,7 +88,7 @@ class SeksjonApiTest {
                 client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     setBody(
-                        PutSeksjonRequest(
+                        PutSeksjonRequestBody(
                             seksjonsvar = "{\"seksjonsvar\": true}",
                             pdfGrunnlag = "{\"pdfgrunnlag\": true}",
                         ),
@@ -109,7 +109,7 @@ class SeksjonApiTest {
                 client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     setBody(
-                        PutSeksjonRequest(
+                        PutSeksjonRequestBody(
                             "{\"seksjonsvar\": true}",
                             "{\"dokumentasjonskrav\": true}",
                             "{\"pdfgrunnlag\": true}",

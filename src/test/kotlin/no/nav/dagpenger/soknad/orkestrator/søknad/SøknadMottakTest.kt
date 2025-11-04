@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -10,9 +11,11 @@ import org.junit.jupiter.api.Test
 class SøknadMottakTest {
     private val testRapid = TestRapid()
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    private val søknadPersonaliaRepository = mockk<SøknadPersonaliaRepository>(relaxed = true)
     private val søknadService =
         SøknadService(
             søknadRepository = søknadRepository,
+            søknadPersonaliaRepository = søknadPersonaliaRepository,
         ).also {
             it.setRapidsConnection(testRapid)
         }
