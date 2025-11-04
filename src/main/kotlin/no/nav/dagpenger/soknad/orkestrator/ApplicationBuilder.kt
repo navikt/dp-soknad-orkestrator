@@ -37,6 +37,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadPdfGenerertOgMellomlag
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadPdfOgVedleggJournalførtMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadSlettetMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonService
@@ -59,6 +60,7 @@ internal class ApplicationBuilder(
             dataSource = dataSource,
             quizOpplysningRepository = quizOpplysningRepositoryPostgres,
         )
+    private val søknadPersonaliaRepository = SøknadPersonaliaRepository(dataSource)
 
     private val seksjonRepository = SeksjonRepository(dataSource, søknadRepository)
     private val seksjonService = SeksjonService(seksjonRepository)
@@ -89,6 +91,7 @@ internal class ApplicationBuilder(
     private val søknadService: SøknadService =
         SøknadService(
             søknadRepository = søknadRepository,
+            søknadPersonaliaRepository = søknadPersonaliaRepository,
         )
 
     private val journalføringService = JournalføringService()

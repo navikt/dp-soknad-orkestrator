@@ -13,6 +13,7 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjonsnavn
 import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.getSeksjon
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -22,10 +23,12 @@ import kotlin.test.Test
 class SøknadServiceTest {
     private val testRapid = TestRapid()
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    private val søknadPersonaliaRepository = mockk<SøknadPersonaliaRepository>(relaxed = true)
     private val seksjon = mockk<Seksjon>(relaxed = true)
     private var søknadService =
         SøknadService(
             søknadRepository = søknadRepository,
+            søknadPersonaliaRepository = søknadPersonaliaRepository,
         ).also { it.setRapidsConnection(testRapid) }
     private val ident = "12345678901"
     private val seksjonPath = "no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.SeksjonKt"

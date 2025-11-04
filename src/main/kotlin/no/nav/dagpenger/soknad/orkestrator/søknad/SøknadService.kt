@@ -6,11 +6,13 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.util.UUID
 
 class SøknadService(
     private val søknadRepository: SøknadRepository,
+    private val søknadPersonaliaRepository: SøknadPersonaliaRepository,
 ) {
     private lateinit var rapidsConnection: RapidsConnection
 
@@ -82,6 +84,8 @@ class SøknadService(
         logg.info { "Publiserte melding om søknad klar til journalføring med søknadId: $søknadId" }
         sikkerlogg.info { "Publiserte melding om søknad klar til journalføring med søknadId: $søknadId og ident: $ident" }
     }
+
+    fun lagrePersonalia(søknadPersonalia: SøknadPersonalia) = søknadPersonaliaRepository.lagre(søknadPersonalia)
 
     private companion object {
         private val logg = KotlinLogging.logger {}

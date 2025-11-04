@@ -23,14 +23,14 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                 put {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
                     val seksjonId = validerSeksjonIdParam() ?: return@put
-                    val putSeksjonRequest = call.receive<PutSeksjonRequest>()
+                    val putSeksjonRequestBody = call.receive<PutSeksjonRequestBody>()
                     seksjonService.lagre(
                         call.ident(),
                         søknadId,
                         seksjonId,
-                        putSeksjonRequest.seksjonsvar,
-                        putSeksjonRequest.dokumentasjonskrav,
-                        putSeksjonRequest.pdfGrunnlag,
+                        putSeksjonRequestBody.seksjonsvar,
+                        putSeksjonRequestBody.dokumentasjonskrav,
+                        putSeksjonRequestBody.pdfGrunnlag,
                     )
                     call.respond(OK)
                 }
@@ -95,7 +95,7 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
     }
 }
 
-data class PutSeksjonRequest(
+data class PutSeksjonRequestBody(
     val seksjonsvar: String,
     val dokumentasjonskrav: String? = null,
     val pdfGrunnlag: String,
