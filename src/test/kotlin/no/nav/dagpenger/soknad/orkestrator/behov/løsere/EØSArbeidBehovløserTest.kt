@@ -61,8 +61,19 @@ class EØSArbeidBehovløserTest {
                 ident = ident,
                 søknadId = søknadId,
             )
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
 
         opplysningRepository.lagre(opplysning)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EØSArbeid))
 
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe "true"
@@ -78,8 +89,18 @@ class EØSArbeidBehovløserTest {
                 ident = ident,
                 søknadId = søknadId,
             )
-
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
         opplysningRepository.lagre(opplysning)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EØSArbeid))
 
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe "false"
@@ -87,6 +108,17 @@ class EØSArbeidBehovløserTest {
 
     @Test
     fun `Behovløser svarer false dersom opplysning om Eøs arbeid ikke finnes`() {
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
         val behovmelding = lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EØSArbeid)
         behovløser.løs(behovmelding)
         behovløser.harJobbetIEøsSiste36mnd(ident, søknadId) shouldBe false

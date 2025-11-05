@@ -12,11 +12,13 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
 import org.junit.jupiter.api.Test
+import java.time.ZonedDateTime
 import java.util.UUID
 import java.util.UUID.randomUUID
 
@@ -84,8 +86,19 @@ class BarnetilleggBehovLøserTest {
                         ),
                     ),
             )
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+
         opplysningRepository.lagre(pdlBarn)
         opplysningRepository.lagre(egetBarn)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
         val lagretSøknadbarnId = opplysningRepository.lagreBarnSøknadMapping(søknadId = søknadId)
 
         behovløser.løs(lagBehovmelding(ident, søknadId, Barnetillegg))
@@ -125,6 +138,18 @@ class BarnetilleggBehovLøserTest {
 
     @Test
     fun `løser behov om barn som forventet hvis søknaden ikke har barn`() {
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
         behovløser.løs(lagBehovmelding(ident, søknadId, Barnetillegg))
 
         val løsteBarn = testRapid.inspektør.field(0, "@løsning")[Barnetillegg.name]["verdi"]

@@ -53,6 +53,18 @@ class ØnsketArbeidstidBehovløserTest {
 
     @Test
     fun `Behovløser returnerer 40 timer dersom det ikke finnes en opplysning som kan besvare behovet`() {
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
         behovløser.løs(lagBehovmelding(ident, søknadId, ØnsketArbeidstid))
 
         testRapid.inspektør.message(0)["@løsning"]["ØnsketArbeidstid"].also { løsning ->
