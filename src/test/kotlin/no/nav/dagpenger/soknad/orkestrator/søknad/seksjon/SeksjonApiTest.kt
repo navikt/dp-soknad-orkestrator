@@ -40,7 +40,7 @@ class SeksjonApiTest {
     @Test
     fun `PUT seksjon returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
-            client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon").status shouldBe Unauthorized
+            client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon").status shouldBe Unauthorized
         }
     }
 
@@ -48,7 +48,7 @@ class SeksjonApiTest {
     fun `PUT seksjon returnerer 400 Bad Request hvis søknadId ikke er en UUID`() {
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.put("/seksjon/v2/ikke-en-uuid/din-situasjon") {
+                client.put("/seksjon/ikke-en-uuid/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                 }
 
@@ -63,7 +63,7 @@ class SeksjonApiTest {
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
+                client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     setBody(
                         PutSeksjonRequestBody(
@@ -85,7 +85,7 @@ class SeksjonApiTest {
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
+                client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     setBody(
                         PutSeksjonRequestBody(
@@ -106,7 +106,7 @@ class SeksjonApiTest {
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
-                client.put("/seksjon/v2/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
+                client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon") {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     setBody(
                         PutSeksjonRequestBody(

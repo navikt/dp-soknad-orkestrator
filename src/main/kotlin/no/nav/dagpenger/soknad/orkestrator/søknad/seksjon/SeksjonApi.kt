@@ -17,9 +17,7 @@ import no.nav.dagpenger.soknad.orkestrator.utils.validerSeksjonIdParam
 internal fun Application.seksjonApi(seksjonService: SeksjonService) {
     routing {
         authenticate("tokenX") {
-            // TODO: Versjonert så vi ikke skal brekke hele frontend før den er skrevet om. Siden vi ikke er i prod enda,
-            // TODO: så kan vi vurdere å fjerne versjonsnummeret igjen når frontend bruker V2 til lagring av seksjon.
-            route("/seksjon/v2/{søknadId}/{seksjonId}") {
+            route("/seksjon/{søknadId}/{seksjonId}") {
                 put {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
                     val seksjonId = validerSeksjonIdParam() ?: return@put
@@ -34,21 +32,6 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                     )
                     call.respond(OK)
                 }
-            }
-            route("/seksjon/{søknadId}/{seksjonId}") {
-                put {
-                    val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
-                    val seksjonId = validerSeksjonIdParam() ?: return@put
-                    seksjonService.lagre(
-                        ident = call.ident(),
-                        søknadId = søknadId,
-                        seksjonId = seksjonId,
-                        seksjonsvar = call.receive<String>(),
-                        pdfGrunnlag = "{}",
-                    )
-                    call.respond(OK)
-                }
-
                 get {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
                     val seksjonId = validerSeksjonIdParam() ?: return@get
