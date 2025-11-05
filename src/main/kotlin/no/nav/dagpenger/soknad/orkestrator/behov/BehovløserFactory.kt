@@ -78,7 +78,7 @@ class BehovløserFactory(
             BarnetilleggV2 to BarnetilleggV2BehovLøser(rapidsConnection, opplysningRepository),
             AndreØkonomiskeYtelser to AndreØkonomiskeYtelserBehovløser(rapidsConnection, opplysningRepository),
             ØnsketArbeidstid to ØnsketArbeidstidBehovløser(rapidsConnection, opplysningRepository),
-            HarTilleggsopplysninger to HarTilleggsopplysningerBehovløser(rapidsConnection, opplysningRepository),
+            HarTilleggsopplysninger to HarTilleggsopplysningerBehovløser(rapidsConnection, opplysningRepository, seksjonRepository),
             BostedslandErNorge to BostedslandErNorgeBehovløser(rapidsConnection, opplysningRepository),
             PermittertGrensearbeider to PermittertGrensearbeiderBehovløser(rapidsConnection, opplysningRepository),
             EgetGårdsbruk to EgetGårdsbrukBehovløser(rapidsConnection, opplysningRepository),
