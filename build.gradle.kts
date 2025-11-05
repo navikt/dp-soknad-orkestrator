@@ -8,6 +8,7 @@ val urnlibVersion: String by project
 val prometheusMetricsCoreVersion: String by project
 val openHtmlToPdfVersion: String by project
 val dagpengerOauth2KlientVersion: String by project
+val freemarkerVersion: String by project
 
 val junitJupiterVersion: String by project
 val naisfulTestAppVersion: String by project
@@ -67,6 +68,7 @@ dependencies {
     implementation("no.nav.dagpenger:oauth2-klient:$dagpengerOauth2KlientVersion")
     implementation("no.nav.pam.geography:pam-geography:$pamGeographyVersion")
     implementation("no.nav.dagpenger:pdl-klient:$pdlVersion")
+    implementation("org.freemarker:freemarker:$freemarkerVersion")
 
     implementation("io.ktor:ktor-server-netty:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-server-config-yaml:${libs.versions.ktor.get()}")

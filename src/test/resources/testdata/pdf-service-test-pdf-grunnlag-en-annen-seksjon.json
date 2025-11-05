@@ -1,0 +1,270 @@
+{
+  "navn": "En Annen Seksjon",
+  "spørsmål": [
+    {
+      "id": "driver-du-egen-næringsvirksomhet",
+      "type": "envalg",
+      "label": "Driver du egen næringsvirksomhet?",
+      "options": [
+        {
+          "value": "ja",
+          "label": "Ja"
+        },
+        {
+          "value": "nei",
+          "label": "Nei"
+        }
+      ],
+      "svar": "ja"
+    },
+    {
+      "id": "driverDuEgenNæringsvirksomhetLesMer",
+      "type": "lesMer",
+      "label": "For deg som driver eget aksjeselskap",
+      "description": "Hvis du er ansatt i ditt eget aksjeselskap, må du legge til arbeidsforholdet i forrige steg. På dette spørsmålet skal du kun legge til egen næring, som enkeltpersonsforetak."
+    },
+    [
+      {
+        "id": "organisasjonsnummer",
+        "type": "kortTekst",
+        "label": "Næringens organisasjonsnummer",
+        "svar": "1"
+      },
+      {
+        "id": "hvor-mange-timer-jobbet-per-uke-før-arbeidstiden-ble-redusert",
+        "type": "tall",
+        "label": "Skriv inn hvor mange timer du jobbet per uke i egen næring før arbeidstiden ble redusert",
+        "svar": "1"
+      },
+      {
+        "id": "hvor-mange-timer-jobbet-per-uke-nå",
+        "type": "tall",
+        "label": "Skriv inn hvor mange timer du jobber per uke i egen næring nå",
+        "description": "For å vurdere om du har rett til dagpenger, må vi vite din nåværende ukentlige arbeidstid. Hvis du jobber mer enn 50 prosent av den totale arbeidstiden du hadde før, har du ikke rett til dagpenger.<br/><br/>Hvis arbeidstiden din i egen næring ikke er redusert, kan du skrive inn samme antall timer som i spørsmålet over.",
+        "svar": "1"
+      }
+    ],
+    {
+      "id": "driver-du-eget-gårdsbruk",
+      "type": "envalg",
+      "label": "Driver du eget gårdsbruk?",
+      "options": [
+        {
+          "value": "ja",
+          "label": "Ja"
+        },
+        {
+          "value": "nei",
+          "label": "Nei"
+        }
+      ],
+      "svar": "ja"
+    },
+    [
+      {
+        "id": "organisasjonsnummer",
+        "type": "kortTekst",
+        "label": "Gårdsbrukets organisasjonsnummer",
+        "svar": "1"
+      },
+      {
+        "id": "hvilke-type-gårdsbruk-driver-du",
+        "type": "flervalg",
+        "label": "Hvilken type gårdsbruk driver du?",
+        "options": [
+          {
+            "value": "dyr",
+            "label": "Dyr"
+          },
+          {
+            "value": "jord",
+            "label": "Jord"
+          },
+          {
+            "value": "skog",
+            "label": "Skog"
+          },
+          {
+            "value": "annet",
+            "label": "Annet"
+          }
+        ],
+        "svar": [
+          "dyr"
+        ]
+      },
+      {
+        "id": "hvem-eier-gårdsbruket",
+        "type": "flervalg",
+        "label": "Hvem eier gårdsbruket?",
+        "options": [
+          {
+            "value": "jeg",
+            "label": "Jeg"
+          },
+          {
+            "value": "samboer-ektefelle",
+            "label": "Samboer/ektefelle"
+          },
+          {
+            "value": "andre",
+            "label": "Andre"
+          }
+        ],
+        "svar": [
+          "jeg"
+        ]
+      },
+      {
+        "id": "hvor-mange-prosent-av-inntekten-går-til-deg",
+        "type": "tall",
+        "label": "Hvor mange prosent av inntekten går til deg?",
+        "svar": "1"
+      },
+      {
+        "id": "hvor-mange-arbeidstimer-blir-brukt-på-gårdsbruket-totalt-iløpet-av-et-år-valgt-år",
+        "type": "nedtrekksliste",
+        "label": "Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først",
+        "options": [
+          {
+            "value": "2025",
+            "label": "2025"
+          },
+          {
+            "value": "2024",
+            "label": "2024"
+          },
+          {
+            "value": "2023",
+            "label": "2023"
+          },
+          {
+            "value": "2022",
+            "label": "2022"
+          },
+          {
+            "value": "2021",
+            "label": "2021"
+          }
+        ],
+        "svar": "2025"
+      },
+      {
+        "id": "hvor-mange-arbeidstimer-blir-brukt-på-gårdsbruket-totalt-iløpet-av-et-år-antall-timer",
+        "type": "tall",
+        "label": "Skriv hvor mange arbeidstimer som ble brukt",
+        "svar": "1"
+      },
+      {
+        "id": "hvordan-har-du-beregnet-antall-arbeidstimer-totalt",
+        "type": "langTekst",
+        "label": "Forklar kort hvordan du har beregnet antall arbeidstimer totalt",
+        "svar": "1"
+      }
+    ],
+    [
+      {
+        "id": "organisasjonsnummer",
+        "type": "kortTekst",
+        "label": "Gårdsbrukets organisasjonsnummer",
+        "svar": "2"
+      },
+      {
+        "id": "hvilke-type-gårdsbruk-driver-du",
+        "type": "flervalg",
+        "label": "Hvilken type gårdsbruk driver du?",
+        "options": [
+          {
+            "value": "dyr",
+            "label": "Dyr"
+          },
+          {
+            "value": "jord",
+            "label": "Jord"
+          },
+          {
+            "value": "skog",
+            "label": "Skog"
+          },
+          {
+            "value": "annet",
+            "label": "Annet"
+          }
+        ],
+        "svar": [
+          "jord",
+          "skog",
+          "annet"
+        ]
+      },
+      {
+        "id": "hvem-eier-gårdsbruket",
+        "type": "flervalg",
+        "label": "Hvem eier gårdsbruket?",
+        "options": [
+          {
+            "value": "jeg",
+            "label": "Jeg"
+          },
+          {
+            "value": "samboer-ektefelle",
+            "label": "Samboer/ektefelle"
+          },
+          {
+            "value": "andre",
+            "label": "Andre"
+          }
+        ],
+        "svar": [
+          "samboer-ektefelle"
+        ]
+      },
+      {
+        "id": "hvor-mange-prosent-av-inntekten-går-til-deg",
+        "type": "tall",
+        "label": "Hvor mange prosent av inntekten går til deg?",
+        "svar": "2"
+      },
+      {
+        "id": "hvor-mange-arbeidstimer-blir-brukt-på-gårdsbruket-totalt-iløpet-av-et-år-valgt-år",
+        "type": "nedtrekksliste",
+        "label": "Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først",
+        "options": [
+          {
+            "value": "2025",
+            "label": "2025"
+          },
+          {
+            "value": "2024",
+            "label": "2024"
+          },
+          {
+            "value": "2023",
+            "label": "2023"
+          },
+          {
+            "value": "2022",
+            "label": "2022"
+          },
+          {
+            "value": "2021",
+            "label": "2021"
+          }
+        ],
+        "svar": "2024"
+      },
+      {
+        "id": "hvor-mange-arbeidstimer-blir-brukt-på-gårdsbruket-totalt-iløpet-av-et-år-antall-timer",
+        "type": "tall",
+        "label": "Skriv hvor mange arbeidstimer som ble brukt",
+        "svar": "2"
+      },
+      {
+        "id": "hvordan-har-du-beregnet-antall-arbeidstimer-totalt",
+        "type": "langTekst",
+        "label": "Forklar kort hvordan du har beregnet antall arbeidstimer totalt",
+        "svar": "2"
+      }
+    ]
+  ]
+}
