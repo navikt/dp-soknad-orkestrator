@@ -1,0 +1,311 @@
+
+<html lang="no">
+<head>
+    <title>Søknad om dagpenger</title>
+    <style>
+        body {
+            font-family: 'Source Sans Pro';
+            font-style: normal;
+            width: 600px;
+            padding: 0 40px 40px 40px;
+            color: rgb(38, 38, 38);
+        }
+
+        .modalSpørsmål {
+            background: #eee;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .pageHeaderRight {
+            position: running(pageHeaderRight);
+            font-size: 0.6em;
+            padding: 4px;
+            text-align: right;
+        }
+
+        @page {
+            size: A4 portrait;
+            @top-right {
+                content: element(pageHeaderRight);
+            }
+            @bottom-right {
+                content: counter(page);
+                font-family: 'Source Sans Pro';
+                padding-right: 15px;
+            }
+            orphans: 2;
+        }
+
+    </style>
+</head>
+<body>
+<div class="pageHeaderRight">
+    Innsendt elektronisk 2020-12-31 23:59:59<br/>
+    Fødselsnummer: 987654321
+</div><h1>Søknad om dagpenger</h1>
+<p>fornavn mellomnavn etternavn<br/>987654321<br/>adresselinje1, adresselinje2, adresselinje3, 1234 poststed, land<br/>Kontonummer: 97143830733</p>
+<hr/>    <h2>Egen næring</h2>
+        <p>
+            <strong>Driver du egen næringsvirksomhet?</strong>
+            <br/>
+    Svar:
+
+                    Ja
+        </p>
+            <div class="modalSpørsmål">
+        <p>
+            <strong>Næringens organisasjonsnummer</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+        <p>
+            <strong>Skriv inn hvor mange timer du jobbet per uke i egen næring før arbeidstiden ble redusert</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+        <p>
+            <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+            </div>
+        <p>
+            <strong>Driver du eget gårdsbruk?</strong>
+            <br/>
+    Svar:
+
+                    Ja
+        </p>
+            <div class="modalSpørsmål">
+        <p>
+            <strong>Gårdsbrukets organisasjonsnummer</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+        <p>
+            <strong>Hvilken type gårdsbruk driver du?</strong>
+            <br/>
+    Svar:
+
+                    Dyr
+        </p>
+        <p>
+            <strong>Hvem eier gårdsbruket?</strong>
+            <br/>
+    Svar:
+
+                    Jeg
+        </p>
+        <p>
+            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+        <p>
+            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+            <br/>
+    Svar:
+
+                    2025
+        </p>
+        <p>
+            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+        <p>
+            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+            </div>
+            <div class="modalSpørsmål">
+        <p>
+            <strong>Gårdsbrukets organisasjonsnummer</strong>
+            <br/>
+    Svar:
+        2
+        </p>
+        <p>
+            <strong>Hvilken type gårdsbruk driver du?</strong>
+            <br/>
+    Svar:
+
+                    Jord,
+                    Skog,
+                    Annet
+        </p>
+        <p>
+            <strong>Hvem eier gårdsbruket?</strong>
+            <br/>
+    Svar:
+
+                    Samboer/ektefelle
+        </p>
+        <p>
+            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+            <br/>
+    Svar:
+        2
+        </p>
+        <p>
+            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+            <br/>
+    Svar:
+
+                    2024
+        </p>
+        <p>
+            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+            <br/>
+    Svar:
+        2
+        </p>
+        <p>
+            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+            <br/>
+    Svar:
+        2
+        </p>
+            </div>
+    <h2>En Annen Seksjon</h2>
+        <p>
+            <strong>Driver du egen næringsvirksomhet?</strong>
+            <br/>
+    Svar:
+
+                    Ja
+        </p>
+            <div class="modalSpørsmål">
+        <p>
+            <strong>Næringens organisasjonsnummer</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+        <p>
+            <strong>Skriv inn hvor mange timer du jobbet per uke i egen næring før arbeidstiden ble redusert</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+        <p>
+            <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+            </div>
+        <p>
+            <strong>Driver du eget gårdsbruk?</strong>
+            <br/>
+    Svar:
+
+                    Ja
+        </p>
+            <div class="modalSpørsmål">
+        <p>
+            <strong>Gårdsbrukets organisasjonsnummer</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+        <p>
+            <strong>Hvilken type gårdsbruk driver du?</strong>
+            <br/>
+    Svar:
+
+                    Dyr
+        </p>
+        <p>
+            <strong>Hvem eier gårdsbruket?</strong>
+            <br/>
+    Svar:
+
+                    Jeg
+        </p>
+        <p>
+            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+        <p>
+            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+            <br/>
+    Svar:
+
+                    2025
+        </p>
+        <p>
+            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+        <p>
+            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+            <br/>
+    Svar:
+        1
+        </p>
+            </div>
+            <div class="modalSpørsmål">
+        <p>
+            <strong>Gårdsbrukets organisasjonsnummer</strong>
+            <br/>
+    Svar:
+        2
+        </p>
+        <p>
+            <strong>Hvilken type gårdsbruk driver du?</strong>
+            <br/>
+    Svar:
+
+                    Jord,
+                    Skog,
+                    Annet
+        </p>
+        <p>
+            <strong>Hvem eier gårdsbruket?</strong>
+            <br/>
+    Svar:
+
+                    Samboer/ektefelle
+        </p>
+        <p>
+            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+            <br/>
+    Svar:
+        2
+        </p>
+        <p>
+            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+            <br/>
+    Svar:
+
+                    2024
+        </p>
+        <p>
+            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+            <br/>
+    Svar:
+        2
+        </p>
+        <p>
+            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+            <br/>
+    Svar:
+        2
+        </p>
+            </div>
+</body>
+</html>

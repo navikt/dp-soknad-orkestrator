@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.pdf.PdfPayloadService
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDateTime
 import java.util.UUID
@@ -18,9 +19,10 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
     private val ident = "12345678903"
     private val rapidsConnection = TestRapid()
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    private val pdfPayloadService = mockk<PdfPayloadService>(relaxed = true)
 
     init {
-        MeldingOmSøknadKlarTilJournalføringMottak(rapidsConnection, søknadRepository)
+        MeldingOmSøknadKlarTilJournalføringMottak(rapidsConnection, søknadRepository, pdfPayloadService)
     }
 
     @BeforeEach
@@ -35,6 +37,8 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
 
         verify { søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt) }
+        verify { pdfPayloadService.genererBruttoPdfPayload(ident, søknadId) }
+        verify { pdfPayloadService.genererNettoPdfPayload(ident, søknadId) }
         rapidsConnection.inspektør.size shouldBe 1
         rapidsConnection.inspektør.message(0)["@behov"][0].asText() shouldBe "generer_og_mellomlagre_søknad_pdf"
     }

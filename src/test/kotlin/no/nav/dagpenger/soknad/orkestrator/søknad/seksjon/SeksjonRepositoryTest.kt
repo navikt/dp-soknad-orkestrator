@@ -330,4 +330,38 @@ class SeksjonRepositoryTest {
 
         seksjonRepository.hentDokumentasjonskrav(ident, randomUUID()) shouldBe emptyList()
     }
+
+    @Test
+    fun `hentPdfGrunnlag returnerer forventede seksjoner hvis søknaden tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.lagre(Søknad(søknadId, ident))
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(ident, søknadId, seksjonId2, seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
+
+        val dokumentasjonskravForSøknad = seksjonRepository.hentPdfGrunnlag(ident, søknadId)
+
+        dokumentasjonskravForSøknad shouldContainExactlyInAnyOrder
+            listOf(
+                pdfGrunnlag,
+                pdfGrunnlag2,
+            )
+    }
+
+    @Test
+    fun `hentPdfGrunnlag returnerer tom liste hvis søknaden tilhører en annen bruker enn den som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.lagre(Søknad(søknadId, ident))
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        seksjonRepository.hentPdfGrunnlag("en-annen-ident", søknadId) shouldBe emptyList()
+    }
+
+    @Test
+    fun `hentPdfGrunnlag returnerer tom liste hvis søknaden ikke eksisterer`() {
+        val søknadId = randomUUID()
+        søknadRepository.lagre(Søknad(søknadId, ident))
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        seksjonRepository.hentPdfGrunnlag(ident, randomUUID()) shouldBe emptyList()
+    }
 }

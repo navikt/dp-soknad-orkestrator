@@ -39,6 +39,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadSlettetMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.pdf.PdfPayloadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonService
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.seksjonApi
@@ -138,7 +139,11 @@ internal class ApplicationBuilder(
                 søknadService.setRapidsConnection(rapidsConnection)
                 journalføringService.setRapidsConnection(rapidsConnection)
                 SøknadMottak(rapidsConnection, søknadService, søknadRepository)
-                MeldingOmSøknadKlarTilJournalføringMottak(rapidsConnection, søknadRepository)
+                MeldingOmSøknadKlarTilJournalføringMottak(
+                    rapidsConnection,
+                    søknadRepository,
+                    PdfPayloadService(søknadRepository, søknadPersonaliaRepository, seksjonRepository),
+                )
                 SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection)
                 SøknadPdfOgVedleggJournalførtMottak(rapidsConnection, søknadRepository)
                 MinidialogJournalførtMottak(rapidsConnection)
