@@ -103,7 +103,13 @@ class BehovløserFactory(
                     søknadRepository,
                     seksjonRepository,
                 ),
-            JobbetUtenforNorge to JobbetUtenforNorgeBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            JobbetUtenforNorge to
+                JobbetUtenforNorgeBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
             Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             Lønnsgaranti to LønnsgarantiBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             Permittert to PermittertBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
