@@ -78,7 +78,13 @@ class BehovløserFactory(
                     søknadRepository,
                     seksjonRepository,
                 ),
-            KanJobbeHvorSomHelst to KanJobbeHvorSomHelstBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            KanJobbeHvorSomHelst to
+                KanJobbeHvorSomHelstBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
             VilligTilÅBytteYrke to VilligTilÅBytteYrkeBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             JobbetUtenforNorge to JobbetUtenforNorgeBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
