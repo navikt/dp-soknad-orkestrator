@@ -74,7 +74,13 @@ class BehovløserFactory(
                     opplysningRepository,
                     søknadRepository,
                 ),
-            EØSArbeid to EØSArbeidBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            EØSArbeid to
+                EØSArbeidBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
             KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             HelseTilAlleTyperJobb to
                 HelseTilAlleTyperJobbBehovløser(
