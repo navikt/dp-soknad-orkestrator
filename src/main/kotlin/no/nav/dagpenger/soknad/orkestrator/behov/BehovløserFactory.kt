@@ -118,7 +118,13 @@ class BehovløserFactory(
                     søknadRepository,
                     seksjonRepository,
                 ),
-            Permittert to PermittertBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            Permittert to
+                PermittertBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
             PermittertFiskeforedling to PermittertFiskeforedlingBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             Ordinær to OrdinærBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             Søknadsdato to SøknadsdatoBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
