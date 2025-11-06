@@ -4,12 +4,17 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -19,7 +24,8 @@ class HelseTilAlleTyperJobbBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
-    val behovløser = HelseTilAlleTyperJobbBehovløser(testRapid, opplysningRepository, søknadRepository)
+    val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
+    val behovløser = HelseTilAlleTyperJobbBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 
@@ -49,6 +55,48 @@ class HelseTilAlleTyperJobbBehovløserTest {
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.HelseTilAlleTyperJobb))
 
+        testRapid.inspektør.message(0)["@løsning"]["HelseTilAlleTyperJobb"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe true
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
+    @Test
+    fun `Behovløser publiserer løsning på behov HelseTilAlleTyperJobb med verdi og gjelderFra fra seksjonsdata`() {
+        every {
+            seksjonRepository.hentSeksjonsvar(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+              "seksjon": {
+                "kan-du-ta-alle-typer-arbeid": "ja"
+              },
+              "versjon": 1
+            }
+            """.trimIndent()
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.HelseTilAlleTyperJobb))
+
+        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "reell-arbeidssoker") }
+        verify {
+            søknadRepository.hent(søknadId)
+        }
         testRapid.inspektør.message(0)["@løsning"]["HelseTilAlleTyperJobb"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
