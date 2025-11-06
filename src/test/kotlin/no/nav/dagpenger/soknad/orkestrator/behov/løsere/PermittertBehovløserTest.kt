@@ -3,12 +3,14 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
+import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Permittert
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -17,7 +19,8 @@ import kotlin.test.Test
 class PermittertBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
-    val behovløser = PermittertBehovløser(testRapid, opplysningRepository)
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val behovløser = PermittertBehovløser(testRapid, opplysningRepository, søknadRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 

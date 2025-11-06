@@ -5,11 +5,13 @@ import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnskerDagpengerFraDato
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 
 class ØnskerDagpengerFraDatoBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
-) : Behovløser(rapidsConnection, opplysningRepository) {
+    søknadRepository: SøknadRepository,
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository) {
     override val behov = ØnskerDagpengerFraDato.name
     override val beskrivendeId
         get() = throw NotImplementedError("Overrider løs() og trenger ikke beskrivendeId")

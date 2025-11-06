@@ -9,6 +9,7 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import java.time.LocalDate
 import java.util.UUID
@@ -17,8 +18,9 @@ import java.util.UUID.randomUUID
 class BarnetilleggBehovLøser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
+    søknadRepository: SøknadRepository,
     seksjonRepository: SeksjonRepository,
-) : Behovløser(rapidsConnection, opplysningRepository, seksjonRepository) {
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository) {
     override val behov = Barnetillegg.name
     override val beskrivendeId
         get() = throw NotImplementedError("Overrider løs() og trenger ikke beskrivendeId")

@@ -32,7 +32,7 @@ class BehovløserFactoryTest {
                     søknadRepository,
                 )
         }
-        behovløserFactory = BehovløserFactory(testRapid, opplysningRepository, seksjonRepository)
+        behovløserFactory = BehovløserFactory(testRapid, opplysningRepository, seksjonRepository, søknadRepository)
     }
 
     companion object {

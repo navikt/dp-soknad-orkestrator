@@ -154,6 +154,7 @@ internal class ApplicationBuilder(
                             rapidsConnection,
                             QuizOpplysningRepositoryPostgres(dataSource),
                             seksjonRepository,
+                            søknadRepository,
                         ),
                     søknadService = søknadService,
                 )

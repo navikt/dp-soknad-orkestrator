@@ -5,11 +5,13 @@ import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnsketArbeidstid
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 
 class ØnsketArbeidstidBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
-) : Behovløser(rapidsConnection, opplysningRepository) {
+    søknadRepository: SøknadRepository,
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository) {
     override val behov = ØnsketArbeidstid.name
     override val beskrivendeId = "faktum.kun-deltid-aarsak-antall-timer"
 

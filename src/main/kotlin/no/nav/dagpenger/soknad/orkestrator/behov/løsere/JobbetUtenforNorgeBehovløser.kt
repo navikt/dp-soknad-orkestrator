@@ -7,12 +7,14 @@ import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.util.UUID
 
 class JobbetUtenforNorgeBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
-) : Behovløser(rapidsConnection, opplysningRepository) {
+    søknadRepository: SøknadRepository,
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository) {
     override val behov = JobbetUtenforNorge.name
     override val beskrivendeId = "faktum.arbeidsforhold"
     private val landkodeNorge = "NOR"

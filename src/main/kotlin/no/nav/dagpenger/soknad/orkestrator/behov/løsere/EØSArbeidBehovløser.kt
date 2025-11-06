@@ -5,12 +5,14 @@ import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EØSArbeid
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.util.UUID
 
 class EØSArbeidBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
-) : Behovløser(rapidsConnection, opplysningRepository) {
+    søknadRepository: SøknadRepository,
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository) {
     override val behov = EØSArbeid.name
     override val beskrivendeId = "faktum.eos-arbeid-siste-36-mnd"
 

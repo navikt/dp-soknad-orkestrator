@@ -7,14 +7,16 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Vernep
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.erBoolean
 
 class VernepliktBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
+    søknadRepository: SøknadRepository,
     seksjonRepository: SeksjonRepository,
-) : Behovløser(rapidsConnection, opplysningRepository, seksjonRepository) {
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository) {
     override val behov = Verneplikt.name
     override val beskrivendeId = "faktum.avtjent-militaer-sivilforsvar-tjeneste-siste-12-mnd"
 

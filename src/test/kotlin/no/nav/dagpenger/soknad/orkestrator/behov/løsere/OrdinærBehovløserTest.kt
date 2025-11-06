@@ -3,12 +3,14 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
+import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Ordinær
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -17,8 +19,9 @@ import kotlin.test.Test
 @Suppress("ktlint:standard:max-line-length")
 class OrdinærBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val testRapid = TestRapid()
-    val behovløser = OrdinærBehovløser(testRapid, opplysningRepository)
+    val behovløser = OrdinærBehovløser(testRapid, opplysningRepository, søknadRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 

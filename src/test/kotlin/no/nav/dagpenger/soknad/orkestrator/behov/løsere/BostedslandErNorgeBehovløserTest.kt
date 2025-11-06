@@ -4,9 +4,11 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
@@ -16,8 +18,9 @@ import kotlin.test.Test
 
 class BostedslandErNorgeBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val testRapid = TestRapid()
-    val behovløser = BostedslandErNorgeBehovløser(testRapid, opplysningRepository)
+    val behovløser = BostedslandErNorgeBehovløser(testRapid, opplysningRepository, søknadRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 

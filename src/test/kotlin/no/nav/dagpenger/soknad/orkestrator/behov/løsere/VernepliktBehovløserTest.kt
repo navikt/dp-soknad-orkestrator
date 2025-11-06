@@ -42,7 +42,7 @@ class VernepliktBehovløserTest {
                     søknadRepository,
                 )
         }
-        behovløser = VernepliktBehovløser(testRapid, opplysningRepository, seksjonRepository)
+        behovløser = VernepliktBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
     }
 
     @Test
@@ -98,9 +98,9 @@ class VernepliktBehovløserTest {
         seksjonRepository.lagre(
             ident,
             søknadId,
-            "verneplikt",
-            """{"seksjon":{"avtjent-verneplikt":"ja"},"versjon":1}""",
-            """{"pdfGrunnlagKey": "pdfGrunnlagValue"}""",
+            seksjonId = "verneplikt",
+            seksjonsvar = """{"seksjon":{"avtjent-verneplikt":"ja"},"versjon":1}""",
+            pdfGrunnlag = """{"pdfGrunnlagKey": "pdfGrunnlagValue"}""",
         )
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Verneplikt))

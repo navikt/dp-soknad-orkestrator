@@ -11,6 +11,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.HarTil
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import java.time.ZonedDateTime
@@ -21,7 +22,8 @@ class HarTilleggsopplysningerBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
     val seksjonRepository = mockk<SeksjonRepository>()
-    val behovløser = HarTilleggsopplysningerBehovløser(testRapid, opplysningRepository, seksjonRepository)
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val behovløser = HarTilleggsopplysningerBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 

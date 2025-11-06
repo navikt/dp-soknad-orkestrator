@@ -7,13 +7,15 @@ import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.time.LocalDate
 import java.util.UUID
 
 class BarnetilleggV2BehovLøser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
-) : Behovløser(rapidsConnection, opplysningRepository) {
+    søknadRepository: SøknadRepository,
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository) {
     override val behov = BarnetilleggV2.name
     override val beskrivendeId
         get() = throw NotImplementedError("Overrider løs() og trenger ikke beskrivendeId")

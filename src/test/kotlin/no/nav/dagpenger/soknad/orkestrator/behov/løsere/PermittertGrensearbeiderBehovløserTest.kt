@@ -3,12 +3,14 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
+import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertGrensearbeiderBehovløser.Companion.reistITaktMedRotasjonBeskrivendeId
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertGrensearbeiderBehovløser.Companion.reistTilbakeEnGangEllerMerBeskrivendeId
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -17,8 +19,9 @@ import java.util.UUID
 
 class PermittertGrensearbeiderBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val testRapid = TestRapid()
-    val behovløser = PermittertGrensearbeiderBehovløser(testRapid, opplysningRepository)
+    val behovløser = PermittertGrensearbeiderBehovløser(testRapid, opplysningRepository, søknadRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 

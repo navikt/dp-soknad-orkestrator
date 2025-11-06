@@ -5,6 +5,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BarnetilleggV2
@@ -15,6 +16,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
@@ -26,8 +28,9 @@ import java.util.UUID.randomUUID
 class BarnetilleggV2BehovLøserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val quizOpplysningRepositorySpy = spyk<QuizOpplysningRepository>(opplysningRepository)
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val testRapid = TestRapid()
-    val behovløser = BarnetilleggV2BehovLøser(testRapid, quizOpplysningRepositorySpy)
+    val behovløser = BarnetilleggV2BehovLøser(testRapid, quizOpplysningRepositorySpy, søknadRepository)
     val ident = "12345678910"
     val søknadId: UUID = randomUUID()
 

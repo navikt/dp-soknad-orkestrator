@@ -7,13 +7,15 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.HarTil
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 
 class HarTilleggsopplysningerBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
+    søknadRepository: SøknadRepository,
     seksjonRepository: SeksjonRepository,
-) : Behovløser(rapidsConnection, opplysningRepository, seksjonRepository) {
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository) {
     override val behov = HarTilleggsopplysninger.name
     override val beskrivendeId = "faktum.tilleggsopplysninger.har-tilleggsopplysninger"
 

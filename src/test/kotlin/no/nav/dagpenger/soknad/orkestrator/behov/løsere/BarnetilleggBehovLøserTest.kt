@@ -3,7 +3,6 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.collections.shouldBeEmpty
-import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -18,6 +17,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
@@ -31,8 +31,9 @@ class BarnetilleggBehovLøserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val quizOpplysningRepositorySpy = spyk<QuizOpplysningRepository>(opplysningRepository)
     val seksjonRepository = mockk<SeksjonRepository>()
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val testRapid = TestRapid()
-    val behovløser = BarnetilleggBehovLøser(testRapid, quizOpplysningRepositorySpy, seksjonRepository)
+    val behovløser = BarnetilleggBehovLøser(testRapid, quizOpplysningRepositorySpy, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId: UUID = randomUUID()
 
@@ -169,10 +170,10 @@ class BarnetilleggBehovLøserTest {
             it["fødselsdato"].asText() shouldBe "2013-05-26"
             it["statsborgerskap"].asText() shouldBe "NOR"
             it["kvalifiserer"].asBoolean() shouldBe false
-            it["barnetilleggFom"].asLocalDate().shouldBeNull()
-            it["barnetilleggTom"].asLocalDate().shouldBeNull()
-            it["endretAv"].asText().shouldBeNull()
-            it["begrunnelse"].asText().shouldBeNull()
+            it["barnetilleggFom"].asText().shouldBe("null")
+            it["barnetilleggTom"].asText().shouldBe("null")
+            it["endretAv"].asText().shouldBe("null")
+            it["begrunnelse"].asText().shouldBe("null")
         }
     }
 
