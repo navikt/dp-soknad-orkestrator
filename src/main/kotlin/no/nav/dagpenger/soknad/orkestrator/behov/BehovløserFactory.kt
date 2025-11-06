@@ -111,7 +111,13 @@ class BehovløserFactory(
                     seksjonRepository,
                 ),
             Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
-            Lønnsgaranti to LønnsgarantiBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            Lønnsgaranti to
+                LønnsgarantiBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
             Permittert to PermittertBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             PermittertFiskeforedling to PermittertFiskeforedlingBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             Ordinær to OrdinærBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
