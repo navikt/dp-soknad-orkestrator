@@ -70,7 +70,7 @@ class BehovløserFactory(
                     søknadRepository,
                 ),
             EØSArbeid to EØSArbeidBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
-            KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             HelseTilAlleTyperJobb to HelseTilAlleTyperJobbBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             KanJobbeHvorSomHelst to KanJobbeHvorSomHelstBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             VilligTilÅBytteYrke to VilligTilÅBytteYrkeBehovløser(rapidsConnection, opplysningRepository, søknadRepository),

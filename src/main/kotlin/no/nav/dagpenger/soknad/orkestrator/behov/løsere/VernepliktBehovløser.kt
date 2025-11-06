@@ -37,23 +37,17 @@ class VernepliktBehovløser(
                         "og kan ikke svare på behov $behov for søknad med id: ${behovmelding.søknadId}",
                 )
 
-            var avtjentVernepliktValue: Boolean? = null
             objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
                 seksjonsJson.findPath("avtjent-verneplikt")?.let {
                     if (!it.isMissingOrNull()) {
-                        avtjentVernepliktValue = it.erBoolean()
+                        publiserLøsning(behovmelding, it.erBoolean())
                     }
                 }
             }
 
-            if (avtjentVernepliktValue == null) {
-                throw IllegalStateException(
-                    "Fant ingen opplysning med beskrivendeId: $beskrivendeId " +
-                        "og kan ikke svare på behov $behov for søknad med id: ${behovmelding.søknadId}",
-                )
-            }
-
-            publiserLøsning(behovmelding, avtjentVernepliktValue)
+            throw IllegalStateException(
+                "Fant ingen opplysning på behov $behov for søknad med id: ${behovmelding.søknadId}",
+            )
         }
     }
 }
