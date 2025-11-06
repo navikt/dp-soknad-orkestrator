@@ -62,7 +62,12 @@ class BehovløserFactory(
     private val behovløsere: Map<Behov, Behovløser> =
         mapOf(
             OppgittAndreYtelserUtenforNav to
-                OppgittAndreYtelserUtenforNavBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+                OppgittAndreYtelserUtenforNavBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
             ØnskerDagpengerFraDato to
                 ØnskerDagpengerFraDatoBehovløser(
                     rapidsConnection,
