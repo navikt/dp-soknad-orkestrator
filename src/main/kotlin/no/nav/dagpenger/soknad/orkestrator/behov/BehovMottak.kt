@@ -17,6 +17,14 @@ class BehovMottak(
     private val behovløserFactory: BehovløserFactory,
     private val søknadService: SøknadService,
 ) : River.PacketListener {
+    private companion object {
+        private val logger = KotlinLogging.logger {}
+        private val behovIdSkipSet =
+            setOf(
+                "93fe996c-2ead-4e67-b6dc-cac88cf16954",
+            )
+    }
+
     init {
         River(rapidsConnection)
             .apply {
@@ -37,14 +45,21 @@ class BehovMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
+        val behovId = packet["@behovId"].asText()
+
         withMDC(
             mapOf(
                 "søknadId" to packet["søknadId"].asText(),
                 "behandlingId" to packet["behandlingId"].asText(),
-                "behovId" to packet["@behovId"].asText(),
+                "behovId" to behovId,
             ),
         ) {
             logger.info { "Mottok behov: ${packet.mottatteBehov()}" }
+
+            if (behovIdSkipSet.contains(behovId)) {
+                logger.info { "Mottok behov $behovId som ligger i behovIdSkipSet, ignorerer meldingen." }
+                return@withMDC
+            }
 
             if (!søknadService.søknadFinnes(packet["søknadId"].asUUID())) {
                 logger.warn { "Søknad med søknadId: ${packet["søknadId"].asText()} finnes ikke, kan ikke løse behov" }
@@ -68,10 +83,6 @@ class BehovMottak(
     }
 
     internal fun behovsløserFor(behov: BehovløserFactory.Behov) = behovløserFactory.behovløserFor(behov)
-
-    private companion object {
-        private val logger = KotlinLogging.logger {}
-    }
 }
 
 internal fun JsonMessage.mottatteBehov() =
