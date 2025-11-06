@@ -74,7 +74,7 @@ class BehovløserFactory(
             Ordinær to OrdinærBehovløser(rapidsConnection, opplysningRepository),
             Søknadsdato to SøknadsdatoBehovløser(rapidsConnection, opplysningRepository),
             TarUtdanningEllerOpplæring to UtdanningEllerOpplæringBehovløser(rapidsConnection, opplysningRepository),
-            Barnetillegg to BarnetilleggBehovLøser(rapidsConnection, opplysningRepository),
+            Barnetillegg to BarnetilleggBehovLøser(rapidsConnection, opplysningRepository, seksjonRepository),
             BarnetilleggV2 to BarnetilleggV2BehovLøser(rapidsConnection, opplysningRepository),
             AndreØkonomiskeYtelser to AndreØkonomiskeYtelserBehovløser(rapidsConnection, opplysningRepository),
             ØnsketArbeidstid to ØnsketArbeidstidBehovløser(rapidsConnection, opplysningRepository),

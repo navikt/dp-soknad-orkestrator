@@ -1,19 +1,24 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Barnetillegg
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import java.time.LocalDate
 import java.util.UUID
+import java.util.UUID.randomUUID
 
 class BarnetilleggBehovLøser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
-) : Behovløser(rapidsConnection, opplysningRepository) {
+    seksjonRepository: SeksjonRepository,
+) : Behovløser(rapidsConnection, opplysningRepository, seksjonRepository) {
     override val behov = Barnetillegg.name
     override val beskrivendeId
         get() = throw NotImplementedError("Overrider løs() og trenger ikke beskrivendeId")
@@ -53,7 +58,42 @@ class BarnetilleggBehovLøser(
                 )
             }
         }
-        return emptyList()
+
+        val seksjonsvar =
+            seksjonRepository?.hentSeksjonsvar(
+                ident,
+                søknadId,
+                "barnetillegg",
+            ) ?: return emptyList()
+
+        val pdlBarn =
+            objectMapper.readTree(seksjonsvar).let { seksjonJson ->
+                seksjonJson.findPath("barnFraPdl")?.toList() ?: emptyList()
+            }
+
+        val egneBarn =
+            objectMapper.readTree(seksjonsvar).let { seksjonJson ->
+                seksjonJson.findPath("barnLagtManuelt")?.toList() ?: emptyList()
+            }
+
+        val svar =
+            (pdlBarn + egneBarn).map { barnJson ->
+                // TODO: Vi har vel ikke alt vi trenger her?
+                Løsningsbarn(
+                    søknadbarnId = randomUUID(),
+                    fornavnOgMellomnavn = barnJson["fornavn-og-mellomnavn"].asText(),
+                    etternavn = barnJson["etternavn"].asText(),
+                    fødselsdato = barnJson["fødselsdato"].asLocalDate(),
+                    statsborgerskap = barnJson["bostedsland"].asText(),
+                    kvalifiserer = false,
+                    barnetilleggFom = null,
+                    barnetilleggTom = null,
+                    endretAv = null,
+                    begrunnelse = null,
+                )
+            }
+
+        return svar
     }
 
     private fun hentBarnSvar(

@@ -47,6 +47,10 @@ abstract class Behovløser(
         svarPåBehov: Any,
     ) {
         var gjelderFra: LocalDate? = finnGjelderFraDato(behovmelding.søknadId, behovmelding.ident)
+
+        // TODO: Dette funker ikke ordentlig
+        //  Det er litt rart å bruke søknadRepository via seksjonRepository, vi burde heller sende den inn direkte
+        //  innsendtTidspunkt er litt rar, så jeg tror ikke vi nødvendigvis får riktig dato
         if (gjelderFra == null) {
             val søknad =
                 seksjonRepository
