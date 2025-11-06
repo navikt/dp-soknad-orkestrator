@@ -5,6 +5,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -14,6 +15,7 @@ import java.util.UUID
 abstract class Behovløser(
     val rapidsConnection: RapidsConnection,
     val opplysningRepository: QuizOpplysningRepository,
+    val søknadRepository: SøknadRepository,
     val seksjonRepository: SeksjonRepository? = null,
 ) {
     abstract val behov: String
@@ -46,26 +48,8 @@ abstract class Behovløser(
         behovmelding: Behovmelding,
         svarPåBehov: Any,
     ) {
-        var gjelderFra: LocalDate? = finnGjelderFraDato(behovmelding.søknadId, behovmelding.ident)
+        val gjelderFra: LocalDate? = finnGjelderFraDato(behovmelding.søknadId, behovmelding.ident)
 
-        // TODO: Dette funker ikke ordentlig
-        //  Det er litt rart å bruke søknadRepository via seksjonRepository, vi burde heller sende den inn direkte
-        //  innsendtTidspunkt er litt rar, så jeg tror ikke vi nødvendigvis får riktig dato
-        if (gjelderFra == null) {
-            val søknad =
-                seksjonRepository
-                    ?.søknadRepository
-                    ?.hent(behovmelding.søknadId)
-
-            gjelderFra =
-                søknad
-                    ?.innsendtTidspunkt
-                    ?.toLocalDate()
-                    ?: throw IllegalStateException(
-                        "Fant ingen opplysning om innsendt dato med beskrivendeId " +
-                            "og kan ikke svare på behov $behov for søknad med id: ${behovmelding.søknadId}",
-                    )
-        }
         behovmelding.innkommendePacket["@løsning"] =
             mapOf(
                 behov to
@@ -86,7 +70,16 @@ abstract class Behovløser(
     fun JsonMessage.ident(): String = get("ident").asText()
 
     // I første omgang er gjelderFra lik søknadstidspunkt
-    fun finnGjelderFraDato(
+    private fun finnGjelderFraDato(
+        søknadId: UUID,
+        ident: String,
+    ): LocalDate? {
+        val søknadstidspunktFraQuiz = hentSøknadstidspunktFraQuizSøknad(søknadId, ident)
+
+        return søknadstidspunktFraQuiz ?: hentSøknadstidspunkt(søknadId)
+    }
+
+    private fun hentSøknadstidspunktFraQuizSøknad(
         søknadId: UUID,
         ident: String,
     ): LocalDate? {
@@ -101,5 +94,14 @@ abstract class Behovløser(
         return søknadstidspunkt?.let {
             ZonedDateTime.parse(it as String, DateTimeFormatter.ISO_ZONED_DATE_TIME).toLocalDate()
         }
+    }
+
+    private fun hentSøknadstidspunkt(søknadId: UUID): LocalDate? {
+        val søknadstidspunkt =
+            søknadRepository
+                .hent(søknadId)
+                ?.innsendtTidspunkt
+
+        return søknadstidspunkt?.toLocalDate()
     }
 }
