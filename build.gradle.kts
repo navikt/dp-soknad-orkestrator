@@ -15,7 +15,7 @@ val naisfulTestAppVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.2.21"
-    id("io.ktor.plugin") version "3.3.1"
+    id("io.ktor.plugin") version "3.3.2"
     id("org.jlleitschuh.gradle.ktlint") version "13.1.0"
 }
 
