@@ -145,7 +145,13 @@ class BehovløserFactory(
                     søknadRepository,
                     seksjonRepository,
                 ),
-            ØnsketArbeidstid to ØnsketArbeidstidBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            ØnsketArbeidstid to
+                ØnsketArbeidstidBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
             HarTilleggsopplysninger to
                 HarTilleggsopplysningerBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             BostedslandErNorge to BostedslandErNorgeBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
