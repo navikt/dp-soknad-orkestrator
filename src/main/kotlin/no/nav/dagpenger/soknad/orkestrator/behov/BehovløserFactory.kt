@@ -154,7 +154,13 @@ class BehovløserFactory(
                 ),
             HarTilleggsopplysninger to
                 HarTilleggsopplysningerBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
-            BostedslandErNorge to BostedslandErNorgeBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            BostedslandErNorge to
+                BostedslandErNorgeBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
             PermittertGrensearbeider to
                 PermittertGrensearbeiderBehovløser(
                     rapidsConnection,
