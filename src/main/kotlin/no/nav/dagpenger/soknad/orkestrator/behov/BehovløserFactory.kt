@@ -132,7 +132,7 @@ class BehovløserFactory(
                     søknadRepository,
                     seksjonRepository,
                 ),
-            Ordinær to OrdinærBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            Ordinær to OrdinærBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             Søknadsdato to SøknadsdatoBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             TarUtdanningEllerOpplæring to UtdanningEllerOpplæringBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             Barnetillegg to BarnetilleggBehovLøser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
