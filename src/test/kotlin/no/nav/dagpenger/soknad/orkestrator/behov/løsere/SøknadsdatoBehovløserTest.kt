@@ -4,12 +4,16 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
+import java.time.LocalDateTime
 import java.time.ZonedDateTime
 import java.util.UUID
 import kotlin.test.Test
@@ -44,7 +48,28 @@ class SøknadsdatoBehovløserTest {
     }
 
     @Test
+    fun `Behovløser publiserer løsning på behov Søknadsdato med verdi og gjelderFra fra søknadstabellen`() {
+        val svar = LocalDateTime.now()
+        every { søknadRepository.hent(any()) } returns
+            Søknad(
+                ident = ident,
+                søknadId = søknadId,
+                innsendtTidspunkt = svar,
+            )
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Søknadsdato))
+
+        verify { søknadRepository.hent(søknadId) }
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdato"].also { løsning ->
+            løsning["verdi"].asLocalDate() shouldBe svar.toLocalDate()
+            løsning["gjelderFra"].asLocalDate() shouldBe svar.toLocalDate()
+        }
+    }
+
+    @Test
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
+        every { søknadRepository.hent(søknadId) } returns null
+
         shouldThrow<IllegalStateException> { behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Søknadsdato)) }
     }
 }
