@@ -166,6 +166,7 @@ class BehovløserFactory(
                     rapidsConnection,
                     opplysningRepository,
                     søknadRepository,
+                    seksjonRepository,
                 ),
             EgetGårdsbruk to EgetGårdsbrukBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             EgenNæringsvirksomhet to EgenNæringsvirksomhetBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
