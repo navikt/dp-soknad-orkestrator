@@ -34,34 +34,26 @@ class BarnetilleggV2BehovLøser(
     ): BarnetilleggV2Løsning {
         val pdlBarnSvar = hentBarnSvar(BESKRIVENDE_ID_PDL_BARN, ident, søknadId)
         val egneBarnSvar = hentBarnSvar(BESKRIVENDE_ID_EGNE_BARN, ident, søknadId)
+        val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
 
-        if ((pdlBarnSvar + egneBarnSvar).isNotEmpty()) {
-            val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
-
-            val alleBarn =
-                (pdlBarnSvar + egneBarnSvar).map {
-                    LøsningsbarnV2(
-                        fornavnOgMellomnavn = it.fornavnOgMellomnavn,
-                        etternavn = it.etternavn,
-                        fødselsdato = it.fødselsdato,
-                        statsborgerskap = it.statsborgerskap,
-                        kvalifiserer = it.kvalifisererTilBarnetillegg,
-                        barnetilleggFom = it.barnetilleggFom,
-                        barnetilleggTom = it.barnetilleggTom,
-                        endretAv = it.endretAv,
-                        begrunnelse = it.begrunnelse,
-                    )
-                }
-
-            return BarnetilleggV2Løsning(
-                søknadbarnId = søknadbarnId,
-                barn = alleBarn,
-            )
-        }
+        val alleBarn =
+            (pdlBarnSvar + egneBarnSvar).map {
+                LøsningsbarnV2(
+                    fornavnOgMellomnavn = it.fornavnOgMellomnavn,
+                    etternavn = it.etternavn,
+                    fødselsdato = it.fødselsdato,
+                    statsborgerskap = it.statsborgerskap,
+                    kvalifiserer = it.kvalifisererTilBarnetillegg,
+                    barnetilleggFom = it.barnetilleggFom,
+                    barnetilleggTom = it.barnetilleggTom,
+                    endretAv = it.endretAv,
+                    begrunnelse = it.begrunnelse,
+                )
+            }
 
         return BarnetilleggV2Løsning(
-            søknadbarnId = null,
-            barn = emptyList(),
+            søknadbarnId = søknadbarnId,
+            barn = alleBarn,
         )
     }
 

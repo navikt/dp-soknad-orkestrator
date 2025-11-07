@@ -4,6 +4,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.spyk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BarnetilleggV2
@@ -128,8 +129,8 @@ class BarnetilleggV2BehovLøserTest {
 
         val barnetilleggV2Løsning = testRapid.inspektør.field(0, "@løsning")[BarnetilleggV2.name]["verdi"]
         val løsteBarn = barnetilleggV2Løsning["barn"]
-        verify(exactly = 0) { quizOpplysningRepositorySpy.hentEllerOpprettSøknadbarnId(any()) }
-        barnetilleggV2Løsning["søknadbarnId"].isNull shouldBe true
+        verify(exactly = 1) { quizOpplysningRepositorySpy.hentEllerOpprettSøknadbarnId(any()) }
+        barnetilleggV2Løsning["søknadbarnId"] shouldNotBe null
         løsteBarn.shouldBeEmpty()
     }
 }

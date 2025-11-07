@@ -2,8 +2,6 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
 import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
@@ -47,7 +45,7 @@ class SøknadRepository(
                 it[tilstand] = søknad.tilstand.name
             }
 
-            opprettBarnSøknadMappingHvisBarnEksistererISøknaden(søknad, quizOpplysningRepository)
+            quizOpplysningRepository.lagreBarnSøknadMapping(søknadId = søknad.søknadId)
 
             søknad.opplysninger.forEach { quizOpplysningRepository.lagre(it) }
         }
@@ -185,17 +183,3 @@ fun SøknadTabell.getId(søknadId: UUID) =
         .singleOrNull()
         ?.get(SøknadTabell.id)
         ?.value
-
-private fun opprettBarnSøknadMappingHvisBarnEksistererISøknaden(
-    søknad: Søknad,
-    quizOpplysningRepository: QuizOpplysningRepository,
-) {
-    val barnEksistererISøknad =
-        søknad.opplysninger.find { it.type == Barn && (it.svar as List<BarnSvar>).isNotEmpty() } != null
-
-    if (barnEksistererISøknad) {
-        quizOpplysningRepository.lagreBarnSøknadMapping(
-            søknadId = søknad.søknadId,
-        )
-    }
-}

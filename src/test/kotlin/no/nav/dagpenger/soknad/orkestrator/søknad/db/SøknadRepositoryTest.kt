@@ -8,8 +8,6 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
@@ -20,7 +18,6 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.JOURNALFØRT
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.transactions.transaction
-import java.time.LocalDate
 import java.time.LocalDateTime.now
 import java.util.UUID
 import java.util.UUID.randomUUID
@@ -58,49 +55,6 @@ class SøknadRepositoryTest {
                             beskrivendeId = "beskrivendeId",
                             type = Tekst,
                             svar = "Svar",
-                            ident = ident,
-                            søknadId = søknadId,
-                        ),
-                    ),
-            )
-
-        søknadRepository.lagreQuizSøknad(søknad)
-        val hentetSøknad = søknadRepository.hent(søknadId)
-        val søknadbarnId = hentSøknadbarnIdUtenÅOppretteNy(søknadId)
-
-        hentetSøknad?.ident shouldBe søknad.ident
-        hentetSøknad?.søknadId shouldBe søknad.søknadId
-        hentetSøknad?.tilstand shouldBe søknad.tilstand
-        hentetSøknad?.opplysninger?.size shouldBe 1
-        søknadbarnId shouldBe null
-    }
-
-    @Test
-    fun `lagrer søknadbarnId når det finnes barn-opplysning i søknaden`() {
-        val søknadId = randomUUID()
-        val søknad =
-            Søknad(
-                søknadId = søknadId,
-                ident = ident,
-                tilstand = INNSENDT,
-                opplysninger =
-                    listOf(
-                        QuizOpplysning(
-                            beskrivendeId = "faktum.barn-liste",
-                            type = Barn,
-                            svar =
-                                listOf(
-                                    BarnSvar(
-                                        barnSvarId = randomUUID(),
-                                        fornavnOgMellomnavn = "Test",
-                                        etternavn = "Testesen",
-                                        fødselsdato = LocalDate.now(),
-                                        statsborgerskap = "NOR",
-                                        forsørgerBarnet = true,
-                                        fraRegister = true,
-                                        kvalifisererTilBarnetillegg = true,
-                                    ),
-                                ),
                             ident = ident,
                             søknadId = søknadId,
                         ),
