@@ -29,7 +29,7 @@ class HarTilleggsopplysningerBehovløser(
         }
 
         val seksjonsvar =
-            seksjonRepository?.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvar(
                 behovmelding.ident,
                 behovmelding.søknadId,
                 "tilleggsopplysninger",

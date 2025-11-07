@@ -28,7 +28,7 @@ class AndreØkonomiskeYtelserBehovløser(
             return publiserLøsning(behovmelding, svarPåBehov)
         }
         val seksjonsSvar =
-            seksjonRepository?.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvar(
                 behovmelding.ident,
                 behovmelding.søknadId,
                 "annen-pengestotte",

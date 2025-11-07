@@ -6,13 +6,15 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søkna
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import java.time.ZonedDateTime
 
 class SøknadsdatoBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
     søknadRepository: SøknadRepository,
-) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository) {
+    seksjonRepository: SeksjonRepository,
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository) {
     override val behov = Søknadsdato.name
     override val beskrivendeId = "søknadstidspunkt"
 

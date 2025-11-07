@@ -62,7 +62,7 @@ class BarnetilleggBehovLøser(
         }
 
         val seksjonsvar =
-            seksjonRepository?.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvar(
                 ident,
                 søknadId,
                 "barnetillegg",

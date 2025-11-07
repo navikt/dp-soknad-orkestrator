@@ -41,7 +41,7 @@ class PermittertFiskeforedlingBehovløser(
         }
 
         val seksjonsSvar =
-            seksjonRepository?.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvar(
                 ident,
                 søknadId,
                 "arbeidsforhold",

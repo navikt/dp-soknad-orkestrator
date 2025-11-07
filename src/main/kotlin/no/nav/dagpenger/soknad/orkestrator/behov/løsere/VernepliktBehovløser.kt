@@ -25,29 +25,28 @@ class VernepliktBehovløser(
             opplysningRepository.hent(beskrivendeId, behovmelding.ident, behovmelding.søknadId)?.svar
 
         if (svarPåBehov != null) {
-            publiserLøsning(behovmelding, svarPåBehov)
-        } else {
-            val seksjonsSvar =
-                seksjonRepository?.hentSeksjonsvar(
-                    behovmelding.ident,
-                    behovmelding.søknadId,
-                    "verneplikt",
-                ) ?: throw IllegalStateException(
-                    "Fant ingen opplysning med beskrivendeId: $beskrivendeId " +
-                        "og kan ikke svare på behov $behov for søknad med id: ${behovmelding.søknadId}",
-                )
+            return publiserLøsning(behovmelding, svarPåBehov)
+        }
 
-            objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
-                seksjonsJson.findPath("avtjent-verneplikt")?.let {
-                    if (!it.isMissingOrNull()) {
-                        publiserLøsning(behovmelding, it.erBoolean())
-                    }
+        val seksjonsSvar =
+            seksjonRepository.hentSeksjonsvar(
+                behovmelding.ident,
+                behovmelding.søknadId,
+                "verneplikt",
+            ) ?: throw IllegalStateException(
+                "Fant ingen seksjonsvar på Reell Arbeidssøker for søknad=${behovmelding.søknadId}",
+            )
+
+        objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
+            seksjonsJson.findPath("avtjent-verneplikt")?.let {
+                if (!it.isMissingOrNull()) {
+                    return publiserLøsning(behovmelding, it.erBoolean())
                 }
             }
-
-            throw IllegalStateException(
-                "Fant ingen opplysning på behov $behov for søknad med id: ${behovmelding.søknadId}",
-            )
         }
+
+        throw IllegalStateException(
+            "Fant ingen opplysning på behov $behov for søknad med id: ${behovmelding.søknadId}",
+        )
     }
 }

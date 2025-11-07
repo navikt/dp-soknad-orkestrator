@@ -29,7 +29,7 @@ class ØnsketArbeidstidBehovløser(
         }
 
         var seksjonsSvar =
-            seksjonRepository?.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvar(
                 ident = behovmelding.ident,
                 søknadId = behovmelding.søknadId,
                 seksjonId = "reell-arbeidssoker",

@@ -73,6 +73,7 @@ class BehovløserFactory(
                     rapidsConnection,
                     opplysningRepository,
                     søknadRepository,
+                    seksjonRepository,
                 ),
             EØSArbeid to
                 EØSArbeidBehovløser(
@@ -133,11 +134,11 @@ class BehovløserFactory(
                     seksjonRepository,
                 ),
             Ordinær to OrdinærBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
-            Søknadsdato to SøknadsdatoBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            Søknadsdato to SøknadsdatoBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             TarUtdanningEllerOpplæring to
                 UtdanningEllerOpplæringBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             Barnetillegg to BarnetilleggBehovLøser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
-            BarnetilleggV2 to BarnetilleggV2BehovLøser(rapidsConnection, opplysningRepository, søknadRepository),
+            BarnetilleggV2 to BarnetilleggV2BehovLøser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             AndreØkonomiskeYtelser to
                 AndreØkonomiskeYtelserBehovløser(
                     rapidsConnection,

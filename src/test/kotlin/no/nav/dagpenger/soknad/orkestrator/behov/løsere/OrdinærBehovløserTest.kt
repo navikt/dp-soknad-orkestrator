@@ -56,7 +56,7 @@ class OrdinærBehovløserTest {
     }
 
     @Test
-    fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata`() {
+    fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata med ikke ordinær arbeidsforhold avslutning`() {
         every {
             seksjonRepository.hentSeksjonsvar(
                 any(),
@@ -73,7 +73,7 @@ class OrdinærBehovløserTest {
                         "hvordan-har-dette-arbeidsforholdet-endret-seg": "arbeidsgiver-er-konkurs"
                     },
                     {
-                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "jeg-har-sagt-opp-selv"
+                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "jeg-er-permitert"
                     }
                 ]
                 },

@@ -28,7 +28,7 @@ class EØSArbeidBehovløser(
             return publiserLøsning(behovmelding, svarPåBehov)
         }
         val seksjonsSvar =
-            seksjonRepository?.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvar(
                 behovmelding.ident,
                 behovmelding.søknadId,
                 "arbeidsforhold",

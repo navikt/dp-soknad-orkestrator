@@ -17,6 +17,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
@@ -29,8 +30,9 @@ class BarnetilleggV2BehovLøserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val quizOpplysningRepositorySpy = spyk<QuizOpplysningRepository>(opplysningRepository)
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
     val testRapid = TestRapid()
-    val behovløser = BarnetilleggV2BehovLøser(testRapid, quizOpplysningRepositorySpy, søknadRepository)
+    val behovløser = BarnetilleggV2BehovLøser(testRapid, quizOpplysningRepositorySpy, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId: UUID = randomUUID()
 

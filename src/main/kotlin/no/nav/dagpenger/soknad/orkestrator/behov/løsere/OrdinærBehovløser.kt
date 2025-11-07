@@ -43,7 +43,7 @@ class OrdinærBehovløser(
         }
 
         val seksjonsSvar =
-            seksjonRepository?.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvar(
                 ident,
                 søknadId,
                 "arbeidsforhold",

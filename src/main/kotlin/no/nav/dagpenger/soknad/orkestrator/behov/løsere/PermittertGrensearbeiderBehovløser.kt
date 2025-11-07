@@ -48,7 +48,7 @@ class PermittertGrensearbeiderBehovløser(
         }
 
         val seksjonsSvar =
-            seksjonRepository?.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvar(
                 ident,
                 søknadId,
                 "personalia",

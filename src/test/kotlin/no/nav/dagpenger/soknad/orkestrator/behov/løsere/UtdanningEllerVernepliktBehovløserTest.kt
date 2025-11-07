@@ -56,8 +56,6 @@ class UtdanningEllerVernepliktBehovløserTest {
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
         behovløser.løs(lagBehovmelding(ident, søknadId, TarUtdanningEllerOpplæring))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "utdanning") }
-        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["TarUtdanningEllerOpplæring"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
@@ -94,7 +92,8 @@ class UtdanningEllerVernepliktBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
         behovløser.løs(lagBehovmelding(ident, søknadId, TarUtdanningEllerOpplæring))
-
+        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "utdanning") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["TarUtdanningEllerOpplæring"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

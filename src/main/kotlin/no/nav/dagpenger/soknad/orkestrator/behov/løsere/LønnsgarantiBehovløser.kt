@@ -40,7 +40,7 @@ class LønnsgarantiBehovløser(
         }
 
         val seksjonsSvar =
-            seksjonRepository?.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvar(
                 ident,
                 søknadId,
                 "arbeidsforhold",

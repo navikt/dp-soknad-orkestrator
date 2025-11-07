@@ -4,46 +4,30 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.mockk.every
 import io.mockk.mockk
-import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
-import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
-import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import java.time.ZonedDateTime
 import java.util.UUID
-import kotlin.test.BeforeTest
 import kotlin.test.Test
 
 class VernepliktBehovløserTest {
-    private lateinit var seksjonRepository: SeksjonRepository
-    private lateinit var søknadRepository: SøknadRepository
-    lateinit var behovløser: Behovløser
-
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
+    val behovløser = VernepliktBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
-
-    @BeforeTest
-    fun setup() {
-        withMigratedDb {
-            søknadRepository = SøknadRepository(dataSource, mockk<QuizOpplysningRepository>(relaxed = true))
-            seksjonRepository =
-                SeksjonRepository(
-                    dataSource,
-                    søknadRepository,
-                )
-        }
-        behovløser = VernepliktBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
-    }
 
     @Test
     fun `Behovløser publiserer løsning på behov Verneplikt med verdi og gjelderFra`() {
@@ -80,31 +64,38 @@ class VernepliktBehovløserTest {
 
     @Test
     fun `Behovløser publiserer løsning på behov Verneplikt med verdi og gjelderFra fra seksjonRepository`() {
+        every {
+            seksjonRepository.hentSeksjonsvar(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+              "seksjon": {
+                "avtjent-verneplikt": "ja"
+              },
+              "versjon": 1
+            }
+            """.trimIndent()
+
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()
-        println("søknadid: $søknadId")
-
-        seksjonRepository.søknadRepository.lagre(
+        every {
+            søknadRepository.hent(any())
+        } returns
             Søknad(
                 søknadId = søknadId,
                 ident = ident,
+                tilstand = Tilstand.INNSENDT,
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
-            ),
-        )
-        seksjonRepository.søknadRepository.markerSøknadSomInnsendt(
-            søknadId = søknadId,
-            innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
-        )
-        seksjonRepository.lagre(
-            ident,
-            søknadId,
-            seksjonId = "verneplikt",
-            seksjonsvar = """{"seksjon":{"avtjent-verneplikt":"ja"},"versjon":1}""",
-            pdfGrunnlag = """{"pdfGrunnlagKey": "pdfGrunnlagValue"}""",
-        )
+            )
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Verneplikt))
 
+        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "verneplikt") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["Verneplikt"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

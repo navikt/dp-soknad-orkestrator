@@ -29,7 +29,7 @@ class UtdanningEllerOpplæringBehovløser(
         }
 
         val utdanningSeksjonsData =
-            seksjonRepository?.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvar(
                 ident = behovmelding.ident,
                 søknadId = behovmelding.søknadId,
                 seksjonId = "utdanning",

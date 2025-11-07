@@ -12,6 +12,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import java.time.LocalDateTime
 import java.time.ZonedDateTime
@@ -21,8 +22,9 @@ import kotlin.test.Test
 class SøknadsdatoBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
     val testRapid = TestRapid()
-    val behovløser = SøknadsdatoBehovløser(testRapid, opplysningRepository, søknadRepository)
+    val behovløser = SøknadsdatoBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 

@@ -16,7 +16,7 @@ abstract class Behovløser(
     val rapidsConnection: RapidsConnection,
     val opplysningRepository: QuizOpplysningRepository,
     val søknadRepository: SøknadRepository,
-    val seksjonRepository: SeksjonRepository? = null,
+    val seksjonRepository: SeksjonRepository,
 ) {
     abstract val behov: String
     abstract val beskrivendeId: String
