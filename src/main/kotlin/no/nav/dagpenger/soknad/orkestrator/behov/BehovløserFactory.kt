@@ -175,7 +175,8 @@ class BehovløserFactory(
                     søknadRepository,
                     seksjonRepository,
                 ),
-            EgenNæringsvirksomhet to EgenNæringsvirksomhetBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            EgenNæringsvirksomhet to
+                EgenNæringsvirksomhetBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
         )
 
     fun behovløserFor(behov: Behov): Behovløser =
