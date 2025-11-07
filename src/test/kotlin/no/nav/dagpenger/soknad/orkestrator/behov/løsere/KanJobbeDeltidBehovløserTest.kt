@@ -94,9 +94,7 @@ class KanJobbeDeltidBehovløserTest {
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.KanJobbeDeltid))
 
         verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "reell-arbeidssoker") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["KanJobbeDeltid"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

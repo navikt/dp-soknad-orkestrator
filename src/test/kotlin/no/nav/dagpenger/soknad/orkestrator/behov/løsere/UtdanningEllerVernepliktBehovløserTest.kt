@@ -6,6 +6,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.TarUtdanningEllerOpplæring
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
@@ -55,6 +56,8 @@ class UtdanningEllerVernepliktBehovløserTest {
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
         behovløser.løs(lagBehovmelding(ident, søknadId, TarUtdanningEllerOpplæring))
 
+        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "utdanning") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["TarUtdanningEllerOpplæring"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

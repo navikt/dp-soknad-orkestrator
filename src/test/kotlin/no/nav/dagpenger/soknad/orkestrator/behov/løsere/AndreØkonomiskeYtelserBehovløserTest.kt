@@ -4,12 +4,17 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.AndreØkonomiskeYtelser
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -19,7 +24,8 @@ class AndreØkonomiskeYtelserBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
-    val behovløser = AndreØkonomiskeYtelserBehovløser(testRapid, opplysningRepository, søknadRepository)
+    val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
+    val behovløser = AndreØkonomiskeYtelserBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 
@@ -49,6 +55,45 @@ class AndreØkonomiskeYtelserBehovløserTest {
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
         behovløser.løs(lagBehovmelding(ident, søknadId, AndreØkonomiskeYtelser))
 
+        testRapid.inspektør.message(0)["@løsning"]["AndreØkonomiskeYtelser"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe true
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
+    @Test
+    fun `Behovløser publiserer løsning på behov AndreØkonomiskeYtelser med verdi og gjelderFra fra seksjonsdata`() {
+        every {
+            seksjonRepository.hentSeksjonsvar(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+              "seksjon": {
+                "får-eller-kommer-til-å-få-lønn-eller-andre-goder-fra-tidligere-arbeidsgiver": "ja"
+              },
+              "versjon": 1
+            }
+            """.trimIndent()
+
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, AndreØkonomiskeYtelser))
+
+        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "annen-pengestotte") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["AndreØkonomiskeYtelser"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

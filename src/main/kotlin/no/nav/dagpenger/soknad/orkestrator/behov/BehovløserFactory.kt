@@ -138,7 +138,13 @@ class BehovløserFactory(
                 UtdanningEllerOpplæringBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             Barnetillegg to BarnetilleggBehovLøser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             BarnetilleggV2 to BarnetilleggV2BehovLøser(rapidsConnection, opplysningRepository, søknadRepository),
-            AndreØkonomiskeYtelser to AndreØkonomiskeYtelserBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
+            AndreØkonomiskeYtelser to
+                AndreØkonomiskeYtelserBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
             ØnsketArbeidstid to ØnsketArbeidstidBehovløser(rapidsConnection, opplysningRepository, søknadRepository),
             HarTilleggsopplysninger to
                 HarTilleggsopplysningerBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),

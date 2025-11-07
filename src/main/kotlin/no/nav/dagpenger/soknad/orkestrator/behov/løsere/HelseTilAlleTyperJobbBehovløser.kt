@@ -33,7 +33,7 @@ class HelseTilAlleTyperJobbBehovløser(
                 behovmelding.søknadId,
                 "reell-arbeidssoker",
             ) ?: throw IllegalStateException(
-                "Fant ingen seksjonsar på Reell Arbeidssøker for søknad=${behovmelding.søknadId}",
+                "Fant ingen seksjonsvar på Reell Arbeidssøker for søknad=${behovmelding.søknadId}",
             )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->

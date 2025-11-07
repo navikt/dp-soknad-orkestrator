@@ -33,7 +33,7 @@ class OppgittAndreYtelserUtenforNavBehovløser(
                 behovmelding.søknadId,
                 "annen-pengestotte",
             ) ?: throw IllegalStateException(
-                "Fant ingen seksjonsar på Annen-pengestøtte for søknad=${behovmelding.søknadId}",
+                "Fant ingen seksjonsvar på Annen-pengestøtte for søknad=${behovmelding.søknadId}",
             )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->

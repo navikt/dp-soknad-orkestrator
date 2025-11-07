@@ -33,7 +33,7 @@ class EØSArbeidBehovløser(
                 behovmelding.søknadId,
                 "arbeidsforhold",
             ) ?: throw IllegalStateException(
-                "Fant ingen seksjonsar på Arbeidsforhold for søknad=${behovmelding.søknadId}",
+                "Fant ingen seksjonsvar på Arbeidsforhold for søknad=${behovmelding.søknadId}",
             )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
