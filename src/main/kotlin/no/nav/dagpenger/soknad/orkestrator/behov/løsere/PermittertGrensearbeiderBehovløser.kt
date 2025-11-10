@@ -48,11 +48,15 @@ class PermittertGrensearbeiderBehovløser(
         }
 
         val seksjonsSvar =
-            seksjonRepository.hentSeksjonsvar(
-                ident,
-                søknadId,
-                "personalia",
-            ) ?: return false
+            try {
+                seksjonRepository.hentSeksjonsvarEllerKastException(
+                    ident,
+                    søknadId,
+                    "personalia",
+                )
+            } catch (e: IllegalStateException) {
+                return false
+            }
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             val reistTilbakeEnGangEllerMerOpplysning =

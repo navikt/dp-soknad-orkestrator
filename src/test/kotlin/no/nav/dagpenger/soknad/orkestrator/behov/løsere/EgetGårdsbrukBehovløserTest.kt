@@ -64,7 +64,7 @@ class EgetGårdsbrukBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov EgetGårdsbruk med verdi og gjelderFra fra seksjonsvar`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -93,7 +93,7 @@ class EgetGårdsbrukBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, EgetGårdsbruk))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "egen-naring") }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "egen-naring") }
         verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"][EgetGårdsbruk.name].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true

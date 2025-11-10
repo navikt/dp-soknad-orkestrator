@@ -64,7 +64,7 @@ class EgenNæringsvirksomhetBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov EgenNæringsvirksomhet med verdi og gjelderFra fra seksjonsvar`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -93,7 +93,7 @@ class EgenNæringsvirksomhetBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, EgenNæringsvirksomhet))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "egen-naring") }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "egen-naring") }
         verify { søknadRepository.hent(søknadId) }
 
         testRapid.inspektør.message(0)["@løsning"][EgenNæringsvirksomhet.name].also { løsning ->

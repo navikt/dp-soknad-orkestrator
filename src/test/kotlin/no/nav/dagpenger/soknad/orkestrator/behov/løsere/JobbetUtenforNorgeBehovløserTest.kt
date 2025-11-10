@@ -58,7 +58,7 @@ class JobbetUtenforNorgeBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov JobbetUtenforNorge med verdi og gjelderFra fra seksjonsdata med arbeidsforhold utenfor Norge`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -94,10 +94,8 @@ class JobbetUtenforNorgeBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.JobbetUtenforNorge))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["JobbetUtenforNorge"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
@@ -108,7 +106,7 @@ class JobbetUtenforNorgeBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov JobbetUtenforNorge med verdi og gjelderFra fra seksjonsdata med arbeidsforhold kun i Norge`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -144,10 +142,8 @@ class JobbetUtenforNorgeBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.JobbetUtenforNorge))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["JobbetUtenforNorge"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
@@ -157,7 +153,7 @@ class JobbetUtenforNorgeBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov JobbetUtenforNorge med verdi og gjelderFra fra seksjonsdata uten arbeidsforhold`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -181,10 +177,8 @@ class JobbetUtenforNorgeBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.JobbetUtenforNorge))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["JobbetUtenforNorge"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

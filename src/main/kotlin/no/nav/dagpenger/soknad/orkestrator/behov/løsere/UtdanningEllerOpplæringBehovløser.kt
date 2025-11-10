@@ -29,13 +29,10 @@ class UtdanningEllerOpplæringBehovløser(
         }
 
         val utdanningSeksjonsData =
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident = behovmelding.ident,
                 søknadId = behovmelding.søknadId,
                 seksjonId = "utdanning",
-            ) ?: throw IllegalStateException(
-                "Fant ikke seksjonsvar for utdanning for søknad ${behovmelding.søknadId}" +
-                    " og behovet $behov",
             )
 
         objectMapper.readTree(utdanningSeksjonsData).let { seksjonsJson ->

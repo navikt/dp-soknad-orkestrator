@@ -64,7 +64,7 @@ class KanJobbeHvorSomHelstBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov KanJobbeHvorSomHelst med verdi og gjelderFra fra seksjonsdata`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -93,10 +93,8 @@ class KanJobbeHvorSomHelstBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.KanJobbeHvorSomHelst))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "reell-arbeidssoker") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "reell-arbeidssoker") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["KanJobbeHvorSomHelst"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

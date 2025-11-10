@@ -30,13 +30,10 @@ class HarTilleggsopplysningerBehovløser(
         }
 
         val seksjonsvar =
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 behovmelding.ident,
                 behovmelding.søknadId,
                 "tilleggsopplysninger",
-            ) ?: throw IllegalStateException(
-                "Fant ingen opplysning med beskrivendeId: $beskrivendeId " +
-                    "og kan ikke svare på behov $behov for søknad med id: ${behovmelding.søknadId}",
             )
 
         objectMapper.readTree(seksjonsvar).let { seksjonsJson ->

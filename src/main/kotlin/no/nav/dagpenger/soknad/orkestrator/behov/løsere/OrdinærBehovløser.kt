@@ -43,11 +43,15 @@ class OrdinærBehovløser(
         }
 
         val seksjonsSvar =
-            seksjonRepository.hentSeksjonsvar(
-                ident,
-                søknadId,
-                "arbeidsforhold",
-            ) ?: return false
+            try {
+                seksjonRepository.hentSeksjonsvarEllerKastException(
+                    ident,
+                    søknadId,
+                    "arbeidsforhold",
+                )
+            } catch (e: IllegalStateException) {
+                return false
+            }
 
         val ikkeOrdinæreRettighetstyper =
             setOf(

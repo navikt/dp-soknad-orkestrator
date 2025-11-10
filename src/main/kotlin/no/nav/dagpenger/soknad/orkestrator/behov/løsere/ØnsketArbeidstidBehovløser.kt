@@ -29,12 +29,10 @@ class ØnsketArbeidstidBehovløser(
         }
 
         var seksjonsSvar =
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident = behovmelding.ident,
                 søknadId = behovmelding.søknadId,
                 seksjonId = "reell-arbeidssoker",
-            ) ?: throw IllegalStateException(
-                "Fant ingen seksjonsvar på Reell Arbeidssøker for søknad=${behovmelding.søknadId}",
             )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->

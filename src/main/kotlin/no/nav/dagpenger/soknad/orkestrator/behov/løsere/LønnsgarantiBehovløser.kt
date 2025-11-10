@@ -40,11 +40,15 @@ class LønnsgarantiBehovløser(
         }
 
         val seksjonsSvar =
-            seksjonRepository.hentSeksjonsvar(
-                ident,
-                søknadId,
-                "arbeidsforhold",
-            ) ?: return false
+            try {
+                seksjonRepository.hentSeksjonsvarEllerKastException(
+                    ident,
+                    søknadId,
+                    "arbeidsforhold",
+                )
+            } catch (e: IllegalStateException) {
+                return false
+            }
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {

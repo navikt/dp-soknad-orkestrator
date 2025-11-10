@@ -64,7 +64,7 @@ class KanJobbeDeltidBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov KanJobbeDeltid med verdi og gjelderFra fra seksjonsdata`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -93,7 +93,7 @@ class KanJobbeDeltidBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.KanJobbeDeltid))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "reell-arbeidssoker") }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "reell-arbeidssoker") }
         verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["KanJobbeDeltid"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true

@@ -70,7 +70,7 @@ class OppgittAndreYtelserUtenforNavBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov OppgittAndreYtelserUtenforNav med verdi og gjelderFra fra seksjonsdata`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -105,10 +105,8 @@ class OppgittAndreYtelserUtenforNavBehovløserTest {
             ),
         )
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "annen-pengestotte") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "annen-pengestotte") }
+        verify { søknadRepository.hent(søknadId) }
 
         testRapid.inspektør.message(0)["@løsning"]["OppgittAndreYtelserUtenforNav"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true

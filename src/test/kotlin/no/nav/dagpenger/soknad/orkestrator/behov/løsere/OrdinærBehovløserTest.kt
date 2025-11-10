@@ -58,7 +58,7 @@ class OrdinærBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata med ikke ordinær arbeidsforhold avslutning`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -94,10 +94,8 @@ class OrdinærBehovløserTest {
             )
         behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["Ordinær"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
@@ -107,7 +105,7 @@ class OrdinærBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata med bare ordinære arbeidsforhold`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -143,10 +141,8 @@ class OrdinærBehovløserTest {
             )
         behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["Ordinær"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
@@ -156,7 +152,7 @@ class OrdinærBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata uten arbeidsforhold`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -185,10 +181,8 @@ class OrdinærBehovløserTest {
             )
         behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["Ordinær"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

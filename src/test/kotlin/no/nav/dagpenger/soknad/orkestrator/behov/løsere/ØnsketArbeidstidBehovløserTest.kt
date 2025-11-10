@@ -63,7 +63,7 @@ class ØnsketArbeidstidBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov ØnsketArbeidstid med verdi og gjelderFra fra seksjonsvar`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -93,7 +93,7 @@ class ØnsketArbeidstidBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, ØnsketArbeidstid))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "reell-arbeidssoker") }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "reell-arbeidssoker") }
         verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["ØnsketArbeidstid"].also { løsning ->
             løsning["verdi"].asDouble() shouldBe 27

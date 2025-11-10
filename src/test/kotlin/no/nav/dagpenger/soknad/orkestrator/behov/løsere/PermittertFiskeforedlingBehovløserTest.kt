@@ -57,7 +57,7 @@ class PermittertFiskeforedlingBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov PermittertFiskeforedling med verdi og gjelderFra fra seksjonsdata`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -91,10 +91,8 @@ class PermittertFiskeforedlingBehovløserTest {
             )
         behovløser.løs(lagBehovmelding(ident, søknadId, PermittertFiskeforedling))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["PermittertFiskeforedling"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
@@ -105,7 +103,7 @@ class PermittertFiskeforedlingBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov PermittertFiskeforedling med verdi og gjelderFra fra seksjonsdata hvor ikke permitert pga fiskforedling`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -139,10 +137,8 @@ class PermittertFiskeforedlingBehovløserTest {
             )
         behovløser.løs(lagBehovmelding(ident, søknadId, PermittertFiskeforedling))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["PermittertFiskeforedling"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
@@ -153,7 +149,7 @@ class PermittertFiskeforedlingBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov PermittertFiskeforedling med verdi og gjelderFra fra seksjonsdata hvor arbeidsforhold var annet enn permittert skal gi false`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -186,10 +182,8 @@ class PermittertFiskeforedlingBehovløserTest {
             )
         behovløser.løs(lagBehovmelding(ident, søknadId, PermittertFiskeforedling))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["PermittertFiskeforedling"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

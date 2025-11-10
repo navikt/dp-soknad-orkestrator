@@ -57,7 +57,7 @@ class LønnsgarantiBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov Lønnsgaranti med verdi og gjelderFra fra seksjonsdata`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -90,10 +90,8 @@ class LønnsgarantiBehovløserTest {
             )
         behovløser.løs(lagBehovmelding(ident, søknadId, Lønnsgaranti))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["Lønnsgaranti"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
@@ -104,7 +102,7 @@ class LønnsgarantiBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov Lønnsgaranti med verdi og gjelderFra fra seksjonsdata hvor arbeidsgiveren ikke gikk konkurs`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -137,10 +135,8 @@ class LønnsgarantiBehovløserTest {
             )
         behovløser.løs(lagBehovmelding(ident, søknadId, Lønnsgaranti))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["Lønnsgaranti"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
@@ -151,7 +147,7 @@ class LønnsgarantiBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov Lønnsgaranti med verdi og gjelderFra fra seksjonsdata uten arbeidsforhold svarer false`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -180,10 +176,8 @@ class LønnsgarantiBehovløserTest {
             )
         behovløser.løs(lagBehovmelding(ident, søknadId, Lønnsgaranti))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["Lønnsgaranti"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

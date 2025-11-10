@@ -64,7 +64,7 @@ class AndreØkonomiskeYtelserBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov AndreØkonomiskeYtelser med verdi og gjelderFra fra seksjonsdata`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -92,7 +92,7 @@ class AndreØkonomiskeYtelserBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, AndreØkonomiskeYtelser))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "annen-pengestotte") }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "annen-pengestotte") }
         verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["AndreØkonomiskeYtelser"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true

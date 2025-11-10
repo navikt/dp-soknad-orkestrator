@@ -81,11 +81,12 @@ class HarTilleggsopplysningerBehovløserTest {
                 }
             }
             """.trimIndent()
-        every { seksjonRepository.hentSeksjonsvar(any(), any(), any()) } returns seksjonsvar
+        every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns seksjonsvar
 
         behovløser.løs(lagBehovmelding(ident, søknadId, HarTilleggsopplysninger))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "tilleggsopplysninger") }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "tilleggsopplysninger") }
+
         testRapid.inspektør.message(0)["@løsning"][HarTilleggsopplysninger.name].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

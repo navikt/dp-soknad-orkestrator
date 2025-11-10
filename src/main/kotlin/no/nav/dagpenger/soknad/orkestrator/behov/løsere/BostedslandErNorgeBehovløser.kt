@@ -39,12 +39,10 @@ class BostedslandErNorgeBehovløser(
         }
 
         val seksjonsSvar =
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
                 søknadId,
                 "personalia",
-            ) ?: throw IllegalStateException(
-                "Fant ingen seksjonsvar på Personalia for søknad=$søknadId",
             )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->

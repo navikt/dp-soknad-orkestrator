@@ -63,7 +63,7 @@ class EØSArbeidBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov EøsArbeid med verdi og gjelderFra fra seksjonsdata`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -92,10 +92,8 @@ class EØSArbeidBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EØSArbeid))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "arbeidsforhold") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
 
         testRapid.inspektør.message(0)["@løsning"]["EØSArbeid"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true

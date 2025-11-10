@@ -65,7 +65,7 @@ class UtdanningEllerVernepliktBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov TarUtdanningEllerOpplæring med verdi og gjelderFra med seksjonsdata`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -92,7 +92,7 @@ class UtdanningEllerVernepliktBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
         behovløser.løs(lagBehovmelding(ident, søknadId, TarUtdanningEllerOpplæring))
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "utdanning") }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "utdanning") }
         verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["TarUtdanningEllerOpplæring"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true

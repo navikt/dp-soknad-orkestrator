@@ -64,7 +64,7 @@ class HelseTilAlleTyperJobbBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov HelseTilAlleTyperJobb med verdi og gjelderFra fra seksjonsdata`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -93,10 +93,8 @@ class HelseTilAlleTyperJobbBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.HelseTilAlleTyperJobb))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "reell-arbeidssoker") }
-        verify {
-            søknadRepository.hent(søknadId)
-        }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "reell-arbeidssoker") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["HelseTilAlleTyperJobb"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

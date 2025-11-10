@@ -65,7 +65,7 @@ class VernepliktBehovløserTest {
     @Test
     fun `Behovløser publiserer løsning på behov Verneplikt med verdi og gjelderFra fra seksjonRepository`() {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -94,7 +94,7 @@ class VernepliktBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Verneplikt))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "verneplikt") }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "verneplikt") }
         verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["Verneplikt"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true

@@ -28,12 +28,10 @@ class EØSArbeidBehovløser(
             return publiserLøsning(behovmelding, svarPåBehov)
         }
         val seksjonsSvar =
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 behovmelding.ident,
                 behovmelding.søknadId,
                 "arbeidsforhold",
-            ) ?: throw IllegalStateException(
-                "Fant ingen seksjonsvar på Arbeidsforhold for søknad=${behovmelding.søknadId}",
             )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->

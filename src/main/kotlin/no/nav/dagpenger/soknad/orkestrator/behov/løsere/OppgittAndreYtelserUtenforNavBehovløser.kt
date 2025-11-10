@@ -28,12 +28,10 @@ class OppgittAndreYtelserUtenforNavBehovløser(
             return publiserLøsning(behovmelding, svarPåBehov)
         }
         val seksjonsSvar =
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 behovmelding.ident,
                 behovmelding.søknadId,
                 "annen-pengestotte",
-            ) ?: throw IllegalStateException(
-                "Fant ingen seksjonsvar på Annen-pengestøtte for søknad=${behovmelding.søknadId}",
             )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->

@@ -28,12 +28,10 @@ class EgenNæringsvirksomhetBehovløser(
             return publiserLøsning(behovmelding, svarPåBehov)
         }
         val seksjonsSvar =
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 behovmelding.ident,
                 behovmelding.søknadId,
                 "egen-naring",
-            ) ?: throw IllegalStateException(
-                "Fant ingen seksjonsvar på Egen næring for søknad=${behovmelding.søknadId}",
             )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->

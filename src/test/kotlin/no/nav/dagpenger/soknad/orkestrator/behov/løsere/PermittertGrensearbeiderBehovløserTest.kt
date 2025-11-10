@@ -75,7 +75,7 @@ class PermittertGrensearbeiderBehovløserTest {
         val forventetSvar = testData.third
 
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -105,7 +105,7 @@ class PermittertGrensearbeiderBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.PermittertGrensearbeider))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "personalia") }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "personalia") }
         verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["PermittertGrensearbeider"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe forventetSvar

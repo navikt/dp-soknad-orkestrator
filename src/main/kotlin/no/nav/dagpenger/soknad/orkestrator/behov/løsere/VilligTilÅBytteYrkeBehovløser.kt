@@ -28,12 +28,10 @@ class VilligTilÅBytteYrkeBehovløser(
             return publiserLøsning(behovmelding, svarPåBehov)
         }
         val seksjonsSvar =
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 behovmelding.ident,
                 behovmelding.søknadId,
                 "reell-arbeidssoker",
-            ) ?: throw IllegalStateException(
-                "Fant ingen seksjonsvar på Reell Arbeidssøker for søknad=${behovmelding.søknadId}",
             )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->

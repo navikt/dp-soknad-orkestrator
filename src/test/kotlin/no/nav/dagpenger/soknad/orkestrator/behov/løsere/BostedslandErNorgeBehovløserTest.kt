@@ -73,7 +73,7 @@ class BostedslandErNorgeBehovløserTest {
         returverdi: Boolean,
     ) {
         every {
-            seksjonRepository.hentSeksjonsvar(
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
                 any(),
@@ -101,7 +101,7 @@ class BostedslandErNorgeBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.BostedslandErNorge))
 
-        verify { seksjonRepository.hentSeksjonsvar(ident, søknadId, "personalia") }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "personalia") }
         verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["BostedslandErNorge"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe returverdi
