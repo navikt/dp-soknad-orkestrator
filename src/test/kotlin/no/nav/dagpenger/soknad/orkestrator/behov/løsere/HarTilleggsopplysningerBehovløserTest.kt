@@ -21,7 +21,7 @@ import kotlin.test.Test
 class HarTilleggsopplysningerBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
-    val seksjonRepository = mockk<SeksjonRepository>()
+    val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val behovløser = HarTilleggsopplysningerBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
     val ident = "12345678910"

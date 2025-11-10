@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
-import com.fasterxml.jackson.databind.node.TextNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.HarTilleggsopplysninger
@@ -9,6 +9,7 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
+import no.nav.dagpenger.soknad.orkestrator.utils.erBoolean
 
 class HarTilleggsopplysningerBehovløser(
     rapidsConnection: RapidsConnection,
@@ -38,21 +39,15 @@ class HarTilleggsopplysningerBehovløser(
                     "og kan ikke svare på behov $behov for søknad med id: ${behovmelding.søknadId}",
             )
 
-        val harTilleggsopplysninger =
-            objectMapper.readTree(seksjonsvar).let { seksjonsJson ->
-                seksjonsJson["seksjon"]?.let { seksjonsData ->
-                    val harTilleggsopplysninger = seksjonsData["har-tilleggsopplysninger"] as TextNode
-                    harTilleggsopplysninger.asText() == "ja"
+        objectMapper.readTree(seksjonsvar).let { seksjonsJson ->
+            seksjonsJson.findPath("har-tilleggsopplysninger")?.let {
+                if (!it.isMissingOrNull()) {
+                    return publiserLøsning(behovmelding, it.erBoolean())
                 }
             }
-
-        if (harTilleggsopplysninger == null) {
-            throw IllegalStateException(
-                "Fant ingen opplysning med beskrivendeId: $beskrivendeId " +
-                    "og kan ikke svare på behov $behov for søknad med id: ${behovmelding.søknadId}",
-            )
         }
-
-        publiserLøsning(behovmelding, harTilleggsopplysninger)
+        throw IllegalStateException(
+            "Fant ingen opplysning på behov $behov for søknad med id: ${behovmelding.søknadId}",
+        )
     }
 }
