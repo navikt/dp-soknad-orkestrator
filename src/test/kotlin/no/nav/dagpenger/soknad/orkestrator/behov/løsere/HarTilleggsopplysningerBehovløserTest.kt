@@ -95,7 +95,7 @@ class HarTilleggsopplysningerBehovløserTest {
 
     @Test
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
-        every { seksjonRepository.hentSeksjonsvar(any(), any(), any()) } returns null
+        every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } throws IllegalStateException("asdasd")
 
         shouldThrow<IllegalStateException> {
             behovløser.løs(
