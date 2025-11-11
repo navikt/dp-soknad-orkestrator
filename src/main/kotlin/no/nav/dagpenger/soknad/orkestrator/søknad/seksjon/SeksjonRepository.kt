@@ -145,6 +145,20 @@ class SeksjonRepository(
             }.toList()
     }
 
+    fun hentDokumentasjonskrav(
+        ident: String,
+        søknadId: UUID,
+        seksjonId: String,
+    ) = transaction {
+        SeksjonV2Tabell
+            .innerJoin(SøknadTabell)
+            .select(SeksjonV2Tabell.dokumentasjonskrav)
+            .where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) and (SeksjonV2Tabell.seksjonId eq seksjonId) }
+            .map {
+                it[SeksjonV2Tabell.dokumentasjonskrav]
+            }.firstOrNull()
+    }
+
     fun hentPdfGrunnlag(
         ident: String,
         søknadId: UUID,
