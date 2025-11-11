@@ -4,10 +4,17 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -16,7 +23,9 @@ import kotlin.test.Test
 class VernepliktBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
-    val behovløser = VernepliktBehovløser(testRapid, opplysningRepository)
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
+    val behovløser = VernepliktBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 
@@ -32,6 +41,7 @@ class VernepliktBehovløserTest {
             )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        // github.com/navikt/dp-soknad/blob/53c7a36d199e207dca01ede6d1b0ceebc18debff/mediator/src/main/kotlin/no/nav/dagpenger/soknad/livssyklus/ferdigstilling/FerdigstillingRoute.kt#L28
         val søknadstidspunkt = ZonedDateTime.now()
         val søknadstidpsunktOpplysning =
             QuizOpplysning(
@@ -46,6 +56,46 @@ class VernepliktBehovløserTest {
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
         behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Verneplikt))
 
+        testRapid.inspektør.message(0)["@løsning"]["Verneplikt"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe true
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
+    @Test
+    fun `Behovløser publiserer løsning på behov Verneplikt med verdi og gjelderFra fra seksjonRepository`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+              "seksjon": {
+                "avtjent-verneplikt": "ja"
+              },
+              "versjon": 1
+            }
+            """.trimIndent()
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Verneplikt))
+
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "verneplikt") }
+        verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["Verneplikt"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()

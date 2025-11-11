@@ -73,6 +73,16 @@ class SeksjonRepository(
                 }.firstOrNull()
         }
 
+    fun hentSeksjonsvarEllerKastException(
+        ident: String,
+        søknadId: UUID,
+        seksjonId: String,
+    ): String =
+        transaction {
+            hentSeksjonsvar(ident, søknadId, seksjonId)
+                ?: throw IllegalStateException("Fant ingen seksjonsvar på $seksjonId for søknad=$søknadId")
+        }
+
     fun hentSeksjoner(
         ident: String,
         søknadId: UUID,

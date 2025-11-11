@@ -50,37 +50,134 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBeh
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnskerDagpengerFraDatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnsketArbeidstidBehovløser
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 
 class BehovløserFactory(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepositoryPostgres,
+    seksjonRepository: SeksjonRepository,
+    søknadRepository: SøknadRepository,
 ) {
     private val behovløsere: Map<Behov, Behovløser> =
         mapOf(
-            OppgittAndreYtelserUtenforNav to OppgittAndreYtelserUtenforNavBehovløser(rapidsConnection, opplysningRepository),
-            ØnskerDagpengerFraDato to ØnskerDagpengerFraDatoBehovløser(rapidsConnection, opplysningRepository),
-            EØSArbeid to EØSArbeidBehovløser(rapidsConnection, opplysningRepository),
-            KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository),
-            HelseTilAlleTyperJobb to HelseTilAlleTyperJobbBehovløser(rapidsConnection, opplysningRepository),
-            KanJobbeHvorSomHelst to KanJobbeHvorSomHelstBehovløser(rapidsConnection, opplysningRepository),
-            VilligTilÅBytteYrke to VilligTilÅBytteYrkeBehovløser(rapidsConnection, opplysningRepository),
-            JobbetUtenforNorge to JobbetUtenforNorgeBehovløser(rapidsConnection, opplysningRepository),
-            Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository),
-            Lønnsgaranti to LønnsgarantiBehovløser(rapidsConnection, opplysningRepository),
-            Permittert to PermittertBehovløser(rapidsConnection, opplysningRepository),
-            PermittertFiskeforedling to PermittertFiskeforedlingBehovløser(rapidsConnection, opplysningRepository),
-            Ordinær to OrdinærBehovløser(rapidsConnection, opplysningRepository),
-            Søknadsdato to SøknadsdatoBehovløser(rapidsConnection, opplysningRepository),
-            TarUtdanningEllerOpplæring to UtdanningEllerOpplæringBehovløser(rapidsConnection, opplysningRepository),
-            Barnetillegg to BarnetilleggBehovLøser(rapidsConnection, opplysningRepository),
-            BarnetilleggV2 to BarnetilleggV2BehovLøser(rapidsConnection, opplysningRepository),
-            AndreØkonomiskeYtelser to AndreØkonomiskeYtelserBehovløser(rapidsConnection, opplysningRepository),
-            ØnsketArbeidstid to ØnsketArbeidstidBehovløser(rapidsConnection, opplysningRepository),
-            HarTilleggsopplysninger to HarTilleggsopplysningerBehovløser(rapidsConnection, opplysningRepository),
-            BostedslandErNorge to BostedslandErNorgeBehovløser(rapidsConnection, opplysningRepository),
-            PermittertGrensearbeider to PermittertGrensearbeiderBehovløser(rapidsConnection, opplysningRepository),
-            EgetGårdsbruk to EgetGårdsbrukBehovløser(rapidsConnection, opplysningRepository),
-            EgenNæringsvirksomhet to EgenNæringsvirksomhetBehovløser(rapidsConnection, opplysningRepository),
+            OppgittAndreYtelserUtenforNav to
+                OppgittAndreYtelserUtenforNavBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            ØnskerDagpengerFraDato to
+                ØnskerDagpengerFraDatoBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            EØSArbeid to
+                EØSArbeidBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            HelseTilAlleTyperJobb to
+                HelseTilAlleTyperJobbBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            KanJobbeHvorSomHelst to
+                KanJobbeHvorSomHelstBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            VilligTilÅBytteYrke to
+                VilligTilÅBytteYrkeBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            JobbetUtenforNorge to
+                JobbetUtenforNorgeBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            Lønnsgaranti to
+                LønnsgarantiBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            Permittert to
+                PermittertBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            PermittertFiskeforedling to
+                PermittertFiskeforedlingBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            Ordinær to OrdinærBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            Søknadsdato to SøknadsdatoBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            TarUtdanningEllerOpplæring to
+                UtdanningEllerOpplæringBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            Barnetillegg to BarnetilleggBehovLøser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            BarnetilleggV2 to BarnetilleggV2BehovLøser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            AndreØkonomiskeYtelser to
+                AndreØkonomiskeYtelserBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            ØnsketArbeidstid to
+                ØnsketArbeidstidBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            HarTilleggsopplysninger to
+                HarTilleggsopplysningerBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            BostedslandErNorge to
+                BostedslandErNorgeBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            PermittertGrensearbeider to
+                PermittertGrensearbeiderBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            EgetGårdsbruk to
+                EgetGårdsbrukBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                ),
+            EgenNæringsvirksomhet to
+                EgenNæringsvirksomhetBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
         )
 
     fun behovløserFor(behov: Behov): Behovløser =

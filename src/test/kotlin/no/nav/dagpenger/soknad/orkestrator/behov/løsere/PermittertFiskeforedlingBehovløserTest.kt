@@ -3,12 +3,19 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
+import io.mockk.every
+import io.mockk.mockk
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertFiskeforedling
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -16,8 +23,10 @@ import kotlin.test.Test
 
 class PermittertFiskeforedlingBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
     val testRapid = TestRapid()
-    val behovløser = PermittertFiskeforedlingBehovløser(testRapid, opplysningRepository)
+    val behovløser = PermittertFiskeforedlingBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 
@@ -41,6 +50,142 @@ class PermittertFiskeforedlingBehovløserTest {
 
         testRapid.inspektør.message(0)["@løsning"]["PermittertFiskeforedling"].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
+    @Test
+    fun `Behovløser publiserer løsning på behov PermittertFiskeforedling med verdi og gjelderFra fra seksjonsdata`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+                "seksjonId": "arbeidsforhold",
+                "seksjon": {
+                "registrerteArbeidsforhold": [
+                    {
+                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "jeg-er-permitert",
+                        "permittert-er-du-permittert-fra-fiskeforedlings-eller-fiskeoljeindustrien": "ja"
+                    }
+                ]
+                },
+                "versjon": 1
+            }
+            """.trimIndent()
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+        behovløser.løs(lagBehovmelding(ident, søknadId, PermittertFiskeforedling))
+
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
+        testRapid.inspektør.message(0)["@løsning"]["PermittertFiskeforedling"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe true
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
+    @Suppress("ktlint:standard:max-line-length")
+    @Test
+    fun `Behovløser publiserer løsning på behov PermittertFiskeforedling med verdi og gjelderFra fra seksjonsdata hvor ikke permitert pga fiskforedling`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+                "seksjonId": "arbeidsforhold",
+                "seksjon": {
+                "registrerteArbeidsforhold": [
+                    {
+                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "jeg-er-permitert",
+                        "permittert-er-du-permittert-fra-fiskeforedlings-eller-fiskeoljeindustrien": "nei"
+                    }
+                ]
+                },
+                "versjon": 1
+            }
+            """.trimIndent()
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+        behovløser.løs(lagBehovmelding(ident, søknadId, PermittertFiskeforedling))
+
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
+        testRapid.inspektør.message(0)["@løsning"]["PermittertFiskeforedling"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe false
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
+    @Suppress("ktlint:standard:max-line-length")
+    @Test
+    fun `Behovløser publiserer løsning på behov PermittertFiskeforedling med verdi og gjelderFra fra seksjonsdata hvor arbeidsforhold var annet enn permittert skal gi false`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+                "seksjonId": "arbeidsforhold",
+                "seksjon": {
+                "registrerteArbeidsforhold": [
+                    {
+                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "arbeidsgiver-er-konkurs"
+                    }
+                ]
+                },
+                "versjon": 1
+            }
+            """.trimIndent()
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+        behovløser.løs(lagBehovmelding(ident, søknadId, PermittertFiskeforedling))
+
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
+        testRapid.inspektør.message(0)["@løsning"]["PermittertFiskeforedling"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }

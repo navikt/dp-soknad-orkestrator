@@ -1,16 +1,23 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertGrensearbeider
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
+import no.nav.dagpenger.soknad.orkestrator.utils.erBoolean
 import java.util.UUID
 
 class PermittertGrensearbeiderBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
-) : Behovløser(rapidsConnection, opplysningRepository) {
+    søknadRepository: SøknadRepository,
+    seksjonRepository: SeksjonRepository,
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository) {
     override val behov = PermittertGrensearbeider.name
     override val beskrivendeId
         get() = throw NotImplementedError("Overrider løs() og trenger ikke beskrivendeId")
@@ -35,7 +42,43 @@ class PermittertGrensearbeiderBehovløser(
         val reistITaktMedRotasjonOpplysning =
             opplysningRepository.hent(reistITaktMedRotasjonBeskrivendeId, ident, søknadId)
 
-        return reistTilbakeEnGangEllerMerOpplysning?.svar as? Boolean ?: false ||
-            reistITaktMedRotasjonOpplysning?.svar as? Boolean ?: false
+        if (reistTilbakeEnGangEllerMerOpplysning != null || reistITaktMedRotasjonOpplysning != null) {
+            return reistTilbakeEnGangEllerMerOpplysning?.svar as? Boolean ?: false ||
+                reistITaktMedRotasjonOpplysning?.svar as? Boolean ?: false
+        }
+
+        val seksjonsSvar =
+            try {
+                seksjonRepository.hentSeksjonsvarEllerKastException(
+                    ident,
+                    søknadId,
+                    "personalia",
+                )
+            } catch (e: IllegalStateException) {
+                return false
+            }
+
+        objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
+            val reistTilbakeEnGangEllerMerOpplysning =
+                seksjonsJson.findPath("reiste-du-hjem-til-landet-du-bor-i")?.let {
+                    if (!it.isMissingOrNull()) {
+                        it.erBoolean()
+                    } else {
+                        false
+                    }
+                }
+
+            val reistITaktMedRotasjonOpplysning =
+                seksjonsJson.findPath("reiste-du-i-takt-med-rotasjon")?.let {
+                    if (!it.isMissingOrNull()) {
+                        it.erBoolean()
+                    } else {
+                        false
+                    }
+                }
+
+            return reistTilbakeEnGangEllerMerOpplysning as? Boolean ?: false ||
+                reistITaktMedRotasjonOpplysning as? Boolean ?: false
+        }
     }
 }

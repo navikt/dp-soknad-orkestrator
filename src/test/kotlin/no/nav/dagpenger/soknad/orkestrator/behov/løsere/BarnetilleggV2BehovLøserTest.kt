@@ -5,6 +5,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BarnetilleggV2
@@ -13,19 +14,25 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
 import org.junit.jupiter.api.Test
+import java.time.ZonedDateTime
 import java.util.UUID
 import java.util.UUID.randomUUID
 
 class BarnetilleggV2BehovLøserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val quizOpplysningRepositorySpy = spyk<QuizOpplysningRepository>(opplysningRepository)
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
     val testRapid = TestRapid()
-    val behovløser = BarnetilleggV2BehovLøser(testRapid, quizOpplysningRepositorySpy)
+    val behovløser = BarnetilleggV2BehovLøser(testRapid, quizOpplysningRepositorySpy, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId: UUID = randomUUID()
 
@@ -85,8 +92,19 @@ class BarnetilleggV2BehovLøserTest {
                         ),
                     ),
             )
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+
         opplysningRepository.lagre(pdlBarn)
         opplysningRepository.lagre(egetBarn)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
         val lagretSøknadbarnId = opplysningRepository.lagreBarnSøknadMapping(søknadId = søknadId)
 
         behovløser.løs(lagBehovmelding(ident, søknadId, BarnetilleggV2))
@@ -125,6 +143,18 @@ class BarnetilleggV2BehovLøserTest {
 
     @Test
     fun `løser behov om barn som forventet hvis søknaden ikke har barn`() {
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
         behovløser.løs(lagBehovmelding(ident, søknadId, BarnetilleggV2))
 
         val barnetilleggV2Løsning = testRapid.inspektør.field(0, "@løsning")[BarnetilleggV2.name]["verdi"]

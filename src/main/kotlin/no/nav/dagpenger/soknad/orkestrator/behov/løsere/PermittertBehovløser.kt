@@ -1,19 +1,25 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Permittert
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import java.util.UUID
 
 class PermittertBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
-) : Behovløser(rapidsConnection, opplysningRepository) {
+    søknadRepository: SøknadRepository,
+    seksjonRepository: SeksjonRepository,
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository) {
     override val behov = Permittert.name
     override val beskrivendeId = "faktum.arbeidsforhold"
 
@@ -26,10 +32,34 @@ class PermittertBehovløser(
         ident: String,
         søknadId: UUID,
     ): Boolean {
-        val arbeidsforholdOpplysning = opplysningRepository.hent(beskrivendeId, ident, søknadId) ?: return false
+        val arbeidsforholdOpplysning = opplysningRepository.hent(beskrivendeId, ident, søknadId)
 
-        return arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>().any {
-            it.sluttårsak == Sluttårsak.PERMITTERT
+        if (arbeidsforholdOpplysning != null) {
+            return arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>().any {
+                it.sluttårsak == Sluttårsak.PERMITTERT
+            }
         }
+
+        val seksjonsSvar =
+            try {
+                seksjonRepository.hentSeksjonsvarEllerKastException(
+                    ident,
+                    søknadId,
+                    "arbeidsforhold",
+                )
+            } catch (e: IllegalStateException) {
+                return false
+            }
+
+        objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
+            seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
+                if (!it.isMissingOrNull()) {
+                    return it.any { arbeidsforhold ->
+                        arbeidsforhold["hvordan-har-dette-arbeidsforholdet-endret-seg"].asText() == "jeg-er-permitert"
+                    }
+                }
+            }
+        }
+        return false
     }
 }
