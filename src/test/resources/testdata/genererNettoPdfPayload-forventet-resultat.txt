@@ -47,7 +47,7 @@
 <p>fornavn mellomnavn etternavn<br/>987654321<br/>adresselinje1, adresselinje2, adresselinje3, 1234 poststed, land<br/>Kontonummer: 97143830733</p>
 <hr/>    <h2>Egen næring</h2>
         <p>
-            <strong>Driver du egen næringsvirksomhet?</strong>
+                <strong>Driver du egen næringsvirksomhet?</strong>
             <br/>
     Svar:
 
@@ -55,26 +55,26 @@
         </p>
             <div class="modalSpørsmål">
         <p>
-            <strong>Næringens organisasjonsnummer</strong>
+                <strong>Næringens organisasjonsnummer</strong>
             <br/>
     Svar:
         1
         </p>
         <p>
-            <strong>Skriv inn hvor mange timer du jobbet per uke i egen næring før arbeidstiden ble redusert</strong>
+                <strong>Skriv inn hvor mange timer du jobbet per uke i egen næring før arbeidstiden ble redusert</strong>
             <br/>
     Svar:
         1
         </p>
         <p>
-            <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
+                <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
             <br/>
     Svar:
         1
         </p>
             </div>
         <p>
-            <strong>Driver du eget gårdsbruk?</strong>
+                <strong>Driver du eget gårdsbruk?</strong>
             <br/>
     Svar:
 
@@ -82,46 +82,46 @@
         </p>
             <div class="modalSpørsmål">
         <p>
-            <strong>Gårdsbrukets organisasjonsnummer</strong>
+                <strong>Gårdsbrukets organisasjonsnummer</strong>
             <br/>
     Svar:
         1
         </p>
         <p>
-            <strong>Hvilken type gårdsbruk driver du?</strong>
+                <strong>Hvilken type gårdsbruk driver du?</strong>
             <br/>
     Svar:
 
                     Dyr
         </p>
         <p>
-            <strong>Hvem eier gårdsbruket?</strong>
+                <strong>Hvem eier gårdsbruket?</strong>
             <br/>
     Svar:
 
                     Jeg
         </p>
         <p>
-            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+                <strong>Hvor mange prosent av inntekten går til deg?</strong>
             <br/>
     Svar:
         1
         </p>
         <p>
-            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+                <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
             <br/>
     Svar:
 
                     2025
         </p>
         <p>
-            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+                <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
             <br/>
     Svar:
         1
         </p>
         <p>
-            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+                <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
             <br/>
     Svar:
         1
@@ -129,13 +129,13 @@
             </div>
             <div class="modalSpørsmål">
         <p>
-            <strong>Gårdsbrukets organisasjonsnummer</strong>
+                <strong>Gårdsbrukets organisasjonsnummer</strong>
             <br/>
     Svar:
         2
         </p>
         <p>
-            <strong>Hvilken type gårdsbruk driver du?</strong>
+                <strong>Hvilken type gårdsbruk driver du?</strong>
             <br/>
     Svar:
 
@@ -144,33 +144,33 @@
                     Annet
         </p>
         <p>
-            <strong>Hvem eier gårdsbruket?</strong>
+                <strong>Hvem eier gårdsbruket?</strong>
             <br/>
     Svar:
 
                     Samboer/ektefelle
         </p>
         <p>
-            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+                <strong>Hvor mange prosent av inntekten går til deg?</strong>
             <br/>
     Svar:
         2
         </p>
         <p>
-            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+                <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
             <br/>
     Svar:
 
                     2024
         </p>
         <p>
-            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+                <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
             <br/>
     Svar:
         2
         </p>
         <p>
-            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+                <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
             <br/>
     Svar:
         2
@@ -178,7 +178,7 @@
             </div>
     <h2>En Annen Seksjon</h2>
         <p>
-            <strong>Driver du egen næringsvirksomhet?</strong>
+                <strong>Driver du egen næringsvirksomhet?</strong>
             <br/>
     Svar:
 
@@ -186,26 +186,26 @@
         </p>
             <div class="modalSpørsmål">
         <p>
-            <strong>Næringens organisasjonsnummer</strong>
+                <strong>Næringens organisasjonsnummer</strong>
             <br/>
     Svar:
         1
         </p>
         <p>
-            <strong>Skriv inn hvor mange timer du jobbet per uke i egen næring før arbeidstiden ble redusert</strong>
+                <strong>Skriv inn hvor mange timer du jobbet per uke i egen næring før arbeidstiden ble redusert</strong>
             <br/>
     Svar:
         1
         </p>
         <p>
-            <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
+                <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
             <br/>
     Svar:
         1
         </p>
             </div>
         <p>
-            <strong>Driver du eget gårdsbruk?</strong>
+                <strong>Driver du eget gårdsbruk?</strong>
             <br/>
     Svar:
 
@@ -213,46 +213,46 @@
         </p>
             <div class="modalSpørsmål">
         <p>
-            <strong>Gårdsbrukets organisasjonsnummer</strong>
+                <strong>Gårdsbrukets organisasjonsnummer</strong>
             <br/>
     Svar:
         1
         </p>
         <p>
-            <strong>Hvilken type gårdsbruk driver du?</strong>
+                <strong>Hvilken type gårdsbruk driver du?</strong>
             <br/>
     Svar:
 
                     Dyr
         </p>
         <p>
-            <strong>Hvem eier gårdsbruket?</strong>
+                <strong>Hvem eier gårdsbruket?</strong>
             <br/>
     Svar:
 
                     Jeg
         </p>
         <p>
-            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+                <strong>Hvor mange prosent av inntekten går til deg?</strong>
             <br/>
     Svar:
         1
         </p>
         <p>
-            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+                <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
             <br/>
     Svar:
 
                     2025
         </p>
         <p>
-            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+                <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
             <br/>
     Svar:
         1
         </p>
         <p>
-            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+                <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
             <br/>
     Svar:
         1
@@ -260,13 +260,13 @@
             </div>
             <div class="modalSpørsmål">
         <p>
-            <strong>Gårdsbrukets organisasjonsnummer</strong>
+                <strong>Gårdsbrukets organisasjonsnummer</strong>
             <br/>
     Svar:
         2
         </p>
         <p>
-            <strong>Hvilken type gårdsbruk driver du?</strong>
+                <strong>Hvilken type gårdsbruk driver du?</strong>
             <br/>
     Svar:
 
@@ -275,37 +275,165 @@
                     Annet
         </p>
         <p>
-            <strong>Hvem eier gårdsbruket?</strong>
+                <strong>Hvem eier gårdsbruket?</strong>
             <br/>
     Svar:
 
                     Samboer/ektefelle
         </p>
         <p>
-            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+                <strong>Hvor mange prosent av inntekten går til deg?</strong>
             <br/>
     Svar:
         2
         </p>
         <p>
-            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+                <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
             <br/>
     Svar:
 
                     2024
         </p>
         <p>
-            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+                <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
             <br/>
     Svar:
         2
         </p>
         <p>
-            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+                <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
             <br/>
     Svar:
         2
         </p>
             </div>
+    <h2>Annen pengestøtte</h2>
+        <p>
+                <strong>Har du de siste 36 måneder motatt pengestøtte fra EØS-land, Sveits eller Storbritania som ligner på</strong>
+            <br/>
+    Svar:
+
+                    Ja
+        </p>
+            <div class="modalSpørsmål">
+        <p>
+                <strong>Hvilke utenlandske pengestøtte har du mottatt eller søkt om?</strong>
+            <br/>
+    Svar:
+
+                    Sykepenger
+        </p>
+        <p>
+                <strong>Fra hvilket land har du mottatt eller søkt om pengestøtten?</strong>
+            <br/>
+    Svar:
+
+                    Aserbajdsjan
+        </p>
+        <p>
+                <strong>Mottar du fortsatt pengestøtten?</strong>
+            <br/>
+    Svar:
+
+                    Nei
+        </p>
+        <p>
+                <strong>Fra og med</strong>
+            <br/>
+    Svar:
+        12. november 2025
+        </p>
+        <p>
+                <strong>Til og med</strong>
+            <br/>
+    Svar:
+        28. november 2025
+        </p>
+            </div>
+            <div class="modalSpørsmål">
+        <p>
+                <strong>Hvilke utenlandske pengestøtte har du mottatt eller søkt om?</strong>
+            <br/>
+    Svar:
+
+                    Pleiepenger, omsorgspenger eller opplæringspenger
+        </p>
+        <p>
+                <strong>Fra hvilket land har du mottatt eller søkt om pengestøtten?</strong>
+            <br/>
+    Svar:
+
+                    Anguilla
+        </p>
+        <p>
+                <strong>Mottar du fortsatt pengestøtten?</strong>
+            <br/>
+    Svar:
+
+                    Ja
+        </p>
+        <p>
+                <strong>Fra og med hvilken dato har du mottatt pengestøtten?</strong>
+            <br/>
+    Svar:
+        30. november 2025
+        </p>
+            </div>
+        <p>
+                <strong>Mottar du eller har du søkt om pengestøtte fra andre enn Nav?</strong>
+            <br/>
+    Svar:
+
+                    Ja
+        </p>
+            <div class="modalSpørsmål">
+        <p>
+                <strong>Hvilke pengestøtte fra andre enn Nav har du mottatt eller søkt om?</strong>
+            <br/>
+    Svar:
+
+                    Pensjon fra andre enn Nav
+        </p>
+        <p>
+                <strong>Hvem utbetaler pengestøtten?</strong>
+            <br/>
+    Svar:
+        Foreningen Pensjon Til Alle
+        </p>
+        <p>
+                <strong>Fra og med</strong>
+            <br/>
+    Svar:
+        11. november 2025
+        </p>
+            </div>
+            <div class="modalSpørsmål">
+        <p>
+                <strong>Hvilke pengestøtte fra andre enn Nav har du mottatt eller søkt om?</strong>
+            <br/>
+    Svar:
+
+                    Pengestøtte under arbeidsløshet eller garantilott fra Garantikassen for fiskere (GFF)
+        </p>
+        <p>
+                <strong>Fra og med</strong>
+            <br/>
+    Svar:
+        25. november 2025
+        </p>
+            </div>
+        <p>
+                <strong>Får du eller kommer du til å få lønn eller andre økonomiske goder fra tidligere arbeidsgiver?</strong>
+            <br/>
+    Svar:
+
+                    Ja
+        </p>
+        <p>
+                <strong>Skriv inn hva du får beholde</strong>
+            <br/>
+    Svar:
+        En ost
+        </p>
 </body>
 </html>
