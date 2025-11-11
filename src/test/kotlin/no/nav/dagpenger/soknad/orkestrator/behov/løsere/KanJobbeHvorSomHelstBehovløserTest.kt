@@ -103,6 +103,13 @@ class KanJobbeHvorSomHelstBehovløserTest {
 
     @Test
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } throws IllegalStateException("Fant ingen seksjonsvar på arbeidsforhold for søknad=$søknadId")
         shouldThrow<IllegalStateException> {
             behovløser.løs(
                 lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.KanJobbeHvorSomHelst),

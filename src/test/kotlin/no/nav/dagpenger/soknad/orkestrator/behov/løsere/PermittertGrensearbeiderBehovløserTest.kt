@@ -74,22 +74,32 @@ class PermittertGrensearbeiderBehovløserTest {
     ) {
         val forventetSvar = testData.third
 
-        every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                any(),
-                any(),
-                any(),
-            )
-        } returns
-            """
-            {
-              "seksjon": {
-                "reiste-du-hjem-til-landet-du-bor-i": "${testData.first}",
-                "reiste-du-i-takt-med-rotasjon": "${testData.second}"
-              },
-              "versjon": 1
-            }
-            """.trimIndent()
+        if (testData.first == null && testData.second == null) {
+            every {
+                seksjonRepository.hentSeksjonsvarEllerKastException(
+                    any(),
+                    any(),
+                    any(),
+                )
+            } throws IllegalStateException("Fant ingen seksjonsvar på personalia for søknad=$søknadId")
+        } else {
+            every {
+                seksjonRepository.hentSeksjonsvarEllerKastException(
+                    any(),
+                    any(),
+                    any(),
+                )
+            } returns
+                """
+                {
+                  "seksjon": {
+                    "reiste-du-hjem-til-landet-du-bor-i": "${testData.first}",
+                    "reiste-du-i-takt-med-rotasjon": "${testData.second}"
+                  },
+                  "versjon": 1
+                }
+                """.trimIndent()
+        }
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()

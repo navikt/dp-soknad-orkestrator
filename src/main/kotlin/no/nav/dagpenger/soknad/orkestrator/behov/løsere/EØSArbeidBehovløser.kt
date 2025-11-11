@@ -27,12 +27,17 @@ class EØSArbeidBehovløser(
         if (svarPåBehov != null) {
             return publiserLøsning(behovmelding, svarPåBehov)
         }
+
         val seksjonsSvar =
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                behovmelding.ident,
-                behovmelding.søknadId,
-                "arbeidsforhold",
-            )
+            try {
+                seksjonRepository.hentSeksjonsvarEllerKastException(
+                    behovmelding.ident,
+                    behovmelding.søknadId,
+                    "arbeidsforhold",
+                )
+            } catch (e: IllegalStateException) {
+                return publiserLøsning(behovmelding, false)
+            }
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("har-du-jobbet-i-et-annet-eøs-land-sveits-eller-storbritannia-i-løpet-av-de-siste-36-månedene")?.let {

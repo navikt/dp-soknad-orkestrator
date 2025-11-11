@@ -222,6 +222,13 @@ class JobbetUtenforNorgeBehovløserTest {
 
     @Test
     fun `Behovløser setter løsning til false når det ikke er noen opplysning om arbeidsforhold`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } throws IllegalStateException("Fant ingen seksjonsvar på arbeidsforhold for søknad=$søknadId")
         behovløser.harJobbetUtenforNorge(ident, søknadId) shouldBe false
     }
 

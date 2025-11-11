@@ -25,8 +25,7 @@ class HarTilleggsopplysningerBehovløser(
             opplysningRepository.hent(beskrivendeId, behovmelding.ident, behovmelding.søknadId)?.svar
 
         if (quizOpplysningsvar != null) {
-            publiserLøsning(behovmelding, quizOpplysningsvar)
-            return
+            return publiserLøsning(behovmelding, quizOpplysningsvar)
         }
 
         val seksjonsvar =
