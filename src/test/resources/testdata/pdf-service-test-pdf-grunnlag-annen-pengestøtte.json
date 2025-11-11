@@ -1,0 +1,2292 @@
+{
+  "navn": "Annen pengestøtte",
+  "spørsmål": [
+    {
+      "id": "har-mottatt-eller-søkt-om-pengestøtte-fra-andre-eøs-land",
+      "type": "envalg",
+      "label": "Har du de siste 36 måneder motatt pengestøtte fra EØS-land, Sveits eller Storbritania som ligner på",
+      "description": "<ul><li>Sykepenger</li><li>Foreldrepenger eller svangerskapspenger</li><li>Dagpenger / arbeidsledighetstrygd</li><li>Pleiepenger, omsorgspenger eller opplæringspenger</li></ul>",
+      "options": [
+        {
+          "value": "ja",
+          "label": "Ja"
+        },
+        {
+          "value": "nei",
+          "label": "Nei"
+        }
+      ],
+      "svar": "ja"
+    },
+    {
+      "id": "harMottattPengestøtteFraAndreEØSLandLesMer",
+      "type": "lesMer",
+      "label": "Grunnen til at vi spør om dette",
+      "description": "Med utgangspunkt i en vedvarende agenda dokumenteres oppfølgingen som en følge av resultatoppnåelsen."
+    },
+    {
+      "id": "harMottattEllerSøktOmPengestøtteFraAndreEøsLandForklarendeTekst",
+      "type": "forklarendeTekst",
+      "description": "<strong>Dine pengestøtter fra EØS land</strong><br/>Du må legge til alle trygdeytelser fra EØS-land, Sveits eller Storbritannia du har mottatt eller søkt på de siste 36 måneder"
+    },
+    [
+      {
+        "id": "hvilken-pengestøtte-har-du-mottatt-eller-søkt-om-fra-andre-eøs-land",
+        "type": "envalg",
+        "label": "Hvilke utenlandske pengestøtte har du mottatt eller søkt om?",
+        "options": [
+          {
+            "value": "sykepenger",
+            "label": "Sykepenger"
+          },
+          {
+            "value": "foreldrepenger-eller-svangerskapspenger",
+            "label": "Foreldrepenger eller svangerskapspenger"
+          },
+          {
+            "value": "dagpenger-eller-arbeidsledighetstrygd",
+            "label": "Dagpenger / arbeidsledighetstrygd"
+          },
+          {
+            "value": "pleiepenger-omsorgspenger-eller-opplæringspenger",
+            "label": "Pleiepenger, omsorgspenger eller opplæringspenger"
+          }
+        ],
+        "svar": "sykepenger"
+      },
+      {
+        "id": "hvilkenPengestøtteHarDuMottattEllerSøktOmFraAndreEøsLandVarsel",
+        "type": "dokumentasjonskravindikator",
+        "label": "Dokumentasjon på hvilken periode du har hatt, mottatt eller har søkt om pengestøtte fra et EØS-land, Sveits eller Storbritannia"
+      },
+      {
+        "id": "fra-hvilket-eøs-land-har-du-mottatt-eller-søkt-om-pengestøtte",
+        "type": "land",
+        "label": "Fra hvilket land har du mottatt eller søkt om pengestøtten?",
+        "options": [
+          {
+            "value": "NOR",
+            "label": "Norge"
+          },
+          {
+            "value": "SWE",
+            "label": "Sverige"
+          },
+          {
+            "value": "POL",
+            "label": "Polen"
+          },
+          {
+            "value": "AFG",
+            "label": "Afghanistan"
+          },
+          {
+            "value": "ALA",
+            "label": "Åland"
+          },
+          {
+            "value": "ALB",
+            "label": "Albania"
+          },
+          {
+            "value": "DZA",
+            "label": "Algerie"
+          },
+          {
+            "value": "ASM",
+            "label": "Amerikansk Samoa"
+          },
+          {
+            "value": "AND",
+            "label": "Andorra"
+          },
+          {
+            "value": "AGO",
+            "label": "Angola"
+          },
+          {
+            "value": "AIA",
+            "label": "Anguilla"
+          },
+          {
+            "value": "ATA",
+            "label": "Antarktis"
+          },
+          {
+            "value": "ATG",
+            "label": "Antigua og Barbuda"
+          },
+          {
+            "value": "ARG",
+            "label": "Argentina"
+          },
+          {
+            "value": "ARM",
+            "label": "Armenia"
+          },
+          {
+            "value": "ABW",
+            "label": "Aruba"
+          },
+          {
+            "value": "AZE",
+            "label": "Aserbajdsjan"
+          },
+          {
+            "value": "AUS",
+            "label": "Australia"
+          },
+          {
+            "value": "BHS",
+            "label": "Bahamas"
+          },
+          {
+            "value": "BHR",
+            "label": "Bahrain"
+          },
+          {
+            "value": "BGD",
+            "label": "Bangladesh"
+          },
+          {
+            "value": "BRB",
+            "label": "Barbados"
+          },
+          {
+            "value": "BEL",
+            "label": "Belgia"
+          },
+          {
+            "value": "BLZ",
+            "label": "Belize"
+          },
+          {
+            "value": "BEN",
+            "label": "Benin"
+          },
+          {
+            "value": "BMU",
+            "label": "Bermuda"
+          },
+          {
+            "value": "BTN",
+            "label": "Bhutan"
+          },
+          {
+            "value": "BOL",
+            "label": "Bolivia"
+          },
+          {
+            "value": "BIH",
+            "label": "Bosnia-Hercegovina"
+          },
+          {
+            "value": "BWA",
+            "label": "Botswana"
+          },
+          {
+            "value": "BVT",
+            "label": "Bouvetøya"
+          },
+          {
+            "value": "BRA",
+            "label": "Brasil"
+          },
+          {
+            "value": "IOT",
+            "label": "Britisk territorium i Indiahavet"
+          },
+          {
+            "value": "BRN",
+            "label": "Brunei"
+          },
+          {
+            "value": "BGR",
+            "label": "Bulgaria"
+          },
+          {
+            "value": "BFA",
+            "label": "Burkina Faso"
+          },
+          {
+            "value": "BDI",
+            "label": "Burundi"
+          },
+          {
+            "value": "CAN",
+            "label": "Canada"
+          },
+          {
+            "value": "CYM",
+            "label": "Caymanøyene"
+          },
+          {
+            "value": "CHL",
+            "label": "Chile"
+          },
+          {
+            "value": "CXR",
+            "label": "Christmasøya"
+          },
+          {
+            "value": "COL",
+            "label": "Colombia"
+          },
+          {
+            "value": "COK",
+            "label": "Cookøyene"
+          },
+          {
+            "value": "CRI",
+            "label": "Costa Rica"
+          },
+          {
+            "value": "CUB",
+            "label": "Cuba"
+          },
+          {
+            "value": "CUW",
+            "label": "Curaçao"
+          },
+          {
+            "value": "DNK",
+            "label": "Danmark"
+          },
+          {
+            "value": "ARE",
+            "label": "De forente arabiske emirater"
+          },
+          {
+            "value": "PSE",
+            "label": "De okkuperte palestinske områdene"
+          },
+          {
+            "value": "DOM",
+            "label": "Den dominikanske republikk"
+          },
+          {
+            "value": "CAF",
+            "label": "Den sentralafrikanske republikk"
+          },
+          {
+            "value": "DJI",
+            "label": "Djibouti"
+          },
+          {
+            "value": "DMA",
+            "label": "Dominica"
+          },
+          {
+            "value": "ECU",
+            "label": "Ecuador"
+          },
+          {
+            "value": "EGY",
+            "label": "Egypt"
+          },
+          {
+            "value": "GNQ",
+            "label": "Ekvatorial-Guinea"
+          },
+          {
+            "value": "SLV",
+            "label": "El Salvador"
+          },
+          {
+            "value": "CIV",
+            "label": "Elfenbenskysten"
+          },
+          {
+            "value": "ERI",
+            "label": "Eritrea"
+          },
+          {
+            "value": "EST",
+            "label": "Estland"
+          },
+          {
+            "value": "SWZ",
+            "label": "Eswatini"
+          },
+          {
+            "value": "ETH",
+            "label": "Etiopia"
+          },
+          {
+            "value": "FRO",
+            "label": "Færøyene"
+          },
+          {
+            "value": "FLK",
+            "label": "Falklandsøyene"
+          },
+          {
+            "value": "FJI",
+            "label": "Fiji"
+          },
+          {
+            "value": "PHL",
+            "label": "Filippinene"
+          },
+          {
+            "value": "FIN",
+            "label": "Finland"
+          },
+          {
+            "value": "FRA",
+            "label": "Frankrike"
+          },
+          {
+            "value": "GUF",
+            "label": "Fransk Guyana"
+          },
+          {
+            "value": "PYF",
+            "label": "Fransk Polynesia"
+          },
+          {
+            "value": "GAB",
+            "label": "Gabon"
+          },
+          {
+            "value": "GMB",
+            "label": "Gambia"
+          },
+          {
+            "value": "GEO",
+            "label": "Georgia"
+          },
+          {
+            "value": "GHA",
+            "label": "Ghana"
+          },
+          {
+            "value": "GIB",
+            "label": "Gibraltar"
+          },
+          {
+            "value": "GRD",
+            "label": "Grenada"
+          },
+          {
+            "value": "GRL",
+            "label": "Grønland"
+          },
+          {
+            "value": "GLP",
+            "label": "Guadeloupe"
+          },
+          {
+            "value": "GUM",
+            "label": "Guam"
+          },
+          {
+            "value": "GTM",
+            "label": "Guatemala"
+          },
+          {
+            "value": "GGY",
+            "label": "Guernsey"
+          },
+          {
+            "value": "GIN",
+            "label": "Guinea"
+          },
+          {
+            "value": "GNB",
+            "label": "Guinea-Bissau"
+          },
+          {
+            "value": "GUY",
+            "label": "Guyana"
+          },
+          {
+            "value": "HTI",
+            "label": "Haiti"
+          },
+          {
+            "value": "HMD",
+            "label": "Heard- og McDonald-øyene"
+          },
+          {
+            "value": "GRC",
+            "label": "Hellas"
+          },
+          {
+            "value": "HND",
+            "label": "Honduras"
+          },
+          {
+            "value": "HKG",
+            "label": "Hongkong"
+          },
+          {
+            "value": "BLR",
+            "label": "Hviterussland"
+          },
+          {
+            "value": "IND",
+            "label": "India"
+          },
+          {
+            "value": "IDN",
+            "label": "Indonesia"
+          },
+          {
+            "value": "IRQ",
+            "label": "Irak"
+          },
+          {
+            "value": "IRN",
+            "label": "Iran"
+          },
+          {
+            "value": "IRL",
+            "label": "Irland"
+          },
+          {
+            "value": "ISL",
+            "label": "Island"
+          },
+          {
+            "value": "ISR",
+            "label": "Israel"
+          },
+          {
+            "value": "ITA",
+            "label": "Italia"
+          },
+          {
+            "value": "JAM",
+            "label": "Jamaica"
+          },
+          {
+            "value": "JPN",
+            "label": "Japan"
+          },
+          {
+            "value": "YEM",
+            "label": "Jemen"
+          },
+          {
+            "value": "JEY",
+            "label": "Jersey"
+          },
+          {
+            "value": "VGB",
+            "label": "Jomfruøyene (Britisk)"
+          },
+          {
+            "value": "VIR",
+            "label": "Jomfruøyene (USA)"
+          },
+          {
+            "value": "JOR",
+            "label": "Jordan"
+          },
+          {
+            "value": "KHM",
+            "label": "Kambodsja"
+          },
+          {
+            "value": "CMR",
+            "label": "Kamerun"
+          },
+          {
+            "value": "CPV",
+            "label": "Kapp Verde"
+          },
+          {
+            "value": "BES",
+            "label": "Karibisk Nederland"
+          },
+          {
+            "value": "KAZ",
+            "label": "Kasakhstan"
+          },
+          {
+            "value": "KEN",
+            "label": "Kenya"
+          },
+          {
+            "value": "CHN",
+            "label": "Kina"
+          },
+          {
+            "value": "KGZ",
+            "label": "Kirgisistan"
+          },
+          {
+            "value": "KIR",
+            "label": "Kiribati"
+          },
+          {
+            "value": "CCK",
+            "label": "Kokosøyene"
+          },
+          {
+            "value": "COM",
+            "label": "Komorene"
+          },
+          {
+            "value": "COD",
+            "label": "Kongo"
+          },
+          {
+            "value": "COG",
+            "label": "Kongo-Brazzaville"
+          },
+          {
+            "value": "HRV",
+            "label": "Kroatia"
+          },
+          {
+            "value": "KWT",
+            "label": "Kuwait"
+          },
+          {
+            "value": "CYP",
+            "label": "Kypros"
+          },
+          {
+            "value": "LAO",
+            "label": "Laos"
+          },
+          {
+            "value": "LVA",
+            "label": "Latvia"
+          },
+          {
+            "value": "LSO",
+            "label": "Lesotho"
+          },
+          {
+            "value": "LBN",
+            "label": "Libanon"
+          },
+          {
+            "value": "LBR",
+            "label": "Liberia"
+          },
+          {
+            "value": "LBY",
+            "label": "Libya"
+          },
+          {
+            "value": "LIE",
+            "label": "Liechtenstein"
+          },
+          {
+            "value": "LTU",
+            "label": "Litauen"
+          },
+          {
+            "value": "LUX",
+            "label": "Luxembourg"
+          },
+          {
+            "value": "MAC",
+            "label": "Macao"
+          },
+          {
+            "value": "MDG",
+            "label": "Madagaskar"
+          },
+          {
+            "value": "MWI",
+            "label": "Malawi"
+          },
+          {
+            "value": "MYS",
+            "label": "Malaysia"
+          },
+          {
+            "value": "MDV",
+            "label": "Maldivene"
+          },
+          {
+            "value": "MLI",
+            "label": "Mali"
+          },
+          {
+            "value": "MLT",
+            "label": "Malta"
+          },
+          {
+            "value": "IMN",
+            "label": "Man"
+          },
+          {
+            "value": "MAR",
+            "label": "Marokko"
+          },
+          {
+            "value": "MHL",
+            "label": "Marshalløyene"
+          },
+          {
+            "value": "MTQ",
+            "label": "Martinique"
+          },
+          {
+            "value": "MRT",
+            "label": "Mauritania"
+          },
+          {
+            "value": "MUS",
+            "label": "Mauritius"
+          },
+          {
+            "value": "MYT",
+            "label": "Mayotte"
+          },
+          {
+            "value": "MEX",
+            "label": "Mexico"
+          },
+          {
+            "value": "FSM",
+            "label": "Mikronesiaføderasjonen"
+          },
+          {
+            "value": "MDA",
+            "label": "Moldova"
+          },
+          {
+            "value": "MCO",
+            "label": "Monaco"
+          },
+          {
+            "value": "MNG",
+            "label": "Mongolia"
+          },
+          {
+            "value": "MNE",
+            "label": "Montenegro"
+          },
+          {
+            "value": "MSR",
+            "label": "Montserrat"
+          },
+          {
+            "value": "MOZ",
+            "label": "Mosambik"
+          },
+          {
+            "value": "MMR",
+            "label": "Myanmar (Burma)"
+          },
+          {
+            "value": "NAM",
+            "label": "Namibia"
+          },
+          {
+            "value": "NRU",
+            "label": "Nauru"
+          },
+          {
+            "value": "NLD",
+            "label": "Nederland"
+          },
+          {
+            "value": "NPL",
+            "label": "Nepal"
+          },
+          {
+            "value": "NZL",
+            "label": "New Zealand"
+          },
+          {
+            "value": "NIC",
+            "label": "Nicaragua"
+          },
+          {
+            "value": "NER",
+            "label": "Niger"
+          },
+          {
+            "value": "NGA",
+            "label": "Nigeria"
+          },
+          {
+            "value": "NIU",
+            "label": "Niue"
+          },
+          {
+            "value": "PRK",
+            "label": "Nord-Korea"
+          },
+          {
+            "value": "MKD",
+            "label": "Nord-Makedonia"
+          },
+          {
+            "value": "MNP",
+            "label": "Nord-Marianene"
+          },
+          {
+            "value": "NFK",
+            "label": "Norfolk Island"
+          },
+          {
+            "value": "NCL",
+            "label": "Ny-Caledonia"
+          },
+          {
+            "value": "OMN",
+            "label": "Oman"
+          },
+          {
+            "value": "TLS",
+            "label": "Øst-Timor"
+          },
+          {
+            "value": "AUT",
+            "label": "Østerrike"
+          },
+          {
+            "value": "PAK",
+            "label": "Pakistan"
+          },
+          {
+            "value": "PLW",
+            "label": "Palau"
+          },
+          {
+            "value": "PAN",
+            "label": "Panama"
+          },
+          {
+            "value": "PNG",
+            "label": "Papua Ny-Guinea"
+          },
+          {
+            "value": "PRY",
+            "label": "Paraguay"
+          },
+          {
+            "value": "PER",
+            "label": "Peru"
+          },
+          {
+            "value": "PCN",
+            "label": "Pitcairn"
+          },
+          {
+            "value": "PRT",
+            "label": "Portugal"
+          },
+          {
+            "value": "PRI",
+            "label": "Puerto Rico"
+          },
+          {
+            "value": "QAT",
+            "label": "Qatar"
+          },
+          {
+            "value": "REU",
+            "label": "Réunion"
+          },
+          {
+            "value": "ROU",
+            "label": "Romania"
+          },
+          {
+            "value": "RUS",
+            "label": "Russland"
+          },
+          {
+            "value": "RWA",
+            "label": "Rwanda"
+          },
+          {
+            "value": "KNA",
+            "label": "Saint Kitts og Nevis"
+          },
+          {
+            "value": "LCA",
+            "label": "Saint Lucia"
+          },
+          {
+            "value": "VCT",
+            "label": "Saint Vincent og Grenadinene"
+          },
+          {
+            "value": "BLM",
+            "label": "Saint-Barthélemy"
+          },
+          {
+            "value": "MAF",
+            "label": "Saint-Martin"
+          },
+          {
+            "value": "SPM",
+            "label": "Saint-Pierre-et-Miquelon"
+          },
+          {
+            "value": "SLB",
+            "label": "Salomonøyene"
+          },
+          {
+            "value": "WSM",
+            "label": "Samoa"
+          },
+          {
+            "value": "SMR",
+            "label": "San Marino"
+          },
+          {
+            "value": "STP",
+            "label": "São Tomé og Príncipe"
+          },
+          {
+            "value": "SAU",
+            "label": "Saudi-Arabia"
+          },
+          {
+            "value": "SEN",
+            "label": "Senegal"
+          },
+          {
+            "value": "SRB",
+            "label": "Serbia"
+          },
+          {
+            "value": "SYC",
+            "label": "Seychellene"
+          },
+          {
+            "value": "SLE",
+            "label": "Sierra Leone"
+          },
+          {
+            "value": "SGP",
+            "label": "Singapore"
+          },
+          {
+            "value": "SXM",
+            "label": "Sint Maarten (Nederlandsk del)"
+          },
+          {
+            "value": "SVK",
+            "label": "Slovakia"
+          },
+          {
+            "value": "SVN",
+            "label": "Slovenia"
+          },
+          {
+            "value": "SOM",
+            "label": "Somalia"
+          },
+          {
+            "value": "ZAF",
+            "label": "Sør-Afrika"
+          },
+          {
+            "value": "SGS",
+            "label": "Sør-Georgia og de søre Sandwichøyene"
+          },
+          {
+            "value": "KOR",
+            "label": "Sør-Korea"
+          },
+          {
+            "value": "SSD",
+            "label": "Sør-Sudan"
+          },
+          {
+            "value": "ATF",
+            "label": "Søre franske territorier"
+          },
+          {
+            "value": "ESP",
+            "label": "Spania"
+          },
+          {
+            "value": "LKA",
+            "label": "Sri Lanka"
+          },
+          {
+            "value": "SHN",
+            "label": "St. Helena"
+          },
+          {
+            "value": "GBR",
+            "label": "Storbritannia"
+          },
+          {
+            "value": "SDN",
+            "label": "Sudan"
+          },
+          {
+            "value": "SUR",
+            "label": "Surinam"
+          },
+          {
+            "value": "SJM",
+            "label": "Svalbard og Jan Mayen"
+          },
+          {
+            "value": "CHE",
+            "label": "Sveits"
+          },
+          {
+            "value": "SYR",
+            "label": "Syria"
+          },
+          {
+            "value": "TJK",
+            "label": "Tadsjikistan"
+          },
+          {
+            "value": "TWN",
+            "label": "Taiwan"
+          },
+          {
+            "value": "TZA",
+            "label": "Tanzania"
+          },
+          {
+            "value": "THA",
+            "label": "Thailand"
+          },
+          {
+            "value": "TGO",
+            "label": "Togo"
+          },
+          {
+            "value": "TKL",
+            "label": "Tokelau"
+          },
+          {
+            "value": "TON",
+            "label": "Tonga"
+          },
+          {
+            "value": "TTO",
+            "label": "Trinidad og Tobago"
+          },
+          {
+            "value": "TCD",
+            "label": "Tsjad"
+          },
+          {
+            "value": "CZE",
+            "label": "Tsjekkia"
+          },
+          {
+            "value": "TUN",
+            "label": "Tunisia"
+          },
+          {
+            "value": "TKM",
+            "label": "Turkmenistan"
+          },
+          {
+            "value": "TCA",
+            "label": "Turks- og Caicosøyene"
+          },
+          {
+            "value": "TUV",
+            "label": "Tuvalu"
+          },
+          {
+            "value": "TUR",
+            "label": "Tyrkia"
+          },
+          {
+            "value": "DEU",
+            "label": "Tyskland"
+          },
+          {
+            "value": "UGA",
+            "label": "Uganda"
+          },
+          {
+            "value": "UKR",
+            "label": "Ukraina"
+          },
+          {
+            "value": "HUN",
+            "label": "Ungarn"
+          },
+          {
+            "value": "URY",
+            "label": "Uruguay"
+          },
+          {
+            "value": "USA",
+            "label": "USA"
+          },
+          {
+            "value": "UMI",
+            "label": "USA, mindre, utenforliggende øyer"
+          },
+          {
+            "value": "UZB",
+            "label": "Usbekistan"
+          },
+          {
+            "value": "VUT",
+            "label": "Vanuatu"
+          },
+          {
+            "value": "VAT",
+            "label": "Vatikanstaten"
+          },
+          {
+            "value": "VEN",
+            "label": "Venezuela"
+          },
+          {
+            "value": "ESH",
+            "label": "Vest-Sahara"
+          },
+          {
+            "value": "VNM",
+            "label": "Vietnam"
+          },
+          {
+            "value": "WLF",
+            "label": "Wallis- og Futunaøyene"
+          },
+          {
+            "value": "ZMB",
+            "label": "Zambia"
+          },
+          {
+            "value": "ZWE",
+            "label": "Zimbabwe"
+          }
+        ],
+        "svar": "AZE"
+      },
+      {
+        "id": "mottar-du-fortsatt-pengestøtten-fra-andre-eøs-land",
+        "type": "envalg",
+        "label": "Mottar du fortsatt pengestøtten?",
+        "options": [
+          {
+            "value": "ja",
+            "label": "Ja"
+          },
+          {
+            "value": "nei",
+            "label": "Nei"
+          }
+        ],
+        "svar": "nei"
+      },
+      {
+        "id": "i-hvilken-periode-har-du-mottatt-eller-søkt-om-pengestøtte-fra-andre-eøs-land-fra-og-med",
+        "type": "periodeFra",
+        "label": "Fra og med",
+        "svar": "12. november 2025"
+      },
+      {
+        "id": "i-hvilken-periode-har-du-mottatt-eller-søkt-om-pengestøtte-fra-andre-eøs-land-til-og-med",
+        "type": "periodeTil",
+        "label": "Til og med",
+        "svar": "28. november 2025"
+      }
+    ],
+    [
+      {
+        "id": "hvilken-pengestøtte-har-du-mottatt-eller-søkt-om-fra-andre-eøs-land",
+        "type": "envalg",
+        "label": "Hvilke utenlandske pengestøtte har du mottatt eller søkt om?",
+        "options": [
+          {
+            "value": "sykepenger",
+            "label": "Sykepenger"
+          },
+          {
+            "value": "foreldrepenger-eller-svangerskapspenger",
+            "label": "Foreldrepenger eller svangerskapspenger"
+          },
+          {
+            "value": "dagpenger-eller-arbeidsledighetstrygd",
+            "label": "Dagpenger / arbeidsledighetstrygd"
+          },
+          {
+            "value": "pleiepenger-omsorgspenger-eller-opplæringspenger",
+            "label": "Pleiepenger, omsorgspenger eller opplæringspenger"
+          }
+        ],
+        "svar": "pleiepenger-omsorgspenger-eller-opplæringspenger"
+      },
+      {
+        "id": "hvilkenPengestøtteHarDuMottattEllerSøktOmFraAndreEøsLandVarsel",
+        "type": "dokumentasjonskravindikator",
+        "label": "Dokumentasjon på hvilken periode du har hatt, mottatt eller har søkt om pengestøtte fra et EØS-land, Sveits eller Storbritannia"
+      },
+      {
+        "id": "fra-hvilket-eøs-land-har-du-mottatt-eller-søkt-om-pengestøtte",
+        "type": "land",
+        "label": "Fra hvilket land har du mottatt eller søkt om pengestøtten?",
+        "options": [
+          {
+            "value": "NOR",
+            "label": "Norge"
+          },
+          {
+            "value": "SWE",
+            "label": "Sverige"
+          },
+          {
+            "value": "POL",
+            "label": "Polen"
+          },
+          {
+            "value": "AFG",
+            "label": "Afghanistan"
+          },
+          {
+            "value": "ALA",
+            "label": "Åland"
+          },
+          {
+            "value": "ALB",
+            "label": "Albania"
+          },
+          {
+            "value": "DZA",
+            "label": "Algerie"
+          },
+          {
+            "value": "ASM",
+            "label": "Amerikansk Samoa"
+          },
+          {
+            "value": "AND",
+            "label": "Andorra"
+          },
+          {
+            "value": "AGO",
+            "label": "Angola"
+          },
+          {
+            "value": "AIA",
+            "label": "Anguilla"
+          },
+          {
+            "value": "ATA",
+            "label": "Antarktis"
+          },
+          {
+            "value": "ATG",
+            "label": "Antigua og Barbuda"
+          },
+          {
+            "value": "ARG",
+            "label": "Argentina"
+          },
+          {
+            "value": "ARM",
+            "label": "Armenia"
+          },
+          {
+            "value": "ABW",
+            "label": "Aruba"
+          },
+          {
+            "value": "AZE",
+            "label": "Aserbajdsjan"
+          },
+          {
+            "value": "AUS",
+            "label": "Australia"
+          },
+          {
+            "value": "BHS",
+            "label": "Bahamas"
+          },
+          {
+            "value": "BHR",
+            "label": "Bahrain"
+          },
+          {
+            "value": "BGD",
+            "label": "Bangladesh"
+          },
+          {
+            "value": "BRB",
+            "label": "Barbados"
+          },
+          {
+            "value": "BEL",
+            "label": "Belgia"
+          },
+          {
+            "value": "BLZ",
+            "label": "Belize"
+          },
+          {
+            "value": "BEN",
+            "label": "Benin"
+          },
+          {
+            "value": "BMU",
+            "label": "Bermuda"
+          },
+          {
+            "value": "BTN",
+            "label": "Bhutan"
+          },
+          {
+            "value": "BOL",
+            "label": "Bolivia"
+          },
+          {
+            "value": "BIH",
+            "label": "Bosnia-Hercegovina"
+          },
+          {
+            "value": "BWA",
+            "label": "Botswana"
+          },
+          {
+            "value": "BVT",
+            "label": "Bouvetøya"
+          },
+          {
+            "value": "BRA",
+            "label": "Brasil"
+          },
+          {
+            "value": "IOT",
+            "label": "Britisk territorium i Indiahavet"
+          },
+          {
+            "value": "BRN",
+            "label": "Brunei"
+          },
+          {
+            "value": "BGR",
+            "label": "Bulgaria"
+          },
+          {
+            "value": "BFA",
+            "label": "Burkina Faso"
+          },
+          {
+            "value": "BDI",
+            "label": "Burundi"
+          },
+          {
+            "value": "CAN",
+            "label": "Canada"
+          },
+          {
+            "value": "CYM",
+            "label": "Caymanøyene"
+          },
+          {
+            "value": "CHL",
+            "label": "Chile"
+          },
+          {
+            "value": "CXR",
+            "label": "Christmasøya"
+          },
+          {
+            "value": "COL",
+            "label": "Colombia"
+          },
+          {
+            "value": "COK",
+            "label": "Cookøyene"
+          },
+          {
+            "value": "CRI",
+            "label": "Costa Rica"
+          },
+          {
+            "value": "CUB",
+            "label": "Cuba"
+          },
+          {
+            "value": "CUW",
+            "label": "Curaçao"
+          },
+          {
+            "value": "DNK",
+            "label": "Danmark"
+          },
+          {
+            "value": "ARE",
+            "label": "De forente arabiske emirater"
+          },
+          {
+            "value": "PSE",
+            "label": "De okkuperte palestinske områdene"
+          },
+          {
+            "value": "DOM",
+            "label": "Den dominikanske republikk"
+          },
+          {
+            "value": "CAF",
+            "label": "Den sentralafrikanske republikk"
+          },
+          {
+            "value": "DJI",
+            "label": "Djibouti"
+          },
+          {
+            "value": "DMA",
+            "label": "Dominica"
+          },
+          {
+            "value": "ECU",
+            "label": "Ecuador"
+          },
+          {
+            "value": "EGY",
+            "label": "Egypt"
+          },
+          {
+            "value": "GNQ",
+            "label": "Ekvatorial-Guinea"
+          },
+          {
+            "value": "SLV",
+            "label": "El Salvador"
+          },
+          {
+            "value": "CIV",
+            "label": "Elfenbenskysten"
+          },
+          {
+            "value": "ERI",
+            "label": "Eritrea"
+          },
+          {
+            "value": "EST",
+            "label": "Estland"
+          },
+          {
+            "value": "SWZ",
+            "label": "Eswatini"
+          },
+          {
+            "value": "ETH",
+            "label": "Etiopia"
+          },
+          {
+            "value": "FRO",
+            "label": "Færøyene"
+          },
+          {
+            "value": "FLK",
+            "label": "Falklandsøyene"
+          },
+          {
+            "value": "FJI",
+            "label": "Fiji"
+          },
+          {
+            "value": "PHL",
+            "label": "Filippinene"
+          },
+          {
+            "value": "FIN",
+            "label": "Finland"
+          },
+          {
+            "value": "FRA",
+            "label": "Frankrike"
+          },
+          {
+            "value": "GUF",
+            "label": "Fransk Guyana"
+          },
+          {
+            "value": "PYF",
+            "label": "Fransk Polynesia"
+          },
+          {
+            "value": "GAB",
+            "label": "Gabon"
+          },
+          {
+            "value": "GMB",
+            "label": "Gambia"
+          },
+          {
+            "value": "GEO",
+            "label": "Georgia"
+          },
+          {
+            "value": "GHA",
+            "label": "Ghana"
+          },
+          {
+            "value": "GIB",
+            "label": "Gibraltar"
+          },
+          {
+            "value": "GRD",
+            "label": "Grenada"
+          },
+          {
+            "value": "GRL",
+            "label": "Grønland"
+          },
+          {
+            "value": "GLP",
+            "label": "Guadeloupe"
+          },
+          {
+            "value": "GUM",
+            "label": "Guam"
+          },
+          {
+            "value": "GTM",
+            "label": "Guatemala"
+          },
+          {
+            "value": "GGY",
+            "label": "Guernsey"
+          },
+          {
+            "value": "GIN",
+            "label": "Guinea"
+          },
+          {
+            "value": "GNB",
+            "label": "Guinea-Bissau"
+          },
+          {
+            "value": "GUY",
+            "label": "Guyana"
+          },
+          {
+            "value": "HTI",
+            "label": "Haiti"
+          },
+          {
+            "value": "HMD",
+            "label": "Heard- og McDonald-øyene"
+          },
+          {
+            "value": "GRC",
+            "label": "Hellas"
+          },
+          {
+            "value": "HND",
+            "label": "Honduras"
+          },
+          {
+            "value": "HKG",
+            "label": "Hongkong"
+          },
+          {
+            "value": "BLR",
+            "label": "Hviterussland"
+          },
+          {
+            "value": "IND",
+            "label": "India"
+          },
+          {
+            "value": "IDN",
+            "label": "Indonesia"
+          },
+          {
+            "value": "IRQ",
+            "label": "Irak"
+          },
+          {
+            "value": "IRN",
+            "label": "Iran"
+          },
+          {
+            "value": "IRL",
+            "label": "Irland"
+          },
+          {
+            "value": "ISL",
+            "label": "Island"
+          },
+          {
+            "value": "ISR",
+            "label": "Israel"
+          },
+          {
+            "value": "ITA",
+            "label": "Italia"
+          },
+          {
+            "value": "JAM",
+            "label": "Jamaica"
+          },
+          {
+            "value": "JPN",
+            "label": "Japan"
+          },
+          {
+            "value": "YEM",
+            "label": "Jemen"
+          },
+          {
+            "value": "JEY",
+            "label": "Jersey"
+          },
+          {
+            "value": "VGB",
+            "label": "Jomfruøyene (Britisk)"
+          },
+          {
+            "value": "VIR",
+            "label": "Jomfruøyene (USA)"
+          },
+          {
+            "value": "JOR",
+            "label": "Jordan"
+          },
+          {
+            "value": "KHM",
+            "label": "Kambodsja"
+          },
+          {
+            "value": "CMR",
+            "label": "Kamerun"
+          },
+          {
+            "value": "CPV",
+            "label": "Kapp Verde"
+          },
+          {
+            "value": "BES",
+            "label": "Karibisk Nederland"
+          },
+          {
+            "value": "KAZ",
+            "label": "Kasakhstan"
+          },
+          {
+            "value": "KEN",
+            "label": "Kenya"
+          },
+          {
+            "value": "CHN",
+            "label": "Kina"
+          },
+          {
+            "value": "KGZ",
+            "label": "Kirgisistan"
+          },
+          {
+            "value": "KIR",
+            "label": "Kiribati"
+          },
+          {
+            "value": "CCK",
+            "label": "Kokosøyene"
+          },
+          {
+            "value": "COM",
+            "label": "Komorene"
+          },
+          {
+            "value": "COD",
+            "label": "Kongo"
+          },
+          {
+            "value": "COG",
+            "label": "Kongo-Brazzaville"
+          },
+          {
+            "value": "HRV",
+            "label": "Kroatia"
+          },
+          {
+            "value": "KWT",
+            "label": "Kuwait"
+          },
+          {
+            "value": "CYP",
+            "label": "Kypros"
+          },
+          {
+            "value": "LAO",
+            "label": "Laos"
+          },
+          {
+            "value": "LVA",
+            "label": "Latvia"
+          },
+          {
+            "value": "LSO",
+            "label": "Lesotho"
+          },
+          {
+            "value": "LBN",
+            "label": "Libanon"
+          },
+          {
+            "value": "LBR",
+            "label": "Liberia"
+          },
+          {
+            "value": "LBY",
+            "label": "Libya"
+          },
+          {
+            "value": "LIE",
+            "label": "Liechtenstein"
+          },
+          {
+            "value": "LTU",
+            "label": "Litauen"
+          },
+          {
+            "value": "LUX",
+            "label": "Luxembourg"
+          },
+          {
+            "value": "MAC",
+            "label": "Macao"
+          },
+          {
+            "value": "MDG",
+            "label": "Madagaskar"
+          },
+          {
+            "value": "MWI",
+            "label": "Malawi"
+          },
+          {
+            "value": "MYS",
+            "label": "Malaysia"
+          },
+          {
+            "value": "MDV",
+            "label": "Maldivene"
+          },
+          {
+            "value": "MLI",
+            "label": "Mali"
+          },
+          {
+            "value": "MLT",
+            "label": "Malta"
+          },
+          {
+            "value": "IMN",
+            "label": "Man"
+          },
+          {
+            "value": "MAR",
+            "label": "Marokko"
+          },
+          {
+            "value": "MHL",
+            "label": "Marshalløyene"
+          },
+          {
+            "value": "MTQ",
+            "label": "Martinique"
+          },
+          {
+            "value": "MRT",
+            "label": "Mauritania"
+          },
+          {
+            "value": "MUS",
+            "label": "Mauritius"
+          },
+          {
+            "value": "MYT",
+            "label": "Mayotte"
+          },
+          {
+            "value": "MEX",
+            "label": "Mexico"
+          },
+          {
+            "value": "FSM",
+            "label": "Mikronesiaføderasjonen"
+          },
+          {
+            "value": "MDA",
+            "label": "Moldova"
+          },
+          {
+            "value": "MCO",
+            "label": "Monaco"
+          },
+          {
+            "value": "MNG",
+            "label": "Mongolia"
+          },
+          {
+            "value": "MNE",
+            "label": "Montenegro"
+          },
+          {
+            "value": "MSR",
+            "label": "Montserrat"
+          },
+          {
+            "value": "MOZ",
+            "label": "Mosambik"
+          },
+          {
+            "value": "MMR",
+            "label": "Myanmar (Burma)"
+          },
+          {
+            "value": "NAM",
+            "label": "Namibia"
+          },
+          {
+            "value": "NRU",
+            "label": "Nauru"
+          },
+          {
+            "value": "NLD",
+            "label": "Nederland"
+          },
+          {
+            "value": "NPL",
+            "label": "Nepal"
+          },
+          {
+            "value": "NZL",
+            "label": "New Zealand"
+          },
+          {
+            "value": "NIC",
+            "label": "Nicaragua"
+          },
+          {
+            "value": "NER",
+            "label": "Niger"
+          },
+          {
+            "value": "NGA",
+            "label": "Nigeria"
+          },
+          {
+            "value": "NIU",
+            "label": "Niue"
+          },
+          {
+            "value": "PRK",
+            "label": "Nord-Korea"
+          },
+          {
+            "value": "MKD",
+            "label": "Nord-Makedonia"
+          },
+          {
+            "value": "MNP",
+            "label": "Nord-Marianene"
+          },
+          {
+            "value": "NFK",
+            "label": "Norfolk Island"
+          },
+          {
+            "value": "NCL",
+            "label": "Ny-Caledonia"
+          },
+          {
+            "value": "OMN",
+            "label": "Oman"
+          },
+          {
+            "value": "TLS",
+            "label": "Øst-Timor"
+          },
+          {
+            "value": "AUT",
+            "label": "Østerrike"
+          },
+          {
+            "value": "PAK",
+            "label": "Pakistan"
+          },
+          {
+            "value": "PLW",
+            "label": "Palau"
+          },
+          {
+            "value": "PAN",
+            "label": "Panama"
+          },
+          {
+            "value": "PNG",
+            "label": "Papua Ny-Guinea"
+          },
+          {
+            "value": "PRY",
+            "label": "Paraguay"
+          },
+          {
+            "value": "PER",
+            "label": "Peru"
+          },
+          {
+            "value": "PCN",
+            "label": "Pitcairn"
+          },
+          {
+            "value": "PRT",
+            "label": "Portugal"
+          },
+          {
+            "value": "PRI",
+            "label": "Puerto Rico"
+          },
+          {
+            "value": "QAT",
+            "label": "Qatar"
+          },
+          {
+            "value": "REU",
+            "label": "Réunion"
+          },
+          {
+            "value": "ROU",
+            "label": "Romania"
+          },
+          {
+            "value": "RUS",
+            "label": "Russland"
+          },
+          {
+            "value": "RWA",
+            "label": "Rwanda"
+          },
+          {
+            "value": "KNA",
+            "label": "Saint Kitts og Nevis"
+          },
+          {
+            "value": "LCA",
+            "label": "Saint Lucia"
+          },
+          {
+            "value": "VCT",
+            "label": "Saint Vincent og Grenadinene"
+          },
+          {
+            "value": "BLM",
+            "label": "Saint-Barthélemy"
+          },
+          {
+            "value": "MAF",
+            "label": "Saint-Martin"
+          },
+          {
+            "value": "SPM",
+            "label": "Saint-Pierre-et-Miquelon"
+          },
+          {
+            "value": "SLB",
+            "label": "Salomonøyene"
+          },
+          {
+            "value": "WSM",
+            "label": "Samoa"
+          },
+          {
+            "value": "SMR",
+            "label": "San Marino"
+          },
+          {
+            "value": "STP",
+            "label": "São Tomé og Príncipe"
+          },
+          {
+            "value": "SAU",
+            "label": "Saudi-Arabia"
+          },
+          {
+            "value": "SEN",
+            "label": "Senegal"
+          },
+          {
+            "value": "SRB",
+            "label": "Serbia"
+          },
+          {
+            "value": "SYC",
+            "label": "Seychellene"
+          },
+          {
+            "value": "SLE",
+            "label": "Sierra Leone"
+          },
+          {
+            "value": "SGP",
+            "label": "Singapore"
+          },
+          {
+            "value": "SXM",
+            "label": "Sint Maarten (Nederlandsk del)"
+          },
+          {
+            "value": "SVK",
+            "label": "Slovakia"
+          },
+          {
+            "value": "SVN",
+            "label": "Slovenia"
+          },
+          {
+            "value": "SOM",
+            "label": "Somalia"
+          },
+          {
+            "value": "ZAF",
+            "label": "Sør-Afrika"
+          },
+          {
+            "value": "SGS",
+            "label": "Sør-Georgia og de søre Sandwichøyene"
+          },
+          {
+            "value": "KOR",
+            "label": "Sør-Korea"
+          },
+          {
+            "value": "SSD",
+            "label": "Sør-Sudan"
+          },
+          {
+            "value": "ATF",
+            "label": "Søre franske territorier"
+          },
+          {
+            "value": "ESP",
+            "label": "Spania"
+          },
+          {
+            "value": "LKA",
+            "label": "Sri Lanka"
+          },
+          {
+            "value": "SHN",
+            "label": "St. Helena"
+          },
+          {
+            "value": "GBR",
+            "label": "Storbritannia"
+          },
+          {
+            "value": "SDN",
+            "label": "Sudan"
+          },
+          {
+            "value": "SUR",
+            "label": "Surinam"
+          },
+          {
+            "value": "SJM",
+            "label": "Svalbard og Jan Mayen"
+          },
+          {
+            "value": "CHE",
+            "label": "Sveits"
+          },
+          {
+            "value": "SYR",
+            "label": "Syria"
+          },
+          {
+            "value": "TJK",
+            "label": "Tadsjikistan"
+          },
+          {
+            "value": "TWN",
+            "label": "Taiwan"
+          },
+          {
+            "value": "TZA",
+            "label": "Tanzania"
+          },
+          {
+            "value": "THA",
+            "label": "Thailand"
+          },
+          {
+            "value": "TGO",
+            "label": "Togo"
+          },
+          {
+            "value": "TKL",
+            "label": "Tokelau"
+          },
+          {
+            "value": "TON",
+            "label": "Tonga"
+          },
+          {
+            "value": "TTO",
+            "label": "Trinidad og Tobago"
+          },
+          {
+            "value": "TCD",
+            "label": "Tsjad"
+          },
+          {
+            "value": "CZE",
+            "label": "Tsjekkia"
+          },
+          {
+            "value": "TUN",
+            "label": "Tunisia"
+          },
+          {
+            "value": "TKM",
+            "label": "Turkmenistan"
+          },
+          {
+            "value": "TCA",
+            "label": "Turks- og Caicosøyene"
+          },
+          {
+            "value": "TUV",
+            "label": "Tuvalu"
+          },
+          {
+            "value": "TUR",
+            "label": "Tyrkia"
+          },
+          {
+            "value": "DEU",
+            "label": "Tyskland"
+          },
+          {
+            "value": "UGA",
+            "label": "Uganda"
+          },
+          {
+            "value": "UKR",
+            "label": "Ukraina"
+          },
+          {
+            "value": "HUN",
+            "label": "Ungarn"
+          },
+          {
+            "value": "URY",
+            "label": "Uruguay"
+          },
+          {
+            "value": "USA",
+            "label": "USA"
+          },
+          {
+            "value": "UMI",
+            "label": "USA, mindre, utenforliggende øyer"
+          },
+          {
+            "value": "UZB",
+            "label": "Usbekistan"
+          },
+          {
+            "value": "VUT",
+            "label": "Vanuatu"
+          },
+          {
+            "value": "VAT",
+            "label": "Vatikanstaten"
+          },
+          {
+            "value": "VEN",
+            "label": "Venezuela"
+          },
+          {
+            "value": "ESH",
+            "label": "Vest-Sahara"
+          },
+          {
+            "value": "VNM",
+            "label": "Vietnam"
+          },
+          {
+            "value": "WLF",
+            "label": "Wallis- og Futunaøyene"
+          },
+          {
+            "value": "ZMB",
+            "label": "Zambia"
+          },
+          {
+            "value": "ZWE",
+            "label": "Zimbabwe"
+          }
+        ],
+        "svar": "AIA"
+      },
+      {
+        "id": "mottar-du-fortsatt-pengestøtten-fra-andre-eøs-land",
+        "type": "envalg",
+        "label": "Mottar du fortsatt pengestøtten?",
+        "options": [
+          {
+            "value": "ja",
+            "label": "Ja"
+          },
+          {
+            "value": "nei",
+            "label": "Nei"
+          }
+        ],
+        "svar": "ja"
+      },
+      {
+        "id": "fra-når-har-du-mottatt-pengestøtte-fra-andre-eøs-land-fra-og-med",
+        "type": "dato",
+        "label": "Fra og med hvilken dato har du mottatt pengestøtten?",
+        "svar": "30. november 2025"
+      }
+    ],
+    {
+      "id": "mottar-du-eller-har-du-søkt-om-pengestøtte-fra-andre-enn-nav",
+      "type": "envalg",
+      "label": "Mottar du eller har du søkt om pengestøtte fra andre enn Nav?",
+      "description": "<ul><li>Pensjon fra andre enn NAV</li><li>Etterlønn</li><li>Pengestøtte under arbeidsløshet eller garantilott fra Garantikassen for fiskere (GFF)</li></ul>",
+      "options": [
+        {
+          "value": "ja",
+          "label": "Ja"
+        },
+        {
+          "value": "nei",
+          "label": "Nei"
+        }
+      ],
+      "svar": "ja"
+    },
+    {
+      "id": "mottarEllerHarSøktOmPengestøtteFraAndreEnnNavLesMer",
+      "type": "lesMer",
+      "label": "Grunnen til at vi spør om dette",
+      "description": "På grunnlag av en sømløs tidshorisont tas det høyde for relasjonene i tillegg til forholdene."
+    },
+    {
+      "id": "mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNavForklarendeTekst",
+      "type": "forklarendeTekst",
+      "description": "<strong>Dine pengestøtter fra Norge</strong><br />Du må legge til alle pengestøtter du mottar eller har søkt om som ikke er fra Nav."
+    },
+    [
+      {
+        "id": "hvilke-pengestøtte-fra-andre-enn-nav-mottar-du-eller-har-du-søkt-om",
+        "type": "envalg",
+        "label": "Hvilke pengestøtte fra andre enn Nav har du mottatt eller søkt om?",
+        "options": [
+          {
+            "value": "pensjonFraAndreEnnNav",
+            "label": "Pensjon fra andre enn Nav"
+          },
+          {
+            "value": "etterlønnFraArbeidsgiver",
+            "label": "Etterlønn fra arbeidsgiver"
+          },
+          {
+            "value": "garantiLottForFiskere",
+            "label": "Pengestøtte under arbeidsløshet eller garantilott fra Garantikassen for fiskere (GFF)"
+          }
+        ],
+        "svar": "pensjonFraAndreEnnNav"
+      },
+      {
+        "id": "hvilkePengestøtteFraAndreEnnNavHarDuMottattEllerSøktOmVarselMelding",
+        "type": "dokumentasjonskravindikator",
+        "label": "Dokumentasjon på hvem som utbetaler pengestøtten, og hvilken periode den gjelder for"
+      },
+      {
+        "id": "hvem-utbetaler-pengestøtten",
+        "type": "kortTekst",
+        "label": "Hvem utbetaler pengestøtten?",
+        "svar": "Foreningen Pensjon Til Alle"
+      },
+      {
+        "id": "i-hvilken-periode-mottar-du-eller-har-du-søkt-om-pengestøtte-fra-norge-fra-og-med",
+        "type": "periodeFra",
+        "label": "Fra og med",
+        "svar": "11. november 2025"
+      },
+      {
+        "id": "i-hvilken-periode-mottar-du-eller-har-du-søkt-om-pengestøtte-fra-norge-til-og-med",
+        "type": "periodeTil",
+        "label": "Til og med (valgfritt)"
+      }
+    ],
+    [
+      {
+        "id": "hvilke-pengestøtte-fra-andre-enn-nav-mottar-du-eller-har-du-søkt-om",
+        "type": "envalg",
+        "label": "Hvilke pengestøtte fra andre enn Nav har du mottatt eller søkt om?",
+        "options": [
+          {
+            "value": "pensjonFraAndreEnnNav",
+            "label": "Pensjon fra andre enn Nav"
+          },
+          {
+            "value": "etterlønnFraArbeidsgiver",
+            "label": "Etterlønn fra arbeidsgiver"
+          },
+          {
+            "value": "garantiLottForFiskere",
+            "label": "Pengestøtte under arbeidsløshet eller garantilott fra Garantikassen for fiskere (GFF)"
+          }
+        ],
+        "svar": "garantiLottForFiskere"
+      },
+      {
+        "id": "hvilkePengestøtteFraAndreEnnNavHarDuMottattEllerSøktOmVarselMelding",
+        "type": "dokumentasjonskravindikator",
+        "label": "Dokumentasjon på hvem som utbetaler pengestøtten, og hvilken periode den gjelder for"
+      },
+      {
+        "id": "i-hvilken-periode-mottar-du-eller-har-du-søkt-om-pengestøtte-fra-norge-fra-og-med",
+        "type": "periodeFra",
+        "label": "Fra og med",
+        "svar": "25. november 2025"
+      }
+    ],
+    {
+      "id": "får-eller-kommer-til-å-få-lønn-eller-andre-goder-fra-tidligere-arbeidsgiver",
+      "type": "envalg",
+      "label": "Får du eller kommer du til å få lønn eller andre økonomiske goder fra tidligere arbeidsgiver?",
+      "description": "Du må gi oss beskjed hvis du får lønn, sluttvederlag eller tilsvarende økonomiske goder fra arbeidsgiver. Du trenger ikke å opplyse om feriepenger.",
+      "options": [
+        {
+          "value": "ja",
+          "label": "Ja"
+        },
+        {
+          "value": "nei",
+          "label": "Nei"
+        }
+      ],
+      "svar": "ja"
+    },
+    {
+      "id": "fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiverLesMer",
+      "type": "lesMer",
+      "label": "Grunnen til at vi spør om dette?",
+      "description": "Under forutsetning av en inkluderende overveielse realiseres incitamentet for så vidt gjelder ressurssituasjonen."
+    },
+    {
+      "id": "fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiverDokumentasjonskravindikator",
+      "type": "dokumentasjonskravindikator",
+      "label": "Avtale om økonomiske goder fra arbeidsgiver"
+    },
+    {
+      "id": "skriv-inn-hva-du-får-beholde-fra-tidligere-arbeidsgiver",
+      "type": "kortTekst",
+      "label": "Skriv inn hva du får beholde",
+      "svar": "En ost"
+    }
+  ]
+}

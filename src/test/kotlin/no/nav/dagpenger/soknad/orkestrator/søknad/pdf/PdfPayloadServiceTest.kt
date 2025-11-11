@@ -61,6 +61,9 @@ class PdfPayloadServiceTest {
                 this::class.java
                     .getResource("/testdata/pdf-service-test-pdf-grunnlag-en-annen-seksjon.json")!!
                     .readText(Charsets.UTF_8),
+                this::class.java
+                    .getResource("/testdata/pdf-service-test-pdf-grunnlag-annen-pengestøtte.json")!!
+                    .readText(Charsets.UTF_8),
             )
     }
 

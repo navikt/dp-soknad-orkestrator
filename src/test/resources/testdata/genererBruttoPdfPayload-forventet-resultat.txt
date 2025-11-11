@@ -47,307 +47,496 @@
 <p>fornavn mellomnavn etternavn<br/>987654321<br/>adresselinje1, adresselinje2, adresselinje3, 1234 poststed, land<br/>Kontonummer: 97143830733</p>
 <hr/>    <h2>Egen næring</h2>
     <p>
-    <strong>Driver du egen næringsvirksomhet?</strong>
-        <br/>
+            <strong>Driver du egen næringsvirksomhet?</strong>
+            <br/>
     Svar:
 
                     Ja
-            <div>Svaralternativene
-                var: Ja, Nei</div>
+                <div>Svaralternativene
+                    var: Ja, Nei</div>
     </p>
     <p>
-    <strong>For deg som driver eget aksjeselskap</strong>
-        <div><i>Hvis du er ansatt i ditt eget aksjeselskap, må du legge til arbeidsforholdet i forrige steg. På dette spørsmålet skal du kun legge til egen næring, som enkeltpersonsforetak.</i></div>
+            <strong>For deg som driver eget aksjeselskap</strong>
+            <div><i>Hvis du er ansatt i ditt eget aksjeselskap, må du legge til arbeidsforholdet i forrige steg. På dette spørsmålet skal du kun legge til egen næring, som enkeltpersonsforetak.</i></div>
     </p>
             <div class="modalSpørsmål">
     <p>
-    <strong>Næringens organisasjonsnummer</strong>
-        <br/>
+            <strong>Næringens organisasjonsnummer</strong>
+            <br/>
     Svar:
         1
     </p>
     <p>
-    <strong>Skriv inn hvor mange timer du jobbet per uke i egen næring før arbeidstiden ble redusert</strong>
-        <br/>
+            <strong>Skriv inn hvor mange timer du jobbet per uke i egen næring før arbeidstiden ble redusert</strong>
+            <br/>
     Svar:
         1
     </p>
     <p>
-    <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
-        <div><i>For å vurdere om du har rett til dagpenger, må vi vite din nåværende ukentlige arbeidstid. Hvis du jobber mer enn 50 prosent av den totale arbeidstiden du hadde før, har du ikke rett til dagpenger.<br/><br/>Hvis arbeidstiden din i egen næring ikke er redusert, kan du skrive inn samme antall timer som i spørsmålet over.</i></div>
-        <br/>
+            <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
+            <div><i>For å vurdere om du har rett til dagpenger, må vi vite din nåværende ukentlige arbeidstid. Hvis du jobber mer enn 50 prosent av den totale arbeidstiden du hadde før, har du ikke rett til dagpenger.<br/><br/>Hvis arbeidstiden din i egen næring ikke er redusert, kan du skrive inn samme antall timer som i spørsmålet over.</i></div>
+            <br/>
     Svar:
         1
     </p>
             </div>
     <p>
-    <strong>Driver du eget gårdsbruk?</strong>
-        <br/>
+            <strong>Driver du eget gårdsbruk?</strong>
+            <br/>
     Svar:
 
                     Ja
-            <div>Svaralternativene
-                var: Ja, Nei</div>
+                <div>Svaralternativene
+                    var: Ja, Nei</div>
     </p>
             <div class="modalSpørsmål">
     <p>
-    <strong>Gårdsbrukets organisasjonsnummer</strong>
-        <br/>
+            <strong>Gårdsbrukets organisasjonsnummer</strong>
+            <br/>
     Svar:
         1
     </p>
     <p>
-    <strong>Hvilken type gårdsbruk driver du?</strong>
-        <br/>
+            <strong>Hvilken type gårdsbruk driver du?</strong>
+            <br/>
     Svar:
 
                     Dyr
-            <div>Svaralternativene
-                var: Dyr, Jord, Skog, Annet</div>
+                <div>Svaralternativene
+                    var: Dyr, Jord, Skog, Annet</div>
     </p>
     <p>
-    <strong>Hvem eier gårdsbruket?</strong>
-        <br/>
+            <strong>Hvem eier gårdsbruket?</strong>
+            <br/>
     Svar:
 
                     Jeg
-            <div>Svaralternativene
-                var: Jeg, Samboer/ektefelle, Andre</div>
+                <div>Svaralternativene
+                    var: Jeg, Samboer/ektefelle, Andre</div>
     </p>
     <p>
-    <strong>Hvor mange prosent av inntekten går til deg?</strong>
-        <br/>
+            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+            <br/>
     Svar:
         1
     </p>
     <p>
-    <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
-        <br/>
+            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+            <br/>
     Svar:
 
                     2025
-            <div>Svaralternativene
-                var: 2025, 2024, 2023, 2022, 2021</div>
+                <div>Svaralternativene
+                    var: 2025, 2024, 2023, 2022, 2021</div>
     </p>
     <p>
-    <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
-        <br/>
+            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+            <br/>
     Svar:
         1
     </p>
     <p>
-    <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
-        <br/>
+            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+            <br/>
     Svar:
         1
     </p>
             </div>
             <div class="modalSpørsmål">
     <p>
-    <strong>Gårdsbrukets organisasjonsnummer</strong>
-        <br/>
+            <strong>Gårdsbrukets organisasjonsnummer</strong>
+            <br/>
     Svar:
         2
     </p>
     <p>
-    <strong>Hvilken type gårdsbruk driver du?</strong>
-        <br/>
+            <strong>Hvilken type gårdsbruk driver du?</strong>
+            <br/>
     Svar:
 
                     Jord,
                     Skog,
                     Annet
-            <div>Svaralternativene
-                var: Dyr, Jord, Skog, Annet</div>
+                <div>Svaralternativene
+                    var: Dyr, Jord, Skog, Annet</div>
     </p>
     <p>
-    <strong>Hvem eier gårdsbruket?</strong>
-        <br/>
+            <strong>Hvem eier gårdsbruket?</strong>
+            <br/>
     Svar:
 
                     Samboer/ektefelle
-            <div>Svaralternativene
-                var: Jeg, Samboer/ektefelle, Andre</div>
+                <div>Svaralternativene
+                    var: Jeg, Samboer/ektefelle, Andre</div>
     </p>
     <p>
-    <strong>Hvor mange prosent av inntekten går til deg?</strong>
-        <br/>
+            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+            <br/>
     Svar:
         2
     </p>
     <p>
-    <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
-        <br/>
+            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+            <br/>
     Svar:
 
                     2024
-            <div>Svaralternativene
-                var: 2025, 2024, 2023, 2022, 2021</div>
+                <div>Svaralternativene
+                    var: 2025, 2024, 2023, 2022, 2021</div>
     </p>
     <p>
-    <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
-        <br/>
+            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+            <br/>
     Svar:
         2
     </p>
     <p>
-    <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
-        <br/>
+            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+            <br/>
     Svar:
         2
     </p>
             </div>
     <h2>En Annen Seksjon</h2>
     <p>
-    <strong>Driver du egen næringsvirksomhet?</strong>
-        <br/>
+            <strong>Driver du egen næringsvirksomhet?</strong>
+            <br/>
     Svar:
 
                     Ja
-            <div>Svaralternativene
-                var: Ja, Nei</div>
+                <div>Svaralternativene
+                    var: Ja, Nei</div>
     </p>
     <p>
-    <strong>For deg som driver eget aksjeselskap</strong>
-        <div><i>Hvis du er ansatt i ditt eget aksjeselskap, må du legge til arbeidsforholdet i forrige steg. På dette spørsmålet skal du kun legge til egen næring, som enkeltpersonsforetak.</i></div>
+            <strong>For deg som driver eget aksjeselskap</strong>
+            <div><i>Hvis du er ansatt i ditt eget aksjeselskap, må du legge til arbeidsforholdet i forrige steg. På dette spørsmålet skal du kun legge til egen næring, som enkeltpersonsforetak.</i></div>
     </p>
             <div class="modalSpørsmål">
     <p>
-    <strong>Næringens organisasjonsnummer</strong>
-        <br/>
+            <strong>Næringens organisasjonsnummer</strong>
+            <br/>
     Svar:
         1
     </p>
     <p>
-    <strong>Skriv inn hvor mange timer du jobbet per uke i egen næring før arbeidstiden ble redusert</strong>
-        <br/>
+            <strong>Skriv inn hvor mange timer du jobbet per uke i egen næring før arbeidstiden ble redusert</strong>
+            <br/>
     Svar:
         1
     </p>
     <p>
-    <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
-        <div><i>For å vurdere om du har rett til dagpenger, må vi vite din nåværende ukentlige arbeidstid. Hvis du jobber mer enn 50 prosent av den totale arbeidstiden du hadde før, har du ikke rett til dagpenger.<br/><br/>Hvis arbeidstiden din i egen næring ikke er redusert, kan du skrive inn samme antall timer som i spørsmålet over.</i></div>
-        <br/>
+            <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
+            <div><i>For å vurdere om du har rett til dagpenger, må vi vite din nåværende ukentlige arbeidstid. Hvis du jobber mer enn 50 prosent av den totale arbeidstiden du hadde før, har du ikke rett til dagpenger.<br/><br/>Hvis arbeidstiden din i egen næring ikke er redusert, kan du skrive inn samme antall timer som i spørsmålet over.</i></div>
+            <br/>
     Svar:
         1
     </p>
             </div>
     <p>
-    <strong>Driver du eget gårdsbruk?</strong>
-        <br/>
+            <strong>Driver du eget gårdsbruk?</strong>
+            <br/>
     Svar:
 
                     Ja
-            <div>Svaralternativene
-                var: Ja, Nei</div>
+                <div>Svaralternativene
+                    var: Ja, Nei</div>
     </p>
             <div class="modalSpørsmål">
     <p>
-    <strong>Gårdsbrukets organisasjonsnummer</strong>
-        <br/>
+            <strong>Gårdsbrukets organisasjonsnummer</strong>
+            <br/>
     Svar:
         1
     </p>
     <p>
-    <strong>Hvilken type gårdsbruk driver du?</strong>
-        <br/>
+            <strong>Hvilken type gårdsbruk driver du?</strong>
+            <br/>
     Svar:
 
                     Dyr
-            <div>Svaralternativene
-                var: Dyr, Jord, Skog, Annet</div>
+                <div>Svaralternativene
+                    var: Dyr, Jord, Skog, Annet</div>
     </p>
     <p>
-    <strong>Hvem eier gårdsbruket?</strong>
-        <br/>
+            <strong>Hvem eier gårdsbruket?</strong>
+            <br/>
     Svar:
 
                     Jeg
-            <div>Svaralternativene
-                var: Jeg, Samboer/ektefelle, Andre</div>
+                <div>Svaralternativene
+                    var: Jeg, Samboer/ektefelle, Andre</div>
     </p>
     <p>
-    <strong>Hvor mange prosent av inntekten går til deg?</strong>
-        <br/>
+            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+            <br/>
     Svar:
         1
     </p>
     <p>
-    <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
-        <br/>
+            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+            <br/>
     Svar:
 
                     2025
-            <div>Svaralternativene
-                var: 2025, 2024, 2023, 2022, 2021</div>
+                <div>Svaralternativene
+                    var: 2025, 2024, 2023, 2022, 2021</div>
     </p>
     <p>
-    <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
-        <br/>
+            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+            <br/>
     Svar:
         1
     </p>
     <p>
-    <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
-        <br/>
+            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+            <br/>
     Svar:
         1
     </p>
             </div>
             <div class="modalSpørsmål">
     <p>
-    <strong>Gårdsbrukets organisasjonsnummer</strong>
-        <br/>
+            <strong>Gårdsbrukets organisasjonsnummer</strong>
+            <br/>
     Svar:
         2
     </p>
     <p>
-    <strong>Hvilken type gårdsbruk driver du?</strong>
-        <br/>
+            <strong>Hvilken type gårdsbruk driver du?</strong>
+            <br/>
     Svar:
 
                     Jord,
                     Skog,
                     Annet
-            <div>Svaralternativene
-                var: Dyr, Jord, Skog, Annet</div>
+                <div>Svaralternativene
+                    var: Dyr, Jord, Skog, Annet</div>
     </p>
     <p>
-    <strong>Hvem eier gårdsbruket?</strong>
-        <br/>
+            <strong>Hvem eier gårdsbruket?</strong>
+            <br/>
     Svar:
 
                     Samboer/ektefelle
-            <div>Svaralternativene
-                var: Jeg, Samboer/ektefelle, Andre</div>
+                <div>Svaralternativene
+                    var: Jeg, Samboer/ektefelle, Andre</div>
     </p>
     <p>
-    <strong>Hvor mange prosent av inntekten går til deg?</strong>
-        <br/>
+            <strong>Hvor mange prosent av inntekten går til deg?</strong>
+            <br/>
     Svar:
         2
     </p>
     <p>
-    <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
-        <br/>
+            <strong>Hvor mange arbeidstimer blir brukt på gårdsbruket totalt i løpet av ett år? Velg hvilket år du oppgir timer for først</strong>
+            <br/>
     Svar:
 
                     2024
-            <div>Svaralternativene
-                var: 2025, 2024, 2023, 2022, 2021</div>
+                <div>Svaralternativene
+                    var: 2025, 2024, 2023, 2022, 2021</div>
     </p>
     <p>
-    <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
-        <br/>
+            <strong>Skriv hvor mange arbeidstimer som ble brukt</strong>
+            <br/>
     Svar:
         2
     </p>
     <p>
-    <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
-        <br/>
+            <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
+            <br/>
     Svar:
         2
     </p>
             </div>
+    <h2>Annen pengestøtte</h2>
+    <p>
+            <strong>Har du de siste 36 måneder motatt pengestøtte fra EØS-land, Sveits eller Storbritania som ligner på</strong>
+            <div><i><ul><li>Sykepenger</li><li>Foreldrepenger eller svangerskapspenger</li><li>Dagpenger / arbeidsledighetstrygd</li><li>Pleiepenger, omsorgspenger eller opplæringspenger</li></ul></i></div>
+            <br/>
+    Svar:
+
+                    Ja
+                <div>Svaralternativene
+                    var: Ja, Nei</div>
+    </p>
+    <p>
+            <strong>Grunnen til at vi spør om dette</strong>
+            <div><i>Med utgangspunkt i en vedvarende agenda dokumenteres oppfølgingen som en følge av resultatoppnåelsen.</i></div>
+    </p>
+    <p>
+            <div><i><strong>Dine pengestøtter fra EØS land</strong><br/>Du må legge til alle trygdeytelser fra EØS-land, Sveits eller Storbritannia du har mottatt eller søkt på de siste 36 måneder</i></div>
+    </p>
+            <div class="modalSpørsmål">
+    <p>
+            <strong>Hvilke utenlandske pengestøtte har du mottatt eller søkt om?</strong>
+            <br/>
+    Svar:
+
+                    Sykepenger
+                <div>Svaralternativene
+                    var: Sykepenger, Foreldrepenger eller svangerskapspenger, Dagpenger / arbeidsledighetstrygd, Pleiepenger, omsorgspenger eller opplæringspenger</div>
+    </p>
+    <p>
+            <strong>Dokumentasjon på hvilken periode du har hatt, mottatt eller har søkt om pengestøtte fra et EØS-land, Sveits eller Storbritannia</strong>
+    </p>
+    <p>
+            <strong>Fra hvilket land har du mottatt eller søkt om pengestøtten?</strong>
+            <br/>
+    Svar:
+
+                    Aserbajdsjan
+                <div>Svaralternativene
+                    var: Norge, Sverige, Polen, Afghanistan, Åland, Albania, Algerie, Amerikansk Samoa, Andorra, Angola, Anguilla, Antarktis, Antigua og Barbuda, Argentina, Armenia, Aruba, Aserbajdsjan, Australia, Bahamas, Bahrain, Bangladesh, Barbados, Belgia, Belize, Benin, Bermuda, Bhutan, Bolivia, Bosnia-Hercegovina, Botswana, Bouvetøya, Brasil, Britisk territorium i Indiahavet, Brunei, Bulgaria, Burkina Faso, Burundi, Canada, Caymanøyene, Chile, Christmasøya, Colombia, Cookøyene, Costa Rica, Cuba, Curaçao, Danmark, De forente arabiske emirater, De okkuperte palestinske områdene, Den dominikanske republikk, Den sentralafrikanske republikk, Djibouti, Dominica, Ecuador, Egypt, Ekvatorial-Guinea, El Salvador, Elfenbenskysten, Eritrea, Estland, Eswatini, Etiopia, Færøyene, Falklandsøyene, Fiji, Filippinene, Finland, Frankrike, Fransk Guyana, Fransk Polynesia, Gabon, Gambia, Georgia, Ghana, Gibraltar, Grenada, Grønland, Guadeloupe, Guam, Guatemala, Guernsey, Guinea, Guinea-Bissau, Guyana, Haiti, Heard- og McDonald-øyene, Hellas, Honduras, Hongkong, Hviterussland, India, Indonesia, Irak, Iran, Irland, Island, Israel, Italia, Jamaica, Japan, Jemen, Jersey, Jomfruøyene (Britisk), Jomfruøyene (USA), Jordan, Kambodsja, Kamerun, Kapp Verde, Karibisk Nederland, Kasakhstan, Kenya, Kina, Kirgisistan, Kiribati, Kokosøyene, Komorene, Kongo, Kongo-Brazzaville, Kroatia, Kuwait, Kypros, Laos, Latvia, Lesotho, Libanon, Liberia, Libya, Liechtenstein, Litauen, Luxembourg, Macao, Madagaskar, Malawi, Malaysia, Maldivene, Mali, Malta, Man, Marokko, Marshalløyene, Martinique, Mauritania, Mauritius, Mayotte, Mexico, Mikronesiaføderasjonen, Moldova, Monaco, Mongolia, Montenegro, Montserrat, Mosambik, Myanmar (Burma), Namibia, Nauru, Nederland, Nepal, New Zealand, Nicaragua, Niger, Nigeria, Niue, Nord-Korea, Nord-Makedonia, Nord-Marianene, Norfolk Island, Ny-Caledonia, Oman, Øst-Timor, Østerrike, Pakistan, Palau, Panama, Papua Ny-Guinea, Paraguay, Peru, Pitcairn, Portugal, Puerto Rico, Qatar, Réunion, Romania, Russland, Rwanda, Saint Kitts og Nevis, Saint Lucia, Saint Vincent og Grenadinene, Saint-Barthélemy, Saint-Martin, Saint-Pierre-et-Miquelon, Salomonøyene, Samoa, San Marino, São Tomé og Príncipe, Saudi-Arabia, Senegal, Serbia, Seychellene, Sierra Leone, Singapore, Sint Maarten (Nederlandsk del), Slovakia, Slovenia, Somalia, Sør-Afrika, Sør-Georgia og de søre Sandwichøyene, Sør-Korea, Sør-Sudan, Søre franske territorier, Spania, Sri Lanka, St. Helena, Storbritannia, Sudan, Surinam, Svalbard og Jan Mayen, Sveits, Syria, Tadsjikistan, Taiwan, Tanzania, Thailand, Togo, Tokelau, Tonga, Trinidad og Tobago, Tsjad, Tsjekkia, Tunisia, Turkmenistan, Turks- og Caicosøyene, Tuvalu, Tyrkia, Tyskland, Uganda, Ukraina, Ungarn, Uruguay, USA, USA, mindre, utenforliggende øyer, Usbekistan, Vanuatu, Vatikanstaten, Venezuela, Vest-Sahara, Vietnam, Wallis- og Futunaøyene, Zambia, Zimbabwe</div>
+    </p>
+    <p>
+            <strong>Mottar du fortsatt pengestøtten?</strong>
+            <br/>
+    Svar:
+
+                    Nei
+                <div>Svaralternativene
+                    var: Ja, Nei</div>
+    </p>
+    <p>
+            <strong>Fra og med</strong>
+            <br/>
+    Svar:
+        12. november 2025
+    </p>
+    <p>
+            <strong>Til og med</strong>
+            <br/>
+    Svar:
+        28. november 2025
+    </p>
+            </div>
+            <div class="modalSpørsmål">
+    <p>
+            <strong>Hvilke utenlandske pengestøtte har du mottatt eller søkt om?</strong>
+            <br/>
+    Svar:
+
+                    Pleiepenger, omsorgspenger eller opplæringspenger
+                <div>Svaralternativene
+                    var: Sykepenger, Foreldrepenger eller svangerskapspenger, Dagpenger / arbeidsledighetstrygd, Pleiepenger, omsorgspenger eller opplæringspenger</div>
+    </p>
+    <p>
+            <strong>Dokumentasjon på hvilken periode du har hatt, mottatt eller har søkt om pengestøtte fra et EØS-land, Sveits eller Storbritannia</strong>
+    </p>
+    <p>
+            <strong>Fra hvilket land har du mottatt eller søkt om pengestøtten?</strong>
+            <br/>
+    Svar:
+
+                    Anguilla
+                <div>Svaralternativene
+                    var: Norge, Sverige, Polen, Afghanistan, Åland, Albania, Algerie, Amerikansk Samoa, Andorra, Angola, Anguilla, Antarktis, Antigua og Barbuda, Argentina, Armenia, Aruba, Aserbajdsjan, Australia, Bahamas, Bahrain, Bangladesh, Barbados, Belgia, Belize, Benin, Bermuda, Bhutan, Bolivia, Bosnia-Hercegovina, Botswana, Bouvetøya, Brasil, Britisk territorium i Indiahavet, Brunei, Bulgaria, Burkina Faso, Burundi, Canada, Caymanøyene, Chile, Christmasøya, Colombia, Cookøyene, Costa Rica, Cuba, Curaçao, Danmark, De forente arabiske emirater, De okkuperte palestinske områdene, Den dominikanske republikk, Den sentralafrikanske republikk, Djibouti, Dominica, Ecuador, Egypt, Ekvatorial-Guinea, El Salvador, Elfenbenskysten, Eritrea, Estland, Eswatini, Etiopia, Færøyene, Falklandsøyene, Fiji, Filippinene, Finland, Frankrike, Fransk Guyana, Fransk Polynesia, Gabon, Gambia, Georgia, Ghana, Gibraltar, Grenada, Grønland, Guadeloupe, Guam, Guatemala, Guernsey, Guinea, Guinea-Bissau, Guyana, Haiti, Heard- og McDonald-øyene, Hellas, Honduras, Hongkong, Hviterussland, India, Indonesia, Irak, Iran, Irland, Island, Israel, Italia, Jamaica, Japan, Jemen, Jersey, Jomfruøyene (Britisk), Jomfruøyene (USA), Jordan, Kambodsja, Kamerun, Kapp Verde, Karibisk Nederland, Kasakhstan, Kenya, Kina, Kirgisistan, Kiribati, Kokosøyene, Komorene, Kongo, Kongo-Brazzaville, Kroatia, Kuwait, Kypros, Laos, Latvia, Lesotho, Libanon, Liberia, Libya, Liechtenstein, Litauen, Luxembourg, Macao, Madagaskar, Malawi, Malaysia, Maldivene, Mali, Malta, Man, Marokko, Marshalløyene, Martinique, Mauritania, Mauritius, Mayotte, Mexico, Mikronesiaføderasjonen, Moldova, Monaco, Mongolia, Montenegro, Montserrat, Mosambik, Myanmar (Burma), Namibia, Nauru, Nederland, Nepal, New Zealand, Nicaragua, Niger, Nigeria, Niue, Nord-Korea, Nord-Makedonia, Nord-Marianene, Norfolk Island, Ny-Caledonia, Oman, Øst-Timor, Østerrike, Pakistan, Palau, Panama, Papua Ny-Guinea, Paraguay, Peru, Pitcairn, Portugal, Puerto Rico, Qatar, Réunion, Romania, Russland, Rwanda, Saint Kitts og Nevis, Saint Lucia, Saint Vincent og Grenadinene, Saint-Barthélemy, Saint-Martin, Saint-Pierre-et-Miquelon, Salomonøyene, Samoa, San Marino, São Tomé og Príncipe, Saudi-Arabia, Senegal, Serbia, Seychellene, Sierra Leone, Singapore, Sint Maarten (Nederlandsk del), Slovakia, Slovenia, Somalia, Sør-Afrika, Sør-Georgia og de søre Sandwichøyene, Sør-Korea, Sør-Sudan, Søre franske territorier, Spania, Sri Lanka, St. Helena, Storbritannia, Sudan, Surinam, Svalbard og Jan Mayen, Sveits, Syria, Tadsjikistan, Taiwan, Tanzania, Thailand, Togo, Tokelau, Tonga, Trinidad og Tobago, Tsjad, Tsjekkia, Tunisia, Turkmenistan, Turks- og Caicosøyene, Tuvalu, Tyrkia, Tyskland, Uganda, Ukraina, Ungarn, Uruguay, USA, USA, mindre, utenforliggende øyer, Usbekistan, Vanuatu, Vatikanstaten, Venezuela, Vest-Sahara, Vietnam, Wallis- og Futunaøyene, Zambia, Zimbabwe</div>
+    </p>
+    <p>
+            <strong>Mottar du fortsatt pengestøtten?</strong>
+            <br/>
+    Svar:
+
+                    Ja
+                <div>Svaralternativene
+                    var: Ja, Nei</div>
+    </p>
+    <p>
+            <strong>Fra og med hvilken dato har du mottatt pengestøtten?</strong>
+            <br/>
+    Svar:
+        30. november 2025
+    </p>
+            </div>
+    <p>
+            <strong>Mottar du eller har du søkt om pengestøtte fra andre enn Nav?</strong>
+            <div><i><ul><li>Pensjon fra andre enn NAV</li><li>Etterlønn</li><li>Pengestøtte under arbeidsløshet eller garantilott fra Garantikassen for fiskere (GFF)</li></ul></i></div>
+            <br/>
+    Svar:
+
+                    Ja
+                <div>Svaralternativene
+                    var: Ja, Nei</div>
+    </p>
+    <p>
+            <strong>Grunnen til at vi spør om dette</strong>
+            <div><i>På grunnlag av en sømløs tidshorisont tas det høyde for relasjonene i tillegg til forholdene.</i></div>
+    </p>
+    <p>
+            <div><i><strong>Dine pengestøtter fra Norge</strong><br />Du må legge til alle pengestøtter du mottar eller har søkt om som ikke er fra Nav.</i></div>
+    </p>
+            <div class="modalSpørsmål">
+    <p>
+            <strong>Hvilke pengestøtte fra andre enn Nav har du mottatt eller søkt om?</strong>
+            <br/>
+    Svar:
+
+                    Pensjon fra andre enn Nav
+                <div>Svaralternativene
+                    var: Pensjon fra andre enn Nav, Etterlønn fra arbeidsgiver, Pengestøtte under arbeidsløshet eller garantilott fra Garantikassen for fiskere (GFF)</div>
+    </p>
+    <p>
+            <strong>Dokumentasjon på hvem som utbetaler pengestøtten, og hvilken periode den gjelder for</strong>
+    </p>
+    <p>
+            <strong>Hvem utbetaler pengestøtten?</strong>
+            <br/>
+    Svar:
+        Foreningen Pensjon Til Alle
+    </p>
+    <p>
+            <strong>Fra og med</strong>
+            <br/>
+    Svar:
+        11. november 2025
+    </p>
+    <p>
+            <strong>Til og med (valgfritt)</strong>
+    </p>
+            </div>
+            <div class="modalSpørsmål">
+    <p>
+            <strong>Hvilke pengestøtte fra andre enn Nav har du mottatt eller søkt om?</strong>
+            <br/>
+    Svar:
+
+                    Pengestøtte under arbeidsløshet eller garantilott fra Garantikassen for fiskere (GFF)
+                <div>Svaralternativene
+                    var: Pensjon fra andre enn Nav, Etterlønn fra arbeidsgiver, Pengestøtte under arbeidsløshet eller garantilott fra Garantikassen for fiskere (GFF)</div>
+    </p>
+    <p>
+            <strong>Dokumentasjon på hvem som utbetaler pengestøtten, og hvilken periode den gjelder for</strong>
+    </p>
+    <p>
+            <strong>Fra og med</strong>
+            <br/>
+    Svar:
+        25. november 2025
+    </p>
+            </div>
+    <p>
+            <strong>Får du eller kommer du til å få lønn eller andre økonomiske goder fra tidligere arbeidsgiver?</strong>
+            <div><i>Du må gi oss beskjed hvis du får lønn, sluttvederlag eller tilsvarende økonomiske goder fra arbeidsgiver. Du trenger ikke å opplyse om feriepenger.</i></div>
+            <br/>
+    Svar:
+
+                    Ja
+                <div>Svaralternativene
+                    var: Ja, Nei</div>
+    </p>
+    <p>
+            <strong>Grunnen til at vi spør om dette?</strong>
+            <div><i>Under forutsetning av en inkluderende overveielse realiseres incitamentet for så vidt gjelder ressurssituasjonen.</i></div>
+    </p>
+    <p>
+            <strong>Avtale om økonomiske goder fra arbeidsgiver</strong>
+    </p>
+    <p>
+            <strong>Skriv inn hva du får beholde</strong>
+            <br/>
+    Svar:
+        En ost
+    </p>
 </body>
 </html>

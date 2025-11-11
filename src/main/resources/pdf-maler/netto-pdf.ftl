@@ -2,7 +2,9 @@
 <#macro håndterSpørmål spørsmål>
     <#if spørsmål.svar??>
         <p>
-            <strong>${spørsmål.label}</strong>
+            <#if spørsmål.label??>
+                <strong>${spørsmål.label}</strong>
+            </#if>
             <br/>
             <@macros.finnSvar spørsmål=spørsmål/>
         </p>
