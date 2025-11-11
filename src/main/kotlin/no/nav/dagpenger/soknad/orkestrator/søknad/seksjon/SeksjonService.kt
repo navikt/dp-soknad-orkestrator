@@ -43,6 +43,12 @@ class SeksjonService(
         ident: String,
         søknadId: UUID,
     ) = seksjonRepository.hentDokumentasjonskrav(ident, søknadId)
+
+    fun hentDokumentasjonskrav(
+        ident: String,
+        søknadId: UUID,
+        seksjonId: String,
+    ) = seksjonRepository.hentDokumentasjonskrav(ident, søknadId, seksjonId)
 }
 
 data class Seksjon(
