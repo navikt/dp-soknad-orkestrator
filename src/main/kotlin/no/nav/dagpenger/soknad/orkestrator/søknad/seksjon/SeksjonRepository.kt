@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
 import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SortOrder.ASC
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.javatime.dateTimeLiteral
 import org.jetbrains.exposed.sql.stringLiteral
@@ -53,6 +54,7 @@ class SeksjonRepository(
                     it[SeksjonV2Tabell.dokumentasjonskrav] = stringLiteral(dokumentasjonskrav)
                 }
                 it[SeksjonV2Tabell.pdfGunnlag] = stringLiteral(pdfGrunnlag)
+                it[SeksjonV2Tabell.opprettet] = dateTimeLiteral(now())
             }
         }
     }
@@ -153,6 +155,7 @@ class SeksjonRepository(
                 .innerJoin(SøknadTabell)
                 .select(SeksjonV2Tabell.pdfGunnlag)
                 .where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
+                .orderBy(SeksjonV2Tabell.opprettet, ASC)
                 .map {
                     it[SeksjonV2Tabell.pdfGunnlag]
                 }.toList()
