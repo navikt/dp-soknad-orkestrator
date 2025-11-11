@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 
 import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.equals.shouldNotBeEqual
 import io.kotest.matchers.shouldBe
@@ -340,7 +341,7 @@ class SeksjonRepositoryTest {
 
         val dokumentasjonskravForSøknad = seksjonRepository.hentPdfGrunnlag(ident, søknadId)
 
-        dokumentasjonskravForSøknad shouldContainExactlyInAnyOrder
+        dokumentasjonskravForSøknad shouldContainExactly
             listOf(
                 pdfGrunnlag,
                 pdfGrunnlag2,
