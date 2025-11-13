@@ -75,13 +75,16 @@ class SøknadRepositoryTest {
     @Test
     fun `oppdaterer bare tilstand når vi lagrer en søknad som allerede er lagret`() {
         val søknadId = randomUUID()
-        val søknad = Søknad(søknadId, "123456780")
+        val søknad = Søknad(søknadId, ident)
         søknadRepository.lagre(søknad)
-        val sammeSøknadMedNyTilstand = Søknad(søknadId, "123456780", tilstand = INNSENDT)
-
+        val sammeSøknadMedNyTilstand = Søknad(søknadId, "ident2", tilstand = INNSENDT)
         søknadRepository.lagreQuizSøknad(sammeSøknadMedNyTilstand)
 
-        søknadRepository.hent(søknadId)?.tilstand shouldBe INNSENDT
+        val hentetSøknad = søknadRepository.hent(søknadId)
+
+        hentetSøknad?.ident shouldBe søknad.ident
+        hentetSøknad?.søknadId shouldBe søknad.søknadId
+        hentetSøknad?.tilstand shouldBe INNSENDT
     }
 
     @Test

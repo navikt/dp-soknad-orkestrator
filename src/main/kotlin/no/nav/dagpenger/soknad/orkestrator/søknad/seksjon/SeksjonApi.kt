@@ -17,27 +17,6 @@ import no.nav.dagpenger.soknad.orkestrator.utils.validerSeksjonIdParam
 internal fun Application.seksjonApi(seksjonService: SeksjonService) {
     routing {
         authenticate("tokenX") {
-            route("/seksjon/v2/{søknadId}/{seksjonId}") {
-                // TODO: Skriv tester for dette endepunktet hvis det ender opp med å bli noe Nattaphong vil bruke
-                // TODO: Hvis det skjer, så skal tilsvarende endepunkt uten versjon fjernes (og V2 på denne fjernes)
-                // TODO: og alle seksjoner må bruke dette endepunktet i stedet.
-                get {
-                    val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
-                    val seksjonId = validerSeksjonIdParam() ?: return@get
-
-                    val seksjonsvar =
-                        seksjonService.hentSeksjonsvar(call.ident(), søknadId, seksjonId)
-                            ?: run {
-                                call.respond(NotFound, "Fant ikke seksjon med id $seksjonId for søknad $søknadId")
-                                return@get
-                            }
-
-                    val dokumentasjonskrav =
-                        seksjonService.hentDokumentasjonskrav(call.ident(), søknadId, seksjonId)
-
-                    call.respond(OK, SeksjonMedDokumentajonskrav(seksjonsvar, dokumentasjonskrav))
-                }
-            }
             route("/seksjon/{søknadId}/{seksjonId}") {
                 put {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
@@ -57,14 +36,26 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
                     val seksjonId = validerSeksjonIdParam() ?: return@get
 
-                    val seksjon =
+                    val seksjonsvar =
                         seksjonService.hentSeksjonsvar(call.ident(), søknadId, seksjonId)
                             ?: run {
                                 call.respond(NotFound, "Fant ikke seksjon med id $seksjonId for søknad $søknadId")
                                 return@get
                             }
 
-                    call.respond(OK, seksjon)
+                    val dokumentasjonskrav =
+                        seksjonService.hentDokumentasjonskrav(call.ident(), søknadId, seksjonId)
+
+                    call.respond(
+                        OK,
+                        //language=json
+                        """
+                        {
+                            "seksjonsvar": $seksjonsvar,
+                            "dokumentasjonskrav": $dokumentasjonskrav
+                        }
+                        """.trimIndent(),
+                    )
                 }
 
                 route("/dokumentasjonskrav") {

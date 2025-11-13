@@ -36,16 +36,16 @@ class SeksjonRepository(
             SeksjonV2Tabell.upsert(
                 SeksjonV2Tabell.søknadId,
                 SeksjonV2Tabell.seksjonId,
-                onUpdate =
-                    mutableListOf(
-                        Pair(SeksjonV2Tabell.seksjonsvar, stringLiteral(seksjonsvar)),
-                        Pair(SeksjonV2Tabell.pdfGunnlag, stringLiteral(pdfGrunnlag)),
-                        Pair(SeksjonV2Tabell.oppdatert, dateTimeLiteral(now())),
-                    ).apply {
-                        if (dokumentasjonskrav != null) {
-                            this.add(Pair(SeksjonV2Tabell.dokumentasjonskrav, stringLiteral(dokumentasjonskrav)))
-                        }
-                    },
+                onUpdate = {
+                    it[SeksjonV2Tabell.seksjonsvar] = stringLiteral(seksjonsvar)
+                    it[SeksjonV2Tabell.pdfGunnlag] = stringLiteral(pdfGrunnlag)
+                    it[SeksjonV2Tabell.oppdatert] = dateTimeLiteral(now())
+                    if (dokumentasjonskrav != null) {
+                        it[SeksjonV2Tabell.dokumentasjonskrav] = stringLiteral(dokumentasjonskrav)
+                    } else {
+                        it[SeksjonV2Tabell.dokumentasjonskrav] = null
+                    }
+                },
             ) {
                 it[SeksjonV2Tabell.søknadId] = søknadId
                 it[SeksjonV2Tabell.seksjonId] = seksjonId
@@ -119,7 +119,7 @@ class SeksjonRepository(
         ident: String,
         søknadId: UUID,
         seksjonId: String,
-        dokumentasjonskrav: String,
+        dokumentasjonskrav: String?,
     ) = transaction {
         val søknad = søknadRepository.hent(søknadId)
         requireNotNull(søknad) { "Fant ikke søknad med ID $søknadId" }
@@ -127,7 +127,11 @@ class SeksjonRepository(
         requireNotNull(hentSeksjonsvar(ident, søknadId, seksjonId)) { "Fant ikke seksjon med ID $seksjonId" }
 
         SeksjonV2Tabell.update({ SeksjonV2Tabell.seksjonId eq seksjonId }) {
-            it[SeksjonV2Tabell.dokumentasjonskrav] = dokumentasjonskrav
+            if (dokumentasjonskrav != null) {
+                it[SeksjonV2Tabell.dokumentasjonskrav] = stringLiteral(dokumentasjonskrav)
+            } else {
+                it[SeksjonV2Tabell.dokumentasjonskrav] = null
+            }
             it[SeksjonV2Tabell.oppdatert] = dateTimeLiteral(now())
         }
     }
@@ -143,6 +147,7 @@ class SeksjonRepository(
             .map {
                 it[SeksjonV2Tabell.dokumentasjonskrav]
             }.toList()
+            .filterNotNull()
     }
 
     fun hentDokumentasjonskrav(
