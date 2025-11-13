@@ -15,7 +15,7 @@ object SeksjonV2Tabell : IntIdTable("seksjon_v2") {
     val seksjonsvar: Column<String> = json("seksjonsvar", { serializeSøknadData(it) }, { it })
     val dokumentasjonskrav: Column<String?> = json("dokumentasjonskrav", { serializeSøknadData(it) }, { it }).nullable()
     val pdfGunnlag: Column<String> = json("pdf_grunnlag", { serializeSøknadData(it) }, { it })
-    val opprettet: Column<LocalDateTime> = datetime("opprettet").default(LocalDateTime.now())
+    val opprettet: Column<LocalDateTime> = datetime("opprettet")
     val oppdatert: Column<LocalDateTime?> = datetime("oppdatert").nullable()
 }
 

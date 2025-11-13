@@ -54,7 +54,6 @@ class SeksjonRepository(
                     it[SeksjonV2Tabell.dokumentasjonskrav] = stringLiteral(dokumentasjonskrav)
                 }
                 it[SeksjonV2Tabell.pdfGunnlag] = stringLiteral(pdfGrunnlag)
-                it[SeksjonV2Tabell.opprettet] = dateTimeLiteral(now())
             }
         }
     }
