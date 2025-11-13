@@ -36,7 +36,7 @@ class SeksjonService(
         ident: String,
         søknadId: UUID,
         seksjonId: String,
-        dokumentasjonskrav: String,
+        dokumentasjonskrav: String? = null,
     ) = seksjonRepository.lagreDokumentasjonskrav(ident, søknadId, seksjonId, dokumentasjonskrav)
 
     fun hentDokumentasjonskrav(

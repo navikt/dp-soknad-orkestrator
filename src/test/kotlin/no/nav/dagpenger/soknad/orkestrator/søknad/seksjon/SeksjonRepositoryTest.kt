@@ -23,10 +23,13 @@ class SeksjonRepositoryTest {
     private val ident = "1234567890"
     private val seksjonsvar = "{\"key\": \"value\"}"
     private val seksjonsvar2 = "{\"key2\": \"value2\"}"
+    private val seksjonsvar3 = "{\"key3\": \"value3\"}"
     private val pdfGrunnlag = "{\"pdfGrunnlagKey\": \"pdfGrunnlagValue\"}"
     private val pdfGrunnlag2 = "{\"pdfGrunnlagKey2\": \"pdfGrunnlagValue2\"}"
+    private val pdfGrunnlag3 = "{\"pdfGrunnlagKey3\": \"pdfGrunnlagValue3\"}"
     private val seksjonId = "seksjon-id"
     private val seksjonId2 = "seksjon-id-2"
+    private val seksjonId3 = "seksjon-id-3"
     private val dokumentasjonskrav = "{\"dokumentasjonskravKey\": \"dokumentasjonskravValue\"}"
     private val dokumentasjonskrav2 = "{\"dokumentasjonskravKey2\": \"dokumentasjonskravValue2\"}"
 
@@ -106,13 +109,23 @@ class SeksjonRepositoryTest {
     }
 
     @Test
-    fun `lagre gjør UPDATE dersom gitt søknadId og seksjonId eksisterer`() {
+    fun `lagre gjør UPDATE hvis gitt søknadId og seksjonId eksisterer`() {
         val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId, ident))
         seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
         seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
 
         seksjonRepository.hentSeksjonsvar(ident, søknadId, seksjonId) shouldBe seksjonsvar2
+    }
+
+    @Test
+    fun `lagre gjør UPDATE hvis gitt søknadId og seksjonId eksisterer og dokumentasjonskrav er null`() {
+        val søknadId = randomUUID()
+        søknadRepository.lagre(Søknad(søknadId, ident))
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar2, null, pdfGrunnlag2)
+
+        seksjonRepository.hentDokumentasjonskrav(ident, søknadId, seksjonId) shouldBe null
     }
 
     @Test
@@ -238,14 +251,30 @@ class SeksjonRepositoryTest {
 
     @Test
     @Suppress("ktlint:standard:max-line-length")
-    fun `lagreDokumentasjonskrav kaster ingen exception hvis seksjonen det lagres på tilhører en søknad som tilhører bruker som gjør kallet`() {
+    fun `lagreDokumentasjonskrav kaster lagrer forventet dokumentasjonskrav hvis input ikke er null og seksjonen det lagres på tilhører en søknad som tilhører bruker som gjør kallet`() {
         val søknadId = randomUUID()
         søknadRepository.lagre(Søknad(søknadId, ident))
         seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
 
         shouldNotThrowAny {
-            seksjonRepository.lagreDokumentasjonskrav(ident, søknadId, seksjonId, dokumentasjonskrav)
+            seksjonRepository.lagreDokumentasjonskrav(ident, søknadId, seksjonId, dokumentasjonskrav2)
         }
+
+        seksjonRepository.hentDokumentasjonskrav(ident, søknadId, seksjonId) shouldBe dokumentasjonskrav2
+    }
+
+    @Test
+    @Suppress("ktlint:standard:max-line-length")
+    fun `lagreDokumentasjonskrav kaster lagrer forventet dokumentasjonskrav hvis input er null og seksjonen det lagres på tilhører en søknad som tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.lagre(Søknad(søknadId, ident))
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        shouldNotThrowAny {
+            seksjonRepository.lagreDokumentasjonskrav(ident, søknadId, seksjonId, null)
+        }
+
+        seksjonRepository.hentDokumentasjonskrav(ident, søknadId, seksjonId) shouldBe null
     }
 
     @Test
@@ -257,7 +286,7 @@ class SeksjonRepositoryTest {
 
         val exception =
             shouldThrow<IllegalArgumentException> {
-                seksjonRepository.lagreDokumentasjonskrav(ident, requestSøknadId, seksjonId, dokumentasjonskrav)
+                seksjonRepository.lagreDokumentasjonskrav(ident, requestSøknadId, seksjonId, dokumentasjonskrav2)
             }
 
         exception.message shouldBe "Fant ikke søknad med ID $requestSøknadId"
@@ -272,7 +301,7 @@ class SeksjonRepositoryTest {
 
         val exception =
             shouldThrow<IllegalArgumentException> {
-                seksjonRepository.lagreDokumentasjonskrav("en-annen-ident", søknadId, seksjonId, dokumentasjonskrav)
+                seksjonRepository.lagreDokumentasjonskrav("en-annen-ident", søknadId, seksjonId, dokumentasjonskrav2)
             }
 
         exception.message shouldBe "Søknad $søknadId tilhører ikke identen som prøver å lagre dokumentasjonskrav"
@@ -291,7 +320,7 @@ class SeksjonRepositoryTest {
                     ident,
                     søknadId,
                     "en-annen-seksjon-id",
-                    dokumentasjonskrav,
+                    dokumentasjonskrav2,
                 )
             }
 
@@ -304,6 +333,7 @@ class SeksjonRepositoryTest {
         søknadRepository.lagre(Søknad(søknadId, ident))
         seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
         seksjonRepository.lagre(ident, søknadId, seksjonId2, seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
+        seksjonRepository.lagre(ident, søknadId, seksjonId3, seksjonsvar3, null, pdfGrunnlag3)
 
         val dokumentasjonskravForSøknad = seksjonRepository.hentDokumentasjonskrav(ident, søknadId)
 

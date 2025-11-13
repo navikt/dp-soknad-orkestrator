@@ -38,7 +38,7 @@ class SøknadRepository(
             // Hvis søknadId allerede finnes oppdaterer vi bare tilstand for søknaden
             SøknadTabell.upsert(
                 SøknadTabell.søknadId,
-                onUpdate = listOf(Pair(SøknadTabell.tilstand, stringLiteral(søknad.tilstand.name))),
+                onUpdate = { it[SøknadTabell.tilstand] = stringLiteral(søknad.tilstand.name) },
             ) {
                 it[søknadId] = søknad.søknadId
                 it[ident] = søknad.ident

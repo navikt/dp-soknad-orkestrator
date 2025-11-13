@@ -131,7 +131,14 @@ class SeksjonApiTest {
 
     @Test
     fun `GET gitt søknadId og seksjonId returnerer 200 OK og forventet repsons hvis kombinasjonen av soknadId og seksjonId eksisterer`() {
-        every { seksjonService.hentSeksjonsvar(any(), any(), any()) } returns "{ seksjonId: \"din-situasjon\" }"
+        every { seksjonService.hentSeksjonsvar(any(), any(), any()) } returns "{ \"seksjonId\": \"din-situasjon\" }"
+        every {
+            seksjonService.hentDokumentasjonskrav(
+                any(),
+                any(),
+                any(),
+            )
+        } returns "{ \"dokumentasjonskrav\": \"et-dokumentasjonskrav\" }"
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
@@ -140,7 +147,13 @@ class SeksjonApiTest {
                 }
 
             response.status shouldBe OK
-            response.body() as String shouldBe "{ seksjonId: \"din-situasjon\" }"
+            response.body() as String shouldBe
+                """
+                {
+                    "seksjonsvar": { "seksjonId": "din-situasjon" },
+                    "dokumentasjonskrav": { "dokumentasjonskrav": "et-dokumentasjonskrav" }
+                }
+                """.trimIndent()
         }
     }
 
@@ -246,6 +259,54 @@ class SeksjonApiTest {
 
             response.status shouldBe BadRequest
             response.body() as String shouldContain "Kunne ikke parse søknadId parameter ikke-en-uuid til UUID"
+        }
+    }
+
+    @Test
+    fun `PUT dokumentasjonskrav returnerer 200 OK hvis dokumentasjonskrav ikke er null og lagring av seksjon er vellykket`() {
+        every { seksjonService.lagreDokumentasjonskrav(any(), any(), any(), any()) } returns 1
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon/dokumentasjonskrav") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    setBody("{\"dokumentasjonskrav\": true}")
+                    contentType(ContentType.Application.Json)
+                }
+
+            response.status shouldBe OK
+        }
+    }
+
+    @Test
+    fun `PUT dokumentasjonskrav returnerer 200 OK hvis dokumentasjonskrav er null og lagring av seksjon er vellykket`() {
+        every { seksjonService.lagreDokumentasjonskrav(any(), any(), any(), any()) } returns 1
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon/dokumentasjonskrav") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    setBody(null)
+                    contentType(ContentType.Application.Json)
+                }
+
+            response.status shouldBe OK
+        }
+    }
+
+    @Test
+    fun `PUT dokumentasjonskrav returnerer 400 Bad Request hvis søknadId ikke er en UUID`() {
+        every { seksjonService.lagreDokumentasjonskrav(any(), any(), any(), any()) } returns 1
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.put("/seksjon/ikke-en-uuid/din-situasjon/dokumentasjonskrav") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    setBody("{\"dokumentasjonskrav\": true}")
+                    contentType(ContentType.Application.Json)
+                }
+
+            response.status shouldBe BadRequest
         }
     }
 }
