@@ -51,7 +51,7 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                         //language=json
                         """
                         {
-                            "seksjonsvar": $seksjonsvar,
+                            "seksjon": $seksjonsvar,
                             "dokumentasjonskrav": $dokumentasjonskrav
                         }
                         """.trimIndent(),

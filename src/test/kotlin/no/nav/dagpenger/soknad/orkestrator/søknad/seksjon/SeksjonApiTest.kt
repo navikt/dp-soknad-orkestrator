@@ -150,7 +150,7 @@ class SeksjonApiTest {
             response.body() as String shouldBe
                 """
                 {
-                    "seksjonsvar": { "seksjonId": "din-situasjon" },
+                    "seksjon": { "seksjonId": "din-situasjon" },
                     "dokumentasjonskrav": { "dokumentasjonskrav": "et-dokumentasjonskrav" }
                 }
                 """.trimIndent()
