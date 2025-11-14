@@ -26,7 +26,7 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                         call.ident(),
                         søknadId,
                         seksjonId,
-                        putSeksjonRequestBody.seksjonsvar,
+                        putSeksjonRequestBody.seksjon,
                         putSeksjonRequestBody.dokumentasjonskrav,
                         putSeksjonRequestBody.pdfGrunnlag,
                     )
@@ -90,13 +90,8 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
     }
 }
 
-data class SeksjonMedDokumentajonskrav(
-    val seksjonsvar: String,
-    val dokumentasjonskrav: String?,
-)
-
 data class PutSeksjonRequestBody(
-    val seksjonsvar: String,
+    val seksjon: String,
     val dokumentasjonskrav: String? = null,
     val pdfGrunnlag: String,
 )

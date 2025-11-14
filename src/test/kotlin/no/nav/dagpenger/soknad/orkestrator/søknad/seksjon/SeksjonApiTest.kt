@@ -89,7 +89,7 @@ class SeksjonApiTest {
                     header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
                     setBody(
                         PutSeksjonRequestBody(
-                            seksjonsvar = "{\"seksjonsvar\": true}",
+                            seksjon = "{\"seksjonsvar\": true}",
                             pdfGrunnlag = "{\"pdfgrunnlag\": true}",
                         ),
                     )
