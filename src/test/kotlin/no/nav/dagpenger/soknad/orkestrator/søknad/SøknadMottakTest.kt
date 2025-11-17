@@ -5,6 +5,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadMottak
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 

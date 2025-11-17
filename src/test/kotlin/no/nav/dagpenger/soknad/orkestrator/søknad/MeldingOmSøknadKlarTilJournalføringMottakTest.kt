@@ -7,6 +7,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføringMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.pdf.PdfPayloadService
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDateTime

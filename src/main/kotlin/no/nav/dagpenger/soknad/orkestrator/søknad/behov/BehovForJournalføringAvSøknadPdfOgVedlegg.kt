@@ -1,6 +1,9 @@
-package no.nav.dagpenger.soknad.orkestrator.søknad
+package no.nav.dagpenger.soknad.orkestrator.søknad.behov
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
+import no.nav.dagpenger.soknad.orkestrator.søknad.Dokument
+import no.nav.dagpenger.soknad.orkestrator.søknad.Dokumentvariant
+import no.nav.dagpenger.soknad.orkestrator.søknad.NyJournalpost
 import java.util.UUID
 
 class BehovForJournalføringAvSøknadPdfOgVedlegg(

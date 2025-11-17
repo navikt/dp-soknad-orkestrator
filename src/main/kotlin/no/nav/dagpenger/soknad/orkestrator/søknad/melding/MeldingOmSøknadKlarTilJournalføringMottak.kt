@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.søknad
+package no.nav.dagpenger.soknad.orkestrator.søknad.melding
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
@@ -11,6 +11,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
+import no.nav.dagpenger.soknad.orkestrator.søknad.behov.BehovForGenereringOgMellomlagringAvSøknadPdf
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.pdf.PdfPayloadService
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID

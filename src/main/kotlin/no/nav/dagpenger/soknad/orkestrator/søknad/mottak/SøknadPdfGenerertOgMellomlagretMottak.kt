@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.søknad
+package no.nav.dagpenger.soknad.orkestrator.søknad.mottak
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
@@ -8,6 +8,8 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.dagpenger.soknad.orkestrator.søknad.behov.BehovForJournalføringAvSøknadPdfOgVedlegg
+import no.nav.dagpenger.soknad.orkestrator.søknad.dokumentVarianter
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 
 internal class SøknadPdfGenerertOgMellomlagretMottak(

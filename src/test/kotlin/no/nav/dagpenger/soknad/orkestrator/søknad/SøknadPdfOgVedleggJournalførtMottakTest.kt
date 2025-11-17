@@ -5,8 +5,9 @@ import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.verify
-import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadPdfOgVedleggJournalførtMottak.Companion.BEHOV
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfOgVedleggJournalførtMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfOgVedleggJournalførtMottak.Companion.BEHOV
 import java.time.LocalDateTime.now
 import java.util.UUID.randomUUID
 import kotlin.test.Test
