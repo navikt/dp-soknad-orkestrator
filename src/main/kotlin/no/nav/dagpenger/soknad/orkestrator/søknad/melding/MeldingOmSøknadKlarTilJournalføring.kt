@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.søknad
+package no.nav.dagpenger.soknad.orkestrator.søknad.melding
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import java.time.LocalDateTime

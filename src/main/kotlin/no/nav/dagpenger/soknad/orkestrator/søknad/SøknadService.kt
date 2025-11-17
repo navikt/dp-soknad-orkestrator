@@ -8,6 +8,8 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadInnsendt
+import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføring
 import java.util.UUID
 
 class SøknadService(

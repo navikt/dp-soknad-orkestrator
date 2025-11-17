@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.søknad
+package no.nav.dagpenger.soknad.orkestrator.søknad.mottak
 
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
@@ -11,6 +11,8 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMapper
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 

@@ -3,6 +3,8 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import no.nav.dagpenger.soknad.orkestrator.søknad.behov.BehovForJournalføringAvSøknadPdfOgVedlegg
+import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfGenerertOgMellomlagretMottak
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import org.junit.jupiter.api.BeforeEach
 import java.util.UUID
