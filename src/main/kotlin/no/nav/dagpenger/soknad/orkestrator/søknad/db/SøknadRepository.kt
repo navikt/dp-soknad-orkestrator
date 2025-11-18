@@ -51,7 +51,7 @@ class SøknadRepository(
         }
     }
 
-    fun lagre(søknad: Søknad): UUID =
+    fun opprett(søknad: Søknad): UUID =
         transaction {
             SøknadTabell.insert {
                 it[søknadId] = søknad.søknadId

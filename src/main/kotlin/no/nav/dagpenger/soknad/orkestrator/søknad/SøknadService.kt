@@ -65,7 +65,7 @@ class SøknadService(
     }
 
     fun opprett(ident: String): UUID {
-        val søknadId = søknadRepository.lagre(Søknad(ident = ident))
+        val søknadId = søknadRepository.opprett(Søknad(ident = ident))
         logg.info { "Opprettet søknad med søknadId $søknadId" }
         sikkerlogg.info { "Opprettet søknad med søknadId $søknadId for $ident" }
         return søknadId
