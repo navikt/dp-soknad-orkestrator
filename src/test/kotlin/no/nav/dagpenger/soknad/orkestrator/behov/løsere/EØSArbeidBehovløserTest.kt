@@ -165,15 +165,23 @@ class EØSArbeidBehovløserTest {
     @Test
     fun `Behovløser svarer false dersom opplysning om Eøs arbeid ikke finnes`() {
         val søknadstidspunkt = ZonedDateTime.now()
-        val søknadstidpsunktOpplysning =
-            QuizOpplysning(
-                beskrivendeId = "søknadstidspunkt",
-                type = Tekst,
-                svar = søknadstidspunkt.toString(),
-                ident = ident,
-                søknadId = søknadId,
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
             )
-        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+        } throws IllegalStateException("Fant ingen seksjonsvar på arbeidsforhold for søknad=$søknadId")
+
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
 
         val behovmelding = lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.EØSArbeid)
         behovløser.løs(behovmelding)
