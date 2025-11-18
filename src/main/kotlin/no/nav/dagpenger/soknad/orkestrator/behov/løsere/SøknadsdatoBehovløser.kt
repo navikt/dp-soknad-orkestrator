@@ -29,7 +29,6 @@ class SøknadsdatoBehovløser(
 
         val innsendtTidspunkt = søknadRepository.hent(behovmelding.søknadId)?.innsendtTidspunkt
 
-        // TODO! FIKS AT INNSENDTTIDSPUNKT KAN VÆRE NULL FØR KONVERTERING TIL DATO!
         if (innsendtTidspunkt != null) {
             val svarPåBehov = innsendtTidspunkt.toLocalDate()
             return publiserLøsning(behovmelding, svarPåBehov)
