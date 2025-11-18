@@ -30,7 +30,7 @@ class SøknadPersonaliaRepositoryTest {
     fun `lagre setter inn en ny rad hvis ingen rad eksisterer fra før for søknadId og ident`() {
         val søknadId = randomUUID()
         val forventetSøknadPersonalia = lagSøknadPersonalia(søknadId)
-        søknadRepository.lagre(Søknad(søknadId, ident))
+        søknadRepository.opprett(Søknad(søknadId, ident))
 
         søknadPersonaliaRepository.lagre(forventetSøknadPersonalia)
 
@@ -42,7 +42,7 @@ class SøknadPersonaliaRepositoryTest {
         val søknadId = randomUUID()
         val forventetSøknadPersonalia =
             SøknadPersonalia(søknadId, ident, fornavn = "fornavn", etternavn = "etternavn", alder = "26")
-        søknadRepository.lagre(Søknad(søknadId, ident))
+        søknadRepository.opprett(Søknad(søknadId, ident))
 
         søknadPersonaliaRepository.lagre(forventetSøknadPersonalia)
 
@@ -55,8 +55,8 @@ class SøknadPersonaliaRepositoryTest {
         val søknadIdSomIkkeSkalOppdateres = randomUUID()
         val søknadPersonaliaSomSkalOppdateres = lagSøknadPersonalia(søknadIdSomSkalOppdateres)
         val søknadPersonaliaSomIkkeSkalOppdateres = lagSøknadPersonalia(søknadIdSomIkkeSkalOppdateres)
-        søknadRepository.lagre(Søknad(søknadIdSomSkalOppdateres, ident))
-        søknadRepository.lagre(Søknad(søknadIdSomIkkeSkalOppdateres, ident))
+        søknadRepository.opprett(Søknad(søknadIdSomSkalOppdateres, ident))
+        søknadRepository.opprett(Søknad(søknadIdSomIkkeSkalOppdateres, ident))
         søknadPersonaliaRepository.lagre(søknadPersonaliaSomSkalOppdateres)
         søknadPersonaliaRepository.lagre(søknadPersonaliaSomIkkeSkalOppdateres)
         val søknadPersonaliaSomErOppdatert = søknadPersonaliaSomSkalOppdateres.copy(fornavn = "nyttFornavn")
@@ -74,7 +74,7 @@ class SøknadPersonaliaRepositoryTest {
     fun `hent returnerer forventet resultat hvis søknadPersonalia for søknadId og ident eksisterer`() {
         val søknadId = randomUUID()
         val forventetSøknadPersonalia = lagSøknadPersonalia(søknadId)
-        søknadRepository.lagre(Søknad(søknadId, ident))
+        søknadRepository.opprett(Søknad(søknadId, ident))
 
         søknadPersonaliaRepository.lagre(forventetSøknadPersonalia)
 
@@ -89,7 +89,7 @@ class SøknadPersonaliaRepositoryTest {
     @Test
     fun `hent returnerer null hvis søknadPersonalia for kombinasjon av søknadId og ident ikke eksisterer`() {
         val søknadId = randomUUID()
-        søknadRepository.lagre(Søknad(søknadId, ident))
+        søknadRepository.opprett(Søknad(søknadId, ident))
         søknadPersonaliaRepository.lagre(lagSøknadPersonalia(søknadId))
 
         søknadPersonaliaRepository.hent(randomUUID(), "en-annen-ident") shouldBe null
@@ -98,7 +98,7 @@ class SøknadPersonaliaRepositoryTest {
     @Test
     fun `hent returnerer null hvis søknadPersonalia for søknadId ikke eksisterer, men ident eksisterer`() {
         val søknadId = randomUUID()
-        søknadRepository.lagre(Søknad(søknadId, ident))
+        søknadRepository.opprett(Søknad(søknadId, ident))
         søknadPersonaliaRepository.lagre(lagSøknadPersonalia(søknadId))
 
         søknadPersonaliaRepository.hent(randomUUID(), ident) shouldBe null

@@ -76,7 +76,7 @@ class SøknadRepositoryTest {
     fun `oppdaterer bare tilstand når vi lagrer en søknad som allerede er lagret`() {
         val søknadId = randomUUID()
         val søknad = Søknad(søknadId, ident)
-        søknadRepository.lagre(søknad)
+        søknadRepository.opprett(søknad)
         val sammeSøknadMedNyTilstand = Søknad(søknadId, "ident2", tilstand = INNSENDT)
         søknadRepository.lagreQuizSøknad(sammeSøknadMedNyTilstand)
 
@@ -92,7 +92,7 @@ class SøknadRepositoryTest {
         val søknadId = randomUUID()
         val søknad = Søknad(søknadId = søknadId, ident = ident, tilstand = Tilstand.PÅBEGYNT)
 
-        søknadRepository.lagre(søknad)
+        søknadRepository.opprett(søknad)
 
         val hentetSøknad = søknadRepository.hentPåbegynt(ident)
 
@@ -109,9 +109,9 @@ class SøknadRepositoryTest {
     }
 
     @Test
-    fun `Kan lagre og hente komplett søknaddata`() {
+    fun `Kan opprette og hente komplett søknaddata`() {
         val søknadId = randomUUID()
-        søknadRepository.lagre(Søknad(søknadId = søknadId, ident = "1234567891"))
+        søknadRepository.opprett(Søknad(søknadId = søknadId, ident = "1234567891"))
 
         søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
         val hentetSøknaddata = søknadRepository.hentKomplettSøknadData(søknadId)
@@ -122,7 +122,7 @@ class SøknadRepositoryTest {
     @Test
     fun `Kan ikke lagre komplett søknaddata for én søknad flere ganger`() {
         val søknadId = randomUUID()
-        søknadRepository.lagre(Søknad(søknadId = søknadId, ident = "1234567891"))
+        søknadRepository.opprett(Søknad(søknadId = søknadId, ident = "1234567891"))
 
         søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
 
@@ -230,7 +230,7 @@ class SøknadRepositoryTest {
     fun `markerSøknadSomInnsendt markerer søknaden som innsendt`() {
         val søknadId = randomUUID()
         val innsendtTidspunkt = now().withNano(0)
-        søknadRepository.lagre(Søknad(søknadId, "ident"))
+        søknadRepository.opprett(Søknad(søknadId, "ident"))
 
         søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt)
 
@@ -246,7 +246,7 @@ class SøknadRepositoryTest {
         val søknadId = randomUUID()
         val journalpostId = "239874323"
         val journalførtTidspunkt = now().withNano(0)
-        søknadRepository.lagre(Søknad(søknadId, "ident"))
+        søknadRepository.opprett(Søknad(søknadId, "ident"))
 
         søknadRepository.markerSøknadSomJournalført(søknadId, journalpostId, journalførtTidspunkt)
 

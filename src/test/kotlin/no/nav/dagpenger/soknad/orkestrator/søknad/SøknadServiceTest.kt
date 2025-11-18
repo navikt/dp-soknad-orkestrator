@@ -107,7 +107,7 @@ class SøknadServiceTest {
     @Test
     fun `opprett returnerer UUID fra repository`() {
         val søknadId = randomUUID()
-        coEvery { søknadRepository.lagre(any()) } returns søknadId
+        coEvery { søknadRepository.opprett(any()) } returns søknadId
 
         søknadService.opprett("ident") shouldBe søknadId
     }
