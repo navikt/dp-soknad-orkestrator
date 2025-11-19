@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "2.2.21"
     id("org.openapi.generator") version "7.17.0"
-    id("org.jlleitschuh.gradle.ktlint") version "13.1.0"
+    id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
 }
 
 tasks.named("compileKotlin").configure {
