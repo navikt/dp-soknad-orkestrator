@@ -9,13 +9,16 @@ class Søknad(
     val ident: String,
     val tilstand: Tilstand = Tilstand.PÅBEGYNT,
     val opplysninger: List<QuizOpplysning<*>> = emptyList(),
+    val oppdatertTidspunkt: LocalDateTime? = null,
     val innsendtTidspunkt: LocalDateTime? = null,
     val journalpostId: String? = null,
     val journalførtTidspunkt: LocalDateTime? = null,
+    val slettetTidspunkt: LocalDateTime? = null,
 )
 
 enum class Tilstand {
     PÅBEGYNT,
     INNSENDT,
     JOURNALFØRT,
+    SLETTET_AV_SYSTEM,
 }

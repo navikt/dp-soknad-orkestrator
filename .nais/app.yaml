@@ -16,6 +16,7 @@ spec:
     requests:
       cpu: 50m
       memory: 384Mi
+  leaderElection: true
   kafka:
     pool: {{ kafka.pool }}
   gcp:

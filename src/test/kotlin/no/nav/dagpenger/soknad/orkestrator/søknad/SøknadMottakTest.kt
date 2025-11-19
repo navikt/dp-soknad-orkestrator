@@ -6,6 +6,7 @@ import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -13,10 +14,12 @@ class SøknadMottakTest {
     private val testRapid = TestRapid()
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     private val søknadPersonaliaRepository = mockk<SøknadPersonaliaRepository>(relaxed = true)
+    private val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
     private val søknadService =
         SøknadService(
             søknadRepository = søknadRepository,
             søknadPersonaliaRepository = søknadPersonaliaRepository,
+            seksjonRepository = seksjonRepository,
         ).also {
             it.setRapidsConnection(testRapid)
         }

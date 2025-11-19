@@ -1,0 +1,4 @@
+ALTER TABLE soknad
+    ADD COLUMN oppdatert_tidspunkt TIMESTAMP WITH TIME ZONE NULL;
+ALTER TABLE soknad
+    ADD COLUMN slettet_tidspunkt TIMESTAMP WITH TIME ZONE NULL;
