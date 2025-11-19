@@ -105,7 +105,7 @@ class SeksjonRepositoryTest {
                 )
             }
 
-        exception.message shouldBe "Søknad $søknadId tilhører ikke identen som prøver å lagre seksjonen"
+        exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
     }
 
     @Test
@@ -153,6 +153,19 @@ class SeksjonRepositoryTest {
         seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
 
         seksjonRepository.hentSeksjonsvar(ident, randomUUID(), seksjonId) shouldBe null
+    }
+
+    @Test
+    fun `hentSeksjonsvarEllerKastException kaster exception hvis ingen seksjoner er lagret i databasen`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+
+        val exception =
+            shouldThrow<IllegalStateException> {
+                seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, seksjonId)
+            }
+
+        exception.message shouldBe "Fant ingen seksjonsvar på $seksjonId for søknad $søknadId"
     }
 
     @Test
@@ -304,7 +317,7 @@ class SeksjonRepositoryTest {
                 seksjonRepository.lagreDokumentasjonskrav("en-annen-ident", søknadId, seksjonId, dokumentasjonskrav2)
             }
 
-        exception.message shouldBe "Søknad $søknadId tilhører ikke identen som prøver å lagre dokumentasjonskrav"
+        exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
     }
 
     @Test
@@ -394,5 +407,47 @@ class SeksjonRepositoryTest {
         seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
 
         seksjonRepository.hentPdfGrunnlag(ident, randomUUID()) shouldBe emptyList()
+    }
+
+    @Test
+    fun `slettAlleSeksjoner sletter forventede seksjoner hvis søknaden tilhører bruker som gjør kallet`() {
+        val søknadId1 = randomUUID()
+        val søknadId2 = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId1, ident))
+        søknadRepository.opprett(Søknad(søknadId2, ident))
+        seksjonRepository.lagre(ident, søknadId1, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(ident, søknadId1, "seksjonId2", seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(ident, søknadId2, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(ident, søknadId2, "seksjonId2", seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        seksjonRepository.slettAlleSeksjoner(ident, søknadId1)
+
+        seksjonRepository.hentSeksjoner(ident, søknadId1) shouldBe emptyList()
+        seksjonRepository.hentSeksjoner(ident, søknadId2).size shouldBe 2
+    }
+
+    @Test
+    fun `slettAlleSeksjoner kaster exception hvis søknaden ikke eksisterer`() {
+        val søknadId = randomUUID()
+
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                seksjonRepository.slettAlleSeksjoner("en-annen-ident", søknadId)
+            }
+
+        exception.message shouldBe "Fant ikke søknad med ID $søknadId"
+    }
+
+    @Test
+    fun `slettAlleSeksjoner kaster exception hvis søknaden ikke tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                seksjonRepository.slettAlleSeksjoner("en-annen-ident", søknadId)
+            }
+
+        exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
     }
 }

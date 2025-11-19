@@ -10,11 +10,13 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepositor
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadInnsendt
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføring
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import java.util.UUID
 
 class SøknadService(
     private val søknadRepository: SøknadRepository,
     private val søknadPersonaliaRepository: SøknadPersonaliaRepository,
+    private val seksjonRepository: SeksjonRepository,
 ) {
     private lateinit var rapidsConnection: RapidsConnection
 
@@ -88,6 +90,19 @@ class SøknadService(
     }
 
     fun lagrePersonalia(søknadPersonalia: SøknadPersonalia) = søknadPersonaliaRepository.lagre(søknadPersonalia)
+
+    fun slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager() {
+        val søknader = søknadRepository.hentAlleSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()
+        logg.info {
+            "Fant ${søknader.size} søknad${if (søknader.size != 1) "er" else ""} som er i tilstand PÅBEGYNT, og som ikke er oppdatert på 7 dager"
+        }
+        søknader.forEach { søknad ->
+            seksjonRepository.slettAlleSeksjoner(søknad.ident, søknad.søknadId)
+            søknadRepository.slettSøknadSomSystem(søknad.søknadId, søknad.ident)
+
+            sikkerlogg.info { "Automatisk jobb slettet søknad ${søknad.søknadId} og tilhørende seksjoner opprettet av ${søknad.ident}" }
+        }
+    }
 
     private companion object {
         private val logg = KotlinLogging.logger {}

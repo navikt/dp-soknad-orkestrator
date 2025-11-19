@@ -4,7 +4,9 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SortOrder.ASC
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.javatime.dateTimeLiteral
 import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -29,9 +31,7 @@ class SeksjonRepository(
         pdfGrunnlag: String,
     ) {
         transaction {
-            val søknad = søknadRepository.hent(søknadId)
-            requireNotNull(søknad) { "Fant ikke søknad med ID $søknadId" }
-            require(søknad.ident == ident) { "Søknad $søknadId tilhører ikke identen som prøver å lagre seksjonen" }
+            søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
 
             SeksjonV2Tabell.upsert(
                 SeksjonV2Tabell.søknadId,
@@ -55,6 +55,8 @@ class SeksjonRepository(
                 }
                 it[SeksjonV2Tabell.pdfGunnlag] = stringLiteral(pdfGrunnlag)
             }
+
+            søknadRepository.markerSøknadSomOppdatert(søknadId, ident)
         }
     }
 
@@ -81,7 +83,7 @@ class SeksjonRepository(
     ): String =
         transaction {
             hentSeksjonsvar(ident, søknadId, seksjonId)
-                ?: throw IllegalStateException("Fant ingen seksjonsvar på $seksjonId for søknad=$søknadId")
+                ?: throw IllegalStateException("Fant ingen seksjonsvar på $seksjonId for søknad $søknadId")
         }
 
     fun hentSeksjoner(
@@ -121,9 +123,7 @@ class SeksjonRepository(
         seksjonId: String,
         dokumentasjonskrav: String?,
     ) = transaction {
-        val søknad = søknadRepository.hent(søknadId)
-        requireNotNull(søknad) { "Fant ikke søknad med ID $søknadId" }
-        require(søknad.ident == ident) { "Søknad $søknadId tilhører ikke identen som prøver å lagre dokumentasjonskrav" }
+        søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
         requireNotNull(hentSeksjonsvar(ident, søknadId, seksjonId)) { "Fant ikke seksjon med ID $seksjonId" }
 
         SeksjonV2Tabell.update({ SeksjonV2Tabell.seksjonId eq seksjonId }) {
@@ -134,6 +134,8 @@ class SeksjonRepository(
             }
             it[SeksjonV2Tabell.oppdatert] = dateTimeLiteral(now())
         }
+
+        søknadRepository.markerSøknadSomOppdatert(søknadId, ident)
     }
 
     fun hentDokumentasjonskrav(
@@ -178,4 +180,12 @@ class SeksjonRepository(
                     it[SeksjonV2Tabell.pdfGunnlag]
                 }.toList()
         }
+
+    fun slettAlleSeksjoner(
+        ident: String,
+        søknadId: UUID,
+    ) = transaction {
+        søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
+        SeksjonV2Tabell.deleteWhere { SeksjonV2Tabell.søknadId eq søknadId }
+    }
 }

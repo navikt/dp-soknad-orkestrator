@@ -34,6 +34,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.jobb.SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføringMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfGenerertOgMellomlagretMottak
@@ -93,6 +94,7 @@ internal class ApplicationBuilder(
         SøknadService(
             søknadRepository = søknadRepository,
             søknadPersonaliaRepository = søknadPersonaliaRepository,
+            seksjonRepository = seksjonRepository,
         )
 
     private val journalføringService = JournalføringService()
@@ -177,5 +179,6 @@ internal class ApplicationBuilder(
                 logger.info { "Koblet til database ${it.name}}" }
                 runMigration()
             }
+        SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb.startFixedRateTimer(søknadService)
     }
 }

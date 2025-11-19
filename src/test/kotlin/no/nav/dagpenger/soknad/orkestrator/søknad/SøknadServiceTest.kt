@@ -15,6 +15,7 @@ import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjonsnavn
 import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.getSeksjon
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import java.util.UUID.randomUUID
@@ -24,11 +25,13 @@ class SøknadServiceTest {
     private val testRapid = TestRapid()
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     private val søknadPersonaliaRepository = mockk<SøknadPersonaliaRepository>(relaxed = true)
+    private val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
     private val seksjon = mockk<Seksjon>(relaxed = true)
     private var søknadService =
         SøknadService(
             søknadRepository = søknadRepository,
             søknadPersonaliaRepository = søknadPersonaliaRepository,
+            seksjonRepository = seksjonRepository,
         ).also { it.setRapidsConnection(testRapid) }
     private val ident = "12345678901"
     private val seksjonPath = "no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.SeksjonKt"
@@ -99,9 +102,9 @@ class SøknadServiceTest {
     fun `slett gjør kall til repository med forventet søknadId`() {
         val søknadId = randomUUID()
 
-        søknadService.slett(søknadId, "ident")
+        søknadService.slett(søknadId, ident)
 
-        verify { søknadRepository.slett(søknadId, "ident") }
+        verify { søknadRepository.slett(søknadId, ident) }
     }
 
     @Test
@@ -109,15 +112,44 @@ class SøknadServiceTest {
         val søknadId = randomUUID()
         coEvery { søknadRepository.opprett(any()) } returns søknadId
 
-        søknadService.opprett("ident") shouldBe søknadId
+        søknadService.opprett(ident) shouldBe søknadId
     }
 
     @Test
     fun `sendInn publiserer forventet melding på rapidsConnection`() {
-        søknadService.sendInn(randomUUID(), "ident")
+        søknadService.sendInn(randomUUID(), ident)
 
         testRapid.inspektør.size shouldBe 1
         testRapid.inspektør.message(0)["@event_name"].asText() shouldBe "søknad_klar_til_journalføring"
+    }
+
+    @Test
+    fun `slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager sletter alle søknader som skal slettes`() {
+        val søknadId1 = randomUUID()
+        val søknadId2 = randomUUID()
+        every { søknadRepository.hentAlleSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager() } returns
+            listOf(
+                Søknad(søknadId1, "ident1"),
+                Søknad(søknadId2, "ident2"),
+            )
+
+        søknadService.slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()
+
+        verify { seksjonRepository.slettAlleSeksjoner("ident1", søknadId1) }
+        verify { søknadRepository.slettSøknadSomSystem(søknadId1, "ident1", any()) }
+        verify { seksjonRepository.slettAlleSeksjoner("ident2", søknadId2) }
+        verify { søknadRepository.slettSøknadSomSystem(søknadId2, "ident2", any()) }
+    }
+
+    @Suppress("ktlint:standard:max-line-length")
+    @Test
+    fun `slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager sletter ingen søknader hvis det ikke eksisterer noen søknader som skal slettes`() {
+        every { søknadRepository.hentAlleSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager() } returns emptyList()
+
+        søknadService.slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()
+
+        verify(exactly = 0) { seksjonRepository.slettAlleSeksjoner(ident, randomUUID()) }
+        verify(exactly = 0) { søknadRepository.slettSøknadSomSystem(randomUUID(), ident, any()) }
     }
 
     private val quizSeksjoner =

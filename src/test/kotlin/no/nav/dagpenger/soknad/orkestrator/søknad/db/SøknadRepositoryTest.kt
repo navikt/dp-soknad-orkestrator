@@ -1,7 +1,10 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
 import BarnSøknadMappingTabell
+import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.matchers.collections.shouldContainAll
+import io.kotest.matchers.collections.shouldNotContainAnyOf
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
@@ -16,8 +19,12 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.JOURNALFØRT
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.SLETTET_AV_SYSTEM
 import org.jetbrains.exposed.exceptions.ExposedSQLException
+import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.util.UUID
 import java.util.UUID.randomUUID
@@ -90,7 +97,7 @@ class SøknadRepositoryTest {
     @Test
     fun `hentPåbegynt henter påbegynt søknad for en gitt ident`() {
         val søknadId = randomUUID()
-        val søknad = Søknad(søknadId = søknadId, ident = ident, tilstand = Tilstand.PÅBEGYNT)
+        val søknad = Søknad(søknadId = søknadId, ident = ident, tilstand = PÅBEGYNT)
 
         søknadRepository.opprett(søknad)
 
@@ -220,17 +227,15 @@ class SøknadRepositoryTest {
     }
 
     @Test
-    fun `vi returnerer null dersom det ikke finnes en søknad med gitt id`() {
-        withMigratedDb {
-            søknadRepository.hent(randomUUID()) shouldBe null
-        }
+    fun `hent returnerer null hvis søknaden ikke eksisterer`() {
+        søknadRepository.hent(randomUUID()) shouldBe null
     }
 
     @Test
     fun `markerSøknadSomInnsendt markerer søknaden som innsendt`() {
         val søknadId = randomUUID()
         val innsendtTidspunkt = now().withNano(0)
-        søknadRepository.opprett(Søknad(søknadId, "ident"))
+        søknadRepository.opprett(Søknad(søknadId, ident))
 
         søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt)
 
@@ -246,7 +251,7 @@ class SøknadRepositoryTest {
         val søknadId = randomUUID()
         val journalpostId = "239874323"
         val journalførtTidspunkt = now().withNano(0)
-        søknadRepository.opprett(Søknad(søknadId, "ident"))
+        søknadRepository.opprett(Søknad(søknadId, ident))
 
         søknadRepository.markerSøknadSomJournalført(søknadId, journalpostId, journalførtTidspunkt)
 
@@ -256,6 +261,155 @@ class SøknadRepositoryTest {
             this?.journalpostId shouldBe journalpostId
             this?.journalførtTidspunkt shouldBe journalførtTidspunkt
         }
+    }
+
+    @Test
+    fun `hentAlleSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager returnerer forentet resultat`() {
+        val påbegyntSøknadSomBleOpprettetForMindreEnn7DagerSidenOgIkkeErOppdatert =
+            opprettSøknad(randomUUID(), PÅBEGYNT, opprettetTidspunkt = now().minusDays(1))
+        val påbegyntSøknadSomBleOpprettetFor7DagerSidenOgIkkeErOppdatert =
+            opprettSøknad(randomUUID(), PÅBEGYNT, opprettetTidspunkt = now().minusDays(7).plusSeconds(5))
+        val påbegyntSøknadSomBleOpprettetForMerEnn7DagerSidenOgIkkeErOppdatert =
+            opprettSøknad(randomUUID(), PÅBEGYNT, opprettetTidspunkt = now().minusDays(8))
+        val påbegyntSøknadSomErOppdatertForMindreEnn7DagerSiden =
+            opprettSøknad(randomUUID(), PÅBEGYNT, oppdatertTidspunkt = now().minusDays(1))
+        val påbegyntSøknadSomErOppdatertFor7DagerSiden =
+            opprettSøknad(randomUUID(), PÅBEGYNT, oppdatertTidspunkt = now().minusDays(7).plusSeconds(5))
+        val påbegyntSøknadSomErOppdatertForMerEnn7DagerSiden =
+            opprettSøknad(randomUUID(), PÅBEGYNT, oppdatertTidspunkt = now().minusDays(8))
+        val innsendtSøknadSomIkkeErOppdatert = opprettSøknad(randomUUID(), INNSENDT)
+        val innsendtSøknadSomErOppdatertForMindreEnn7DagerSiden =
+            opprettSøknad(randomUUID(), INNSENDT, oppdatertTidspunkt = now().minusDays(1))
+        val innsendtSøknadSomErOppdatertFor7DagerSiden =
+            opprettSøknad(randomUUID(), INNSENDT, oppdatertTidspunkt = now().minusDays(7).plusSeconds(5))
+        val innsendtSøknadSomErOppdatertForMerEnn7DagerSiden =
+            opprettSøknad(randomUUID(), INNSENDT, oppdatertTidspunkt = now().minusDays(8))
+        val journalførtSøknadSomErOppdatertForMindreEnn7DagerSiden =
+            opprettSøknad(randomUUID(), JOURNALFØRT, oppdatertTidspunkt = now().minusDays(1))
+        val journalførtSøknadSomErOppdatertFor7DagerSiden =
+            opprettSøknad(randomUUID(), JOURNALFØRT, oppdatertTidspunkt = now().minusDays(7).plusSeconds(5))
+        val journalførtSøknadSomErOppdatertForMerEnn7DagerSiden =
+            opprettSøknad(randomUUID(), JOURNALFØRT, oppdatertTidspunkt = now().minusDays(8))
+
+        val søknader = søknadRepository.hentAlleSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()
+
+        søknader.size shouldBe 2
+        with(søknader.map { søknad -> søknad.søknadId }) {
+            this.shouldNotContainAnyOf(
+                påbegyntSøknadSomBleOpprettetForMindreEnn7DagerSidenOgIkkeErOppdatert,
+                påbegyntSøknadSomBleOpprettetFor7DagerSidenOgIkkeErOppdatert,
+                påbegyntSøknadSomErOppdatertFor7DagerSiden,
+                påbegyntSøknadSomErOppdatertForMindreEnn7DagerSiden,
+                innsendtSøknadSomIkkeErOppdatert,
+                innsendtSøknadSomErOppdatertForMindreEnn7DagerSiden,
+                innsendtSøknadSomErOppdatertFor7DagerSiden,
+                innsendtSøknadSomErOppdatertForMerEnn7DagerSiden,
+                journalførtSøknadSomErOppdatertForMindreEnn7DagerSiden,
+                journalførtSøknadSomErOppdatertFor7DagerSiden,
+                journalførtSøknadSomErOppdatertForMerEnn7DagerSiden,
+            )
+            this.shouldContainAll(
+                påbegyntSøknadSomBleOpprettetForMerEnn7DagerSidenOgIkkeErOppdatert,
+                påbegyntSøknadSomErOppdatertForMerEnn7DagerSiden,
+            )
+        }
+    }
+
+    @Test
+    fun `verifiserAtSøknadEksistererOgTilhørerIdent kaster exception hvis søknaden ikke eksisterer`() {
+        val søknadId = randomUUID()
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
+            }
+
+        exception.message shouldBe "Fant ikke søknad med ID $søknadId"
+    }
+
+    @Test
+    fun `verifiserAtSøknadEksistererOgTilhørerIdent kaster exception hvis søknaden ikke tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, "en-annen-ident")
+            }
+
+        exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
+    }
+
+    @Test
+    fun `verifiserAtSøknadEksistererOgTilhørerIdent kaster ikke exception hvis søknader eksisterer og tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+
+        shouldNotThrow<Exception> {
+            søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
+        }
+    }
+
+    @Test
+    fun `slettSøknadSomSystem oppdaterer søknaden med forventede verdier hvis søknaden eksisterer og tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        val slettetTidspunkt = now().withNano(0)
+        søknadRepository.opprett(Søknad(søknadId, ident))
+
+        søknadRepository.slettSøknadSomSystem(søknadId, ident, slettetTidspunkt)
+
+        val søknad = søknadRepository.hent(søknadId)
+        søknad shouldNotBe null
+        søknad?.tilstand shouldBe SLETTET_AV_SYSTEM
+        søknad?.slettetTidspunkt shouldBe slettetTidspunkt
+    }
+
+    @Test
+    fun `slettSøknadSomSystem kaster exception hvis søknaden ikke eksisterer`() {
+        val søknadId = randomUUID()
+
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                søknadRepository.slettSøknadSomSystem(søknadId, ident)
+            }
+
+        exception.message shouldBe "Fant ikke søknad med ID $søknadId"
+    }
+
+    @Test
+    fun `slettSøknadSomSystem kaster exception hvis søknaden eksisterer men ikke tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                søknadRepository.slettSøknadSomSystem(søknadId, "en-annen-ident")
+            }
+
+        exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
+    }
+
+    private fun opprettSøknad(
+        søknadId: UUID,
+        tilstand: Tilstand,
+        opprettetTidspunkt: LocalDateTime? = null,
+        oppdatertTidspunkt: LocalDateTime? = null,
+    ): UUID {
+        søknadRepository.opprett(Søknad(søknadId, ident, tilstand, oppdatertTidspunkt = oppdatertTidspunkt))
+        if (oppdatertTidspunkt != null) {
+            søknadRepository.markerSøknadSomOppdatert(søknadId, ident, oppdatertTidspunkt)
+        }
+        if (opprettetTidspunkt != null) {
+            transaction {
+                TransactionManager
+                    .current()
+                    .connection
+                    .prepareStatement(
+                        "UPDATE soknad SET opprettet='$opprettetTidspunkt' WHERE soknad_id='$søknadId'",
+                        arrayOf(),
+                    ).executeUpdate()
+            }
+        }
+        return søknadId
     }
 }
 
