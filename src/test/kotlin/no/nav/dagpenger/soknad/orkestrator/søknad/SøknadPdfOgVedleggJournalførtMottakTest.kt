@@ -30,7 +30,7 @@ class SøknadPdfOgVedleggJournalførtMottakTest {
 
         rapidsConnection.sendTestMessage(journalførSøknadPdfOgVedleggMelding)
 
-        verify { søknadRepository.markerSøknadSomJournalført(søknadId, journalpostId, journalførtTidspunkt) }
+        verify { søknadRepository.markerSøknadSomJournalført(søknadId, ident, journalpostId, journalførtTidspunkt) }
     }
 
     @Test
@@ -42,6 +42,7 @@ class SøknadPdfOgVedleggJournalførtMottakTest {
         verify(exactly = 0) {
             søknadRepository.markerSøknadSomJournalført(
                 søknadId,
+                ident,
                 journalpostId,
                 journalførtTidspunkt,
             )
@@ -58,6 +59,7 @@ class SøknadPdfOgVedleggJournalførtMottakTest {
         verify(exactly = 0) {
             søknadRepository.markerSøknadSomJournalført(
                 søknadId,
+                ident,
                 journalpostId,
                 journalførtTidspunkt,
             )

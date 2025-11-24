@@ -80,7 +80,7 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                             return@withMDC
                         }
 
-                        søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt)
+                        søknadRepository.markerSøknadSomInnsendt(søknadId, ident, innsendtTidspunkt)
                         logg.info { "Søknad $søknadId markert som innsendt" }
                         sikkerLogg.info { "Søknad $søknadId innsendt av $ident markert som innsendt" }
                         rapidsConnection.publish(

@@ -63,7 +63,7 @@ internal class SøknadPdfOgVedleggJournalførtMottak(
 
             søknadRepository.hent(søknadId)?.let {
                 if (it.ident == ident) {
-                    søknadRepository.markerSøknadSomJournalført(søknadId, journalpostId, journalførtTidspunkt)
+                    søknadRepository.markerSøknadSomJournalført(søknadId, ident, journalpostId, journalførtTidspunkt)
                     logg.info { "Søknad $søknadId markert som journalført" }
                     sikkerLogg.info { "Søknad $søknadId innsendt av $ident markert som journaført med journalpostId $journalpostId" }
                 } else {
