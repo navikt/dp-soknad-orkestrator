@@ -36,7 +36,7 @@ class HarTilleggsopplysningerBehovløser(
             )
 
         objectMapper.readTree(seksjonsvar).let { seksjonsJson ->
-            seksjonsJson.findPath("har-tilleggsopplysninger")?.let {
+            seksjonsJson.findPath("harTilleggsopplysninger")?.let {
                 if (!it.isMissingOrNull()) {
                     return publiserLøsning(behovmelding, it.erBoolean())
                 }

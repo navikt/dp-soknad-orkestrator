@@ -18,6 +18,6 @@ class VernepliktBehovløser(
     override val beskrivendeId = "faktum.avtjent-militaer-sivilforsvar-tjeneste-siste-12-mnd"
 
     override fun løs(behovmelding: Behovmelding) {
-        løsBehovFraSeksjonsData(behovmelding, "verneplikt", "avtjent-verneplikt")
+        løsBehovFraSeksjonsData(behovmelding, "verneplikt", "avtjentVerneplikt")
     }
 }

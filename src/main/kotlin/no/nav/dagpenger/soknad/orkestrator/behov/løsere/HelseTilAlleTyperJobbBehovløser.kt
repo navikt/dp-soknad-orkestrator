@@ -21,7 +21,7 @@ class HelseTilAlleTyperJobbBehovløser(
         løsBehovFraSeksjonsData(
             behovmelding,
             "reell-arbeidssoker",
-            "kan-du-ta-alle-typer-arbeid",
+            "kanDuTaAlleTyperArbeid",
         )
     }
 }

@@ -18,6 +18,6 @@ class UtdanningEllerOpplæringBehovløser(
     override val beskrivendeId = "faktum.tar-du-utdanning"
 
     override fun løs(behovmelding: Behovmelding) {
-        løsBehovFraSeksjonsData(behovmelding, "utdanning", "tar-utdanning-eller-opplæring")
+        løsBehovFraSeksjonsData(behovmelding, "utdanning", "tarUtdanningEllerOpplæring")
     }
 }
