@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
 import org.jetbrains.exposed.sql.Database
@@ -32,6 +33,7 @@ class SeksjonRepository(
     ) {
         transaction {
             søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
+            søknadRepository.verifiserAtSøknadHarForventetTilstand(søknadId, PÅBEGYNT)
 
             SeksjonV2Tabell.upsert(
                 SeksjonV2Tabell.søknadId,
@@ -124,6 +126,7 @@ class SeksjonRepository(
         dokumentasjonskrav: String?,
     ) = transaction {
         søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
+        søknadRepository.verifiserAtSøknadHarForventetTilstand(søknadId, PÅBEGYNT)
         requireNotNull(hentSeksjonsvar(ident, søknadId, seksjonId)) { "Fant ikke seksjon med ID $seksjonId" }
 
         SeksjonV2Tabell.update({ SeksjonV2Tabell.seksjonId eq seksjonId }) {

@@ -400,6 +400,40 @@ class SøknadRepositoryTest {
     }
 
     @Test
+    fun `verifiserAtSøknadHarForventetTilstand kaster exception hvis søknaden ikke eksisterer`() {
+        val søknadId = randomUUID()
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                søknadRepository.verifiserAtSøknadHarForventetTilstand(søknadId, PÅBEGYNT)
+            }
+
+        exception.message shouldBe "Fant ikke søknad med ID $søknadId"
+    }
+
+    @Test
+    fun `verifiserAtSøknadHarForventetTilstand kaster exception hvis søknaden ikke tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident, INNSENDT))
+
+        val exception =
+            shouldThrow<IllegalStateException> {
+                søknadRepository.verifiserAtSøknadHarForventetTilstand(søknadId, PÅBEGYNT)
+            }
+
+        exception.message shouldBe "Søknad $søknadId har en annen tilstand (INNSENDT) enn forventet (PÅBEGYNT)"
+    }
+
+    @Test
+    fun `verifiserAtSøknadHarForventetTilstand kaster ikke exception hvis søknader eksisterer og tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident, INNSENDT))
+
+        shouldNotThrow<Exception> {
+            søknadRepository.verifiserAtSøknadHarForventetTilstand(søknadId, INNSENDT)
+        }
+    }
+
+    @Test
     fun `slettSøknadSomSystem oppdaterer søknaden med forventede verdier hvis søknaden eksisterer og tilhører bruker som gjør kallet`() {
         val søknadId = randomUUID()
         val slettetTidspunkt = now().withNano(0)
