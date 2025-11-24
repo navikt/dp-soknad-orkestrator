@@ -34,7 +34,7 @@ class NaisUtils {
                     httpClient.get(electorGetUrl).body<Leader>().name
                 }
 
-            logger.info { "Denne podden er \"$hostname\", leader pod er \"$leader\"" }
+            logger.debug { "Denne podden er \"$hostname\", leader pod er \"$leader\"" }
 
             hostname == leader
         } catch (e: Exception) {

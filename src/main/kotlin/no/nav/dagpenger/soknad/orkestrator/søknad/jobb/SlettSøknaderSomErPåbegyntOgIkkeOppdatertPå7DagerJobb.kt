@@ -14,23 +14,23 @@ internal object SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb {
     private const val JOBBNAVN = "Slettejobb for søknader som er påbegynt og ikke oppdatert på 7 dager"
 
     fun startFixedRateTimer(søknadService: SøknadService) {
-        if (NaisUtils().isLeader(defaultHttpClient)) {
-            logger.info { "Pod ${System.getenv("HOSTNAME")} er leader, starter \"$JOBBNAVN\" på denne podden." }
-            fixedRateTimer(
-                name = JOBBNAVN,
-                daemon = true,
-                initialDelay = Random.nextInt(1..10).minutes.inWholeMilliseconds,
-                period = 15.minutes.inWholeMilliseconds,
-                action = {
-                    try {
+        fixedRateTimer(
+            name = JOBBNAVN,
+            daemon = true,
+            initialDelay = Random.nextInt(1..10).minutes.inWholeMilliseconds,
+            period = 15.minutes.inWholeMilliseconds,
+            action = {
+                try {
+                    if (NaisUtils().isLeader(defaultHttpClient)) {
+                        logger.info { "Pod ${System.getenv("HOSTNAME")} er leader, starter \"$JOBBNAVN\" på denne podden." }
                         søknadService.slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()
-                    } catch (e: Exception) {
-                        logger.error(e) { "Kjøring av \"$JOBBNAVN\" feilet" }
+                    } else {
+                        logger.info { "Pod ${System.getenv("HOSTNAME")} er ikke leader, starter ikke \"$JOBBNAVN\" på denne podden" }
                     }
-                },
-            )
-        } else {
-            logger.info { "Pod ${System.getenv("HOSTNAME")} er ikke leader, starter ikke \"$JOBBNAVN\" på denne podden" }
-        }
+                } catch (e: Exception) {
+                    logger.error(e) { "Kjøring av \"$JOBBNAVN\" feilet" }
+                }
+            },
+        )
     }
 }
