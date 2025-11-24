@@ -11,7 +11,9 @@ import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import java.time.LocalDateTime.now
 import java.util.UUID.randomUUID
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -106,6 +108,26 @@ class SeksjonRepositoryTest {
             }
 
         exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
+    }
+
+    @Test
+    fun `lagre kaster exception hvis seksjonen lagres på en søknad som er i en annen tilstand enn PÅBEGYNT`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident, INNSENDT))
+
+        val exception =
+            shouldThrow<IllegalStateException> {
+                seksjonRepository.lagre(
+                    ident,
+                    søknadId,
+                    seksjonId,
+                    seksjonsvar,
+                    dokumentasjonskrav,
+                    pdfGrunnlag,
+                )
+            }
+
+        exception.message shouldBe "Søknad $søknadId har en annen tilstand (INNSENDT) enn forventet (PÅBEGYNT)"
     }
 
     @Test
@@ -318,6 +340,22 @@ class SeksjonRepositoryTest {
             }
 
         exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
+    }
+
+    @Test
+    @Suppress("ktlint:standard:max-line-length")
+    fun `lagreDokumentasjonskrav kaster exception hvis seksjonen det lagres på tilhører en søknad som er i en annen tilstand en PÅBEGYNT`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        søknadRepository.markerSøknadSomInnsendt(søknadId, ident, now())
+
+        val exception =
+            shouldThrow<IllegalStateException> {
+                seksjonRepository.lagreDokumentasjonskrav(ident, søknadId, seksjonId, dokumentasjonskrav2)
+            }
+
+        exception.message shouldBe "Søknad $søknadId har en annen tilstand (INNSENDT) enn forventet (PÅBEGYNT)"
     }
 
     @Test
