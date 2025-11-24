@@ -37,7 +37,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
 
         rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
 
-        verify { søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt) }
+        verify { søknadRepository.markerSøknadSomInnsendt(søknadId, ident, innsendtTidspunkt) }
         verify { pdfPayloadService.genererBruttoPdfPayload(ident, søknadId) }
         verify { pdfPayloadService.genererNettoPdfPayload(ident, søknadId) }
         rapidsConnection.inspektør.size shouldBe 1
@@ -50,7 +50,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
 
         rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
 
-        verify(exactly = 0) { søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt) }
+        verify(exactly = 0) { søknadRepository.markerSøknadSomInnsendt(søknadId, ident, innsendtTidspunkt) }
         rapidsConnection.inspektør.size shouldBe 0
     }
 
@@ -60,7 +60,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
 
         rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
 
-        verify(exactly = 0) { søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt) }
+        verify(exactly = 0) { søknadRepository.markerSøknadSomInnsendt(søknadId, ident, innsendtTidspunkt) }
         rapidsConnection.inspektør.size shouldBe 0
     }
 
@@ -70,7 +70,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
 
         rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
 
-        verify(exactly = 0) { søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt) }
+        verify(exactly = 0) { søknadRepository.markerSøknadSomInnsendt(søknadId, ident, innsendtTidspunkt) }
         rapidsConnection.inspektør.size shouldBe 0
     }
 

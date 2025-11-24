@@ -156,9 +156,11 @@ class SøknadRepository(
 
     fun markerSøknadSomInnsendt(
         søknadId: UUID,
+        ident: String,
         innsendtTidspunkt: LocalDateTime,
     ) {
         transaction {
+            verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
             SøknadTabell.update({ SøknadTabell.søknadId eq søknadId }) {
                 it[tilstand] = INNSENDT.name
                 it[SøknadTabell.innsendtTidspunkt] = innsendtTidspunkt
@@ -168,10 +170,12 @@ class SøknadRepository(
 
     fun markerSøknadSomJournalført(
         søknadId: UUID,
+        ident: String,
         journalpostId: String,
         journalførtTidspunkt: LocalDateTime,
     ) {
         transaction {
+            verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
             SøknadTabell.update({ SøknadTabell.søknadId eq søknadId }) {
                 it[tilstand] = JOURNALFØRT.name
                 it[SøknadTabell.journalpostId] = journalpostId

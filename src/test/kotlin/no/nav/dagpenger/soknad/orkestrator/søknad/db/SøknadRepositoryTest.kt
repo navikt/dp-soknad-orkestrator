@@ -237,7 +237,7 @@ class SøknadRepositoryTest {
         val innsendtTidspunkt = now().withNano(0)
         søknadRepository.opprett(Søknad(søknadId, ident))
 
-        søknadRepository.markerSøknadSomInnsendt(søknadId, innsendtTidspunkt)
+        søknadRepository.markerSøknadSomInnsendt(søknadId, ident, innsendtTidspunkt)
 
         with(søknadRepository.hent(søknadId)) {
             this shouldNotBe null
@@ -247,13 +247,38 @@ class SøknadRepositoryTest {
     }
 
     @Test
+    fun `markerSøknadSomInnsendt kaster exception hvis søknaden ikke eksisterer`() {
+        val søknadId = randomUUID()
+
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                søknadRepository.markerSøknadSomInnsendt(søknadId, ident, now().withNano(0))
+            }
+
+        exception.message shouldBe "Fant ikke søknad med ID $søknadId"
+    }
+
+    @Test
+    fun `markerSøknadSomInnsendt kaster exception hvis søknaden ikke tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                søknadRepository.markerSøknadSomInnsendt(søknadId, "en-annen-ident", now().withNano(0))
+            }
+
+        exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
+    }
+
+    @Test
     fun `markerSøknadSomJournalført markerer søknaden som journalført`() {
         val søknadId = randomUUID()
         val journalpostId = "239874323"
         val journalførtTidspunkt = now().withNano(0)
         søknadRepository.opprett(Søknad(søknadId, ident))
 
-        søknadRepository.markerSøknadSomJournalført(søknadId, journalpostId, journalførtTidspunkt)
+        søknadRepository.markerSøknadSomJournalført(søknadId, ident, journalpostId, journalførtTidspunkt)
 
         with(søknadRepository.hent(søknadId)) {
             this shouldNotBe null
@@ -261,6 +286,31 @@ class SøknadRepositoryTest {
             this?.journalpostId shouldBe journalpostId
             this?.journalførtTidspunkt shouldBe journalførtTidspunkt
         }
+    }
+
+    @Test
+    fun `markerSøknadSomJournalført kaster exception hvis søknaden ikke eksisterer`() {
+        val søknadId = randomUUID()
+
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                søknadRepository.markerSøknadSomJournalført(søknadId, ident, "239874323", now().withNano(0))
+            }
+
+        exception.message shouldBe "Fant ikke søknad med ID $søknadId"
+    }
+
+    @Test
+    fun `markerSøknadSomJournalført kaster exception hvis søknaden ikke tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                søknadRepository.markerSøknadSomJournalført(søknadId, "en-annen-ident", "239874323", now().withNano(0))
+            }
+
+        exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
     }
 
     @Test
