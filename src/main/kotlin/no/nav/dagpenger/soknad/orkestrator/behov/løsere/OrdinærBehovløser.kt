@@ -55,15 +55,15 @@ class OrdinærBehovløser(
 
         val ikkeOrdinæreRettighetstyper =
             setOf(
-                "jeg-er-permitert",
-                "permittert-er-du-permittert-fra-fiskeforedlings-eller-fiskeoljeindustrien",
-                "arbeidsgiver-er-konkurs",
+                "jegErPermitert",
+                "permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien",
+                "arbeidsgiverErKonkurs",
             )
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordan-har-dette-arbeidsforholdet-endret-seg"].asText() !in ikkeOrdinæreRettighetstyper
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"].asText() !in ikkeOrdinæreRettighetstyper
                     }
                 }
             }

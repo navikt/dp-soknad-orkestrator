@@ -21,7 +21,7 @@ class KanJobbeDeltidBehovløser(
         løsBehovFraSeksjonsData(
             behovmelding,
             "reell-arbeidssoker",
-            "kan-du-jobbe-både-heltid-og-deltid",
+            "kanDuJobbeBådeHeltidOgDeltid",
         )
     }
 }

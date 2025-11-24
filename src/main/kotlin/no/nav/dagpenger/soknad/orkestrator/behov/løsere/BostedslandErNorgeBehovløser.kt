@@ -46,7 +46,7 @@ class BostedslandErNorgeBehovløser(
             )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
-            seksjonsJson.findPath("folkeregistrert-adresse-er-norge-stemmer-det")?.let {
+            seksjonsJson.findPath("folkeregistrertAdresseErNorgeStemmerDet")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.erBoolean()
                 }

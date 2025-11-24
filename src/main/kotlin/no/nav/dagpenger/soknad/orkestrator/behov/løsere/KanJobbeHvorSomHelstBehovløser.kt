@@ -18,6 +18,6 @@ class KanJobbeHvorSomHelstBehovløser(
     override val beskrivendeId = "faktum.jobbe-hele-norge"
 
     override fun løs(behovmelding: Behovmelding) {
-        løsBehovFraSeksjonsData(behovmelding, "reell-arbeidssoker", "kan-du-jobbe-i-hele-norge")
+        løsBehovFraSeksjonsData(behovmelding, "reell-arbeidssoker", "kanDuJobbeIHeleNorge")
     }
 }

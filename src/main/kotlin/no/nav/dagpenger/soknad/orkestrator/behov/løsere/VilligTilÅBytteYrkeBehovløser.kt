@@ -18,6 +18,6 @@ class VilligTilÅBytteYrkeBehovløser(
     override val beskrivendeId = "faktum.bytte-yrke-ned-i-lonn"
 
     override fun løs(behovmelding: Behovmelding) {
-        løsBehovFraSeksjonsData(behovmelding, "reell-arbeidssoker", "er-du-villig-til-å-bytte-yrke-eller-gå-ned-i-lønn")
+        løsBehovFraSeksjonsData(behovmelding, "reell-arbeidssoker", "erDuVilligTilÅBytteYrkeEllerGåNedILønn")
     }
 }
