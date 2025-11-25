@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.søknad.behov.BehovForJournalføringAvSøknadPdfOgVedlegg
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfGenerertOgMellomlagretMottak
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
@@ -14,9 +15,10 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
     private val søknadId = UUID.fromString("123e4567-e89b-12d3-a456-426614174000")
     private val ident = "12345678903"
     private val rapidsConnection = TestRapid()
+    private val søknadService: SøknadService = mockk<SøknadService>(relaxed = true)
 
     init {
-        SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection)
+        SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection, søknadService)
     }
 
     @BeforeEach

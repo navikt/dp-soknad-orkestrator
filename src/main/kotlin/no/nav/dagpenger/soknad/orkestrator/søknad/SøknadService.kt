@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -18,6 +19,12 @@ class SøknadService(
     private val søknadPersonaliaRepository: SøknadPersonaliaRepository,
     private val seksjonRepository: SeksjonRepository,
 ) {
+    private companion object {
+        private val logg = KotlinLogging.logger {}
+        private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadService")
+        private val jsonMapper = JsonMapper.builder().build()
+    }
+
     private lateinit var rapidsConnection: RapidsConnection
 
     fun setRapidsConnection(rapidsConnection: RapidsConnection) {
@@ -104,8 +111,41 @@ class SøknadService(
         }
     }
 
-    private companion object {
-        private val logg = KotlinLogging.logger {}
-        private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadService")
-    }
+    fun hentDokumentasjonskrav(
+        ident: String,
+        søknadId: UUID,
+    ) = seksjonRepository.hentDokumentasjonskrav(søknadId, ident)
+
+    fun opprettDokumenterFraDokumentasjonskrav(
+        søknadId: UUID,
+        ident: String,
+    ): List<Dokument> =
+        seksjonRepository
+            .hentDokumentasjonskrav(søknadId, ident)
+            .flatMap { dokumentasjonskrav ->
+                jsonMapper
+                    .readTree(dokumentasjonskrav)
+                    .toList()
+                    .mapNotNull { rootNode ->
+                        rootNode
+                            .findValue("bundle")
+                            ?.let { bundleNode ->
+                                if (!bundleNode.isEmpty) {
+                                    Dokument(
+                                        rootNode.at("/skjemakode").textValue(),
+                                        listOf(
+                                            Dokumentvariant(
+                                                filnavn = bundleNode.at("/filnavn").textValue(),
+                                                urn = bundleNode.at("/urn").textValue(),
+                                                variant = "ARKIV",
+                                                type = "PDF",
+                                            ),
+                                        ),
+                                    )
+                                } else {
+                                    null
+                                }
+                            }
+                    }
+            }
 }

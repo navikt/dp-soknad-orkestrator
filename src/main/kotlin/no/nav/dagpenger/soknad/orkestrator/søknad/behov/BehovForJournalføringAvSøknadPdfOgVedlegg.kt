@@ -10,6 +10,7 @@ class BehovForJournalføringAvSøknadPdfOgVedlegg(
     private val søknadId: UUID,
     private val ident: String,
     private val dokumentvarianter: List<Dokumentvariant>,
+    private val dokumenter: List<Dokument> = emptyList(),
 ) {
     companion object {
         const val BEHOV = "journalfør_søknad_pdf_og_vedlegg"
@@ -31,7 +32,7 @@ class BehovForJournalføringAvSøknadPdfOgVedlegg(
                                     skjemakode = "04-01.04",
                                     varianter = dokumentvarianter,
                                 ),
-                            dokumenter = emptyList(),
+                            dokumenter = dokumenter,
                         ),
                 ),
         )

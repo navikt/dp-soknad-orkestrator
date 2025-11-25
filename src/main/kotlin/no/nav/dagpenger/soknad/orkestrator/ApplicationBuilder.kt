@@ -146,7 +146,7 @@ internal class ApplicationBuilder(
                     søknadRepository,
                     PdfPayloadService(søknadRepository, søknadPersonaliaRepository, seksjonRepository),
                 )
-                SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection)
+                SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection, søknadService)
                 SøknadPdfOgVedleggJournalførtMottak(rapidsConnection, søknadRepository)
                 MinidialogJournalførtMottak(rapidsConnection)
                 BehovMottak(
