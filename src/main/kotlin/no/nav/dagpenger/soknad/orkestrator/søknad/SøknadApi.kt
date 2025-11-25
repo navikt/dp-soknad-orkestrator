@@ -81,7 +81,7 @@ internal fun Application.søknadApi(
                             }
 
                         val dokumentasjonskrav =
-                            seksjonService.hentDokumentasjonskrav(call.ident(), søknadId)
+                            søknadService.hentDokumentasjonskrav(call.ident(), søknadId)
 
                         if (dokumentasjonskrav.isEmpty()) {
                             call.respond(NotFound)

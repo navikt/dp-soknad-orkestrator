@@ -8,12 +8,14 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.behov.BehovForJournalføringAvSøknadPdfOgVedlegg
 import no.nav.dagpenger.soknad.orkestrator.søknad.dokumentVarianter
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 
 internal class SøknadPdfGenerertOgMellomlagretMottak(
     val rapidsConnection: RapidsConnection,
+    val søknadService: SøknadService,
 ) : River.PacketListener {
     companion object {
         private val logg = KotlinLogging.logger {}
@@ -57,6 +59,7 @@ internal class SøknadPdfGenerertOgMellomlagretMottak(
                     søknadId = søknadId,
                     ident = ident,
                     dokumentvarianter = packet["@løsning"][BEHOV].dokumentVarianter(),
+                    dokumenter = søknadService.opprettDokumenterFraDokumentasjonskrav(søknadId, ident),
                 )
 
             rapidsConnection.publish(ident, behovForJournalføringAvSøknadPdfOgVedlegg.asMessage().toJson())

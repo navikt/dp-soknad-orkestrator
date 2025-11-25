@@ -1,7 +1,10 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.kotest.inspectors.shouldForAtMostOne
+import io.kotest.matchers.collections.shouldContainNoNulls
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.clearMocks
 import io.mockk.coEvery
 import io.mockk.every
@@ -141,15 +144,66 @@ class SøknadServiceTest {
         verify { søknadRepository.slettSøknadSomSystem(søknadId2, "ident2", any()) }
     }
 
-    @Suppress("ktlint:standard:max-line-length")
     @Test
-    fun `slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager sletter ingen søknader hvis det ikke eksisterer noen søknader som skal slettes`() {
+    @Suppress("ktlint:standard:max-line-length")
+    fun `slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager sletter ingen søknader hvis det ikke eksisterer noen søkander som skal slettes`() {
         every { søknadRepository.hentAlleSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager() } returns emptyList()
 
         søknadService.slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()
 
         verify(exactly = 0) { seksjonRepository.slettAlleSeksjoner(ident, randomUUID()) }
         verify(exactly = 0) { søknadRepository.slettSøknadSomSystem(randomUUID(), ident, any()) }
+    }
+
+    @Test
+    fun `opprettDokumenterFraDokumentasjonskrav returnerer forventede dokumenter`() {
+        every { seksjonRepository.hentDokumentasjonskrav(any(), any()) } returns
+            listOf(
+                this::class.java
+                    .getResource("/testdata/dokumentasjonskrav-barnetillegg.json")!!
+                    .readText(Charsets.UTF_8),
+                this::class.java
+                    .getResource("/testdata/dokumentasjonskrav-arbeidsforhold.json")!!
+                    .readText(Charsets.UTF_8),
+                this::class.java
+                    .getResource("/testdata/dokumentasjonskrav-annen-pengestøtte.json")!!
+                    .readText(Charsets.UTF_8),
+                this::class.java
+                    .getResource("/testdata/dokumentasjonskrav-verneplikt.json")!!
+                    .readText(Charsets.UTF_8),
+            )
+
+        val dokumenter = søknadService.opprettDokumenterFraDokumentasjonskrav(randomUUID(), ident)
+
+        dokumenter.size shouldBe 3
+        dokumenter.shouldContainNoNulls()
+        dokumenter.shouldForAtMostOne { dokument ->
+            dokument shouldBe "02"
+            dokument.varianter.size shouldBe 1
+            dokument.varianter[0].uuid shouldNotBe null
+            dokument.varianter[0].filnavn shouldBe "ebf48dd8-e3df-4ab0-a015-d9109e2dc000"
+            dokument.varianter[0].urn shouldBe "urn:vedlegg:ad96be1e-a3d0-46c7-a869-1d7ddf01933c/87d8abbf-cf03-46aa-9659-4b74eaa3c8d0"
+            dokument.varianter[0].variant shouldBe "ARKIV"
+            dokument.varianter[0].type shouldBe "PDF"
+        }
+        dokumenter.shouldForAtMostOne { dokument ->
+            dokument shouldBe "T6"
+            dokument.varianter.size shouldBe 1
+            dokument.varianter[0].uuid shouldNotBe null
+            dokument.varianter[0].filnavn shouldBe "ebf48dd8-e3df-4ab0-a015-d9109e2dc001"
+            dokument.varianter[0].urn shouldBe "urn:vedlegg:ad96be1e-a3d0-46c7-a869-1d7ddf01933c/87d8abbf-cf03-46aa-9659-4b74eaa3c8d1"
+            dokument.varianter[0].variant shouldBe "ARKIV"
+            dokument.varianter[0].type shouldBe "PDF"
+        }
+        dokumenter.shouldForAtMostOne { dokument ->
+            dokument shouldBe "X8"
+            dokument.varianter.size shouldBe 1
+            dokument.varianter[0].uuid shouldNotBe null
+            dokument.varianter[0].filnavn shouldBe "ebf48dd8-e3df-4ab0-a015-d9109e2dc002"
+            dokument.varianter[0].urn shouldBe "urn:vedlegg:ad96be1e-a3d0-46c7-a869-1d7ddf01933c/87d8abbf-cf03-46aa-9659-4b74eaa3c8d2"
+            dokument.varianter[0].variant shouldBe "ARKIV"
+            dokument.varianter[0].type shouldBe "PDF"
+        }
     }
 
     private val quizSeksjoner =

@@ -142,8 +142,8 @@ class SeksjonRepository(
     }
 
     fun hentDokumentasjonskrav(
-        ident: String,
         søknadId: UUID,
+        ident: String,
     ) = transaction {
         SeksjonV2Tabell
             .innerJoin(SøknadTabell)

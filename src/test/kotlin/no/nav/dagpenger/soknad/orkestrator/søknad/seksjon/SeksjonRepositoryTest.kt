@@ -386,7 +386,7 @@ class SeksjonRepositoryTest {
         seksjonRepository.lagre(ident, søknadId, seksjonId2, seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
         seksjonRepository.lagre(ident, søknadId, seksjonId3, seksjonsvar3, null, pdfGrunnlag3)
 
-        val dokumentasjonskravForSøknad = seksjonRepository.hentDokumentasjonskrav(ident, søknadId)
+        val dokumentasjonskravForSøknad = seksjonRepository.hentDokumentasjonskrav(søknadId, ident)
 
         dokumentasjonskravForSøknad shouldContainExactlyInAnyOrder
             listOf(
@@ -401,7 +401,7 @@ class SeksjonRepositoryTest {
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
 
-        seksjonRepository.hentDokumentasjonskrav("en-annen-ident", søknadId) shouldBe emptyList()
+        seksjonRepository.hentDokumentasjonskrav(søknadId, "en-annen-ident") shouldBe emptyList()
     }
 
     @Test
@@ -410,7 +410,7 @@ class SeksjonRepositoryTest {
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
 
-        seksjonRepository.hentDokumentasjonskrav(ident, randomUUID()) shouldBe emptyList()
+        seksjonRepository.hentDokumentasjonskrav(randomUUID(), ident) shouldBe emptyList()
     }
 
     @Test
