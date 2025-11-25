@@ -201,7 +201,7 @@ class SøknadApiTest {
 
     @Test
     fun `GET dokumentasjonskrav returnerer 200 OK og liste med dokumentasjonskrav på søknaden`() {
-        every { seksjonService.hentDokumentasjonskrav(any(), any()) } returns
+        every { søknadService.hentDokumentasjonskrav(any(), any()) } returns
             listOf(
                 "{\"dokumentasjonskrav\": true}",
                 "{\"dokumentasjonskrav2\": true}",
@@ -219,7 +219,7 @@ class SøknadApiTest {
 
     @Test
     fun `GET dokumentasjonskrav returnerer 404 Not Found hvis søknaden ikke har dokumentasjonskrav`() {
-        every { seksjonService.hentDokumentasjonskrav(any(), any()) } returns
+        every { søknadService.hentDokumentasjonskrav(any(), any()) } returns
             listOf()
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
@@ -234,7 +234,7 @@ class SøknadApiTest {
 
     @Test
     fun `GET dokumentasjonskrav returnerer 500 Internal Server Error hvis kall fra repository kaster IllegalStateException`() {
-        every { seksjonService.hentDokumentasjonskrav(any(), any()) } throws IllegalStateException()
+        every { søknadService.hentDokumentasjonskrav(any(), any()) } throws IllegalStateException()
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client.get("/soknad/${randomUUID()}/dokumentasjonskrav") {
@@ -345,6 +345,26 @@ class SøknadApiTest {
                 }
 
             response.status shouldBe OK
+        }
+    }
+
+    @Test
+    fun `PUT søknadPersonalia returnerer 400 Bad Requerst hvis søknadId ikke er en UUID`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.put("/soknad/ikke-en-uuid/personalia") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    contentType(Json)
+                    setBody(
+                        PutSøknadPersonaliaRequestBody(
+                            fornavn = "fornavn",
+                            etternavn = "etternavn",
+                            alder = "26",
+                        ),
+                    )
+                }
+
+            response.status shouldBe BadRequest
         }
     }
 
