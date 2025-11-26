@@ -3,9 +3,12 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.søknad.behov.BehovForJournalføringAvSøknadPdfOgVedlegg
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfGenerertOgMellomlagretMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonService
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import org.junit.jupiter.api.BeforeEach
 import java.util.UUID
@@ -16,9 +19,10 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
     private val ident = "12345678903"
     private val rapidsConnection = TestRapid()
     private val søknadService: SøknadService = mockk<SøknadService>(relaxed = true)
+    private val seksjonService: SeksjonService = mockk<SeksjonService>(relaxed = true)
 
     init {
-        SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection, søknadService)
+        SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection, søknadService, seksjonService)
     }
 
     @BeforeEach
@@ -29,14 +33,22 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
     @Test
     fun `onPacket leser melding og behandler den som forventet`() {
         rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
+        every { seksjonService.hentAlleSeksjonerMedSeksjonIdSomNøkkel(any(), any()) } returns søknadsData
 
         rapidsConnection.inspektør.size shouldBe 1
+        verify { seksjonService.hentAlleSeksjonerMedSeksjonIdSomNøkkel(ident, søknadId) }
+
         with(rapidsConnection.inspektør) {
             message(0)["søknadId"].asUUID() shouldBe søknadId
             message(0)["ident"].asText() shouldBe ident
             message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
         }
     }
+
+    private val søknadsData =
+        mapOf(
+            "personalia" to """{"navn":"Ola Nordmann","fødselsnummer":"$ident"}""",
+        )
 
     private val genererOgMellomlagreSøknadPdfLøsning =
         //language=json
@@ -66,7 +78,8 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
                }
              ]},
           "ident": "$ident",
-          "søknadId": "$søknadId"
+          "søknadId": "$søknadId",
+          "data": "[{\"seksjonId\":\"personalia\",\"data\":\"{\\\"navn\\\":\\\"Ola Nordmann\\\",\\\"fødselsnummer\\\":\\\"$ident\\\"}\"}]"
         }
         """.trimIndent()
 }

@@ -27,6 +27,11 @@ class SeksjonService(
         søknadId: UUID,
     ): List<Seksjon> = seksjonRepository.hentSeksjoner(ident, søknadId)
 
+    fun hentAlleSeksjonerMedSeksjonIdSomNøkkel(
+        ident: String,
+        søknadId: UUID,
+    ): Map<String, String> = seksjonRepository.hentAlleSeksjonerMedSeksjonIdSomNøkkel(ident, søknadId)
+
     fun hentSeksjonIdForAlleLagredeSeksjoner(
         ident: String,
         søknadId: UUID,

@@ -8,14 +8,17 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.behov.BehovForJournalføringAvSøknadPdfOgVedlegg
 import no.nav.dagpenger.soknad.orkestrator.søknad.dokumentVarianter
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonService
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 
 internal class SøknadPdfGenerertOgMellomlagretMottak(
     val rapidsConnection: RapidsConnection,
     val søknadService: SøknadService,
+    val seksjonService: SeksjonService,
 ) : River.PacketListener {
     companion object {
         private val logg = KotlinLogging.logger {}
@@ -54,12 +57,14 @@ internal class SøknadPdfGenerertOgMellomlagretMottak(
         ) {
             logg.info { "Mottok løsning for $BEHOV for søknad $søknadId" }
             sikkerLogg.info { "Mottok løsning for $BEHOV for søknad $søknadId innsendt av $ident" }
+            val søknadsData = seksjonService.hentAlleSeksjonerMedSeksjonIdSomNøkkel(ident, søknadId)
             val behovForJournalføringAvSøknadPdfOgVedlegg =
                 BehovForJournalføringAvSøknadPdfOgVedlegg(
                     søknadId = søknadId,
                     ident = ident,
                     dokumentvarianter = packet["@løsning"][BEHOV].dokumentVarianter(),
                     dokumenter = søknadService.opprettDokumenterFraDokumentasjonskrav(søknadId, ident),
+                    data = objectMapper.writeValueAsString(søknadsData),
                 )
 
             rapidsConnection.publish(ident, behovForJournalføringAvSøknadPdfOgVedlegg.asMessage().toJson())

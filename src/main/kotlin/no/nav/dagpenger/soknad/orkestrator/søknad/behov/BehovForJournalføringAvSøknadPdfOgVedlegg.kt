@@ -11,6 +11,7 @@ class BehovForJournalføringAvSøknadPdfOgVedlegg(
     private val ident: String,
     private val dokumentvarianter: List<Dokumentvariant>,
     private val dokumenter: List<Dokument> = emptyList(),
+    private val data: String,
 ) {
     companion object {
         const val BEHOV = "journalfør_søknad_pdf_og_vedlegg"
@@ -24,6 +25,7 @@ class BehovForJournalføringAvSøknadPdfOgVedlegg(
                     "søknadId" to søknadId.toString(),
                     "ident" to ident,
                     "type" to "NY_DIALOG",
+                    "data" to data,
                     BEHOV to
                         NyJournalpost(
                             hovedDokument =
