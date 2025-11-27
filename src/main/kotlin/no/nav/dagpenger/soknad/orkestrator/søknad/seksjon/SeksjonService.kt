@@ -1,5 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
 import java.util.UUID
 
 class SeksjonService(
@@ -27,11 +29,6 @@ class SeksjonService(
         søknadId: UUID,
     ): List<Seksjon> = seksjonRepository.hentSeksjoner(ident, søknadId)
 
-    fun hentAlleSeksjonerMedSeksjonIdSomNøkkel(
-        ident: String,
-        søknadId: UUID,
-    ): Map<String, String> = seksjonRepository.hentAlleSeksjonerMedSeksjonIdSomNøkkel(ident, søknadId)
-
     fun hentSeksjonIdForAlleLagredeSeksjoner(
         ident: String,
         søknadId: UUID,
@@ -49,6 +46,19 @@ class SeksjonService(
         søknadId: UUID,
         seksjonId: String,
     ) = seksjonRepository.hentDokumentasjonskrav(ident, søknadId, seksjonId)
+
+    fun hentAlleSeksjonerMedSeksjonIdSomNøkkel(
+        ident: String,
+        søknadId: UUID,
+    ): Map<String, String> {
+        val hentAlleSeksjoner = seksjonRepository.hentSeksjoner(ident, søknadId)
+        return hentAlleSeksjoner.map {
+            val seksjonId = it.seksjonId
+            val seksjonSvarToJson = Json.parseToJsonElement(it.data).jsonObject
+            val seksjonsvar = seksjonSvarToJson["seksjonsvar"]?.toString() ?: ""
+            seksjonId to seksjonsvar
+        } as Map<String, String>
+    }
 }
 
 data class Seksjon(

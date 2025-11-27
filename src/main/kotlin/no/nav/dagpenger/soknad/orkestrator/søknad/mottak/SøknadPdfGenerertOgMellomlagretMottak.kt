@@ -57,7 +57,14 @@ internal class SøknadPdfGenerertOgMellomlagretMottak(
         ) {
             logg.info { "Mottok løsning for $BEHOV for søknad $søknadId" }
             sikkerLogg.info { "Mottok løsning for $BEHOV for søknad $søknadId innsendt av $ident" }
-            val søknadsData = seksjonService.hentAlleSeksjonerMedSeksjonIdSomNøkkel(ident, søknadId)
+            val søknadsData =
+                mapOf(
+                    "seksjoner" to seksjonService.hentAlleSeksjonerMedSeksjonIdSomNøkkel(ident, søknadId),
+                    "søknad_uuid" to søknadId,
+                    "fødselsnummer" to ident,
+                    "versjon_navn" to "Dagpenger_v2",
+                )
+
             val behovForJournalføringAvSøknadPdfOgVedlegg =
                 BehovForJournalføringAvSøknadPdfOgVedlegg(
                     søknadId = søknadId,

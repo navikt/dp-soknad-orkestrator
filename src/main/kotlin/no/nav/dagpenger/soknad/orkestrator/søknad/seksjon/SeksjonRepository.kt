@@ -105,21 +105,6 @@ class SeksjonRepository(
                 }.toList()
         }
 
-    fun hentAlleSeksjonerMedSeksjonIdSomNøkkel(
-        ident: String,
-        søknadId: UUID,
-    ): Map<String, String> =
-        transaction {
-            SeksjonV2Tabell
-                .innerJoin(SøknadTabell)
-                .select(SeksjonV2Tabell.seksjonsvar, SeksjonV2Tabell.seksjonId)
-                .where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
-                .map {
-                    val seksjonId = it[SeksjonV2Tabell.seksjonId]
-                    seksjonId to it[SeksjonV2Tabell.seksjonsvar]
-                }.toMap()
-        }
-
     fun hentSeksjonIdForAlleLagredeSeksjoner(
         ident: String,
         søknadId: UUID,

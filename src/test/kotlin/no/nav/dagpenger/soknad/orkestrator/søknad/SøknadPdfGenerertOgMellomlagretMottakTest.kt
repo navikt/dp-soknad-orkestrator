@@ -32,8 +32,8 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
     @Test
     fun `onPacket leser melding og behandler den som forventet`() {
-        rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
         every { seksjonService.hentAlleSeksjonerMedSeksjonIdSomNøkkel(any(), any()) } returns søknadsData
+        rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
 
         rapidsConnection.inspektør.size shouldBe 1
         verify { seksjonService.hentAlleSeksjonerMedSeksjonIdSomNøkkel(ident, søknadId) }
@@ -41,6 +41,8 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
         with(rapidsConnection.inspektør) {
             message(0)["søknadId"].asUUID() shouldBe søknadId
             message(0)["ident"].asText() shouldBe ident
+            message(0)["data"].asText() shouldBe
+                """{"seksjoner":{"personalia":"{\"navn\":\"Ola Nordmann\",\"fødselsnummer\":\"12345678903\"}","verneplikt":"{\"avtjentVerneplikt\":\"ja\"}"},"søknad_uuid":"123e4567-e89b-12d3-a456-426614174000","fødselsnummer":"12345678903","versjon_navn":"Dagpenger_v2"}"""
             message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
         }
     }
@@ -48,6 +50,7 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
     private val søknadsData =
         mapOf(
             "personalia" to """{"navn":"Ola Nordmann","fødselsnummer":"$ident"}""",
+            "verneplikt" to """{"avtjentVerneplikt":"ja"}""",
         )
 
     private val genererOgMellomlagreSøknadPdfLøsning =
