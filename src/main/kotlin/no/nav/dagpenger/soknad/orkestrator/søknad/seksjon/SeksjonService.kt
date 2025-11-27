@@ -6,44 +6,44 @@ class SeksjonService(
     val seksjonRepository: SeksjonRepository,
 ) {
     fun lagre(
-        ident: String,
         søknadId: UUID,
+        ident: String,
         seksjonId: String,
         seksjonsvar: String,
         dokumentasjonskrav: String? = null,
         pdfGrunnlag: String,
     ) {
-        seksjonRepository.lagre(ident, søknadId, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
     }
 
     fun hentSeksjonsvar(
-        ident: String,
         søknadId: UUID,
+        ident: String,
         seksjonId: String,
-    ): String? = seksjonRepository.hentSeksjonsvar(ident, søknadId, seksjonId)
+    ): String? = seksjonRepository.hentSeksjonsvar(søknadId, ident, seksjonId)
 
     fun hentAlleSeksjonsvar(
-        ident: String,
         søknadId: UUID,
-    ): List<Seksjon> = seksjonRepository.hentSeksjoner(ident, søknadId)
+        ident: String,
+    ): List<Seksjon> = seksjonRepository.hentSeksjoner(søknadId, ident)
 
     fun hentSeksjonIdForAlleLagredeSeksjoner(
-        ident: String,
         søknadId: UUID,
-    ): List<String> = seksjonRepository.hentSeksjonIdForAlleLagredeSeksjoner(ident, søknadId)
+        ident: String,
+    ): List<String> = seksjonRepository.hentSeksjonIdForAlleLagredeSeksjoner(søknadId, ident)
 
     fun lagreDokumentasjonskrav(
-        ident: String,
         søknadId: UUID,
+        ident: String,
         seksjonId: String,
         dokumentasjonskrav: String? = null,
-    ) = seksjonRepository.lagreDokumentasjonskrav(ident, søknadId, seksjonId, dokumentasjonskrav)
+    ) = seksjonRepository.lagreDokumentasjonskrav(søknadId, ident, seksjonId, dokumentasjonskrav)
 
     fun hentDokumentasjonskrav(
-        ident: String,
         søknadId: UUID,
+        ident: String,
         seksjonId: String,
-    ) = seksjonRepository.hentDokumentasjonskrav(ident, søknadId, seksjonId)
+    ) = seksjonRepository.hentDokumentasjonskrav(søknadId, ident, seksjonId)
 }
 
 data class Seksjon(

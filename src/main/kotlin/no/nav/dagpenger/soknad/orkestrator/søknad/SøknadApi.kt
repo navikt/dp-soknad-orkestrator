@@ -62,7 +62,7 @@ internal fun Application.søknadApi(
                             }
 
                         val progress =
-                            seksjonService.hentSeksjonIdForAlleLagredeSeksjoner(call.ident(), søknadId)
+                            seksjonService.hentSeksjonIdForAlleLagredeSeksjoner(søknadId, call.ident())
 
                         if (progress.isEmpty()) {
                             call.respond(NotFound, mapOf("seksjoner" to progress))
@@ -81,7 +81,7 @@ internal fun Application.søknadApi(
                             }
 
                         val dokumentasjonskrav =
-                            søknadService.hentDokumentasjonskrav(call.ident(), søknadId)
+                            søknadService.hentDokumentasjonskrav(søknadId, call.ident())
 
                         if (dokumentasjonskrav.isEmpty()) {
                             call.respond(NotFound)

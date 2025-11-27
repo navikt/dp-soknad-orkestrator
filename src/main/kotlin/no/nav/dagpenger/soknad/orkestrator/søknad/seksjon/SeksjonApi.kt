@@ -23,8 +23,8 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                     val seksjonId = validerSeksjonIdParam() ?: return@put
                     val putSeksjonRequestBody = call.receive<PutSeksjonRequestBody>()
                     seksjonService.lagre(
-                        call.ident(),
                         søknadId,
+                        call.ident(),
                         seksjonId,
                         putSeksjonRequestBody.seksjon,
                         putSeksjonRequestBody.dokumentasjonskrav,
@@ -37,14 +37,14 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                     val seksjonId = validerSeksjonIdParam() ?: return@get
 
                     val seksjonsvar =
-                        seksjonService.hentSeksjonsvar(call.ident(), søknadId, seksjonId)
+                        seksjonService.hentSeksjonsvar(søknadId, call.ident(), seksjonId)
                             ?: run {
                                 call.respond(NotFound, "Fant ikke seksjon med id $seksjonId for søknad $søknadId")
                                 return@get
                             }
 
                     val dokumentasjonskrav =
-                        seksjonService.hentDokumentasjonskrav(call.ident(), søknadId, seksjonId)
+                        seksjonService.hentDokumentasjonskrav(søknadId, call.ident(), seksjonId)
 
                     call.respond(
                         OK,
@@ -63,8 +63,8 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                         val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
                         val seksjonId = validerSeksjonIdParam() ?: return@put
                         seksjonService.lagreDokumentasjonskrav(
-                            call.ident(),
                             søknadId,
+                            call.ident(),
                             seksjonId,
                             call.receive<String>(),
                         )
@@ -76,7 +76,7 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                 get {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@get
 
-                    val seksjoner = seksjonService.hentAlleSeksjonsvar(call.ident(), søknadId)
+                    val seksjoner = seksjonService.hentAlleSeksjonsvar(søknadId, call.ident())
 
                     if (seksjoner.isEmpty()) {
                         call.respond(NotFound, "Fant ingen seksjoner for søknad $søknadId")

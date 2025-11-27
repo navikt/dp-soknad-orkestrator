@@ -138,9 +138,9 @@ class SøknadServiceTest {
 
         søknadService.slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()
 
-        verify { seksjonRepository.slettAlleSeksjoner("ident1", søknadId1) }
+        verify { seksjonRepository.slettAlleSeksjoner(søknadId1, "ident1") }
         verify { søknadRepository.slettSøknadSomSystem(søknadId1, "ident1", any()) }
-        verify { seksjonRepository.slettAlleSeksjoner("ident2", søknadId2) }
+        verify { seksjonRepository.slettAlleSeksjoner(søknadId2, "ident2") }
         verify { søknadRepository.slettSøknadSomSystem(søknadId2, "ident2", any()) }
     }
 
@@ -151,7 +151,7 @@ class SøknadServiceTest {
 
         søknadService.slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()
 
-        verify(exactly = 0) { seksjonRepository.slettAlleSeksjoner(ident, randomUUID()) }
+        verify(exactly = 0) { seksjonRepository.slettAlleSeksjoner(randomUUID(), ident) }
         verify(exactly = 0) { søknadRepository.slettSøknadSomSystem(randomUUID(), ident, any()) }
     }
 

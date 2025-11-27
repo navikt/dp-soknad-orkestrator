@@ -160,7 +160,7 @@ class BarnetilleggBehovLøserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, Barnetillegg))
 
-        verify(exactly = 1) { seksjonRepository.hentSeksjonsvar(ident, søknadId, "barnetillegg") }
+        verify(exactly = 1) { seksjonRepository.hentSeksjonsvar(søknadId, ident, "barnetillegg") }
         val løsteBarn = testRapid.inspektør.field(0, "@løsning")[Barnetillegg.name]["verdi"]
         løsteBarn.size() shouldBe 3
         løsteBarn[0].also {

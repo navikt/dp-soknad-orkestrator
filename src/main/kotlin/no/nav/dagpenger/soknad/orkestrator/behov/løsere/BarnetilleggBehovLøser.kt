@@ -63,8 +63,8 @@ class BarnetilleggBehovLøser(
 
         val seksjonsvar =
             seksjonRepository.hentSeksjonsvar(
-                ident,
                 søknadId,
+                ident,
                 "barnetillegg",
             ) ?: return emptyList()
 

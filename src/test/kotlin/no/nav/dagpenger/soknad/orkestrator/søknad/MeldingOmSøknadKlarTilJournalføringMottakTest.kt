@@ -38,8 +38,8 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
 
         verify { søknadRepository.markerSøknadSomInnsendt(søknadId, ident, innsendtTidspunkt) }
-        verify { pdfPayloadService.genererBruttoPdfPayload(ident, søknadId) }
-        verify { pdfPayloadService.genererNettoPdfPayload(ident, søknadId) }
+        verify { pdfPayloadService.genererBruttoPdfPayload(søknadId, ident) }
+        verify { pdfPayloadService.genererNettoPdfPayload(søknadId, ident) }
         rapidsConnection.inspektør.size shouldBe 1
         rapidsConnection.inspektør.message(0)["@behov"][0].asText() shouldBe "generer_og_mellomlagre_søknad_pdf"
     }

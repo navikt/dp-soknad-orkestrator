@@ -88,8 +88,8 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                             BehovForGenereringOgMellomlagringAvSøknadPdf(
                                 søknadId,
                                 ident,
-                                pdfPayloadService.genererBruttoPdfPayload(ident, søknadId),
-                                pdfPayloadService.genererNettoPdfPayload(ident, søknadId),
+                                pdfPayloadService.genererBruttoPdfPayload(søknadId, ident),
+                                pdfPayloadService.genererNettoPdfPayload(søknadId, ident),
                             ).asMessage().toJson(),
                         )
                         logg.info { "Publiserte melding om behov for generering av søknad-PDF for søknad $søknadId " }
