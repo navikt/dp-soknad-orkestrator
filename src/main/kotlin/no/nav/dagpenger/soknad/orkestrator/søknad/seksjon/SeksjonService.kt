@@ -52,12 +52,14 @@ class SeksjonService(
         søknadId: UUID,
     ): Map<String, String> {
         val hentAlleSeksjoner = seksjonRepository.hentSeksjoner(ident, søknadId)
-        return hentAlleSeksjoner.map {
-            val seksjonId = it.seksjonId
-            val seksjonSvarToJson = Json.parseToJsonElement(it.data).jsonObject
+        val seksjonIdOgSvarMap = mutableMapOf<String, String>()
+        for (seksjon in hentAlleSeksjoner) {
+            val seksjonId = seksjon.seksjonId
+            val seksjonSvarToJson = Json.parseToJsonElement(seksjon.data).jsonObject
             val seksjonsvar = seksjonSvarToJson["seksjonsvar"]?.toString() ?: ""
-            seksjonId to seksjonsvar
-        } as Map<String, String>
+            seksjonIdOgSvarMap[seksjonId] = seksjonsvar
+        }
+        return seksjonIdOgSvarMap
     }
 }
 
