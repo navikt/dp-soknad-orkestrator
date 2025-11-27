@@ -71,8 +71,8 @@ class PdfPayloadServiceTest {
     fun `genererNettoPdfPayload returnerer forventet resultat hvis søknad og personalia for søknaden eksisterer`() {
         val nettoPdfPayload =
             pdfPayloadService.genererNettoPdfPayload(
-                ident,
                 randomUUID(),
+                ident,
             )
 
         nettoPdfPayload shouldBe
@@ -89,8 +89,8 @@ class PdfPayloadServiceTest {
         val exception =
             shouldThrow<IllegalStateException> {
                 pdfPayloadService.genererNettoPdfPayload(
-                    ident,
                     søknadId,
+                    ident,
                 )
             }
 
@@ -105,8 +105,8 @@ class PdfPayloadServiceTest {
         val exception =
             shouldThrow<IllegalStateException> {
                 pdfPayloadService.genererNettoPdfPayload(
-                    ident,
                     søknadId,
+                    ident,
                 )
             }
 
@@ -121,8 +121,8 @@ class PdfPayloadServiceTest {
         val exception =
             shouldThrow<IllegalStateException> {
                 pdfPayloadService.genererNettoPdfPayload(
-                    ident,
                     søknadId,
+                    ident,
                 )
             }
 
@@ -133,8 +133,8 @@ class PdfPayloadServiceTest {
     fun `genererBruttoPdfPayload returnerer forventet resultat hvis søknad og personalia for søknaden eksisterer`() {
         val bruttoPdfPayload =
             pdfPayloadService.genererBruttoPdfPayload(
-                ident,
                 randomUUID(),
+                ident,
             )
 
         bruttoPdfPayload shouldBe
@@ -151,8 +151,8 @@ class PdfPayloadServiceTest {
         val exception =
             shouldThrow<IllegalStateException> {
                 pdfPayloadService.genererBruttoPdfPayload(
-                    ident,
                     søknadId,
+                    ident,
                 )
             }
 
@@ -167,8 +167,8 @@ class PdfPayloadServiceTest {
         val exception =
             shouldThrow<IllegalStateException> {
                 pdfPayloadService.genererBruttoPdfPayload(
-                    ident,
                     søknadId,
+                    ident,
                 )
             }
 
@@ -183,8 +183,8 @@ class PdfPayloadServiceTest {
         val exception =
             shouldThrow<IllegalStateException> {
                 pdfPayloadService.genererBruttoPdfPayload(
-                    ident,
                     søknadId,
+                    ident,
                 )
             }
 

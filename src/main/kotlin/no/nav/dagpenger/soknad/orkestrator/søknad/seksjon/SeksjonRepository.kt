@@ -24,8 +24,8 @@ class SeksjonRepository(
     val database = Database.connect(dataSource)
 
     fun lagre(
-        ident: String,
         søknadId: UUID,
+        ident: String,
         seksjonId: String,
         seksjonsvar: String,
         dokumentasjonskrav: String? = null,
@@ -63,8 +63,8 @@ class SeksjonRepository(
     }
 
     fun hentSeksjonsvar(
-        ident: String,
         søknadId: UUID,
+        ident: String,
         seksjonId: String,
     ): String? =
         transaction {
@@ -84,13 +84,13 @@ class SeksjonRepository(
         seksjonId: String,
     ): String =
         transaction {
-            hentSeksjonsvar(ident, søknadId, seksjonId)
+            hentSeksjonsvar(søknadId, ident, seksjonId)
                 ?: throw IllegalStateException("Fant ingen seksjonsvar på $seksjonId for søknad $søknadId")
         }
 
     fun hentSeksjoner(
-        ident: String,
         søknadId: UUID,
+        ident: String,
     ): List<Seksjon> =
         transaction {
             SeksjonV2Tabell
@@ -106,8 +106,8 @@ class SeksjonRepository(
         }
 
     fun hentSeksjonIdForAlleLagredeSeksjoner(
-        ident: String,
         søknadId: UUID,
+        ident: String,
     ): List<String> =
         transaction {
             SeksjonV2Tabell
@@ -120,14 +120,14 @@ class SeksjonRepository(
         }
 
     fun lagreDokumentasjonskrav(
-        ident: String,
         søknadId: UUID,
+        ident: String,
         seksjonId: String,
         dokumentasjonskrav: String?,
     ) = transaction {
         søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
         søknadRepository.verifiserAtSøknadHarForventetTilstand(søknadId, PÅBEGYNT)
-        requireNotNull(hentSeksjonsvar(ident, søknadId, seksjonId)) { "Fant ikke seksjon med ID $seksjonId" }
+        requireNotNull(hentSeksjonsvar(søknadId, ident, seksjonId)) { "Fant ikke seksjon med ID $seksjonId" }
 
         SeksjonV2Tabell.update({ SeksjonV2Tabell.seksjonId eq seksjonId }) {
             if (dokumentasjonskrav != null) {
@@ -156,8 +156,8 @@ class SeksjonRepository(
     }
 
     fun hentDokumentasjonskrav(
-        ident: String,
         søknadId: UUID,
+        ident: String,
         seksjonId: String,
     ) = transaction {
         SeksjonV2Tabell
@@ -170,8 +170,8 @@ class SeksjonRepository(
     }
 
     fun hentPdfGrunnlag(
-        ident: String,
         søknadId: UUID,
+        ident: String,
     ): List<String> =
         transaction {
             SeksjonV2Tabell
@@ -185,8 +185,8 @@ class SeksjonRepository(
         }
 
     fun slettAlleSeksjoner(
-        ident: String,
         søknadId: UUID,
+        ident: String,
     ) = transaction {
         søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
         SeksjonV2Tabell.deleteWhere { SeksjonV2Tabell.søknadId eq søknadId }

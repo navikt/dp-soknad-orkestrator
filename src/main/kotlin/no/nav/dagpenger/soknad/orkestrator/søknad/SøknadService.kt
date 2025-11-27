@@ -104,7 +104,7 @@ class SøknadService(
             "Fant ${søknader.size} søknad${if (søknader.size != 1) "er" else ""} som er i tilstand PÅBEGYNT, og som ikke er oppdatert på 7 dager"
         }
         søknader.forEach { søknad ->
-            seksjonRepository.slettAlleSeksjoner(søknad.ident, søknad.søknadId)
+            seksjonRepository.slettAlleSeksjoner(søknad.søknadId, søknad.ident)
             søknadRepository.slettSøknadSomSystem(søknad.søknadId, søknad.ident)
 
             sikkerlogg.info { "Automatisk jobb slettet søknad ${søknad.søknadId} og tilhørende seksjoner opprettet av ${søknad.ident}" }
@@ -112,8 +112,8 @@ class SøknadService(
     }
 
     fun hentDokumentasjonskrav(
-        ident: String,
         søknadId: UUID,
+        ident: String,
     ) = seksjonRepository.hentDokumentasjonskrav(søknadId, ident)
 
     fun opprettDokumenterFraDokumentasjonskrav(

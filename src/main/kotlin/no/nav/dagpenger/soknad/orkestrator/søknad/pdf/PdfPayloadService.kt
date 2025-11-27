@@ -29,18 +29,18 @@ class PdfPayloadService(
     private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
 
     fun genererBruttoPdfPayload(
-        ident: String,
         søknadId: UUID,
-    ): String = genererPdfPayload(ident, søknadId, "brutto-pdf.ftl")
+        ident: String,
+    ): String = genererPdfPayload(søknadId, ident, "brutto-pdf.ftl")
 
     fun genererNettoPdfPayload(
-        ident: String,
         søknadId: UUID,
-    ): String = genererPdfPayload(ident, søknadId, "netto-pdf.ftl")
+        ident: String,
+    ): String = genererPdfPayload(søknadId, ident, "netto-pdf.ftl")
 
     private fun genererPdfPayload(
-        ident: String,
         søknadId: UUID,
+        ident: String,
         mal: String,
     ): String {
         val søknad = søknadRepository.hent(søknadId) ?: throw IllegalStateException("Fant ikke søknad $søknadId")
@@ -49,7 +49,7 @@ class PdfPayloadService(
                 ?: throw IllegalStateException("Fant ikke personalia for søknad $søknadId")
         val pdfGrunnlag =
             seksjonRepository
-                .hentPdfGrunnlag(ident, søknadId)
+                .hentPdfGrunnlag(søknadId, ident)
                 .also { if (it.isEmpty()) throw IllegalStateException("Fant ikke PDF-grunnlag for søknad $søknadId") }
                 .joinToString(",")
 
