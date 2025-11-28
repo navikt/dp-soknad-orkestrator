@@ -269,8 +269,9 @@ class SøknadApiTest {
     fun `DELETE søknad med søknadId returnerer 200 OK hvis sletting av seksjoner går bra`() {
         val søknadId = randomUUID()
         every {
-            søknadService.slett(søknadId, any())
+            søknadService.slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(søknadId, any())
         } returns Unit
+
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client.delete("/soknad/$søknadId") {
@@ -284,6 +285,7 @@ class SøknadApiTest {
     @Test
     fun `DELETE søknad med søknadId returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
         val søknadId = randomUUID()
+
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client.delete("/soknad/$søknadId")
@@ -309,8 +311,9 @@ class SøknadApiTest {
     fun `DELETE søknad returnerer 500 Internal Server Error hvis sletting av seksjoner feiler`() {
         val søknadId = randomUUID()
         every {
-            søknadService.slett(søknadId, any())
+            søknadService.slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(søknadId, any())
         } throws IllegalStateException()
+
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
             val response =
                 client.delete("/soknad/$søknadId") {

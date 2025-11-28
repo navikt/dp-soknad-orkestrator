@@ -11,6 +11,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepositor
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadInnsendt
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføring
+import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadSlettet
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import java.util.UUID
 
@@ -60,7 +61,15 @@ class SøknadService(
         sikkerlogg.info { "Publiserte melding om ny søknad med søknadId: $søknadId og ident: $ident" }
     }
 
-    internal fun slett(
+    internal fun slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(
+        søknadId: UUID,
+        ident: String,
+    ) {
+        slettSøknadOgInkrementerMetrikk(søknadId, ident)
+        rapidsConnection.publish(ident, MeldingOmSøknadSlettet(søknadId, ident).asMessage().toJson())
+    }
+
+    internal fun slettSøknadOgInkrementerMetrikk(
         søknadId: UUID,
         ident: String,
     ) {
@@ -106,6 +115,10 @@ class SøknadService(
         søknader.forEach { søknad ->
             seksjonRepository.slettAlleSeksjoner(søknad.søknadId, søknad.ident)
             søknadRepository.slettSøknadSomSystem(søknad.søknadId, søknad.ident)
+            rapidsConnection.publish(
+                søknad.ident,
+                MeldingOmSøknadSlettet(søknad.søknadId, søknad.ident).asMessage().toJson(),
+            )
 
             sikkerlogg.info { "Automatisk jobb slettet søknad ${søknad.søknadId} og tilhørende seksjoner opprettet av ${søknad.ident}" }
         }
