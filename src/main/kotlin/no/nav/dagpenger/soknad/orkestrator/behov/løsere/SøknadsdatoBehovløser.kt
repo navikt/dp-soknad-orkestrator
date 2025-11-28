@@ -33,6 +33,7 @@ class SøknadsdatoBehovløser(
             val svarPåBehov = innsendtTidspunkt.toLocalDate()
             return publiserLøsning(behovmelding, svarPåBehov)
         }
+
         throw IllegalStateException("Kan ikke finne søknadsdato for søknad ${behovmelding.søknadId} og behovet $behov")
     }
 }
