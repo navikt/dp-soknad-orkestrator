@@ -43,7 +43,7 @@ class SøknadSlettetMottak(
             val søknadId = packet["søknad_uuid"].asUUID()
             val ident = packet["ident"].asText()
 
-            søknadService.slett(søknadId, ident)
+            søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident)
         }
     }
 
