@@ -53,12 +53,13 @@ jobs:
     needs: [ build ]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     environment: dev-gcp
     steps:
       - uses: actions/checkout@v6
       - uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: dev-gcp
           RESOURCE: .nais/app.yaml
           VARS: .nais/vars-dev.yaml
@@ -69,12 +70,13 @@ jobs:
     needs: [ build, deploy-dev ]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
     environment: prod-gcp
     steps:
       - uses: actions/checkout@v6
       - uses: nais/deploy/actions/deploy@v2
         env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-gcp
           RESOURCE: .nais/app.yaml
           VARS: .nais/vars-prod.yaml
