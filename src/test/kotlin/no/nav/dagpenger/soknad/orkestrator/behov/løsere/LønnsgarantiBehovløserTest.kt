@@ -69,7 +69,7 @@ class LønnsgarantiBehovløserTest {
                 "seksjon": {
                 "registrerteArbeidsforhold": [
                     {
-                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "arbeidsgiver-er-konkurs"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
                     }
                 ]
                 },
@@ -114,7 +114,7 @@ class LønnsgarantiBehovløserTest {
                 "seksjon": {
                 "registrerteArbeidsforhold": [
                     {
-                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "jeg-har-fått-avskjed"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jeg-har-fått-avskjed"
                     }
                 ]
                 },

@@ -68,11 +68,11 @@ class JobbetUtenforNorgeBehovløserTest {
             {
                 "seksjonId": "arbeidsforhold",
                 "seksjon": {
-                "hvordan-har-du-jobbet": "jobbet-mer-igjennomsnitt-de-siste-36-månedene-enn-de-siste-12-månedenen",
-                "har-du-jobbet-i-et-annet-eøs-land-sveits-eller-storbritannia-i-løpet-av-de-siste-36-månedene": "nei",
+                "hvordanHarDuJobbet": "jobbet-mer-igjennomsnitt-de-siste-36-månedene-enn-de-siste-12-månedenen",
+                "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "nei",
                 "registrerteArbeidsforhold": [
                     {
-                        "hvilket-land-jobbet-du-i": "SWE"
+                        "hvilketLandJobbetDuI": "SWE"
                     }
                 ]
                 },
@@ -116,11 +116,11 @@ class JobbetUtenforNorgeBehovløserTest {
             {
                 "seksjonId": "arbeidsforhold",
                 "seksjon": {
-                "hvordan-har-du-jobbet": "jobbet-mer-igjennomsnitt-de-siste-36-månedene-enn-de-siste-12-månedenen",
-                "har-du-jobbet-i-et-annet-eøs-land-sveits-eller-storbritannia-i-løpet-av-de-siste-36-månedene": "nei",
+                "hvordanHarDuJobbet": "jobbet-mer-igjennomsnitt-de-siste-36-månedene-enn-de-siste-12-månedenen",
+                "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "nei",
                 "registrerteArbeidsforhold": [
                     {
-                        "hvilket-land-jobbet-du-i": "NOR"
+                        "hvilketLandJobbetDuI": "NOR"
                     }
                 ]
                 },

@@ -73,7 +73,7 @@ class KanJobbeHvorSomHelstBehovløserTest {
             """
             {
               "seksjon": {
-                "kan-du-jobbe-i-hele-norge": "ja"
+                "kanDuJobbeIHeleNorge": "ja"
               },
               "versjon": 1
             }

@@ -73,7 +73,7 @@ class AndreØkonomiskeYtelserBehovløserTest {
             """
             {
               "seksjon": {
-                "får-eller-kommer-til-å-få-lønn-eller-andre-goder-fra-tidligere-arbeidsgiver": "ja"
+                "fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver": "ja"
               },
               "versjon": 1
             }

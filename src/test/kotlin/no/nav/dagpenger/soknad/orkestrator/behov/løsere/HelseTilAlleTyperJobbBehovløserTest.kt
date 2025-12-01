@@ -73,7 +73,7 @@ class HelseTilAlleTyperJobbBehovløserTest {
             """
             {
               "seksjon": {
-                "kan-du-ta-alle-typer-arbeid": "ja"
+                "kanDuTaAlleTyperArbeid": "ja"
               },
               "versjon": 1
             }

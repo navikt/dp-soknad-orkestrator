@@ -73,7 +73,7 @@ class VilligTilÅBytteYrkeBehovløserTest {
             """
             {
               "seksjon": {
-                "er-du-villig-til-å-bytte-yrke-eller-gå-ned-i-lønn": "ja"
+                "erDuVilligTilÅBytteYrkeEllerGåNedILønn": "ja"
               },
               "versjon": 1
             }

@@ -70,10 +70,10 @@ class OrdinærBehovløserTest {
                 "seksjon": {
                 "registrerteArbeidsforhold": [
                     {
-                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "arbeidsgiver-er-konkurs"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
                     },
                     {
-                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "jeg-er-permitert"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
                     }
                 ]
                 },
@@ -117,10 +117,10 @@ class OrdinærBehovløserTest {
                 "seksjon": {
                 "registrerteArbeidsforhold": [
                     {
-                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "kontrakten-er-ugått"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "kontraktenErUgått"
                     },
                     {
-                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "arbeidsgiver-er-konkurs"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
                     }
                 ]
                 },

@@ -77,7 +77,7 @@ class HarTilleggsopplysningerBehovløserTest {
             """
             {
                 "seksjon": {
-                    "har-tilleggsopplysninger": "ja"
+                    "harTilleggsopplysninger": "ja"
                 }
             }
             """.trimIndent()

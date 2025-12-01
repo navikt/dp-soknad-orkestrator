@@ -72,7 +72,7 @@ class EØSArbeidBehovløserTest {
             """
             {
               "seksjon": {
-                "har-du-jobbet-i-et-annet-eøs-land-sveits-eller-storbritannia-i-løpet-av-de-siste-36-månedene": "ja"
+                "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "ja"
               },
               "versjon": 1
             }

@@ -49,7 +49,7 @@ class JobbetUtenforNorgeBehovløser(
             }
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
-            seksjonsJson.findPath("hvilketLandJobbetDuI")?.let {
+            seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.any { arbeidsforhold ->
                         arbeidsforhold["hvilketLandJobbetDuI"].asText() != landkodeNorge

@@ -72,8 +72,8 @@ class ØnsketArbeidstidBehovløserTest {
             """
             {
               "seksjon": {
-                "kan-du-jobbe-både-heltid-og-deltid": "nei",
-                "kan-ikke-jobbe-både-heltid-og-deltid-antall-timer": "27"
+                "kanDuJobbeBådeHeltidOgDeltid": "nei",
+                "kanIkkeJobbeBådeHeltidOgDeltidAntallTimer": "27"
               },
               "versjon": 1
             }

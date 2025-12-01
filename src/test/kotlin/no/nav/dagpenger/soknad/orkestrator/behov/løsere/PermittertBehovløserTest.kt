@@ -69,7 +69,7 @@ class PermittertBehovløserTest {
                 "seksjon": {
                 "registrerteArbeidsforhold": [
                     {
-                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "jeg-er-permitert"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
                     }
                 ]
                 },
@@ -114,7 +114,7 @@ class PermittertBehovløserTest {
                 "seksjon": {
                 "registrerteArbeidsforhold": [
                     {
-                        "hvordan-har-dette-arbeidsforholdet-endret-seg": "arbeidsgiver-er-konkurs"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
                     }
                 ]
                 },

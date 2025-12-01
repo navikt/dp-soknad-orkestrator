@@ -73,7 +73,7 @@ class EgenNæringsvirksomhetBehovløserTest {
             """
             {
               "seksjon": {
-                "driver-du-egen-næringsvirksomhet": "ja"
+                "driverDuEgenNæringsvirksomhet": "ja"
               },
               "versjon": 1
             }
