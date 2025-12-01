@@ -102,12 +102,19 @@ class SøknadServiceTest {
     }
 
     @Test
-    fun `slett gjør kall til repository med forventet søknadId`() {
+    @Suppress("ktlint:standard:max-line-length")
+    fun `slettSøknadInkrementerMetrikkOgSendMeldingOmSletting gjør kall til repository med forventet søknadId og sender forventet melding`() {
         val søknadId = randomUUID()
 
-        søknadService.slett(søknadId, ident)
+        søknadService.slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(søknadId, ident)
 
         verify { søknadRepository.slett(søknadId, ident) }
+        with(testRapid.inspektør) {
+            size shouldBe 1
+            field(0, "@event_name").asText() shouldBe "søknad_slettet"
+            field(0, "søknad_uuid").asText() shouldBe søknadId.toString()
+            field(0, "ident").asText() shouldBe ident
+        }
     }
 
     @Test
@@ -127,21 +134,32 @@ class SøknadServiceTest {
     }
 
     @Test
-    fun `slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager sletter alle søknader som skal slettes`() {
+    fun `slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager sletter alle søknader som skal slettes og sender forventede meldinger`() {
         val søknadId1 = randomUUID()
         val søknadId2 = randomUUID()
+        val ident1 = "ident1"
+        val ident2 = "ident2"
         every { søknadRepository.hentAlleSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager() } returns
             listOf(
-                Søknad(søknadId1, "ident1"),
-                Søknad(søknadId2, "ident2"),
+                Søknad(søknadId1, ident1),
+                Søknad(søknadId2, ident2),
             )
 
         søknadService.slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()
 
-        verify { seksjonRepository.slettAlleSeksjoner(søknadId1, "ident1") }
-        verify { søknadRepository.slettSøknadSomSystem(søknadId1, "ident1", any()) }
-        verify { seksjonRepository.slettAlleSeksjoner(søknadId2, "ident2") }
-        verify { søknadRepository.slettSøknadSomSystem(søknadId2, "ident2", any()) }
+        verify { seksjonRepository.slettAlleSeksjoner(søknadId1, ident1) }
+        verify { søknadRepository.slettSøknadSomSystem(søknadId1, ident1, any()) }
+        verify { seksjonRepository.slettAlleSeksjoner(søknadId2, ident2) }
+        verify { søknadRepository.slettSøknadSomSystem(søknadId2, ident2, any()) }
+        with(testRapid.inspektør) {
+            size shouldBe 2
+            field(0, "@event_name").asText() shouldBe "søknad_slettet"
+            field(0, "søknad_uuid").asText() shouldBe søknadId1.toString()
+            field(0, "ident").asText() shouldBe ident1
+            field(1, "@event_name").asText() shouldBe "søknad_slettet"
+            field(1, "søknad_uuid").asText() shouldBe søknadId2.toString()
+            field(1, "ident").asText() shouldBe ident2
+        }
     }
 
     @Test
