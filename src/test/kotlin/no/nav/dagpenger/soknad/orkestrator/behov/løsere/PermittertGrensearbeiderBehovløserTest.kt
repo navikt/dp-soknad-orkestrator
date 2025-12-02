@@ -93,8 +93,8 @@ class PermittertGrensearbeiderBehovløserTest {
                 """
                 {
                   "seksjon": {
-                    "reiste-du-hjem-til-landet-du-bor-i": "${testData.first}",
-                    "reiste-du-i-takt-med-rotasjon": "${testData.second}"
+                    "reisteDuHjemTilLandetDuBorI": "${testData.first}",
+                    "reisteDuITaktMedRotasjon": "${testData.second}"
                   },
                   "versjon": 1
                 }

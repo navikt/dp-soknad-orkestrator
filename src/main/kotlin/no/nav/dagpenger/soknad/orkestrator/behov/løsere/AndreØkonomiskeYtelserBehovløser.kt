@@ -21,7 +21,7 @@ class AndreØkonomiskeYtelserBehovløser(
         løsBehovFraSeksjonsData(
             behovmelding,
             "annen-pengestotte",
-            "får-eller-kommer-til-å-få-lønn-eller-andre-goder-fra-tidligere-arbeidsgiver",
+            "fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver",
         )
     }
 }

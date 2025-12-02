@@ -18,6 +18,6 @@ class EgetGårdsbrukBehovløser(
     override val beskrivendeId = "faktum.driver-du-eget-gaardsbruk"
 
     override fun løs(behovmelding: Behovmelding) {
-        løsBehovFraSeksjonsData(behovmelding, "egen-naring", "driver-du-eget-gårdsbruk")
+        løsBehovFraSeksjonsData(behovmelding, "egen-naring", "driverDuEgetGårdsbruk")
     }
 }

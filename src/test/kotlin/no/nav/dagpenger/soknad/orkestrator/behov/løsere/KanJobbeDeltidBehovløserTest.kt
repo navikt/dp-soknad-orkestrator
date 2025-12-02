@@ -73,7 +73,7 @@ class KanJobbeDeltidBehovløserTest {
             """
             {
               "seksjon": {
-                "kan-du-jobbe-både-heltid-og-deltid": "ja"
+                "kanDuJobbeBådeHeltidOgDeltid": "ja"
               },
               "versjon": 1
             }

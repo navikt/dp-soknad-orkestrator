@@ -18,6 +18,6 @@ class EgenNæringsvirksomhetBehovløser(
     override val beskrivendeId = "faktum.driver-du-egen-naering"
 
     override fun løs(behovmelding: Behovmelding) {
-        løsBehovFraSeksjonsData(behovmelding, "egen-naring", "driver-du-egen-næringsvirksomhet")
+        løsBehovFraSeksjonsData(behovmelding, "egen-naring", "driverDuEgenNæringsvirksomhet")
     }
 }

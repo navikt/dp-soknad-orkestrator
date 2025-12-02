@@ -40,7 +40,7 @@ class EØSArbeidBehovløser(
             }
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
-            seksjonsJson.findPath("har-du-jobbet-i-et-annet-eøs-land-sveits-eller-storbritannia-i-løpet-av-de-siste-36-månedene")?.let {
+            seksjonsJson.findPath("harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene")?.let {
                 if (!it.isMissingOrNull()) {
                     return publiserLøsning(behovmelding, it.erBoolean())
                 }

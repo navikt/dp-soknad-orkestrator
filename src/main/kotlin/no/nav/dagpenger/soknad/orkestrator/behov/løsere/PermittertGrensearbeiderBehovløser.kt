@@ -60,7 +60,7 @@ class PermittertGrensearbeiderBehovløser(
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             val reistTilbakeEnGangEllerMerOpplysning =
-                seksjonsJson.findPath("reiste-du-hjem-til-landet-du-bor-i")?.let {
+                seksjonsJson.findPath("reisteDuHjemTilLandetDuBorI")?.let {
                     if (!it.isMissingOrNull()) {
                         it.erBoolean()
                     } else {
@@ -69,7 +69,7 @@ class PermittertGrensearbeiderBehovløser(
                 }
 
             val reistITaktMedRotasjonOpplysning =
-                seksjonsJson.findPath("reiste-du-i-takt-med-rotasjon")?.let {
+                seksjonsJson.findPath("reisteDuITaktMedRotasjon")?.let {
                     if (!it.isMissingOrNull()) {
                         it.erBoolean()
                     } else {

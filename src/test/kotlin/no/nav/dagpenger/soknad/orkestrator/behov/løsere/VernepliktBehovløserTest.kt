@@ -74,7 +74,7 @@ class VernepliktBehovløserTest {
             """
             {
               "seksjon": {
-                "avtjent-verneplikt": "ja"
+                "avtjentVerneplikt": "ja"
               },
               "versjon": 1
             }

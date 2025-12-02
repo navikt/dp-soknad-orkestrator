@@ -74,7 +74,7 @@ class UtdanningEllerVernepliktBehovløserTest {
             """
             {
                  "seksjon": {
-                     "tar-utdanning-eller-opplæring": "ja"
+                     "tarUtdanningEllerOpplæring": "ja"
                  },
                  "versjon": 1
             }

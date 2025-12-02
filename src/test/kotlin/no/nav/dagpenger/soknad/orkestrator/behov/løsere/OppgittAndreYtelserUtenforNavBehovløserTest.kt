@@ -79,7 +79,7 @@ class OppgittAndreYtelserUtenforNavBehovløserTest {
             """
             {
               "seksjon": {
-                "mottar-du-eller-har-du-søkt-om-pengestøtte-fra-andre-enn-nav": "ja"
+                "mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav": "ja"
               },
               "versjon": 1
             }

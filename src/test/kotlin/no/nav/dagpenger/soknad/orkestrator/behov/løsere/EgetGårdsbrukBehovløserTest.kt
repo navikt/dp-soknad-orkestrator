@@ -73,7 +73,7 @@ class EgetGårdsbrukBehovløserTest {
             """
             {
               "seksjon": {
-                "driver-du-eget-gårdsbruk": "ja"
+                "driverDuEgetGårdsbruk": "ja"
               },
               "versjon": 1
             }

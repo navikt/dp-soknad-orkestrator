@@ -82,7 +82,7 @@ class BostedslandErNorgeBehovløserTest {
             """
             {
               "seksjon": {
-                "folkeregistrert-adresse-er-norge-stemmer-det": "$svar"
+                "folkeregistrertAdresseErNorgeStemmerDet": "$svar"
               },
               "versjon": 1
             }

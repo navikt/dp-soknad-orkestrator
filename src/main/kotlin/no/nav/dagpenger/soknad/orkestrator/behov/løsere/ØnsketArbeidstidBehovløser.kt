@@ -39,7 +39,7 @@ class ØnsketArbeidstidBehovløser(
                 return publiserLøsning(behovmelding, 40.0)
             }
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
-            seksjonsJson.findPath("kan-ikke-jobbe-både-heltid-og-deltid-antall-timer")?.let {
+            seksjonsJson.findPath("kanIkkeJobbeBådeHeltidOgDeltidAntallTimer")?.let {
                 if (!it.isMissingOrNull()) {
                     return publiserLøsning(behovmelding, it)
                 }
