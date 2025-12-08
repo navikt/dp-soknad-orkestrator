@@ -7,6 +7,9 @@ on:
 
 jobs:
   test:
+    permissions:
+      checks: write
+      pull-requests: write
     name: Bygg og test Dependabot-PR
     runs-on: ubuntu-latest
     steps:
