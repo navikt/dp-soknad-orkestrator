@@ -43,6 +43,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.OrdinærBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertGrensearbeiderBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdataSTSBBehovsløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.UtdanningEllerOpplæringBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
@@ -59,6 +60,12 @@ class BehovløserFactory(
     seksjonRepository: SeksjonRepository,
     søknadRepository: SøknadRepository,
 ) {
+    private val commonBehovsløser =
+        CommonBehovsløser(
+            opplysningRepository,
+            søknadRepository,
+            seksjonRepository,
+        )
     private val behovløsere: Map<Behov, Behovløser> =
         mapOf(
             OppgittAndreYtelserUtenforNav to
@@ -81,6 +88,7 @@ class BehovløserFactory(
                     opplysningRepository,
                     søknadRepository,
                     seksjonRepository,
+                    commonBehovsløser,
                 ),
             KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             HelseTilAlleTyperJobb to
@@ -178,6 +186,14 @@ class BehovløserFactory(
                 ),
             EgenNæringsvirksomhet to
                 EgenNæringsvirksomhetBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            Behov.SøknadsdataSTSB to
+                SøknadsdataSTSBBehovsløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                    commonBehovsløser,
+                ),
         )
 
     fun behovløserFor(behov: Behov): Behovløser =
@@ -210,5 +226,6 @@ class BehovløserFactory(
         PermittertGrensearbeider,
         EgetGårdsbruk,
         EgenNæringsvirksomhet,
+        SøknadsdataSTSB,
     }
 }
