@@ -5,10 +5,10 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.ktor.server.plugins.NotFoundException
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.SøknadsdataSTSB
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdata
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdataSTSBBehovsløser.AvsluttedeArbeidsforhold.Sluttårsaken
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdataBehovløser.AvsluttedeArbeidsforhold.Sluttårsaken
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -16,58 +16,46 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import java.time.LocalDate
 import java.util.UUID
 
-class SøknadsdataSTSBBehovsløser(
+class SøknadsdataBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
     søknadRepository: SøknadRepository,
     seksjonRepository: SeksjonRepository,
     fellesBehovløserLøsninger: FellesBehovløserLøsninger,
 ) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository, fellesBehovløserLøsninger) {
-    override val behov = SøknadsdataSTSB.name
-    override val beskrivendeId = "behov.søknadsdata-stsb"
+    override val behov = Søknadsdata.name
+    override val beskrivendeId = "behov.søknadsdata"
 
     override fun løs(behovmelding: Behovmelding) {
         if (fellesBehovløserLøsninger == null) return
 
         val journalpostId =
             behovmelding.innkommendePacket.get("journalpostId").asText() ?: throw IllegalStateException(
-                "Mangler journalpostId i behov for søknadsdata STSB for søknadId: ${behovmelding.søknadId}",
+                "Mangler journalpostId i behov for søknadsdata for søknadId: ${behovmelding.søknadId}",
             )
 
         val søknadId =
             søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
-        // Personalia
-        val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
 
-        // arbeidsforhold
+        val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
         val eøsArbeidsforhold = fellesBehovløserLøsninger.harSøkerenHattArbeidsforholdIEøs(beskrivendeId, behovmelding.ident, søknadId)
         val avsluttetArbeidsforhold = finnAvsluttedeArbeidsforhold(behovmelding.ident, søknadId)
-
-        // verneplikt
         val avtjentVerneplikt = avtjentVerneplikt(behovmelding.ident, søknadId)
-
-        // barnetillegg
         val harBarn = harSøkerBarn(behovmelding.ident, søknadId)
-
-        // annen-pengestotte
         val harAndreYtelser = harAndreYtelser(behovmelding.ident, søknadId)
-
-        // din-situasjon
         val ønskerDagpengerFraDato =
             fellesBehovløserLøsninger.ønskerDagpengerFraDato(
                 ident = behovmelding.ident,
                 søknadId = søknadId,
             )
-
-        // reell-arbeidssoker
         val reellArbeidssøker =
             erReellArbeidssøker(
                 behovmelding.ident,
                 søknadId,
             )
 
-        val søknadsdataSTSBResultat =
-            SøknadsdataSTSBResultat(
+        val søknadsdataResultat =
+            SøknadsdataResultType(
                 eøsBostedsland = eøsBostedsland,
                 eøsArbeidsforhold = eøsArbeidsforhold,
                 avtjentVerneplikt = avtjentVerneplikt,
@@ -79,12 +67,11 @@ class SøknadsdataSTSBBehovsløser(
                 reellArbeidssøker = reellArbeidssøker,
             )
 
-        val stsbResultJson = objectMapper.writeValueAsString(søknadsdataSTSBResultat)
-        return publiserLøsning(behovmelding, stsbResultJson)
-        //      return publiserLøsning(behovmelding, søknadId)
+        val søknadsdataJson = objectMapper.writeValueAsString(søknadsdataResultat)
+        return publiserLøsning(behovmelding, søknadsdataJson)
     }
 
-    data class SøknadsdataSTSBResultat(
+    data class SøknadsdataResultType(
         val eøsBostedsland: Boolean,
         val eøsArbeidsforhold: Boolean,
         val avtjentVerneplikt: Boolean,

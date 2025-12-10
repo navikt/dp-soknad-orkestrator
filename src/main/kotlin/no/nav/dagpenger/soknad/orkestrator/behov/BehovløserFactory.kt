@@ -43,7 +43,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.OrdinærBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertGrensearbeiderBehovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdataSTSBBehovsløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdataBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.UtdanningEllerOpplæringBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
@@ -186,8 +186,8 @@ class BehovløserFactory(
                 ),
             EgenNæringsvirksomhet to
                 EgenNæringsvirksomhetBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
-            Behov.SøknadsdataSTSB to
-                SøknadsdataSTSBBehovsløser(
+            Behov.Søknadsdata to
+                SøknadsdataBehovløser(
                     rapidsConnection,
                     opplysningRepository,
                     søknadRepository,
@@ -226,6 +226,6 @@ class BehovløserFactory(
         PermittertGrensearbeider,
         EgetGårdsbruk,
         EgenNæringsvirksomhet,
-        SøknadsdataSTSB,
+        Søknadsdata,
     }
 }

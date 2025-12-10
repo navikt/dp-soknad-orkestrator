@@ -4,7 +4,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.SøknadsdataSTSB
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdata
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
@@ -14,7 +14,7 @@ import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.Test
 
-class SøknadsdataSTSBBehovsløserTest {
+class SøknadsdataBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
@@ -26,7 +26,7 @@ class SøknadsdataSTSBBehovsløserTest {
             seksjonRepository,
         )
     val behovløser =
-        SøknadsdataSTSBBehovsløser(
+        SøknadsdataBehovløser(
             testRapid,
             opplysningRepository,
             søknadRepository,
@@ -55,7 +55,7 @@ class SøknadsdataSTSBBehovsløserTest {
     // use grouped tests for eøsBostedsland true/false
 
     @Test
-    fun `SøknadsdataSTSBBehovsløserTest eøsBostedsland cases`() {
+    fun `SøknadsdataBehovløserTest eøsBostedsland cases`() {
         val cases =
             listOf(
                 Triple("ja", "NOR", false),
@@ -71,9 +71,9 @@ class SøknadsdataSTSBBehovsløserTest {
                 )
             } returns personaliaOrkestratorJson(borINorge, bostedsland)
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
+            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
 
-            testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+            testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"eøsBostedsland\":$expectedEøsBostedsland"
                 løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
                 løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
@@ -83,7 +83,7 @@ class SøknadsdataSTSBBehovsløserTest {
     }
 
     @Test
-    fun `SøknadsdataSTSBBehovsløserTest eøsArbeidsforhold cases`() {
+    fun `SøknadsdataBehovløserTest eøsArbeidsforhold cases`() {
         val cases =
             listOf(
                 Pair("ja", true),
@@ -98,9 +98,9 @@ class SøknadsdataSTSBBehovsløserTest {
                 )
             } returns eøsArbeidsforholdOrkestratorJson(eøsArbeidsforhold)
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
+            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
 
-            testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+            testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"eøsArbeidsforhold\":$expectedEøsArbeidsforhold"
                 løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
                 løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
@@ -110,7 +110,7 @@ class SøknadsdataSTSBBehovsløserTest {
     }
 
     @Test
-    fun `SøknadsdataSTSBBehovsløserTest avtjentVerneplikt cases`() {
+    fun `SøknadsdataBehovløserTest avtjentVerneplikt cases`() {
         val cases =
             listOf(
                 Pair("ja", true),
@@ -125,8 +125,8 @@ class SøknadsdataSTSBBehovsløserTest {
                 )
             } returns avtjentVernepliktOrkestratorJson(avtjentVerneplikt)
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-            testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"avtjentVerneplikt\":$expectedAvtjentVerneplikt"
                 løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
                 løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
@@ -136,7 +136,7 @@ class SøknadsdataSTSBBehovsløserTest {
     }
 
     @Test
-    fun `SøknadsdataSTSBBehovsløserTest har andre ytelser til true så lenge søkeren mottar minst en form for ytelse`() {
+    fun `SøknadsdataBehovløserTest har andre ytelser til true så lenge søkeren mottar minst en form for ytelse`() {
         val cases =
             listOf(
                 Triple("ja", "nei", "nei"),
@@ -164,8 +164,8 @@ class SøknadsdataSTSBBehovsløserTest {
                     fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver,
                 )
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-            testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"harAndreYtelser\":true"
                 løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
                 løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
@@ -175,7 +175,7 @@ class SøknadsdataSTSBBehovsløserTest {
     }
 
     @Test
-    fun `SøknadsdataSTSBBehovsløserTest har andre ytelser til false så lenge søkeren mottar ingen form for ytelse`() {
+    fun `SøknadsdataBehovløserTest har andre ytelser til false så lenge søkeren mottar ingen form for ytelse`() {
         every {
             seksjonRepository.hentSeksjonsvar(
                 søknadId,
@@ -189,8 +189,8 @@ class SøknadsdataSTSBBehovsløserTest {
                 "nei",
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-        testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain "\"harAndreYtelser\":false"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
             løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
@@ -207,8 +207,8 @@ class SøknadsdataSTSBBehovsløserTest {
             )
         } returns arbeidsforholdMedRegistrerteAvsluttedeArbeidsforholdOrkestratorJson()
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-        testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "{\"sluttårsak\":\"SAGT_OPP_AV_ARBEIDSGIVER\",\"fiskeforedling\":false,\"land\":\"NOR\"},{\"sluttårsak\":\"PERMITTERT\",\"fiskeforedling\":true,\"land\":\"SWE\"}"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
@@ -226,8 +226,8 @@ class SøknadsdataSTSBBehovsløserTest {
             )
         } returns arbeidsforholdMedRegistrerteAvsluttedeArbeidsforholdOrkestratorJson()
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-        testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "{\"sluttårsak\":\"SAGT_OPP_AV_ARBEIDSGIVER\",\"fiskeforedling\":false,\"land\":\"NOR\"},{\"sluttårsak\":\"PERMITTERT\",\"fiskeforedling\":true,\"land\":\"SWE\"}"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
@@ -245,8 +245,8 @@ class SøknadsdataSTSBBehovsløserTest {
             )
         } returns arbeidsforholdUtenRegistrerteAvsluttedeArbeidsforholdOrkestratorJson()
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-        testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"avsluttetArbeidsforhold\":[]"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
@@ -264,8 +264,8 @@ class SøknadsdataSTSBBehovsløserTest {
             )
         } returns barnetilleggMedToBarnFraPdlOgUtenManuelLagteBarn()
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-        testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"harBarn\":true"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
@@ -283,8 +283,8 @@ class SøknadsdataSTSBBehovsløserTest {
             )
         } returns barnetilleggMedBarnFraPdlOgManueltLagteBarn()
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-        testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"harBarn\":true"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
@@ -302,8 +302,8 @@ class SøknadsdataSTSBBehovsløserTest {
             )
         } returns barnetilleggMedBarnLagtManuelUtenBarnFraPdl()
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-        testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"harBarn\":true"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
@@ -321,8 +321,8 @@ class SøknadsdataSTSBBehovsløserTest {
             )
         } returns barnetilleggUtenBarn()
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-        testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"harBarn\":false"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
@@ -346,8 +346,8 @@ class SøknadsdataSTSBBehovsløserTest {
                 erDuVilligTilÅBytteYrkeEllerGåNedILønn = "nei",
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-        testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"helse\":true,\"geografi\":false,\"deltid\":true,\"yrke\":false"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
@@ -371,8 +371,8 @@ class SøknadsdataSTSBBehovsløserTest {
                 erDuVilligTilÅBytteYrkeEllerGåNedILønn = "ja",
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-        testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"helse\":true,\"geografi\":true,\"deltid\":true,\"yrke\":true"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
@@ -396,8 +396,8 @@ class SøknadsdataSTSBBehovsløserTest {
                 erDuVilligTilÅBytteYrkeEllerGåNedILønn = "nei",
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, SøknadsdataSTSB))
-        testRapid.inspektør.message(0)["@løsning"]["SøknadsdataSTSB"].also { løsning ->
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"helse\":false,\"geografi\":false,\"deltid\":false,\"yrke\":false"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
