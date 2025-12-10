@@ -10,7 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.utils.erBoolean
 import java.time.LocalDate
 import java.util.UUID
 
-open class CommonBehovsløser(
+open class FellesBehovløserLøsninger(
     val opplysningRepository: QuizOpplysningRepository,
     val søknadRepository: SøknadRepository,
     val seksjonRepository: SeksjonRepository,

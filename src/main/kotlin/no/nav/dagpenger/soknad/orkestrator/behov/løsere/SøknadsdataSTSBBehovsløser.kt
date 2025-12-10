@@ -7,7 +7,7 @@ import io.ktor.server.plugins.NotFoundException
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.SøknadsdataSTSB
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
-import no.nav.dagpenger.soknad.orkestrator.behov.CommonBehovsløser
+import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdataSTSBBehovsløser.AvsluttedeArbeidsforhold.Sluttårsaken
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
@@ -21,13 +21,13 @@ class SøknadsdataSTSBBehovsløser(
     opplysningRepository: QuizOpplysningRepository,
     søknadRepository: SøknadRepository,
     seksjonRepository: SeksjonRepository,
-    commonBehovsløser: CommonBehovsløser,
-) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository, commonBehovsløser) {
+    fellesBehovløserLøsninger: FellesBehovløserLøsninger,
+) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository, fellesBehovløserLøsninger) {
     override val behov = SøknadsdataSTSB.name
     override val beskrivendeId = "behov.søknadsdata-stsb"
 
     override fun løs(behovmelding: Behovmelding) {
-        if (commonBehovsløser == null) return
+        if (fellesBehovløserLøsninger == null) return
 
         val journalpostId =
             behovmelding.innkommendePacket.get("journalpostId").asText() ?: throw IllegalStateException(
@@ -40,7 +40,7 @@ class SøknadsdataSTSBBehovsløser(
         val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
 
         // arbeidsforhold
-        val eøsArbeidsforhold = commonBehovsløser.harSøkerenHattArbeidsforholdIEøs(beskrivendeId, behovmelding.ident, søknadId)
+        val eøsArbeidsforhold = fellesBehovløserLøsninger.harSøkerenHattArbeidsforholdIEøs(beskrivendeId, behovmelding.ident, søknadId)
         val avsluttetArbeidsforhold = finnAvsluttedeArbeidsforhold(behovmelding.ident, søknadId)
 
         // verneplikt
@@ -54,7 +54,7 @@ class SøknadsdataSTSBBehovsløser(
 
         // din-situasjon
         val ønskerDagpengerFraDato =
-            commonBehovsløser.ønskerDagpengerFraDato(
+            fellesBehovløserLøsninger.ønskerDagpengerFraDato(
                 ident = behovmelding.ident,
                 søknadId = søknadId,
             )

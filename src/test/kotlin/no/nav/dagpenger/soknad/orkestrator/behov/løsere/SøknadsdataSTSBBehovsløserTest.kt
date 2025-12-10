@@ -1,13 +1,11 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.SøknadsdataSTSB
-import no.nav.dagpenger.soknad.orkestrator.behov.CommonBehovsløser
+import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
@@ -21,8 +19,8 @@ class SøknadsdataSTSBBehovsløserTest {
     val testRapid = TestRapid()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
-    val commonBehovsløser: CommonBehovsløser =
-        CommonBehovsløser(
+    val fellesBehovløserLøsninger: FellesBehovløserLøsninger =
+        FellesBehovløserLøsninger(
             opplysningRepository,
             søknadRepository,
             seksjonRepository,
@@ -33,7 +31,7 @@ class SøknadsdataSTSBBehovsløserTest {
             opplysningRepository,
             søknadRepository,
             seksjonRepository,
-            commonBehovsløser,
+            fellesBehovløserLøsninger,
         )
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
@@ -421,17 +419,6 @@ fun eøsArbeidsforholdOrkestratorJson(eøsArbeidsforhold: String): String =
 
 fun avtjentVernepliktOrkestratorJson(avtjentVerneplikt: String): String =
     "{\"avtjentVerneplikt\":\"$avtjentVerneplikt\",\"dokumentasjonskrav\":\"null\"}".trimIndent()
-
-fun avtjentVernepliktOrkestratorJsonUtenVerdien(): JsonNode =
-    jacksonObjectMapper().readTree(
-        """
-        {
-          "seksjoner": {
-            "verneplikt": "{\"dokumentasjonskrav\":\"null\"}"
-          }
-        }
-        """.trimIndent(),
-    )
 
 fun annenPengestøtteOrkestratorJson(
     mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav: String,
