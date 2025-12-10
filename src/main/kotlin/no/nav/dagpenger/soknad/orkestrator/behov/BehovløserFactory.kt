@@ -60,8 +60,8 @@ class BehovløserFactory(
     seksjonRepository: SeksjonRepository,
     søknadRepository: SøknadRepository,
 ) {
-    private val commonBehovsløser =
-        CommonBehovsløser(
+    private val fellesBehovløserLøsninger =
+        FellesBehovløserLøsninger(
             opplysningRepository,
             søknadRepository,
             seksjonRepository,
@@ -88,7 +88,7 @@ class BehovløserFactory(
                     opplysningRepository,
                     søknadRepository,
                     seksjonRepository,
-                    commonBehovsløser,
+                    fellesBehovløserLøsninger,
                 ),
             KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             HelseTilAlleTyperJobb to
@@ -192,7 +192,7 @@ class BehovløserFactory(
                     opplysningRepository,
                     søknadRepository,
                     seksjonRepository,
-                    commonBehovsløser,
+                    fellesBehovløserLøsninger,
                 ),
         )
 

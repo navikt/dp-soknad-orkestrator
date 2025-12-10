@@ -7,7 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
-import no.nav.dagpenger.soknad.orkestrator.behov.CommonBehovsløser
+import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
@@ -25,8 +25,8 @@ class EØSArbeidBehovløserTest {
     val testRapid = TestRapid()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
-    val commonBehovsløser =
-        CommonBehovsløser(
+    val fellesBehovløserLøsninger =
+        FellesBehovløserLøsninger(
             opplysningRepository,
             søknadRepository,
             seksjonRepository,
@@ -37,7 +37,7 @@ class EØSArbeidBehovløserTest {
             opplysningRepository,
             søknadRepository,
             seksjonRepository,
-            commonBehovsløser,
+            fellesBehovløserLøsninger,
         )
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()

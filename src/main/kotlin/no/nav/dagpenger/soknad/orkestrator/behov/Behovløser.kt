@@ -20,7 +20,7 @@ abstract class Behovløser(
     val opplysningRepository: QuizOpplysningRepository,
     val søknadRepository: SøknadRepository,
     val seksjonRepository: SeksjonRepository,
-    val commonBehovsløser: CommonBehovsløser? = null,
+    val fellesBehovløserLøsninger: FellesBehovløserLøsninger? = null,
 ) {
     abstract val behov: String
     abstract val beskrivendeId: String
