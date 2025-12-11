@@ -119,7 +119,14 @@ class BehovløserFactory(
                     søknadRepository,
                     seksjonRepository,
                 ),
-            Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            Verneplikt to
+                VernepliktBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                    fellesBehovløserLøsninger,
+                ),
             Lønnsgaranti to
                 LønnsgarantiBehovløser(
                     rapidsConnection,

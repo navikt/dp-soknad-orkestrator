@@ -75,4 +75,36 @@ open class FellesBehovløserLøsninger(
             "Fant ingen opplysning på behov ønskerDagpengerFraDato for søknad med id: $søknadId",
         )
     }
+
+    fun harSøkerenAvtjentVerneplikt(
+        behov: String,
+        beskrivendeId: String,
+        ident: String,
+        søknadId: UUID,
+    ): Boolean {
+        val svarPåBehov =
+            opplysningRepository.hent(beskrivendeId, ident, søknadId)?.svar
+
+        if (svarPåBehov != null) {
+            return svarPåBehov.toString().toBoolean()
+        }
+        val seksjonsSvar =
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident,
+                søknadId,
+                "verneplikt",
+            )
+
+        objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
+            seksjonsJson.findPath("avtjentVerneplikt")?.let {
+                if (!it.isMissingOrNull()) {
+                    return it.erBoolean()
+                }
+            }
+        }
+
+        throw IllegalStateException(
+            "Fant ingen opplysning på behov $behov for søknad med id: $søknadId",
+        )
+    }
 }

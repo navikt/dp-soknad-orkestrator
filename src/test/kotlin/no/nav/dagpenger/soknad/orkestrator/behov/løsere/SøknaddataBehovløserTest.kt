@@ -50,6 +50,14 @@ class SøknadsdataBehovløserTest {
                 "din-situasjon",
             )
         } returns dinSituasjonMedGjenopptakelseOrkestratorJson(now)
+
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                "verneplikt",
+            )
+        } returns avtjentVernepliktOrkestratorJson("ja")
     }
 
     // use grouped tests for eøsBostedsland true/false
