@@ -194,17 +194,13 @@ class SøknadsdataBehovløser(
     fun avtjentVerneplikt(
         ident: String,
         søknadId: UUID,
-    ): Boolean {
-        val seksjonsSvar =
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                ident,
-                søknadId,
-                "verneplikt",
-            )
-
-        val seksjonsData = objectMapper.readTree(seksjonsSvar)
-        return seksjonsData.finnOpplysning("avtjentVerneplikt").asText() == "ja"
-    }
+    ): Boolean =
+        fellesBehovløserLøsninger!!.harSøkerenAvtjentVerneplikt(
+            behov,
+            beskrivendeId,
+            ident,
+            søknadId,
+        )
 
     fun finnAvsluttedeArbeidsforhold(
         ident: String,
