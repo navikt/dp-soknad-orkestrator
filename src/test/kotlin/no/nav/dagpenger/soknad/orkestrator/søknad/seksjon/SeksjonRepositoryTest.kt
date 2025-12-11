@@ -288,14 +288,18 @@ class SeksjonRepositoryTest {
     @Suppress("ktlint:standard:max-line-length")
     fun `lagreDokumentasjonskrav kaster lagrer forventet dokumentasjonskrav hvis input ikke er null og seksjonen det lagres på tilhører en søknad som tilhører bruker som gjør kallet`() {
         val søknadId = randomUUID()
+        val søknadId2 = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        søknadRepository.opprett(Søknad(søknadId2, ident))
+        seksjonRepository.lagre(søknadId2, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
 
         shouldNotThrowAny {
             seksjonRepository.lagreDokumentasjonskrav(søknadId, ident, seksjonId, dokumentasjonskrav2)
         }
 
         seksjonRepository.hentDokumentasjonskrav(søknadId, ident, seksjonId) shouldBe dokumentasjonskrav2
+        seksjonRepository.hentDokumentasjonskrav(søknadId2, ident, seksjonId) shouldBe dokumentasjonskrav
     }
 
     @Test

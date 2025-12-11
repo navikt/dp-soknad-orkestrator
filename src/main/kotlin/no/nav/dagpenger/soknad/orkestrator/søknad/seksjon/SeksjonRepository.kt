@@ -129,7 +129,7 @@ class SeksjonRepository(
         søknadRepository.verifiserAtSøknadHarForventetTilstand(søknadId, PÅBEGYNT)
         requireNotNull(hentSeksjonsvar(søknadId, ident, seksjonId)) { "Fant ikke seksjon med ID $seksjonId" }
 
-        SeksjonV2Tabell.update({ SeksjonV2Tabell.seksjonId eq seksjonId }) {
+        SeksjonV2Tabell.update({ SeksjonV2Tabell.søknadId eq søknadId and (SeksjonV2Tabell.seksjonId eq seksjonId) }) {
             if (dokumentasjonskrav != null) {
                 it[SeksjonV2Tabell.dokumentasjonskrav] = stringLiteral(dokumentasjonskrav)
             } else {
