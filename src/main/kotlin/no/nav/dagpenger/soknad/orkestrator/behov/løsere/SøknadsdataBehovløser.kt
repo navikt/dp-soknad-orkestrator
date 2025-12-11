@@ -38,7 +38,12 @@ class SøknadsdataBehovløser(
             søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
 
         val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
-        val eøsArbeidsforhold = fellesBehovløserLøsninger.harSøkerenHattArbeidsforholdIEøs(beskrivendeId, behovmelding.ident, søknadId)
+        val eøsArbeidsforhold =
+            fellesBehovløserLøsninger.harSøkerenHattArbeidsforholdIEøs(
+                "faktum.eos-arbeid-siste-36-mnd",
+                behovmelding.ident,
+                søknadId,
+            )
         val avsluttetArbeidsforhold = finnAvsluttedeArbeidsforhold(behovmelding.ident, søknadId)
         val avtjentVerneplikt = avtjentVerneplikt(behovmelding.ident, søknadId)
         val harBarn = harSøkerBarn(behovmelding.ident, søknadId)
@@ -259,6 +264,14 @@ class SøknadsdataBehovløser(
         ident: String,
         søknadId: UUID,
     ): Boolean {
+        val svarPåBehov =
+            opplysningRepository.hent("faktum.hvilket-land-bor-du-i", ident, søknadId)
+
+        if (svarPåBehov != null) {
+            var bostedsland = svarPåBehov.svar as String
+            return eøsLandOgSveits.contains(bostedsland)
+        }
+
         val seksjonsSvar =
             seksjonRepository.hentSeksjonsvar(
                 søknadId,

@@ -6,11 +6,15 @@ import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdata
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDate
+import java.time.ZonedDateTime
 import java.util.UUID
 import kotlin.test.Test
 
@@ -46,7 +50,7 @@ class SøknadsdataBehovløserTest {
         every {
             seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
-                søknadId,
+                any(),
                 "din-situasjon",
             )
         } returns dinSituasjonMedGjenopptakelseOrkestratorJson(now)
@@ -60,10 +64,8 @@ class SøknadsdataBehovløserTest {
         } returns avtjentVernepliktOrkestratorJson("ja")
     }
 
-    // use grouped tests for eøsBostedsland true/false
-
     @Test
-    fun `SøknadsdataBehovløserTest eøsBostedsland cases`() {
+    fun `SøknadsdataBehovløserTest eøsBostedsland fra orkestrator søknad`() {
         val cases =
             listOf(
                 Triple("ja", "NOR", false),
@@ -91,7 +93,53 @@ class SøknadsdataBehovløserTest {
     }
 
     @Test
-    fun `SøknadsdataBehovløserTest eøsArbeidsforhold cases`() {
+    fun `SøknadsdataBehovløserTest eøsBostedsland fra quiz søknad`() {
+        val cases =
+            listOf(
+                Pair("NOR", false),
+                Pair("SWE", true),
+                Pair("BRA", false),
+            )
+        cases.forEach { (bostedsland, expectedEøsBostedsland) ->
+            val quizSøknadId = UUID.randomUUID()
+
+            every {
+                søknadRepository.hentSøknadIdFraJournalPostId(any(), any())
+            } returns quizSøknadId
+
+            val opplysning =
+                QuizOpplysning(
+                    beskrivendeId = "faktum.hvilket-land-bor-du-i",
+                    type = Tekst,
+                    svar = bostedsland,
+                    ident = ident,
+                    søknadId = quizSøknadId,
+                )
+            val søknadstidspunkt = ZonedDateTime.now()
+            val søknadstidpsunktOpplysning =
+                QuizOpplysning(
+                    beskrivendeId = "søknadstidspunkt",
+                    type = Tekst,
+                    svar = søknadstidspunkt.toString(),
+                    ident = ident,
+                    søknadId = quizSøknadId,
+                )
+            opplysningRepository.lagre(opplysning)
+            opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+
+            testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+                løsning["verdi"].asText() shouldContain "\"eøsBostedsland\":$expectedEøsBostedsland"
+                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$quizSøknadId\""
+                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            }
+            testRapid.reset()
+        }
+    }
+
+    @Test
+    fun `SøknadsdataBehovløserTest eøsArbeidsforhold orkestrator søknad`() {
         val cases =
             listOf(
                 Pair("ja", true),
@@ -111,6 +159,51 @@ class SøknadsdataBehovløserTest {
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"eøsArbeidsforhold\":$expectedEøsArbeidsforhold"
                 løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            }
+            testRapid.reset()
+        }
+    }
+
+    @Test
+    fun `SøknadsdataBehovløserTest eøsArbeidsforhold quiz søknad`() {
+        val cases =
+            listOf(
+                Pair(true, true),
+                Pair(false, false),
+            )
+        cases.forEach { (eøsArbeidsforhold, expectedEøsArbeidsforhold) ->
+            val quizSøknadId = UUID.randomUUID()
+
+            every {
+                søknadRepository.hentSøknadIdFraJournalPostId(any(), any())
+            } returns quizSøknadId
+
+            val opplysning =
+                QuizOpplysning(
+                    beskrivendeId = "faktum.eos-arbeid-siste-36-mnd",
+                    type = Boolsk,
+                    svar = eøsArbeidsforhold,
+                    ident = ident,
+                    søknadId = quizSøknadId,
+                )
+            val søknadstidspunkt = ZonedDateTime.now()
+            val søknadstidpsunktOpplysning =
+                QuizOpplysning(
+                    beskrivendeId = "søknadstidspunkt",
+                    type = Tekst,
+                    svar = søknadstidspunkt.toString(),
+                    ident = ident,
+                    søknadId = quizSøknadId,
+                )
+            opplysningRepository.lagre(opplysning)
+            opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+
+            testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+                løsning["verdi"].asText() shouldContain "\"eøsArbeidsforhold\":$expectedEøsArbeidsforhold"
+                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$quizSøknadId\""
                 løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
             }
             testRapid.reset()
