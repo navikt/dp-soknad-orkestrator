@@ -7,7 +7,10 @@ import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdata
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
@@ -211,7 +214,7 @@ class SøknadsdataBehovløserTest {
     }
 
     @Test
-    fun `SøknadsdataBehovløserTest avtjentVerneplikt cases`() {
+    fun `SøknadsdataBehovløserTest avtjentVerneplikt orkestrator søknad`() {
         val cases =
             listOf(
                 Pair("ja", true),
@@ -230,6 +233,51 @@ class SøknadsdataBehovløserTest {
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"avtjentVerneplikt\":$expectedAvtjentVerneplikt"
                 løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            }
+            testRapid.reset()
+        }
+    }
+
+    @Test
+    fun `SøknadsdataBehovløserTest avtjentVerneplikt for quiz søknad`() {
+        val cases =
+            listOf(
+                Pair(true, true),
+                Pair(false, false),
+            )
+        cases.forEach { (avtjentVerneplikt, expectedAvtjentVerneplikt) ->
+            val quizSøknadId = UUID.randomUUID()
+
+            every {
+                søknadRepository.hentSøknadIdFraJournalPostId(any(), any())
+            } returns quizSøknadId
+
+            val opplysning =
+                QuizOpplysning(
+                    beskrivendeId = "faktum.avtjent-militaer-sivilforsvar-tjeneste-siste-12-mnd",
+                    type = Boolsk,
+                    svar = avtjentVerneplikt,
+                    ident = ident,
+                    søknadId = quizSøknadId,
+                )
+            val søknadstidspunkt = ZonedDateTime.now()
+            val søknadstidpsunktOpplysning =
+                QuizOpplysning(
+                    beskrivendeId = "søknadstidspunkt",
+                    type = Tekst,
+                    svar = søknadstidspunkt.toString(),
+                    ident = ident,
+                    søknadId = quizSøknadId,
+                )
+            opplysningRepository.lagre(opplysning)
+            opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+
+            testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+                løsning["verdi"].asText() shouldContain "\"avtjentVerneplikt\":$expectedAvtjentVerneplikt"
+                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$quizSøknadId\""
                 løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
             }
             testRapid.reset()
@@ -331,6 +379,61 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "{\"sluttårsak\":\"SAGT_OPP_AV_ARBEIDSGIVER\",\"fiskeforedling\":false,\"land\":\"NOR\"},{\"sluttårsak\":\"PERMITTERT\",\"fiskeforedling\":true,\"land\":\"SWE\"}"
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
+
+    @Test
+    fun `Søker med arbeidsforhold returneres med liste over sluttårsak, permittert fra fiskeforedling og land de jobbet i quiz søknad`() {
+        val arbeidsforhold =
+            listOf(
+                ArbeidsforholdSvar(
+                    navn = "Kiwi",
+                    land = "NOR",
+                    sluttårsak = Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
+                ),
+                ArbeidsforholdSvar(
+                    navn = "Meny",
+                    land = "SWE",
+                    sluttårsak = Sluttårsak.PERMITTERT_FISKEFOREDLING,
+                ),
+            )
+        val opplysning =
+            QuizOpplysning(
+                beskrivendeId = "faktum.arbeidsforhold",
+                type = Arbeidsforhold,
+                svar = arbeidsforhold,
+                ident = ident,
+                søknadId = søknadId,
+            )
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        opplysningRepository.lagre(opplysning)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "{\"sluttårsak\":\"SAGT_OPP_AV_ARBEIDSGIVER\",\"fiskeforedling\":false,\"land\":\"NOR\"},{\"sluttårsak\":\"PERMITTERT\",\"fiskeforedling\":true,\"land\":\"SWE\"}"
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
+
+    @Test
+    fun `Søker uten arbeidsforhold returneres med tom list for quiz søknad`() {
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "\"avsluttetArbeidsforhold\":[]"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
             løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
         }

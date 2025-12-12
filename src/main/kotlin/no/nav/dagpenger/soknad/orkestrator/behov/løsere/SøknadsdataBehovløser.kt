@@ -8,8 +8,10 @@ import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdata
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdataBehovløser.AvsluttedeArbeidsforhold.Sluttårsaken
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
@@ -75,42 +77,6 @@ class SøknadsdataBehovløser(
         val søknadsdataJson = objectMapper.writeValueAsString(søknadsdataResultat)
         return publiserLøsning(behovmelding, søknadsdataJson)
     }
-
-    data class SøknadsdataResultType(
-        val eøsBostedsland: Boolean,
-        val eøsArbeidsforhold: Boolean,
-        val avtjentVerneplikt: Boolean,
-        val avsluttetArbeidsforhold: List<AvsluttedeArbeidsforhold>,
-        val harBarn: Boolean,
-        val harAndreYtelser: Boolean,
-        val ønskerDagpengerFraDato: LocalDate,
-        val søknadId: String,
-        val reellArbeidssøker: ReellArbeidssøker,
-    )
-
-    data class AvsluttedeArbeidsforhold(
-        val sluttårsak: Sluttårsaken,
-        val fiskeforedling: Boolean,
-        val land: String,
-    ) {
-        enum class Sluttårsaken {
-            AVSKJEDIGET,
-            ARBEIDSGIVER_KONKURS,
-            KONTRAKT_UTGAATT,
-            PERMITTERT,
-            REDUSERT_ARBEIDSTID,
-            SAGT_OPP_AV_ARBEIDSGIVER,
-            SAGT_OPP_SELV,
-            IKKE_ENDRET,
-        }
-    }
-
-    data class ReellArbeidssøker(
-        val helse: Boolean,
-        val geografi: Boolean,
-        val deltid: Boolean,
-        val yrke: Boolean,
-    )
 
     private fun erReellArbeidssøker(
         ident: String,
@@ -202,7 +168,7 @@ class SøknadsdataBehovløser(
     ): Boolean =
         fellesBehovløserLøsninger!!.harSøkerenAvtjentVerneplikt(
             behov,
-            beskrivendeId,
+            "faktum.avtjent-militaer-sivilforsvar-tjeneste-siste-12-mnd",
             ident,
             søknadId,
         )
@@ -211,6 +177,20 @@ class SøknadsdataBehovløser(
         ident: String,
         søknadId: UUID,
     ): List<AvsluttedeArbeidsforhold> {
+        val arbeidsforholdOpplysning = opplysningRepository.hent("faktum.arbeidsforhold", ident, søknadId)
+
+        if (arbeidsforholdOpplysning != null) {
+            arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>().let { arbeidsforholdListe ->
+                return arbeidsforholdListe.map {
+                    AvsluttedeArbeidsforhold(
+                        sluttårsak = finnSluttÅrsakForQuiz(it.sluttårsak),
+                        fiskeforedling = it.sluttårsak == Sluttårsak.PERMITTERT_FISKEFOREDLING,
+                        land = it.land,
+                    )
+                }
+            }
+        }
+
         val seksjonsSvar =
             try {
                 seksjonRepository.hentSeksjonsvarEllerKastException(
@@ -242,23 +222,33 @@ class SøknadsdataBehovløser(
     private fun JsonNode.finnOpplysning(navn: String): JsonNode =
         this.findPath(navn) ?: throw NoSuchElementException("Finner ikke opplysning med navn: $navn")
 
-    private fun JsonNode.sluttårsak(): Sluttårsaken =
+    private fun JsonNode.sluttårsak(): Sluttårsak =
         this.findPath("hvordanHarDetteArbeidsforholdetEndretSeg").asText().let {
-            when (it) {
-                "arbeidsforholdetErIkkeEndret" -> Sluttårsaken.IKKE_ENDRET
-                "jegHarFåttAvskjed" -> Sluttårsaken.AVSKJEDIGET
-                "arbeidsgiverenMinHarSagtMegOpp" -> Sluttårsaken.SAGT_OPP_AV_ARBEIDSGIVER
-                "arbeidsgiverErKonkurs" -> Sluttårsaken.ARBEIDSGIVER_KONKURS
-                "kontraktenErUtgått" -> Sluttårsaken.KONTRAKT_UTGAATT
-                "jegHarSagtOppSelv" -> Sluttårsaken.SAGT_OPP_SELV
-                "arbeidstidenErRedusert" -> Sluttårsaken.REDUSERT_ARBEIDSTID
-                "jegErPermitert" -> Sluttårsaken.PERMITTERT
-                else -> throw IllegalArgumentException("Ukjent sluttårsak: $it")
-            }
+            mapSluttÅrsak(it)
+        }
+
+    private fun mapSluttÅrsak(string: String?): Sluttårsak =
+        when (string) {
+            "arbeidsforholdetErIkkeEndret" -> Sluttårsak.IKKE_ENDRET
+            "jegHarFåttAvskjed" -> Sluttårsak.AVSKJEDIGET
+            "arbeidsgiverenMinHarSagtMegOpp" -> Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
+            "arbeidsgiverErKonkurs" -> Sluttårsak.ARBEIDSGIVER_KONKURS
+            "kontraktenErUtgått" -> Sluttårsak.KONTRAKT_UTGAATT
+            "jegHarSagtOppSelv" -> Sluttårsak.SAGT_OPP_SELV
+            "arbeidstidenErRedusert" -> Sluttårsak.REDUSERT_ARBEIDSTID
+            "jegErPermitert" -> Sluttårsak.PERMITTERT
+            else -> throw IllegalArgumentException("Ukjent sluttårsak: $string")
         }
 
     private fun JsonNode.fiskForedling(): Boolean =
         this.finnOpplysning("permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien").asText() == "ja"
+
+    private fun finnSluttÅrsakForQuiz(sluttårsak: Sluttårsak): Sluttårsak {
+        if (sluttårsak == Sluttårsak.PERMITTERT_FISKEFOREDLING) {
+            return Sluttårsak.PERMITTERT
+        }
+        return sluttårsak
+    }
 
     fun eøsBostedsland(
         ident: String,
@@ -321,3 +311,28 @@ class SøknadsdataBehovløser(
             "AUT",
         )
 }
+
+data class SøknadsdataResultType(
+    val eøsBostedsland: Boolean,
+    val eøsArbeidsforhold: Boolean,
+    val avtjentVerneplikt: Boolean,
+    val avsluttetArbeidsforhold: List<AvsluttedeArbeidsforhold>,
+    val harBarn: Boolean,
+    val harAndreYtelser: Boolean,
+    val ønskerDagpengerFraDato: LocalDate,
+    val søknadId: String,
+    val reellArbeidssøker: ReellArbeidssøker,
+)
+
+data class AvsluttedeArbeidsforhold(
+    val sluttårsak: Sluttårsak,
+    val fiskeforedling: Boolean,
+    val land: String,
+)
+
+data class ReellArbeidssøker(
+    val helse: Boolean,
+    val geografi: Boolean,
+    val deltid: Boolean,
+    val yrke: Boolean,
+)
