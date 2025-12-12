@@ -81,6 +81,7 @@ class BehovløserFactory(
                     opplysningRepository,
                     søknadRepository,
                     seksjonRepository,
+                    fellesBehovløserLøsninger,
                 ),
             EØSArbeid to
                 EØSArbeidBehovløser(

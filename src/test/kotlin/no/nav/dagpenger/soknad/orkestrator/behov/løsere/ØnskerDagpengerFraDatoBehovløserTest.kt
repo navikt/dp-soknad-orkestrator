@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnskerDagpengerFraDato
+import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Dato
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
@@ -26,9 +27,11 @@ class ØnskerDagpengerFraDatoBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
+    val fellesBehovLøserLøsninger =
+        FellesBehovløserLøsninger(opplysningRepository, søknadRepository, seksjonRepository)
     val testRapid = TestRapid()
     val behovløser =
-        ØnskerDagpengerFraDatoBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
+        ØnskerDagpengerFraDatoBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository, fellesBehovLøserLøsninger)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 
@@ -38,7 +41,7 @@ class ØnskerDagpengerFraDatoBehovløserTest {
 
         val opplysning =
             QuizOpplysning(
-                beskrivendeId = behovløser.beskrivendeIdSøknadsdato,
+                beskrivendeId = "faktum.dagpenger-soknadsdato",
                 type = Dato,
                 svar = svar,
                 ident = ident,
@@ -73,7 +76,7 @@ class ØnskerDagpengerFraDatoBehovløserTest {
 
         val opplysning =
             QuizOpplysning(
-                beskrivendeId = behovløser.beskrivendeIdGjenopptaksdato,
+                beskrivendeId = "faktum.dagpenger-soknadsdato",
                 type = Dato,
                 svar = svar,
                 ident = ident,
