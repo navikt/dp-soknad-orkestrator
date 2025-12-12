@@ -1,7 +1,10 @@
 package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db
 
 import ArbeidsforholdSvarTabell
+import ArbeidsforholdTabell
 import BarnSvarTabell
+import BarnSøknadMappingTabell
+import BarnTabell
 import BoolskTabell
 import DatoTabell
 import DesimaltallTabell
@@ -9,7 +12,9 @@ import EgenNæringSvarTabell
 import EgenNæringTabell
 import EøsArbeidsforholdSvarTabell
 import FlervalgSvarTabell
+import FlervalgTabell
 import HeltallTabell
+import PeriodeTabell
 import QuizOpplysningTabell
 import TekstTabell
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
