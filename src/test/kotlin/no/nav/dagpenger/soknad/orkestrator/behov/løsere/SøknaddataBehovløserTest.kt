@@ -12,6 +12,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforho
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Dato
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -763,6 +764,112 @@ class SøknadsdataBehovløserTest {
             løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
         }
     }
+
+    @Test
+    fun `Søker som gjenopptar dagpenger fra quiz søknad`() {
+        val søknadstidspunkt = ZonedDateTime.now()
+
+        val gjenopptarDagpengerOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "faktum.arbeidsforhold.gjenopptak.soknadsdato-gjenopptak",
+                type = Dato,
+                svar = søknadstidspunkt.toLocalDate(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        opplysningRepository.lagre(gjenopptarDagpengerOpplysning)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt.toLocalDate()}\""
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
+
+    @Test
+    fun `Søker som dagpenger fra dato fra quiz søknad`() {
+        val søknadstidspunkt = ZonedDateTime.now()
+
+        val dagpengerFraDatoOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "faktum.dagpenger-soknadsdato",
+                type = Dato,
+                svar = søknadstidspunkt.toLocalDate(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        opplysningRepository.lagre(dagpengerFraDatoOpplysning)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt.toLocalDate()}\""
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
+
+    @Test
+    fun `Søker som dagpenger fra dato fra orkestrator søknad`() {
+        val søknadstidspunkt = LocalDate.now()
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident,
+                søknadId,
+                "din-situasjon",
+            )
+        } returns
+            dinSituasjonMedDagpengerFraDato(søknadstidspunkt)
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt}\""
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
+
+    @Test
+    fun `Søker som gjenopptar dagpenger fra orkestrator søknad`() {
+        val søknadstidspunkt = LocalDate.now()
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident,
+                søknadId,
+                "din-situasjon",
+            )
+        } returns
+            dinSituasjonMedGjenopptakelseOrkestratorJson(søknadstidspunkt)
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt}\""
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
 }
 
 fun personaliaOrkestratorJson(
@@ -797,6 +904,9 @@ fun arbeidsforholdUtenRegistrerteAvsluttedeArbeidsforholdOrkestratorJson(): Stri
 
 fun dinSituasjonMedGjenopptakelseOrkestratorJson(now: LocalDate): String =
     "{\"harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene\": \"ja\",\"årsakTilAtDagpengeneBleStanset\": \"dfg\",\"hvilkenDatoSøkerDuGjenopptakFra\": \"$now\"}"
+
+fun dinSituasjonMedDagpengerFraDato(now: LocalDate): String =
+    "{\"seksjonId\":\"din-situasjon\",\"seksjonsvar\":{\"harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene\":\"nei\",\"hvilkenDatoSøkerDuDagpengerFra\":\"$now\"},\"versjon\":1}"
 
 fun barnetilleggMedToBarnFraPdlOgUtenManuelLagteBarn(): String =
     "{\"seksjonId\":\"barnetillegg\",\"versjon\":1,\"seksjonsvar\":{\"barnFraPdl\":[{\"id\":\"e27be3cc-1392-4e38-bf48-4200809da68b\",\"fornavn\":\"SMISKENDE\",\"mellomnavn\":\"\",\"fornavnOgMellomnavn\":\"SMISKENDE\",\"etternavn\":\"KJENNING\",\"fødselsdato\":\"2013-05-26\",\"alder\":12,\"bostedsland\":\"NOR\",\"forsørgerDuBarnet\":\"nei\"},{\"id\":\"0113251a-420e-44d8-99d2-9ba7c5e89aac\",\"fornavn\":\"ENGASJERT\",\"mellomnavn\":\"\",\"fornavnOgMellomnavn\":\"ENGASJERT\",\"etternavn\":\"BUSSTOPP\",\"fødselsdato\":\"2009-11-12\",\"alder\":16,\"bostedsland\":\"NOR\",\"forsørgerDuBarnet\":\"nei\"}],\"forsørgerDuBarnSomIkkeVisesHer\":\"nei\",\"barnLagtManuelt\":null}}"

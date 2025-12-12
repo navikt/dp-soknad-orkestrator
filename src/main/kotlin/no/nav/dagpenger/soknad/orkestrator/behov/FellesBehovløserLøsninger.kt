@@ -52,7 +52,21 @@ open class FellesBehovløserLøsninger(
     fun ønskerDagpengerFraDato(
         ident: String,
         søknadId: UUID,
+        behov: String,
     ): LocalDate {
+        val beskrivendeIdSøknadsdato = "faktum.dagpenger-soknadsdato"
+        val beskrivendeIdGjenopptaksdato = "faktum.arbeidsforhold.gjenopptak.soknadsdato-gjenopptak"
+        val dagpengerFraDatoFelt = "hvilkenDatoSøkerDuDagpengerFra"
+        val gjenopptakFraDatoFelt = "hvilkenDatoSøkerDuGjenopptakFra"
+
+        val svarPåBehov =
+            opplysningRepository.hent(beskrivendeIdSøknadsdato, ident, søknadId)?.svar
+                ?: opplysningRepository.hent(beskrivendeIdGjenopptaksdato, ident, søknadId)?.svar
+
+        if (svarPåBehov != null) {
+            return svarPåBehov.toString().let { LocalDate.parse(it) }
+        }
+
         val seksjonsSvar =
             seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
@@ -61,8 +75,8 @@ open class FellesBehovløserLøsninger(
             )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonssJson ->
-            val dagpengerFraDato = seksjonssJson.findPath("hvilkenDatoSøkerDuDagpengerFra")
-            val gjenopptakFraDato = seksjonssJson.findPath("hvilkenDatoSøkerDuGjenopptakFra")
+            val dagpengerFraDato = seksjonssJson.findPath(dagpengerFraDatoFelt)
+            val gjenopptakFraDato = seksjonssJson.findPath(gjenopptakFraDatoFelt)
 
             if (!dagpengerFraDato.isMissingOrNull()) {
                 return dagpengerFraDato.asLocalDate()
@@ -72,7 +86,7 @@ open class FellesBehovløserLøsninger(
         }
 
         throw IllegalStateException(
-            "Fant ingen opplysning på behov ønskerDagpengerFraDato for søknad med id: $søknadId",
+            "Fant ingen opplysning på behov $behov for søknad med id: $søknadId",
         )
     }
 

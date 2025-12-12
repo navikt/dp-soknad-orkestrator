@@ -27,7 +27,7 @@ class VernepliktBehovløserTest {
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
     val fellesBehovLøserLøsninger =
-        `FellesBehovløserLøsninger`(opplysningRepository, søknadRepository, seksjonRepository)
+        FellesBehovløserLøsninger(opplysningRepository, søknadRepository, seksjonRepository)
     val behovløser = VernepliktBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository, fellesBehovLøserLøsninger)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()

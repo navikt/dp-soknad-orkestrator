@@ -65,11 +65,11 @@ class SøknadsdataBehovløser(
         // check
         val harAndreYtelser = harAndreYtelser(behovmelding.ident, søknadId)
 
-        // check
         val ønskerDagpengerFraDato =
             fellesBehovløserLøsninger.ønskerDagpengerFraDato(
-                ident = behovmelding.ident,
-                søknadId = søknadId,
+                behovmelding.ident,
+                søknadId,
+                behov,
             )
         val reellArbeidssøker =
             erReellArbeidssøker(
