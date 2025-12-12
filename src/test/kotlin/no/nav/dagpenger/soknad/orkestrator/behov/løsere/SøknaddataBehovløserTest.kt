@@ -290,16 +290,16 @@ class SøknadsdataBehovløserTest {
     fun `SøknadsdataBehovløserTest har andre ytelser til true så lenge søkeren mottar minst en form for ytelse`() {
         val cases =
             listOf(
-                Triple("ja", "nei", "nei"),
-                Triple("nei", "ja", "nei"),
-                Triple("nei", "nei", "ja"),
-                Triple("ja", "ja", "ja"),
+                Triple("ja", "nei", true),
+                Triple("nei", "ja", true),
+                Triple("nei", "nei", false),
+                Triple("ja", "ja", true),
             )
         cases.forEach {
             (
                 mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav,
-                harMottattEllerSøktOmPengestøtteFraAndreEøsLand,
                 fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver,
+                forventetHarAndreYtelser,
             ),
             ->
             every {
@@ -311,13 +311,12 @@ class SøknadsdataBehovløserTest {
             } returns
                 annenPengestøtteOrkestratorJson(
                     mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav,
-                    harMottattEllerSøktOmPengestøtteFraAndreEøsLand,
                     fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver,
                 )
 
             behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-                løsning["verdi"].asText() shouldContain "\"harAndreYtelser\":true"
+                løsning["verdi"].asText() shouldContain "\"harAndreYtelser\":$forventetHarAndreYtelser"
                 løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
                 løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
             }
@@ -326,25 +325,66 @@ class SøknadsdataBehovløserTest {
     }
 
     @Test
-    fun `SøknadsdataBehovløserTest har andre ytelser til false så lenge søkeren mottar ingen form for ytelse`() {
-        every {
-            seksjonRepository.hentSeksjonsvar(
-                søknadId,
-                ident,
-                "annen-pengestotte",
+    fun `SøknadsdataBehovløserTest har andre ytelser til true så lenge søkeren mottar minst en form for ytelse Fra Quiz søknad`() {
+        val cases =
+            listOf(
+                Triple(true, false, true),
+                Triple(false, true, true),
+                Triple(false, false, false),
+                Triple(true, true, true),
             )
-        } returns
-            annenPengestøtteOrkestratorJson(
-                "nei",
-                "nei",
-                "nei",
-            )
+        cases.forEach {
+            (
+                mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav,
+                fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver,
+                forventetHarAndreYtelser,
+            ),
+            ->
+            val quizSøknadId = UUID.randomUUID()
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
-        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain "\"harAndreYtelser\":false"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            every {
+                søknadRepository.hentSøknadIdFraJournalPostId(any(), any())
+            } returns quizSøknadId
+
+            val tidligereArbeidsgiverYtelseFraQuiz =
+                QuizOpplysning(
+                    beskrivendeId = "faktum.utbetaling-eller-okonomisk-gode-tidligere-arbeidsgiver",
+                    type = Boolsk,
+                    svar = fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver,
+                    ident = ident,
+                    søknadId = quizSøknadId,
+                )
+
+            val andreYtelserFraQuiz =
+                QuizOpplysning(
+                    beskrivendeId = "faktum.andre-ytelser-mottatt-eller-sokt",
+                    type = Boolsk,
+                    svar = mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav,
+                    ident = ident,
+                    søknadId = quizSøknadId,
+                )
+            val søknadstidspunkt = ZonedDateTime.now()
+            val søknadstidpsunktOpplysning =
+                QuizOpplysning(
+                    beskrivendeId = "søknadstidspunkt",
+                    type = Tekst,
+                    svar = søknadstidspunkt.toString(),
+                    ident = ident,
+                    søknadId = quizSøknadId,
+                )
+            opplysningRepository.lagre(tidligereArbeidsgiverYtelseFraQuiz)
+            opplysningRepository.lagre(andreYtelserFraQuiz)
+            opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+
+            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+                løsning["verdi"].asText() shouldContain "\"harAndreYtelser\":$forventetHarAndreYtelser"
+                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$quizSøknadId\""
+                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            }
+            testRapid.reset()
         }
     }
 
@@ -741,12 +781,10 @@ fun avtjentVernepliktOrkestratorJson(avtjentVerneplikt: String): String =
 
 fun annenPengestøtteOrkestratorJson(
     mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav: String,
-    harMottattEllerSøktOmPengestøtteFraAndreEøsLand: String,
     fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver: String,
 ): String =
     (
         "{\"mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav\":\"$mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav\", " +
-            "\"harMottattEllerSøktOmPengestøtteFraAndreEøsLand\":\"$harMottattEllerSøktOmPengestøtteFraAndreEøsLand\", " +
             "\"fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver\":\"$fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver\"}"
     ).trimIndent()
 

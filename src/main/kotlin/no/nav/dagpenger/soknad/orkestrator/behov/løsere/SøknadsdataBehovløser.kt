@@ -42,17 +42,30 @@ class SøknadsdataBehovløser(
         val søknadId =
             søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
 
+        // check
         val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
+
+        // check
         val eøsArbeidsforhold =
             fellesBehovløserLøsninger.harSøkerenHattArbeidsforholdIEøs(
                 "faktum.eos-arbeid-siste-36-mnd",
                 behovmelding.ident,
                 søknadId,
             )
+
+        // check
         val avsluttetArbeidsforhold = finnAvsluttedeArbeidsforhold(behovmelding.ident, søknadId)
+
+        // check
         val avtjentVerneplikt = avtjentVerneplikt(behovmelding.ident, søknadId)
+
+        // check
         val harBarn = harSøkerBarn(behovmelding.ident, søknadId)
+
+        // check
         val harAndreYtelser = harAndreYtelser(behovmelding.ident, søknadId)
+
+        // check
         val ønskerDagpengerFraDato =
             fellesBehovløserLøsninger.ønskerDagpengerFraDato(
                 ident = behovmelding.ident,
@@ -118,6 +131,20 @@ class SøknadsdataBehovløser(
         ident: String,
         søknadId: UUID,
     ): Boolean {
+        val tidligereArbeidsgiverYtelseFraQuiz =
+            opplysningRepository.hent("faktum.utbetaling-eller-okonomisk-gode-tidligere-arbeidsgiver", ident, søknadId)?.svar
+
+        val andreYtelserFraQuiz = opplysningRepository.hent("faktum.andre-ytelser-mottatt-eller-sokt", ident, søknadId)?.svar
+
+        if (tidligereArbeidsgiverYtelseFraQuiz != null || andreYtelserFraQuiz != null) {
+            val andreYtelserFraQuiz =
+                andreYtelserFraQuiz.toString().toBoolean()
+            val tidligereArbeidsgiver =
+                tidligereArbeidsgiverYtelseFraQuiz.toString().toBoolean()
+
+            return andreYtelserFraQuiz || tidligereArbeidsgiver
+        }
+
         val seksjonsvar =
             seksjonRepository.hentSeksjonsvar(
                 søknadId,
@@ -130,14 +157,10 @@ class SøknadsdataBehovløser(
         val mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav: Boolean =
             annenPengestøtteSeksjon.finnOpplysning("mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav").asText() == "ja"
 
-        val harMottattEllerSøktOmPengestøtteFraAndreEøsLand =
-            annenPengestøtteSeksjon.finnOpplysning("harMottattEllerSøktOmPengestøtteFraAndreEøsLand").asText() == "ja"
-
         val fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver =
             annenPengestøtteSeksjon.finnOpplysning("fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver").asText() == "ja"
 
         return mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav ||
-            harMottattEllerSøktOmPengestøtteFraAndreEøsLand ||
             fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver
     }
 
