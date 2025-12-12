@@ -8,9 +8,12 @@ import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdata
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggV2BehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggV2BehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -142,6 +145,12 @@ class SøknadsdataBehovløser(
         ident: String,
         søknadId: UUID,
     ): Boolean {
+        val pdlBarnSvar = hentBarnSvar(BESKRIVENDE_ID_PDL_BARN, ident, søknadId)
+        val egneBarnSvar = hentBarnSvar(BESKRIVENDE_ID_EGNE_BARN, ident, søknadId)
+        if (pdlBarnSvar.isNotEmpty() || egneBarnSvar.isNotEmpty()) {
+            return true
+        }
+
         val seksjonsvar =
             seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
@@ -161,6 +170,12 @@ class SøknadsdataBehovløser(
 
         return !(pdlBarn.isEmpty() && egneBarn.isEmpty())
     }
+
+    private fun hentBarnSvar(
+        beskrivendeId: String,
+        ident: String,
+        søknadId: UUID,
+    ) = opplysningRepository.hent(beskrivendeId, ident, søknadId)?.svar?.asListOf<BarnSvar>() ?: emptyList()
 
     fun avtjentVerneplikt(
         ident: String,

@@ -9,6 +9,8 @@ import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
@@ -535,6 +537,119 @@ class SøknadsdataBehovløserTest {
     }
 
     @Test
+    fun `Søker med pdl og egne barn harBarn verdien satt til true fra quiz søknad`() {
+        val egneBarnOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "faktum.barn-liste",
+                type = Barn,
+                svar = manuelLagteBarnFraQuiz(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        val pdlBarnOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "faktum.register.barn-liste",
+                type = Barn,
+                svar = pdlBarnFraQuiz(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        opplysningRepository.lagre(egneBarnOpplysning)
+        opplysningRepository.lagre(pdlBarnOpplysning)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "\"harBarn\":true"
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
+
+    @Test
+    fun `Søker med kun pdl  harBarn verdien satt til true fra quiz søknad`() {
+        val pdlBarnOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "faktum.register.barn-liste",
+                type = Barn,
+                svar = pdlBarnFraQuiz(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        opplysningRepository.lagre(pdlBarnOpplysning)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "\"harBarn\":true"
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
+
+    @Test
+    fun `Søker med kun egne barn harBarn verdien satt til true fra quiz søknad`() {
+        val egneBarnOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "faktum.barn-liste",
+                type = Barn,
+                svar = manuelLagteBarnFraQuiz(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        opplysningRepository.lagre(egneBarnOpplysning)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "\"harBarn\":true"
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
+
+    @Test
+    fun `Søker med ingen barn får harBarn verdien satt til false fra quiz søknad`() {
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "\"harBarn\":false"
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
+
+    @Test
     fun `Teste reell-arbeidssøker hvor noen verdier er true`() {
         every {
             seksjonRepository.hentSeksjonsvarEllerKastException(
@@ -664,3 +779,51 @@ fun reellArbeidssøkerOrkestratorJson(
     erDuVilligTilÅBytteYrkeEllerGåNedILønn: String,
 ): String =
     "{\"seksjonId\":\"reell-arbeidssoker\",\"seksjonsvar\":{\"kanDuJobbeBådeHeltidOgDeltid\":\"$kanDuJobbeBådeHeltidOgDeltid\",\"kanDuJobbeIHeleNorge\":\"$kanDuJobbeIHeleNorge\",\"kanDuTaAlleTyperArbeid\":\"$kanDuTaAlleTyperArbeid\",\"erDuVilligTilÅBytteYrkeEllerGåNedILønn\":\"$erDuVilligTilÅBytteYrkeEllerGåNedILønn\",\"dokumentasjonskrav\":\"null\"},\"versjon\":1}"
+
+fun pdlBarnFraQuiz() =
+    listOf(
+        BarnSvar(
+            barnSvarId = UUID.randomUUID(),
+            fornavnOgMellomnavn = "Sure",
+            etternavn = "Sopp",
+            `fødselsdato` = LocalDate.now().minusYears(3),
+            statsborgerskap = "NOR",
+            `forsørgerBarnet` = true,
+            fraRegister = true,
+            kvalifisererTilBarnetillegg = true,
+        ),
+        BarnSvar(
+            barnSvarId = UUID.randomUUID(),
+            fornavnOgMellomnavn = "Lure",
+            etternavn = "Laks",
+            `fødselsdato` = LocalDate.now().minusYears(2),
+            statsborgerskap = "NOR",
+            `forsørgerBarnet` = true,
+            fraRegister = true,
+            kvalifisererTilBarnetillegg = true,
+        ),
+    )
+
+fun manuelLagteBarnFraQuiz() =
+    listOf(
+        BarnSvar(
+            barnSvarId = UUID.randomUUID(),
+            fornavnOgMellomnavn = "Glade",
+            etternavn = "Gås",
+            `fødselsdato` = LocalDate.now().minusYears(1),
+            statsborgerskap = "NOR",
+            `forsørgerBarnet` = true,
+            fraRegister = true,
+            kvalifisererTilBarnetillegg = true,
+        ),
+        BarnSvar(
+            barnSvarId = UUID.randomUUID(),
+            fornavnOgMellomnavn = "Triste",
+            etternavn = "Torsk",
+            `fødselsdato` = LocalDate.now(),
+            statsborgerskap = "NOR",
+            `forsørgerBarnet` = true,
+            fraRegister = true,
+            kvalifisererTilBarnetillegg = true,
+        ),
+    )
