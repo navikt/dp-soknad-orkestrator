@@ -42,10 +42,8 @@ class SøknadsdataBehovløser(
         val søknadId =
             søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
 
-        // check
         val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
 
-        // check
         val eøsArbeidsforhold =
             fellesBehovløserLøsninger.harSøkerenHattArbeidsforholdIEøs(
                 "faktum.eos-arbeid-siste-36-mnd",
@@ -53,16 +51,12 @@ class SøknadsdataBehovløser(
                 søknadId,
             )
 
-        // check
         val avsluttetArbeidsforhold = finnAvsluttedeArbeidsforhold(behovmelding.ident, søknadId)
 
-        // check
         val avtjentVerneplikt = avtjentVerneplikt(behovmelding.ident, søknadId)
 
-        // check
         val harBarn = harSøkerBarn(behovmelding.ident, søknadId)
 
-        // check
         val harAndreYtelser = harAndreYtelser(behovmelding.ident, søknadId)
 
         val ønskerDagpengerFraDato =
@@ -71,6 +65,7 @@ class SøknadsdataBehovløser(
                 søknadId,
                 behov,
             )
+
         val reellArbeidssøker =
             erReellArbeidssøker(
                 behovmelding.ident,
@@ -98,6 +93,40 @@ class SøknadsdataBehovløser(
         ident: String,
         søknadId: UUID,
     ): ReellArbeidssøker {
+        val kanTaAlleTypeArbeid =
+            opplysningRepository.hent("faktum.alle-typer-arbeid", ident, søknadId)?.svar
+
+        if (kanTaAlleTypeArbeid != null) {
+            val kanTaAlleTypeArbeidBool = kanTaAlleTypeArbeid.toString().toBoolean()
+            val jobbeIHeleNorge =
+                opplysningRepository
+                    .hent("faktum.jobbe-hele-norge", ident, søknadId)
+                    ?.svar
+                    .toString()
+                    .toBoolean()
+
+            val jobbeHelOgDeltid =
+                opplysningRepository
+                    .hent("faktum.jobbe-hel-deltid", ident, søknadId)
+                    ?.svar
+                    .toString()
+                    .toBoolean()
+
+            val bytteYrkeNedILønn =
+                opplysningRepository
+                    .hent("faktum.bytte-yrke-ned-i-lonn", ident, søknadId)
+                    ?.svar
+                    .toString()
+                    .toBoolean()
+
+            return ReellArbeidssøker(
+                helse = kanTaAlleTypeArbeidBool,
+                geografi = jobbeIHeleNorge,
+                deltid = jobbeHelOgDeltid,
+                yrke = bytteYrkeNedILønn,
+            )
+        }
+
         val seksjonsvar =
             seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,

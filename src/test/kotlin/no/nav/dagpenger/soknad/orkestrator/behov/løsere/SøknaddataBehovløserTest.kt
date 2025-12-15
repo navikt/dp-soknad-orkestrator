@@ -691,7 +691,7 @@ class SøknadsdataBehovløserTest {
     }
 
     @Test
-    fun `Teste reell-arbeidssøker hvor noen verdier er true`() {
+    fun `Teste reell-arbeidssøker for orkestrator søknad hvor noen verdier er true`() {
         every {
             seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
@@ -716,7 +716,7 @@ class SøknadsdataBehovløserTest {
     }
 
     @Test
-    fun `Teste reell-arbeidssøker hvor alle verdier er true`() {
+    fun `Teste reell-arbeidssøker for orkestrator søknad hvor alle verdier er true`() {
         every {
             seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
@@ -741,7 +741,7 @@ class SøknadsdataBehovløserTest {
     }
 
     @Test
-    fun `Teste reell-arbeidssøker hvor ingen verdier er true`() {
+    fun `Teste reell-arbeidssøker for orkestrator søknad hvor ingen verdier er true`() {
         every {
             seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
@@ -760,6 +760,92 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"helse\":false,\"geografi\":false,\"deltid\":false,\"yrke\":false"
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
+
+    @Test
+    fun `Teste reell-arbeidssøker for quiz søknad hvor alle verdier skal være true`() {
+        val alleTypeArbeidOpplysning = hentAlleTypeArbeidForReellArbeidssøkerFraQuiz(ident, søknadId, true)
+        val kanDuJobbeIHeleNorge =
+            hentKanDuJobbeIHeleNorgeForReellArbeidssøkerFraQuiz(
+                ident,
+                søknadId,
+                true,
+            )
+        val kanDuJobbeBådeHeltidOgDeltid = kanDuJobbeBådeHeltidOgDeltidForReellArbeidssøkerFraQuiz(ident, søknadId, true)
+        val erDuVilligTilÅBytteYrkeEllerGåNedILønn =
+            erDuVilligTilÅBytteYrkeEllerGåNedILønnForReellArbeidssøkerFraQuiz(
+                ident,
+                søknadId,
+                true,
+            )
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        opplysningRepository.lagre(alleTypeArbeidOpplysning)
+        opplysningRepository.lagre(kanDuJobbeIHeleNorge)
+        opplysningRepository.lagre(kanDuJobbeBådeHeltidOgDeltid)
+        opplysningRepository.lagre(erDuVilligTilÅBytteYrkeEllerGåNedILønn)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "\"helse\":true,\"geografi\":true,\"deltid\":true,\"yrke\":true"
+            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
+            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+        }
+    }
+
+    @Test
+    fun `Teste reell-arbeidssøker for quiz søknad hvor noen verdier er true`() {
+        val alleTypeArbeidOpplysning = hentAlleTypeArbeidForReellArbeidssøkerFraQuiz(ident, søknadId, true)
+        val kanDuJobbeIHeleNorge =
+            hentKanDuJobbeIHeleNorgeForReellArbeidssøkerFraQuiz(
+                ident,
+                søknadId,
+                false,
+            )
+        val kanDuJobbeBådeHeltidOgDeltid = kanDuJobbeBådeHeltidOgDeltidForReellArbeidssøkerFraQuiz(ident, søknadId, true)
+        val erDuVilligTilÅBytteYrkeEllerGåNedILønn =
+            erDuVilligTilÅBytteYrkeEllerGåNedILønnForReellArbeidssøkerFraQuiz(
+                ident,
+                søknadId,
+                false,
+            )
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+
+        opplysningRepository.lagre(alleTypeArbeidOpplysning)
+        opplysningRepository.lagre(kanDuJobbeIHeleNorge)
+        opplysningRepository.lagre(kanDuJobbeBådeHeltidOgDeltid)
+        opplysningRepository.lagre(erDuVilligTilÅBytteYrkeEllerGåNedILønn)
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            løsning["verdi"].asText() shouldContain
+                "\"helse\":true,\"geografi\":false,\"deltid\":true,\"yrke\":false"
             løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
             løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
         }
@@ -975,3 +1061,52 @@ fun manuelLagteBarnFraQuiz() =
             kvalifisererTilBarnetillegg = true,
         ),
     )
+
+fun hentAlleTypeArbeidForReellArbeidssøkerFraQuiz(
+    ident: String,
+    søknadId: UUID,
+    svar: Boolean,
+): QuizOpplysning<*> =
+    QuizOpplysning(
+        beskrivendeId = "faktum.alle-typer-arbeid",
+        type = Boolsk,
+        svar = svar,
+        ident = ident,
+        søknadId = søknadId,
+    )
+
+fun hentKanDuJobbeIHeleNorgeForReellArbeidssøkerFraQuiz(
+    ident: String,
+    søknadId: UUID,
+    svar: Boolean,
+) = QuizOpplysning(
+    beskrivendeId = "faktum.jobbe-hele-norge",
+    type = Boolsk,
+    svar = svar,
+    ident = ident,
+    søknadId = søknadId,
+)
+
+fun kanDuJobbeBådeHeltidOgDeltidForReellArbeidssøkerFraQuiz(
+    ident: String,
+    søknadId: UUID,
+    svar: Boolean,
+) = QuizOpplysning(
+    beskrivendeId = "faktum.jobbe-hel-deltid",
+    type = Boolsk,
+    svar = svar,
+    ident = ident,
+    søknadId = søknadId,
+)
+
+fun erDuVilligTilÅBytteYrkeEllerGåNedILønnForReellArbeidssøkerFraQuiz(
+    ident: String,
+    søknadId: UUID,
+    svar: Boolean,
+) = QuizOpplysning(
+    beskrivendeId = "faktum.bytte-yrke-ned-i-lonn",
+    type = Boolsk,
+    svar = svar,
+    ident = ident,
+    søknadId = søknadId,
+)
