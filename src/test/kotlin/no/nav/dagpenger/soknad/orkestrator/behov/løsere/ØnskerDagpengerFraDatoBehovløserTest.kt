@@ -76,7 +76,7 @@ class ØnskerDagpengerFraDatoBehovløserTest {
 
         val opplysning =
             QuizOpplysning(
-                beskrivendeId = "faktum.dagpenger-soknadsdato",
+                beskrivendeId = "faktum.arbeidsforhold.gjenopptak.soknadsdato-gjenopptak",
                 type = Dato,
                 svar = svar,
                 ident = ident,

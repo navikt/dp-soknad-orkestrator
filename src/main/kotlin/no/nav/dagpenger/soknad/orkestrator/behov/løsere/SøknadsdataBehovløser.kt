@@ -32,7 +32,11 @@ class SøknadsdataBehovløser(
     override val beskrivendeId = "behov.søknadsdata"
 
     override fun løs(behovmelding: Behovmelding) {
-        if (fellesBehovløserLøsninger == null) return
+        if (fellesBehovløserLøsninger == null) {
+            throw IllegalStateException(
+                "FellesBehovløserLøsninger er ikke satt for SøknadsdataBehovløser",
+            )
+        }
 
         val journalpostId =
             behovmelding.innkommendePacket.get("journalpostId").asText() ?: throw IllegalStateException(
