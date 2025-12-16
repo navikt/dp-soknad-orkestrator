@@ -86,7 +86,7 @@ object Bostedsland : Seksjon() {
 
     override fun avhengigheter(opplysningsbehovId: Int): List<Int> =
         when (opplysningsbehovId) {
-            hvilketLandBorDuI.id ->
+            hvilketLandBorDuI.id -> {
                 listOf(
                     reistTilbakeTilNorge.id,
                     datoForAvreise.id,
@@ -94,13 +94,31 @@ object Bostedsland : Seksjon() {
                     enGangIUken.id,
                     rotasjon.id,
                 )
+            }
 
-            reistTilbakeTilNorge.id -> listOf(datoForAvreise.id, hvorforReisteFraNorge.id)
-            datoForAvreise.id -> listOf(hvorforReisteFraNorge.id)
-            hvorforReisteFraNorge.id -> emptyList()
-            enGangIUken.id -> listOf(rotasjon.id)
-            rotasjon.id -> emptyList()
-            else -> throw IllegalArgumentException("Ukjent opplysning med opplysningId: $opplysningsbehovId")
+            reistTilbakeTilNorge.id -> {
+                listOf(datoForAvreise.id, hvorforReisteFraNorge.id)
+            }
+
+            datoForAvreise.id -> {
+                listOf(hvorforReisteFraNorge.id)
+            }
+
+            hvorforReisteFraNorge.id -> {
+                emptyList()
+            }
+
+            enGangIUken.id -> {
+                listOf(rotasjon.id)
+            }
+
+            rotasjon.id -> {
+                emptyList()
+            }
+
+            else -> {
+                throw IllegalArgumentException("Ukjent opplysning med opplysningId: $opplysningsbehovId")
+            }
         }
 
     override fun validerSvar(

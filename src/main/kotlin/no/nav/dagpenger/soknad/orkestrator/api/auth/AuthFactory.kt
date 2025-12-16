@@ -53,8 +53,14 @@ object AuthFactory {
 
     fun issuerFromString(issuer: String?) =
         when (issuer) {
-            tokenXConfiguration.issuer -> Issuer.TokenX
-            azureAdConfiguration.issuer -> Issuer.AzureAD
+            tokenXConfiguration.issuer -> {
+                Issuer.TokenX
+            }
+
+            azureAdConfiguration.issuer -> {
+                Issuer.AzureAD
+            }
+
             else -> {
                 throw IllegalArgumentException("Ikke støttet issuer: $issuer")
             }

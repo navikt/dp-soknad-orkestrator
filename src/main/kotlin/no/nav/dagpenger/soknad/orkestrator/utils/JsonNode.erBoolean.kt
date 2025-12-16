@@ -7,9 +7,11 @@ fun JsonNode.erBoolean(): Boolean =
         this.asText().lowercase() == "ja" -> {
             true
         }
+
         this.asText().lowercase() == "nei" -> {
             false
         }
+
         else -> {
             this.asBoolean()
         }
