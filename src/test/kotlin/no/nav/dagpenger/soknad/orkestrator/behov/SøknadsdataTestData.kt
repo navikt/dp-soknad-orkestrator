@@ -33,8 +33,7 @@ fun personaliaOrkestratorJson(
 fun eøsArbeidsforholdOrkestratorJson(eøsArbeidsforhold: String): String =
     (
         "{" +
-            "\"seksjonId\":\"arbeidsforhold\"," +
-            "\"seksjonsvar\":{" +
+
             "\"hvordanHarDuJobbet\":\"fastArbeidstidIMindreEnn6Måneder\"," +
             "\"harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene\":\"$eøsArbeidsforhold\"," +
             "\"registrerteArbeidsforhold\":[{" +
@@ -47,8 +46,8 @@ fun eøsArbeidsforholdOrkestratorJson(eøsArbeidsforhold: String): String =
             "\"jegErOppsagtHarDuFåttTilbudOmÅFortsetteHosArbeidsgiverenDinIAnnenStillingEllerEtAnnetStedINorge\":\"nei\"," +
             "\"harDuJobbetSkiftTurnusEllerRotasjon\":\"hverken-skift-turnus-eller-rotasjon\"," +
             "\"id\":\"f047539f-6911-4902-9af5-f1b85545496c\"," +
-            "\"dokumentasjonskrav\":[\"533bdc6d-a3ba-4936-ace2-cd455aaf86ab\",\"a0ec261c-631e-4d2e-8c92-ecabcd399eab\"]}]}," +
-            "\"versjon\":1}"
+            "\"dokumentasjonskrav\":[\"533bdc6d-a3ba-4936-ace2-cd455aaf86ab\",\"a0ec261c-631e-4d2e-8c92-ecabcd399eab\"]}]" +
+            "}"
     ).trimIndent()
 
 fun avtjentVernepliktOrkestratorJson(avtjentVerneplikt: String): String =
@@ -117,17 +116,14 @@ fun dinSituasjonMedGjenopptakelseOrkestratorJson(now: LocalDate): String =
 
 fun dinSituasjonMedDagpengerFraDato(now: LocalDate): String =
     "{" +
-        "\"seksjonId\":\"din-situasjon\"," +
-        "\"seksjonsvar\":{" +
+
         "\"harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene\":\"nei\"," +
-        "\"hvilkenDatoSøkerDuDagpengerFra\":\"$now\"},\"versjon\":1}"
+        "\"hvilkenDatoSøkerDuDagpengerFra\":\"$now\"" +
+        "}"
 
 fun barnetilleggMedToBarnFraPdlOgUtenManuelLagteBarn(): String =
     "{" +
-        "\"seksjonId\":\"barnetillegg\"," +
-        "\"versjon\":1," +
-        "\"seksjonsvar\":" +
-        "{\"barnFraPdl\":[{" +
+        "\"barnFraPdl\":[{" +
         "\"id\":\"e27be3cc-1392-4e38-bf48-4200809da68b\"," +
         "\"fornavn\":\"SMISKENDE\"," +
         "\"mellomnavn\":\"\"," +
@@ -150,13 +146,10 @@ fun barnetilleggMedToBarnFraPdlOgUtenManuelLagteBarn(): String =
         "}]," +
         "\"forsørgerDuBarnSomIkkeVisesHer\":\"nei\"," +
         "\"barnLagtManuelt\":null" +
-        "}}"
+        "}"
 
 fun barnetilleggMedBarnLagtManuelUtenBarnFraPdl(): String =
     "{" +
-        "\"seksjonId\":\"barnetillegg\"," +
-        "\"versjon\":1," +
-        "\"seksjonsvar\":{" +
         "\"barnFraPdl\":null," +
         "\"forsørgerDuBarnSomIkkeVisesHer\":\"nei\"," +
         "\"barnLagtManuelt\":[{" +
@@ -169,23 +162,17 @@ fun barnetilleggMedBarnLagtManuelUtenBarnFraPdl(): String =
         "\"alder\":16," +
         "\"bostedsland\":\"NOR\"," +
         "\"forsørgerDuBarnet\":\"nei\"" +
-        "}]}}"
+        "}]}"
 
 fun barnetilleggUtenBarn(): String =
     "{" +
-        "\"seksjonId\":\"barnetillegg\"," +
-        "\"versjon\":1," +
-        "\"seksjonsvar\":{" +
         "\"barnFraPdl\":null," +
         "\"forsørgerDuBarnSomIkkeVisesHer\":\"nei\"," +
         "\"barnLagtManuelt\":null" +
-        "}}"
+        "}"
 
 fun barnetilleggMedBarnFraPdlOgManueltLagteBarn(): String =
     "{" +
-        "\"seksjonId\":\"barnetillegg\"," +
-        "\"versjon\":1," +
-        "\"seksjonsvar\":{" +
         "\"barnFraPdl\":[{" +
         "\"id\":\"0113251a-420e-44d8-99d2-9ba7c5e89aac\"," +
         "\"fornavn\":\"ENGASJERT\"," +
@@ -208,7 +195,7 @@ fun barnetilleggMedBarnFraPdlOgManueltLagteBarn(): String =
         "\"alder\":12," +
         "\"bostedsland\":\"NOR\"," +
         "\"forsørgerDuBarnet\":\"nei\"" +
-        "}]}}"
+        "}]}"
 
 fun reellArbeidssøkerOrkestratorJson(
     kanDuTaAlleTyperArbeid: String,
@@ -217,14 +204,11 @@ fun reellArbeidssøkerOrkestratorJson(
     erDuVilligTilÅBytteYrkeEllerGåNedILønn: String,
 ): String =
     "{" +
-        "\"seksjonId\":\"reell-arbeidssoker\"," +
-        "\"seksjonsvar\":{" +
         "\"kanDuJobbeBådeHeltidOgDeltid\":\"$kanDuJobbeBådeHeltidOgDeltid\"," +
         "\"kanDuJobbeIHeleNorge\":\"$kanDuJobbeIHeleNorge\"," +
         "\"kanDuTaAlleTyperArbeid\":\"$kanDuTaAlleTyperArbeid\"," +
         "\"erDuVilligTilÅBytteYrkeEllerGåNedILønn\":\"$erDuVilligTilÅBytteYrkeEllerGåNedILønn\"," +
-        "\"dokumentasjonskrav\":" +
-        "\"null\"},\"versjon\":1}"
+        "\"dokumentasjonskrav\":\"null\"}"
 
 fun pdlBarnFraQuiz() =
     listOf(
