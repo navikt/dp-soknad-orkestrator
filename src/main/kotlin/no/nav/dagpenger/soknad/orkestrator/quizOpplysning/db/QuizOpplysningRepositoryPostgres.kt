@@ -1,7 +1,10 @@
 package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db
 
 import ArbeidsforholdSvarTabell
+import ArbeidsforholdTabell
 import BarnSvarTabell
+import BarnSøknadMappingTabell
+import BarnTabell
 import BoolskTabell
 import DatoTabell
 import DesimaltallTabell
@@ -9,7 +12,9 @@ import EgenNæringSvarTabell
 import EgenNæringTabell
 import EøsArbeidsforholdSvarTabell
 import FlervalgSvarTabell
+import FlervalgTabell
 import HeltallTabell
+import PeriodeTabell
 import QuizOpplysningTabell
 import TekstTabell
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
@@ -59,27 +64,55 @@ class QuizOpplysningRepositoryPostgres(
                 val opplysningId = QuizOpplysningTabell.insertAndGetId(opplysning)
 
                 when (opplysning.type) {
-                    Tekst -> lagreTekstSvar(opplysningId, opplysning.svar as String)
-                    Heltall -> lagreHeltallSvar(opplysningId, opplysning.svar as Int)
-                    Desimaltall -> lagreDesimaltallSvar(opplysningId, opplysning.svar as Double)
-                    Boolsk -> lagreBoolskSvar(opplysningId, opplysning.svar as Boolean)
-                    Dato -> lagreDatoSvar(opplysningId, opplysning.svar as LocalDate)
-                    Flervalg -> lagreFlervalgSvar(opplysningId, opplysning.svar.asListOf<String>())
-                    Periode -> lagrePeriodeSvar(opplysningId, opplysning.svar as PeriodeSvar)
-                    Arbeidsforhold ->
+                    Tekst -> {
+                        lagreTekstSvar(opplysningId, opplysning.svar as String)
+                    }
+
+                    Heltall -> {
+                        lagreHeltallSvar(opplysningId, opplysning.svar as Int)
+                    }
+
+                    Desimaltall -> {
+                        lagreDesimaltallSvar(opplysningId, opplysning.svar as Double)
+                    }
+
+                    Boolsk -> {
+                        lagreBoolskSvar(opplysningId, opplysning.svar as Boolean)
+                    }
+
+                    Dato -> {
+                        lagreDatoSvar(opplysningId, opplysning.svar as LocalDate)
+                    }
+
+                    Flervalg -> {
+                        lagreFlervalgSvar(opplysningId, opplysning.svar.asListOf<String>())
+                    }
+
+                    Periode -> {
+                        lagrePeriodeSvar(opplysningId, opplysning.svar as PeriodeSvar)
+                    }
+
+                    Arbeidsforhold -> {
                         lagreArbeidsforholdSvar(
                             opplysningId,
                             opplysning.svar.asListOf<ArbeidsforholdSvar>(),
                         )
+                    }
 
-                    EøsArbeidsforhold ->
+                    EøsArbeidsforhold -> {
                         lagreEøsArbeidsforholdSvar(
                             opplysningId,
                             opplysning.svar.asListOf<EøsArbeidsforholdSvar>(),
                         )
+                    }
 
-                    EgenNæring -> lagreEgenNæringSvar(opplysningId, opplysning.svar.asListOf<Int>())
-                    Barn -> lagreBarnSvar(opplysningId, opplysning.svar.asListOf<BarnSvar>())
+                    EgenNæring -> {
+                        lagreEgenNæringSvar(opplysningId, opplysning.svar.asListOf<Int>())
+                    }
+
+                    Barn -> {
+                        lagreBarnSvar(opplysningId, opplysning.svar.asListOf<BarnSvar>())
+                    }
                 }
             }
         }

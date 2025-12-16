@@ -35,8 +35,14 @@ fun JsonNode.dokumentVarianter(): List<Dokumentvariant> =
     this.toList().map { node ->
         val format =
             when (node["metainfo"]["variant"].asText()) {
-                "NETTO" -> "ARKIV"
-                "BRUTTO" -> "FULLVERSJON"
+                "NETTO" -> {
+                    "ARKIV"
+                }
+
+                "BRUTTO" -> {
+                    "FULLVERSJON"
+                }
+
                 else -> {
                     throw kotlin.IllegalArgumentException(
                         "Ukjent joarkvariant, se https://confluence.adeo.no/display/BOA/Variantformat",
