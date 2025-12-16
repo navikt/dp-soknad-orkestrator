@@ -13,4 +13,3 @@ jobs:
         with:
           github_token: ${{ secrets.github_token }}
           reporter: github-check
-          ktlint_version: 1.8.0
