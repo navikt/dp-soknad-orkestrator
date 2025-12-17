@@ -10,110 +10,98 @@ import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
-import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
-import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
-import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
+import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.UUID
 import kotlin.test.Test
 
 class VernepliktBehovløserTest {
-    val opplysningRepository = InMemoryQuizOpplysningRepository()
+    val opplysningRepository = mockk<QuizOpplysningRepository>()
     val testRapid = TestRapid()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
-    val fellesBehovLøserLøsninger =
-        FellesBehovløserLøsninger(opplysningRepository, søknadRepository, seksjonRepository)
+    val fellesBehovLøserLøsninger = mockk<FellesBehovløserLøsninger>(relaxed = true)
     val behovløser = VernepliktBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository, fellesBehovLøserLøsninger)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 
     @Test
     fun `Behovløser publiserer løsning på behov Verneplikt med verdi og gjelderFra`() {
-        val opplysning =
-            QuizOpplysning(
-                beskrivendeId = behovløser.beskrivendeId,
-                type = Boolsk,
-                svar = true,
-                ident = ident,
-                søknadId = søknadId,
-            )
-
-        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
-        // github.com/navikt/dp-soknad/blob/53c7a36d199e207dca01ede6d1b0ceebc18debff/mediator/src/main/kotlin/no/nav/dagpenger/soknad/livssyklus/ferdigstilling/FerdigstillingRoute.kt#L28
         val søknadstidspunkt = ZonedDateTime.now()
-        val søknadstidpsunktOpplysning =
-            QuizOpplysning(
-                beskrivendeId = "søknadstidspunkt",
-                type = Tekst,
-                svar = søknadstidspunkt.toString(),
-                ident = ident,
-                søknadId = søknadId,
-            )
+        val cases = listOf(true, false)
+        cases.forEach { avtjentVerneplikt ->
+            every {
+                fellesBehovLøserLøsninger.harSøkerenAvtjentVerneplikt(
+                    any(),
+                    any(),
+                    any(),
+                    any(),
+                )
+            } returns avtjentVerneplikt
 
-        opplysningRepository.lagre(opplysning)
-        opplysningRepository.lagre(søknadstidpsunktOpplysning)
-        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Verneplikt))
+            every {
+                opplysningRepository.hent(any(), any(), any())
+            } returns
+                QuizOpplysning(
+                    beskrivendeId = "søknadstidspunkt",
+                    type = Tekst,
+                    svar = søknadstidspunkt.toString(),
+                    ident = ident,
+                    søknadId = søknadId,
+                )
 
-        testRapid.inspektør.message(0)["@løsning"]["Verneplikt"].also { løsning ->
-            løsning["verdi"].asBoolean() shouldBe true
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
-        }
-    }
+            behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Verneplikt))
 
-    @Test
-    fun `Behovløser publiserer løsning på behov Verneplikt med verdi og gjelderFra fra seksjonRepository`() {
-        every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                any(),
-                any(),
-                any(),
-            )
-        } returns
-            """
-            {
-              "seksjon": {
-                "avtjentVerneplikt": "ja"
-              },
-              "versjon": 1
+            verify {
+                fellesBehovLøserLøsninger.harSøkerenAvtjentVerneplikt(
+                    BehovløserFactory.Behov.Verneplikt.name,
+                    behovløser.beskrivendeId,
+                    ident,
+                    søknadId,
+                )
             }
-            """.trimIndent()
 
-        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
-        val søknadstidspunkt = ZonedDateTime.now()
-        every {
-            søknadRepository.hent(any())
-        } returns
-            Søknad(
-                søknadId = søknadId,
-                ident = ident,
-                tilstand = Tilstand.INNSENDT,
-                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
-            )
+            verify {
+                opplysningRepository.hent(
+                    "søknadstidspunkt",
+                    ident,
+                    søknadId,
+                )
+            }
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Verneplikt))
-
-        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "verneplikt") }
-        verify { søknadRepository.hent(søknadId) }
-        testRapid.inspektør.message(0)["@løsning"]["Verneplikt"].also { løsning ->
-            løsning["verdi"].asBoolean() shouldBe true
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+            testRapid.inspektør.message(0)["@løsning"]["Verneplikt"].also { løsning ->
+                løsning["verdi"].asBoolean() shouldBe avtjentVerneplikt
+                løsning["gjelderFra"].asLocalDate() shouldBe LocalDate.now()
+            }
+            testRapid.reset()
         }
     }
 
     @Test
     fun `Behovløser kaster feil dersom det ikke finnes en opplysning som kan besvare behovet`() {
+        val behov = BehovløserFactory.Behov.Verneplikt.name
         every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(
+            fellesBehovLøserLøsninger.harSøkerenAvtjentVerneplikt(
+                any(),
                 any(),
                 any(),
                 any(),
             )
-        } throws IllegalStateException("Fant ingen seksjonsvar på verneplikt for søknad=$søknadId")
+        } throws IllegalStateException("Fant ingen opplysning på behov $behov for søknad med id: $søknadId")
+
         shouldThrow<IllegalStateException> { behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.Verneplikt)) }
+
+        verify {
+            fellesBehovLøserLøsninger.harSøkerenAvtjentVerneplikt(
+                behov,
+                behovløser.beskrivendeId,
+                ident,
+                søknadId,
+            )
+        }
     }
 }
