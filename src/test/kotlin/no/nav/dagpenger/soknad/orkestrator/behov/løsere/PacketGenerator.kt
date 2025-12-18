@@ -19,6 +19,7 @@ fun lagBehovmelding(
                         "ident" to ident,
                         "søknadId" to søknadId,
                         "@behov" to listOf(behov),
+                        "journalpostId" to "12345679",
                     ),
-            ).apply { this.requireKey("ident", "søknadId", "@behov") },
+            ).apply { this.requireKey("ident", "søknadId", "@behov", "journalpostId") },
     )

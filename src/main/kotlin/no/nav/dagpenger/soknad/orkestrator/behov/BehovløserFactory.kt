@@ -43,6 +43,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.OrdinærBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertGrensearbeiderBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdataBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.UtdanningEllerOpplæringBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
@@ -59,6 +60,12 @@ class BehovløserFactory(
     seksjonRepository: SeksjonRepository,
     søknadRepository: SøknadRepository,
 ) {
+    private val fellesBehovløserLøsninger =
+        FellesBehovløserLøsninger(
+            opplysningRepository,
+            søknadRepository,
+            seksjonRepository,
+        )
     private val behovløsere: Map<Behov, Behovløser> =
         mapOf(
             OppgittAndreYtelserUtenforNav to
@@ -74,6 +81,7 @@ class BehovløserFactory(
                     opplysningRepository,
                     søknadRepository,
                     seksjonRepository,
+                    fellesBehovløserLøsninger,
                 ),
             EØSArbeid to
                 EØSArbeidBehovløser(
@@ -81,6 +89,7 @@ class BehovløserFactory(
                     opplysningRepository,
                     søknadRepository,
                     seksjonRepository,
+                    fellesBehovløserLøsninger,
                 ),
             KanJobbeDeltid to KanJobbeDeltidBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             HelseTilAlleTyperJobb to
@@ -111,7 +120,14 @@ class BehovløserFactory(
                     søknadRepository,
                     seksjonRepository,
                 ),
-            Verneplikt to VernepliktBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            Verneplikt to
+                VernepliktBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                    fellesBehovløserLøsninger,
+                ),
             Lønnsgaranti to
                 LønnsgarantiBehovløser(
                     rapidsConnection,
@@ -178,6 +194,14 @@ class BehovløserFactory(
                 ),
             EgenNæringsvirksomhet to
                 EgenNæringsvirksomhetBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            Behov.Søknadsdata to
+                SøknadsdataBehovløser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                    fellesBehovløserLøsninger,
+                ),
         )
 
     fun behovløserFor(behov: Behov): Behovløser =
@@ -210,5 +234,6 @@ class BehovløserFactory(
         PermittertGrensearbeider,
         EgetGårdsbruk,
         EgenNæringsvirksomhet,
+        Søknadsdata,
     }
 }

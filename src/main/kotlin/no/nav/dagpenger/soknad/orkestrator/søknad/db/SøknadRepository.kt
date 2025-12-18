@@ -250,6 +250,20 @@ class SøknadRepository(
             journalførtTidspunkt = resultRow[SøknadTabell.journalførtTidspunkt],
             slettetTidspunkt = resultRow[SøknadTabell.slettetTidspunkt],
         )
+
+    fun hentSøknadIdFraJournalPostId(
+        journalpostId: String,
+        ident: String,
+    ): UUID =
+        transaction {
+            SøknadTabell
+                .select(SøknadTabell.søknadId)
+                .where { SøknadTabell.journalpostId eq journalpostId }
+                .andWhere { SøknadTabell.ident eq ident }
+                .map { it[SøknadTabell.søknadId] }
+                .firstOrNull()
+                ?: throw IllegalStateException("Fant ikke søknad med journalpostId: $journalpostId for ident: $ident")
+        }
 }
 
 object SøknadTabell : IntIdTable("soknad") {
