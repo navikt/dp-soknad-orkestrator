@@ -54,14 +54,14 @@ fun avtjentVernepliktOrkestratorJson(avtjentVerneplikt: String): String =
     "{\"avtjentVerneplikt\":\"$avtjentVerneplikt\",\"dokumentasjonskrav\":\"null\"}".trimIndent()
 
 fun annenPengestøtteOrkestratorJson(
-    mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav: String,
-    fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver: String,
+    mottarDuPengestøtteFraAndreEnnNav: String,
+    mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver: String,
 ): String =
     (
         "{" +
-            "\"mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav\":\"$mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav\", " +
-            "\"fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver\":" +
-            "\"$fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver\"" +
+            "\"mottarDuPengestøtteFraAndreEnnNav\":\"$mottarDuPengestøtteFraAndreEnnNav\", " +
+            "\"mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver\":" +
+            "\"$mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver\"" +
             "}"
     ).trimIndent()
 

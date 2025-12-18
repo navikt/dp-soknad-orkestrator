@@ -18,6 +18,6 @@ class OppgittAndreYtelserUtenforNavBehovløser(
     override val beskrivendeId = "faktum.andre-ytelser-mottatt-eller-sokt"
 
     override fun løs(behovmelding: Behovmelding) {
-        løsBehovFraSeksjonsData(behovmelding, "annen-pengestotte", "mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav")
+        løsBehovFraSeksjonsData(behovmelding, "annen-pengestotte", "mottarDuPengestøtteFraAndreEnnNav")
     }
 }

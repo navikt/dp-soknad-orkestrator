@@ -2173,7 +2173,7 @@
       "description": "På grunnlag av en sømløs tidshorisont tas det høyde for relasjonene i tillegg til forholdene."
     },
     {
-      "id": "mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNavForklarendeTekst",
+      "id": "mottarDuPengestøtteFraAndreEnnNav",
       "type": "forklarendeTekst",
       "description": "<strong>Dine pengestøtter fra Norge</strong><br />Du må legge til alle pengestøtter du mottar eller har søkt om som ikke er fra Nav."
     },
@@ -2272,13 +2272,13 @@
       "svar": "ja"
     },
     {
-      "id": "fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiverLesMer",
+      "id": "mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiverLesMer",
       "type": "lesMer",
       "label": "Grunnen til at vi spør om dette?",
       "description": "Under forutsetning av en inkluderende overveielse realiseres incitamentet for så vidt gjelder ressurssituasjonen."
     },
     {
-      "id": "fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiverDokumentasjonskravindikator",
+      "id": "mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiverDokumentasjonskravindikator",
       "type": "dokumentasjonskravindikator",
       "label": "Avtale om økonomiske goder fra arbeidsgiver"
     },

@@ -187,14 +187,14 @@ class SøknadsdataBehovløser(
 
         val annenPengestøtteSeksjon = objectMapper.readTree(seksjonsvar)
 
-        val mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav: Boolean =
-            annenPengestøtteSeksjon.finnOpplysning("mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav").asText() == "ja"
+        val mottarDuPengestøtteFraAndreEnnNav: Boolean =
+            annenPengestøtteSeksjon.finnOpplysning("mottarDuPengestøtteFraAndreEnnNav").asText() == "ja"
 
-        val fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver =
-            annenPengestøtteSeksjon.finnOpplysning("fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver").asText() == "ja"
+        val mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver =
+            annenPengestøtteSeksjon.finnOpplysning("mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver").asText() == "ja"
 
-        return mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav ||
-            fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver
+        return mottarDuPengestøtteFraAndreEnnNav ||
+            mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver
     }
 
     private fun harSøkerBarn(
