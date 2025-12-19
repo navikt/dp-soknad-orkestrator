@@ -73,7 +73,7 @@ class AndreØkonomiskeYtelserBehovløserTest {
             """
             {
               "seksjon": {
-                "mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver": "ja"
+                "mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver": "ja"
               },
               "versjon": 1
             }

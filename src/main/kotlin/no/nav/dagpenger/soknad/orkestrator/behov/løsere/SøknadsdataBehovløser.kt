@@ -190,11 +190,11 @@ class SøknadsdataBehovløser(
         val mottarDuPengestøtteFraAndreEnnNav: Boolean =
             annenPengestøtteSeksjon.finnOpplysning("mottarDuPengestøtteFraAndreEnnNav").asText() == "ja"
 
-        val mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver =
-            annenPengestøtteSeksjon.finnOpplysning("mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver").asText() == "ja"
+        val mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver =
+            annenPengestøtteSeksjon.finnOpplysning("mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver").asText() == "ja"
 
         return mottarDuPengestøtteFraAndreEnnNav ||
-            mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver
+            mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver
     }
 
     private fun harSøkerBarn(
