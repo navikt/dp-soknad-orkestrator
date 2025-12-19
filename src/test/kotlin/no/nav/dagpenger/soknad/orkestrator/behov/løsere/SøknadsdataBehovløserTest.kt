@@ -359,8 +359,8 @@ class SøknadsdataBehovløserTest {
             )
         cases.forEach {
             (
-                mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav,
-                fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver,
+                mottarDuPengestøtteFraAndreEnnNav,
+                mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver,
                 forventetHarAndreYtelser,
             ),
             ->
@@ -372,8 +372,8 @@ class SøknadsdataBehovløserTest {
                 )
             } returns
                 annenPengestøtteOrkestratorJson(
-                    mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav,
-                    fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver,
+                    mottarDuPengestøtteFraAndreEnnNav,
+                    mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver,
                 )
             val søknadstidspunkt = ZonedDateTime.now()
             every {
@@ -408,8 +408,8 @@ class SøknadsdataBehovløserTest {
             )
         cases.forEach {
             (
-                mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav,
-                fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver,
+                mottarDuPengestøtteFraAndreEnnNav,
+                mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver,
                 forventetHarAndreYtelser,
             ),
             ->
@@ -423,7 +423,7 @@ class SøknadsdataBehovløserTest {
                 QuizOpplysning(
                     beskrivendeId = "faktum.utbetaling-eller-okonomisk-gode-tidligere-arbeidsgiver",
                     type = Boolsk,
-                    svar = fårEllerKommerTilÅFåLønnEllerAndreGoderFraTidligereArbeidsgiver,
+                    svar = mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver,
                     ident = ident,
                     søknadId = quizSøknadId,
                 )
@@ -432,7 +432,7 @@ class SøknadsdataBehovløserTest {
                 QuizOpplysning(
                     beskrivendeId = "faktum.andre-ytelser-mottatt-eller-sokt",
                     type = Boolsk,
-                    svar = mottarDuEllerHarDuSøktOmPengestøtteFraAndreEnnNav,
+                    svar = mottarDuPengestøtteFraAndreEnnNav,
                     ident = ident,
                     søknadId = quizSøknadId,
                 )
