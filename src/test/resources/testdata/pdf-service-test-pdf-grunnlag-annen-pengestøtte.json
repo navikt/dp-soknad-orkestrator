@@ -2272,13 +2272,13 @@
       "svar": "ja"
     },
     {
-      "id": "mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiverLesMer",
+      "id": "mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiverLesMer",
       "type": "lesMer",
       "label": "Grunnen til at vi spør om dette?",
       "description": "Under forutsetning av en inkluderende overveielse realiseres incitamentet for så vidt gjelder ressurssituasjonen."
     },
     {
-      "id": "mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiverDokumentasjonskravindikator",
+      "id": "mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiverDokumentasjonskravindikator",
       "type": "dokumentasjonskravindikator",
       "label": "Avtale om økonomiske goder fra arbeidsgiver"
     },

@@ -360,7 +360,7 @@ class SøknadsdataBehovløserTest {
         cases.forEach {
             (
                 mottarDuPengestøtteFraAndreEnnNav,
-                mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver,
+                mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver,
                 forventetHarAndreYtelser,
             ),
             ->
@@ -373,7 +373,7 @@ class SøknadsdataBehovløserTest {
             } returns
                 annenPengestøtteOrkestratorJson(
                     mottarDuPengestøtteFraAndreEnnNav,
-                    mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver,
+                    mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver,
                 )
             val søknadstidspunkt = ZonedDateTime.now()
             every {
@@ -409,7 +409,7 @@ class SøknadsdataBehovløserTest {
         cases.forEach {
             (
                 mottarDuPengestøtteFraAndreEnnNav,
-                mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver,
+                mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver,
                 forventetHarAndreYtelser,
             ),
             ->
@@ -423,7 +423,7 @@ class SøknadsdataBehovløserTest {
                 QuizOpplysning(
                     beskrivendeId = "faktum.utbetaling-eller-okonomisk-gode-tidligere-arbeidsgiver",
                     type = Boolsk,
-                    svar = mottarDuAndreUtbetalingerEllerGoderFraTidligereArbeidsgiver,
+                    svar = mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver,
                     ident = ident,
                     søknadId = quizSøknadId,
                 )
