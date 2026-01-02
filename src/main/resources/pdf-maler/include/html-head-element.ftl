@@ -9,10 +9,14 @@
             color: rgb(38, 38, 38);
         }
 
+        .spørsmål {
+            margin: 1rem 0 1rem 0;
+        }
+
         .modalSpørsmål {
             background: #eee;
             padding: 1rem;
-            margin-bottom: 1rem;
+            margin: 1rem 0 1rem 0;
         }
 
         .pageHeaderRight {

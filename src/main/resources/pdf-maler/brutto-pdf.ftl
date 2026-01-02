@@ -1,21 +1,29 @@
 <#import "include/macros.ftl" as macros/>
 <#macro håndterSpørsmål spørsmål>
-    <p>
+    <div class="spørsmål">
         <#if spørsmål.label??>
-            <strong>${spørsmål.label}</strong>
+            <div>
+                <strong>
+                    <#if spørsmål.type == "dokumentasjonskravindikator">
+                        Dokumentasjonskrav:
+                    </#if>
+                    ${spørsmål.label}
+                </strong>
+            </div>
         </#if>
         <#if spørsmål.description??>
             <div><i>${spørsmål.description}</i></div>
         </#if>
         <#if spørsmål.svar??>
-            <br/>
-            <@macros.finnSvar spørsmål=spørsmål/>
+            <div>
+                <@macros.finnSvar spørsmål=spørsmål/>
+            </div>
             <#if spørsmål.options??>
                 <div>Svaralternativene
                     var: <#list spørsmål.options as option>${option.label}<#sep>, </#sep></#list></div>
             </#if>
         </#if>
-    </p>
+    </div>
 </#macro>
 <#assign root = json?eval_json>
 
