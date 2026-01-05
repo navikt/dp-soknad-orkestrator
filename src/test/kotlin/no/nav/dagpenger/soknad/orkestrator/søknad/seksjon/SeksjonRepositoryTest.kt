@@ -383,7 +383,7 @@ class SeksjonRepositoryTest {
     }
 
     @Test
-    fun `hentDokumentasjonskrav returnerer forventede seksjoner hvis søknaden tilhører bruker som gjør kallet`() {
+    fun `hentDokumentasjonskrav returnerer forventede dokumentasjonskrav hvis søknaden tilhører bruker som gjør kallet`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
@@ -392,7 +392,7 @@ class SeksjonRepositoryTest {
 
         val dokumentasjonskravForSøknad = seksjonRepository.hentDokumentasjonskrav(søknadId, ident)
 
-        dokumentasjonskravForSøknad shouldContainExactlyInAnyOrder
+        dokumentasjonskravForSøknad shouldContainExactly
             listOf(
                 dokumentasjonskrav,
                 dokumentasjonskrav2,
