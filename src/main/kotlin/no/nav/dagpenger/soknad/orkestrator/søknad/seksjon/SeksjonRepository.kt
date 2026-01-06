@@ -149,6 +149,7 @@ class SeksjonRepository(
             .innerJoin(SøknadTabell)
             .select(SeksjonV2Tabell.dokumentasjonskrav)
             .where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
+            .orderBy(SeksjonV2Tabell.opprettet)
             .map {
                 it[SeksjonV2Tabell.dokumentasjonskrav]
             }.toList()
