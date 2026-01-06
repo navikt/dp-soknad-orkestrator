@@ -44,6 +44,15 @@ class SeksjonService(
         ident: String,
         seksjonId: String,
     ) = seksjonRepository.hentDokumentasjonskrav(søknadId, ident, seksjonId)
+
+    fun lagreDokumentasjonskravEttersending(
+        søknadId: UUID,
+        ident: String,
+        seksjonId: String,
+        dokumentasjonskrav: String? = null,
+    ) {
+        seksjonRepository.lagreDokumentasjonskravEttersending(søknadId, ident, seksjonId, dokumentasjonskrav)
+    }
 }
 
 data class Seksjon(
