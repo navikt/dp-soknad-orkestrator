@@ -160,6 +160,24 @@ class SøknadRepository(
         }
     }
 
+    fun verifiserAtSøknadenHarEnAvTilstandene(
+        søknadId: UUID,
+        forventedeTilstander: List<Tilstand>,
+    ) {
+        transaction {
+            val tilstand =
+                SøknadTabell
+                    .select(SøknadTabell.tilstand)
+                    .where { SøknadTabell.søknadId eq søknadId }
+                    .map { it[SøknadTabell.tilstand] }
+                    .firstOrNull()
+            requireNotNull(tilstand) { "Fant ikke søknad med ID $søknadId" }
+            check(forventedeTilstander.map { it.name }.contains(tilstand)) {
+                "Søknad $søknadId har en annen tilstand ($tilstand) enn forventet (${forventedeTilstander.map { it.name }})"
+            }
+        }
+    }
+
     fun slettSøknadSomSystem(
         søknadId: UUID,
         ident: String,

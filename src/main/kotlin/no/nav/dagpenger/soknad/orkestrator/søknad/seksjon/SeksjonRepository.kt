@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell
@@ -127,6 +128,28 @@ class SeksjonRepository(
     ) = transaction {
         søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
         søknadRepository.verifiserAtSøknadHarForventetTilstand(søknadId, PÅBEGYNT)
+        requireNotNull(hentSeksjonsvar(søknadId, ident, seksjonId)) { "Fant ikke seksjon med ID $seksjonId" }
+
+        SeksjonV2Tabell.update({ SeksjonV2Tabell.søknadId eq søknadId and (SeksjonV2Tabell.seksjonId eq seksjonId) }) {
+            if (dokumentasjonskrav != null) {
+                it[SeksjonV2Tabell.dokumentasjonskrav] = stringLiteral(dokumentasjonskrav)
+            } else {
+                it[SeksjonV2Tabell.dokumentasjonskrav] = null
+            }
+            it[SeksjonV2Tabell.oppdatert] = dateTimeLiteral(now())
+        }
+
+        søknadRepository.markerSøknadSomOppdatert(søknadId, ident)
+    }
+
+    fun lagreDokumentasjonskravEttersending(
+        søknadId: UUID,
+        ident: String,
+        seksjonId: String,
+        dokumentasjonskrav: String?,
+    ) = transaction {
+        søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
+        søknadRepository.verifiserAtSøknadenHarEnAvTilstandene(søknadId, listOf(Tilstand.INNSENDT, Tilstand.JOURNALFØRT))
         requireNotNull(hentSeksjonsvar(søknadId, ident, seksjonId)) { "Fant ikke seksjon med ID $seksjonId" }
 
         SeksjonV2Tabell.update({ SeksjonV2Tabell.søknadId eq søknadId and (SeksjonV2Tabell.seksjonId eq seksjonId) }) {

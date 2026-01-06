@@ -71,6 +71,21 @@ internal fun Application.seksjonApi(seksjonService: SeksjonService) {
                         call.respond(OK)
                     }
                 }
+                route("/dokumentasjonskrav/ettersending") {
+                    put {
+                        val søknadId = validerOgFormaterSøknadIdParam() ?: return@put
+                        val seksjonId = validerSeksjonIdParam() ?: return@put
+
+                        seksjonService.lagreDokumentasjonskravEttersending(
+                            søknadId,
+                            call.ident(),
+                            seksjonId,
+                            call.receive<String>(),
+                        )
+
+                        call.respond(OK)
+                    }
+                }
             }
             route("/seksjon/{søknadId}") {
                 get {
