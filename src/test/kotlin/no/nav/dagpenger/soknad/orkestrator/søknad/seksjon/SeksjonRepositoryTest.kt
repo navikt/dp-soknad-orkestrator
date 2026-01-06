@@ -364,6 +364,83 @@ class SeksjonRepositoryTest {
 
     @Test
     @Suppress("ktlint:standard:max-line-length")
+    fun `lagreDokumentasjonskravEttersending kaster lagrer forventet dokumentasjonskrav hvis input ikke er null og seksjonen det lagres på tilhører en søknad som tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        søknadRepository.markerSøknadSomInnsendt(søknadId, ident, now())
+
+        shouldNotThrowAny {
+            seksjonRepository.lagreDokumentasjonskravEttersending(søknadId, ident, seksjonId, dokumentasjonskrav2)
+        }
+
+        seksjonRepository.hentDokumentasjonskrav(søknadId, ident, seksjonId) shouldBe dokumentasjonskrav2
+    }
+
+    @Test
+    @Suppress("ktlint:standard:max-line-length")
+    fun `lagreDokumentasjonskravEttersending kaster lagrer forventet dokumentasjonskrav hvis input er null og seksjonen det lagres på tilhører en søknad som tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        søknadRepository.markerSøknadSomJournalført(søknadId, ident, "journalPostId", now())
+
+        shouldNotThrowAny {
+            seksjonRepository.lagreDokumentasjonskravEttersending(søknadId, ident, seksjonId, null)
+        }
+
+        seksjonRepository.hentDokumentasjonskrav(søknadId, ident, seksjonId) shouldBe null
+    }
+
+    @Test
+    fun `lagreDokumentasjonskravEttersending kaster exception hvis seksjonen det lagres på tilhører til en søknad som ikke eksisterer`() {
+        val lagretSøknadId = randomUUID()
+        val requestSøknadId = randomUUID()
+        søknadRepository.opprett(Søknad(lagretSøknadId, ident))
+        seksjonRepository.lagre(lagretSøknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        søknadRepository.markerSøknadSomInnsendt(lagretSøknadId, ident, now())
+
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                seksjonRepository.lagreDokumentasjonskravEttersending(requestSøknadId, ident, seksjonId, dokumentasjonskrav2)
+            }
+
+        exception.message shouldBe "Fant ikke søknad med ID $requestSøknadId"
+    }
+
+    @Test
+    @Suppress("ktlint:standard:max-line-length")
+    fun `lagreDokumentasjonskravEttersending kaster exception hvis seksjonen det lagres på tilhører en søknad som tilhører en annen bruker enn den som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        søknadRepository.markerSøknadSomInnsendt(søknadId, ident, now())
+
+        val exception =
+            shouldThrow<IllegalArgumentException> {
+                seksjonRepository.lagreDokumentasjonskravEttersending(søknadId, "en-annen-ident", seksjonId, dokumentasjonskrav2)
+            }
+
+        exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
+    }
+
+    @Test
+    @Suppress("ktlint:standard:max-line-length")
+    fun `lagreDokumentasjonskrav kaster exception hvis seksjonen det lagres på tilhører en søknad som er i tilstanden PÅBEGYNT`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        val exception =
+            shouldThrow<IllegalStateException> {
+                seksjonRepository.lagreDokumentasjonskravEttersending(søknadId, ident, seksjonId, dokumentasjonskrav2)
+            }
+
+        exception.message shouldBe "Søknad $søknadId har en annen tilstand (PÅBEGYNT) enn forventet ([INNSENDT, JOURNALFØRT])"
+    }
+
+    @Test
+    @Suppress("ktlint:standard:max-line-length")
     fun `lagreDokumentasjonskrav kaster exception hvis seksjonen ikke eksisterer`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
