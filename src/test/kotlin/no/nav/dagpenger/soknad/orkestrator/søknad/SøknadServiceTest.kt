@@ -224,6 +224,43 @@ class SøknadServiceTest {
         }
     }
 
+    @Test
+    fun `hentSistOppdatertTidspunkt returnerer forventet tidspunkt`() {
+        val søknadId = randomUUID()
+        val forventetTidspunkt = java.time.LocalDateTime.now()
+
+        every { søknadRepository.hent(any()) } returns Søknad(ident = ident, oppdatertTidspunkt = forventetTidspunkt)
+
+        val faktiskTidspunkt = søknadService.hentSistOppdatertTidspunkt(søknadId)
+
+        faktiskTidspunkt shouldBe forventetTidspunkt
+        verify(exactly = 1) { søknadRepository.hent(søknadId) }
+    }
+
+    @Test
+    fun `hentSistOppdatertTidspunkt returnerer null når søknad ikke finnes`() {
+        val søknadId = randomUUID()
+
+        every { søknadRepository.hent(any()) } returns null
+
+        val faktiskTidspunkt = søknadService.hentSistOppdatertTidspunkt(søknadId)
+
+        faktiskTidspunkt shouldBe null
+        verify(exactly = 1) { søknadRepository.hent(søknadId) }
+    }
+
+    @Test
+    fun `hentSistOppdatertTidspunkt returnerer null når oppdatertTidspunkt er null`() {
+        val søknadId = randomUUID()
+
+        every { søknadRepository.hent(any()) } returns Søknad(ident = ident, oppdatertTidspunkt = null)
+
+        val faktiskTidspunkt = søknadService.hentSistOppdatertTidspunkt(søknadId)
+
+        faktiskTidspunkt shouldBe null
+        verify(exactly = 1) { søknadRepository.hent(søknadId) }
+    }
+
     private val quizSeksjoner =
         //language=json
         """

@@ -13,6 +13,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadInnse
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføring
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadSlettet
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
+import java.time.LocalDateTime
 import java.util.UUID
 
 class SøknadService(
@@ -161,4 +162,6 @@ class SøknadService(
                             }
                     }
             }
+
+    fun hentSistOppdatertTidspunkt(søknadId: UUID): LocalDateTime? = søknadRepository.hent(søknadId)?.oppdatertTidspunkt
 }

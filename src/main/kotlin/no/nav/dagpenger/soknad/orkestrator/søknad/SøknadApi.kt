@@ -122,6 +122,24 @@ internal fun Application.søknadApi(
                         call.respond(OK)
                     }
                 }
+                route("/sistoppdatert") {
+                    get {
+                        val søknadId =
+                            validerOgFormaterSøknadIdParam() ?: let {
+                                call.respond(BadRequest)
+                                return@get
+                            }
+
+                        val sistOppdatert = søknadService.hentSistOppdatertTidspunkt(søknadId)
+
+                        if (sistOppdatert == null) {
+                            call.respond(NotFound, "Fant ikke oppdatert-tidspunkt for søknad $søknadId")
+                            return@get
+                        }
+
+                        call.respond(OK, sistOppdatert)
+                    }
+                }
             }
         }
     }

@@ -25,10 +25,12 @@ import io.ktor.server.auth.jwt.jwt
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonService
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.testTokenXToken
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.withMockAuthServerAndTestApplication
 import org.junit.jupiter.api.Test
+import java.time.LocalDateTime
 import java.util.UUID.randomUUID
 
 class SøknadApiTest {
@@ -391,6 +393,58 @@ class SøknadApiTest {
                     }
 
             response.status shouldBe InternalServerError
+        }
+    }
+
+    @Test
+    fun `GET sistoppdatert returnerer tidspunkt for når søknaden sist ble oppdatert`() {
+        val søknadId = randomUUID()
+        val sistOppdatertTidspunkt = LocalDateTime.now()
+        every { søknadService.hentSistOppdatertTidspunkt(søknadId) } returns sistOppdatertTidspunkt
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/$søknadId/sistoppdatert") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe OK
+            response.body() as String shouldBe objectMapper.writeValueAsString(sistOppdatertTidspunkt)
+        }
+    }
+
+    @Test
+    fun `GET sistoppdatert returnerer 404 Not Found hvis tidspunkt for når søknaden sist ble oppdatert ikke finnes`() {
+        val søknadId = randomUUID()
+        every { søknadService.hentSistOppdatertTidspunkt(søknadId) } returns null
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/$søknadId/sistoppdatert") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe NotFound
+        }
+    }
+
+    @Test
+    fun `GET sistoppdatert returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client.get("/soknad/${randomUUID()}/sistoppdatert").status shouldBe Unauthorized
+        }
+    }
+
+    @Test
+    fun `GET sistoppdatert returnerer 400 Bad Request hvis søknadId ikke er en UUID`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/ikke-en-uuid/sistoppdatert") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe BadRequest
+            response.body() as String shouldContain "Kunne ikke parse søknadId parameter ikke-en-uuid til UUID"
         }
     }
 }
