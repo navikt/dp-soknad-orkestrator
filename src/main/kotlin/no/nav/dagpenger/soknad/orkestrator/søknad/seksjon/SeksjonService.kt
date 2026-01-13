@@ -1,10 +1,30 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 
+import com.fasterxml.jackson.databind.json.JsonMapper
+import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
+import io.github.oshai.kotlinlogging.KotlinLogging
+import no.nav.dagpenger.soknad.orkestrator.søknad.Dokument
+import no.nav.dagpenger.soknad.orkestrator.søknad.Dokumentvariant
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmEttersending
 import java.util.UUID
 
 class SeksjonService(
     val seksjonRepository: SeksjonRepository,
+    val søknadRepository: SøknadRepository,
 ) {
+    private companion object {
+        private val logg = KotlinLogging.logger {}
+        private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadService")
+        private val jsonMapper = JsonMapper.builder().build()
+    }
+
+    private lateinit var rapidsConnection: RapidsConnection
+
+    fun setRapidsConnection(rapidsConnection: RapidsConnection) {
+        this.rapidsConnection = rapidsConnection
+    }
+
     fun lagre(
         søknadId: UUID,
         ident: String,
@@ -53,6 +73,60 @@ class SeksjonService(
         ident: String,
         seksjonId: String,
     ) = seksjonRepository.hentDokumentasjonskrav(søknadId, ident, seksjonId)
+
+    fun hentDokumentasjonskravEttersending(
+        søknadId: UUID,
+        ident: String,
+    ) {
+        val søknad = søknadRepository.hent(søknadId)!!
+        val event =
+            MeldingOmEttersending(
+                søknadId,
+                ident,
+                søknad,
+                opprettDokumenterFraDokumentasjonskrav(
+                    søknadId,
+                    ident,
+                ),
+            )
+        rapidsConnection.publish(
+            ident,
+            event.asMessage().toJson(),
+        )
+    }
+
+    fun opprettDokumenterFraDokumentasjonskrav(
+        søknadId: UUID,
+        ident: String,
+    ): List<Dokument> =
+        seksjonRepository
+            .hentDokumentasjonskrav(søknadId, ident)
+            .flatMap { dokumentasjonskrav ->
+                jsonMapper
+                    .readTree(dokumentasjonskrav)
+                    .toList()
+                    .mapNotNull { rootNode ->
+                        rootNode
+                            .findValue("bundle")
+                            ?.let { bundleNode ->
+                                if (!bundleNode.isEmpty) {
+                                    Dokument(
+                                        rootNode.at("/skjemakode").textValue(),
+                                        listOf(
+                                            Dokumentvariant(
+                                                filnavn = bundleNode.at("/filnavn").textValue(),
+                                                urn = bundleNode.at("/urn").textValue(),
+                                                variant = "ARKIV",
+                                                type = "PDF",
+                                            ),
+                                        ),
+                                    )
+                                } else {
+                                    null
+                                }
+                            }
+                    }
+            }
 }
 
 data class Seksjon(
