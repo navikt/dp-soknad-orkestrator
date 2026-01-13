@@ -65,7 +65,7 @@ internal class ApplicationBuilder(
     private val søknadPersonaliaRepository = SøknadPersonaliaRepository(dataSource)
 
     private val seksjonRepository = SeksjonRepository(dataSource, søknadRepository)
-    private val seksjonService = SeksjonService(seksjonRepository)
+    private val seksjonService = SeksjonService(seksjonRepository, søknadRepository)
     private val personaliaService =
         PersonaliaService(
             personService =
@@ -139,6 +139,7 @@ internal class ApplicationBuilder(
                 },
             ).also { rapidsConnection ->
                 søknadService.setRapidsConnection(rapidsConnection)
+                seksjonService.setRapidsConnection(rapidsConnection)
                 journalføringService.setRapidsConnection(rapidsConnection)
                 SøknadMottak(rapidsConnection, søknadService, søknadRepository)
                 MeldingOmSøknadKlarTilJournalføringMottak(
