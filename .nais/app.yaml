@@ -43,8 +43,6 @@ spec:
     autoInstrumentation:
       enabled: true
       runtime: java
-  secureLogs:
-    enabled: true
   prometheus:
     enabled: true
     path: /metrics
@@ -88,6 +86,8 @@ spec:
         - application: dp-behandling
         - application: sokos-kontoregister-person
           namespace: okonomi
+        - application: logging
+          namespace: nais-system
       external:
         - host: {{PDL_API_HOST}}
   tokenx:
