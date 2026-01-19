@@ -9,6 +9,10 @@ data class NyJournalpost(
     val dokumenter: List<Dokument>,
 )
 
+data class NyEttersendingJournalPost(
+    val dokumenter: List<Dokument>,
+)
+
 data class Dokument(
     val skjemakode: String,
     val varianter: List<Dokumentvariant>,

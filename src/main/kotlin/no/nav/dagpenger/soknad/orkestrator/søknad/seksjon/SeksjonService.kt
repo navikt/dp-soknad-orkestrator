@@ -63,8 +63,9 @@ class SeksjonService(
         søknadId: UUID,
         ident: String,
         seksjonId: String,
-        dokumentasjonskrav: String? = null,
+        dokumentasjonskrav: String,
     ) {
+        sendEttersendingMelding(søknadId, ident, dokumentasjonskrav)
         seksjonRepository.lagreDokumentasjonskravEttersending(søknadId, ident, seksjonId, dokumentasjonskrav)
     }
 
@@ -74,19 +75,17 @@ class SeksjonService(
         seksjonId: String,
     ) = seksjonRepository.hentDokumentasjonskrav(søknadId, ident, seksjonId)
 
-    fun hentDokumentasjonskravEttersending(
+    fun sendEttersendingMelding(
         søknadId: UUID,
         ident: String,
+        dokumentasjonskrav: String,
     ) {
-        val søknad = søknadRepository.hent(søknadId)!!
         val event =
             MeldingOmEttersending(
                 søknadId,
                 ident,
-                søknad,
-                opprettDokumenterFraDokumentasjonskrav(
-                    søknadId,
-                    ident,
+                opprettDokumenterFraDokumentasjonskravEttersending(
+                    dokumentasjonskrav,
                 ),
             )
         rapidsConnection.publish(
@@ -95,36 +94,29 @@ class SeksjonService(
         )
     }
 
-    fun opprettDokumenterFraDokumentasjonskrav(
-        søknadId: UUID,
-        ident: String,
-    ): List<Dokument> =
-        seksjonRepository
-            .hentDokumentasjonskrav(søknadId, ident)
-            .flatMap { dokumentasjonskrav ->
-                jsonMapper
-                    .readTree(dokumentasjonskrav)
-                    .toList()
-                    .mapNotNull { rootNode ->
-                        rootNode
-                            .findValue("bundle")
-                            ?.let { bundleNode ->
-                                if (!bundleNode.isEmpty) {
-                                    Dokument(
-                                        rootNode.at("/skjemakode").textValue(),
-                                        listOf(
-                                            Dokumentvariant(
-                                                filnavn = bundleNode.at("/filnavn").textValue(),
-                                                urn = bundleNode.at("/urn").textValue(),
-                                                variant = "ARKIV",
-                                                type = "PDF",
-                                            ),
-                                        ),
-                                    )
-                                } else {
-                                    null
-                                }
-                            }
+    fun opprettDokumenterFraDokumentasjonskravEttersending(dokumentasjonskrav: String): List<Dokument> =
+        jsonMapper
+            .readTree(dokumentasjonskrav)
+            .toList()
+            .mapNotNull { rootNode ->
+                rootNode
+                    .findValue("bundle")
+                    ?.let { bundleNode ->
+                        if (!bundleNode.isEmpty) {
+                            Dokument(
+                                rootNode.at("/skjemakode").textValue(),
+                                listOf(
+                                    Dokumentvariant(
+                                        filnavn = bundleNode.at("/filnavn").textValue(),
+                                        urn = bundleNode.at("/urn").textValue(),
+                                        variant = "ARKIV",
+                                        type = "PDF",
+                                    ),
+                                ),
+                            )
+                        } else {
+                            null
+                        }
                     }
             }
 }
