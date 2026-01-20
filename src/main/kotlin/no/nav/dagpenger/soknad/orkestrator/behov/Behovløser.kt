@@ -36,6 +36,8 @@ abstract class Behovløser(
         publiserLøsning(behovmelding, svarPåBehov)
     }
 
+    internal open fun løs(behovmelding: SøknadBehovmelding) {}
+
     internal open fun løsBehovFraSeksjonsData(
         behovmelding: Behovmelding,
         seksjonId: String,

@@ -6,7 +6,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdata
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
 import no.nav.dagpenger.soknad.orkestrator.behov.annenPengestøtteOrkestratorJson
 import no.nav.dagpenger.soknad.orkestrator.behov.arbeidsforholdMedRegistrerteAvsluttedeArbeidsforholdOrkestratorJson
@@ -120,7 +119,7 @@ class SøknadsdataBehovløserTest {
                     innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
                 )
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"eøsBostedsland\":$expectedEøsBostedsland"
@@ -167,7 +166,7 @@ class SøknadsdataBehovløserTest {
             opplysningRepository.lagre(opplysning)
             opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"eøsBostedsland\":$expectedEøsBostedsland"
@@ -206,7 +205,7 @@ class SøknadsdataBehovløserTest {
                     innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
                 )
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"eøsArbeidsforhold\":$expectedEøsArbeidsforhold"
@@ -252,7 +251,7 @@ class SøknadsdataBehovløserTest {
             opplysningRepository.lagre(opplysning)
             opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"eøsArbeidsforhold\":$expectedEøsArbeidsforhold"
@@ -291,7 +290,7 @@ class SøknadsdataBehovløserTest {
                     innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
                 )
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"avtjentVerneplikt\":$expectedAvtjentVerneplikt"
                 løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
@@ -336,7 +335,7 @@ class SøknadsdataBehovløserTest {
             opplysningRepository.lagre(opplysning)
             opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"avtjentVerneplikt\":$expectedAvtjentVerneplikt"
@@ -386,7 +385,7 @@ class SøknadsdataBehovløserTest {
                     innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
                 )
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"harAndreYtelser\":$forventetHarAndreYtelser"
                 løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
@@ -449,9 +448,9 @@ class SøknadsdataBehovløserTest {
             opplysningRepository.lagre(andreYtelserFraQuiz)
             opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 løsning["verdi"].asText() shouldContain "\"harAndreYtelser\":$forventetHarAndreYtelser"
                 løsning["verdi"].asText() shouldContain "\"søknadId\":\"$quizSøknadId\""
@@ -483,7 +482,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "{\"sluttårsak\":\"SAGT_OPP_AV_ARBEIDSGIVER\",\"fiskeforedling\":false,\"land\":\"NOR\"},{\"sluttårsak\":\"PERMITTERT\",\"fiskeforedling\":true,\"land\":\"SWE\"}"
@@ -514,7 +513,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "{\"sluttårsak\":\"SAGT_OPP_AV_ARBEIDSGIVER\",\"fiskeforedling\":false,\"land\":\"NOR\"},{\"sluttårsak\":\"PERMITTERT\",\"fiskeforedling\":true,\"land\":\"SWE\"}"
@@ -559,7 +558,7 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(opplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "{\"sluttårsak\":\"SAGT_OPP_AV_ARBEIDSGIVER\",\"fiskeforedling\":false,\"land\":\"NOR\"},{\"sluttårsak\":\"PERMITTERT\",\"fiskeforedling\":true,\"land\":\"SWE\"}"
@@ -571,7 +570,7 @@ class SøknadsdataBehovløserTest {
 
     @Test
     fun `Søker uten arbeidsforhold returneres med tom list for quiz søknad`() {
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"avsluttetArbeidsforhold\":[]"
@@ -601,7 +600,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"avsluttetArbeidsforhold\":[]"
@@ -632,7 +631,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"harBarn\":true"
@@ -663,7 +662,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"harBarn\":true"
@@ -694,7 +693,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"harBarn\":true"
@@ -724,7 +723,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"harBarn\":false"
@@ -765,7 +764,7 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(pdlBarnOpplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"harBarn\":true"
@@ -797,7 +796,7 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(pdlBarnOpplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"harBarn\":true"
@@ -829,7 +828,7 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(egneBarnOpplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"harBarn\":true"
@@ -852,7 +851,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
@@ -890,7 +889,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"helse\":true,\"geografi\":false,\"deltid\":true,\"yrke\":false"
@@ -927,7 +926,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"helse\":true,\"geografi\":true,\"deltid\":true,\"yrke\":true"
@@ -964,7 +963,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"helse\":false,\"geografi\":false,\"deltid\":false,\"yrke\":false"
@@ -1008,7 +1007,7 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(erDuVilligTilÅBytteYrkeEllerGåNedILønn)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"helse\":true,\"geografi\":true,\"deltid\":true,\"yrke\":true"
@@ -1052,7 +1051,7 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(erDuVilligTilÅBytteYrkeEllerGåNedILønn)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"helse\":true,\"geografi\":false,\"deltid\":true,\"yrke\":false"
@@ -1085,7 +1084,7 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(gjenopptarDagpengerOpplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt.toLocalDate()}\""
@@ -1118,7 +1117,7 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(dagpengerFraDatoOpplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt.toLocalDate()}\""
@@ -1150,7 +1149,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt.toLocalDate()}\""
@@ -1181,7 +1180,7 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             løsning["verdi"].asText() shouldContain
                 "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt.toLocalDate()}\""
