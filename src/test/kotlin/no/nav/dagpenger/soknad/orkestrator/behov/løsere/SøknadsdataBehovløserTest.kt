@@ -3,10 +3,8 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdata
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
 import no.nav.dagpenger.soknad.orkestrator.behov.annenPengestøtteOrkestratorJson
 import no.nav.dagpenger.soknad.orkestrator.behov.arbeidsforholdMedRegistrerteAvsluttedeArbeidsforholdOrkestratorJson
@@ -40,6 +38,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDate
 import java.time.ZonedDateTime
@@ -120,12 +119,13 @@ class SøknadsdataBehovløserTest {
                     innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
                 )
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-                løsning["verdi"].asText() shouldContain "\"eøsBostedsland\":$expectedEøsBostedsland"
-                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+                val verdi = løsning["verdi"]
+                verdi["eøsBostedsland"].asBoolean() shouldBe expectedEøsBostedsland
+                verdi["søknadId"].asUUID() shouldBe søknadId
+                verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
                 løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
@@ -167,12 +167,13 @@ class SøknadsdataBehovløserTest {
             opplysningRepository.lagre(opplysning)
             opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-                løsning["verdi"].asText() shouldContain "\"eøsBostedsland\":$expectedEøsBostedsland"
-                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$quizSøknadId\""
-                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+                val verdi = løsning["verdi"]
+                verdi["eøsBostedsland"].asBoolean() shouldBe expectedEøsBostedsland
+                verdi["søknadId"].asUUID() shouldBe quizSøknadId
+                verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
                 løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
@@ -206,12 +207,13 @@ class SøknadsdataBehovløserTest {
                     innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
                 )
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-                løsning["verdi"].asText() shouldContain "\"eøsArbeidsforhold\":$expectedEøsArbeidsforhold"
-                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+                val verdi = løsning["verdi"]
+                verdi["eøsArbeidsforhold"].asBoolean() shouldBe expectedEøsArbeidsforhold
+                verdi["søknadId"].asUUID() shouldBe søknadId
+                verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
                 løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
@@ -252,12 +254,13 @@ class SøknadsdataBehovløserTest {
             opplysningRepository.lagre(opplysning)
             opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-                løsning["verdi"].asText() shouldContain "\"eøsArbeidsforhold\":$expectedEøsArbeidsforhold"
-                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$quizSøknadId\""
-                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+                val verdi = løsning["verdi"]
+                verdi["eøsArbeidsforhold"].asBoolean() shouldBe expectedEøsArbeidsforhold
+                verdi["søknadId"].asUUID() shouldBe quizSøknadId
+                verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
                 løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
@@ -291,11 +294,12 @@ class SøknadsdataBehovløserTest {
                     innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
                 )
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-                løsning["verdi"].asText() shouldContain "\"avtjentVerneplikt\":$expectedAvtjentVerneplikt"
-                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+                val verdi = løsning["verdi"]
+                verdi["avtjentVerneplikt"].asBoolean() shouldBe expectedAvtjentVerneplikt
+                verdi["søknadId"].asUUID() shouldBe søknadId
+                verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
                 løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
@@ -336,12 +340,13 @@ class SøknadsdataBehovløserTest {
             opplysningRepository.lagre(opplysning)
             opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-                løsning["verdi"].asText() shouldContain "\"avtjentVerneplikt\":$expectedAvtjentVerneplikt"
-                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$quizSøknadId\""
-                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+                val verdi = løsning["verdi"]
+                verdi["avtjentVerneplikt"].asBoolean() shouldBe expectedAvtjentVerneplikt
+                verdi["søknadId"].asUUID() shouldBe quizSøknadId
+                verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
                 løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
@@ -386,11 +391,12 @@ class SøknadsdataBehovløserTest {
                     innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
                 )
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-                løsning["verdi"].asText() shouldContain "\"harAndreYtelser\":$forventetHarAndreYtelser"
-                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+                val verdi = løsning["verdi"]
+                verdi["harAndreYtelser"].asBoolean() shouldBe forventetHarAndreYtelser
+                verdi["søknadId"].asUUID() shouldBe søknadId
+                verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
                 løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
@@ -449,13 +455,14 @@ class SøknadsdataBehovløserTest {
             opplysningRepository.lagre(andreYtelserFraQuiz)
             opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-            behovløser.løs(lagBehovmelding(ident, quizSøknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
-            behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+            behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-                løsning["verdi"].asText() shouldContain "\"harAndreYtelser\":$forventetHarAndreYtelser"
-                løsning["verdi"].asText() shouldContain "\"søknadId\":\"$quizSøknadId\""
-                løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+                val verdi = løsning["verdi"]
+                verdi["harAndreYtelser"].asBoolean() shouldBe forventetHarAndreYtelser
+                verdi["søknadId"].asUUID() shouldBe quizSøknadId
+                verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
                 løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
@@ -483,12 +490,19 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "{\"sluttårsak\":\"SAGT_OPP_AV_ARBEIDSGIVER\",\"fiskeforedling\":false,\"land\":\"NOR\"},{\"sluttårsak\":\"PERMITTERT\",\"fiskeforedling\":true,\"land\":\"SWE\"}"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            val avsluttetArbeidsforhold = verdi["avsluttetArbeidsforhold"]
+            avsluttetArbeidsforhold.size() shouldBe 2
+            avsluttetArbeidsforhold[0]["sluttårsak"].asText() shouldBe "SAGT_OPP_AV_ARBEIDSGIVER"
+            avsluttetArbeidsforhold[0]["fiskeforedling"].asBoolean() shouldBe false
+            avsluttetArbeidsforhold[0]["land"].asText() shouldBe "NOR"
+            avsluttetArbeidsforhold[1]["sluttårsak"].asText() shouldBe "PERMITTERT"
+            avsluttetArbeidsforhold[1]["fiskeforedling"].asBoolean() shouldBe true
+            avsluttetArbeidsforhold[1]["land"].asText() shouldBe "SWE"
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -514,12 +528,19 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "{\"sluttårsak\":\"SAGT_OPP_AV_ARBEIDSGIVER\",\"fiskeforedling\":false,\"land\":\"NOR\"},{\"sluttårsak\":\"PERMITTERT\",\"fiskeforedling\":true,\"land\":\"SWE\"}"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            val avsluttetArbeidsforhold = verdi["avsluttetArbeidsforhold"]
+            avsluttetArbeidsforhold.size() shouldBe 2
+            avsluttetArbeidsforhold[0]["sluttårsak"].asText() shouldBe "SAGT_OPP_AV_ARBEIDSGIVER"
+            avsluttetArbeidsforhold[0]["fiskeforedling"].asBoolean() shouldBe false
+            avsluttetArbeidsforhold[0]["land"].asText() shouldBe "NOR"
+            avsluttetArbeidsforhold[1]["sluttårsak"].asText() shouldBe "PERMITTERT"
+            avsluttetArbeidsforhold[1]["fiskeforedling"].asBoolean() shouldBe true
+            avsluttetArbeidsforhold[1]["land"].asText() shouldBe "SWE"
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -559,24 +580,31 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(opplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "{\"sluttårsak\":\"SAGT_OPP_AV_ARBEIDSGIVER\",\"fiskeforedling\":false,\"land\":\"NOR\"},{\"sluttårsak\":\"PERMITTERT\",\"fiskeforedling\":true,\"land\":\"SWE\"}"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            val avsluttetArbeidsforhold = verdi["avsluttetArbeidsforhold"]
+            avsluttetArbeidsforhold.size() shouldBe 2
+            avsluttetArbeidsforhold[0]["sluttårsak"].asText() shouldBe "SAGT_OPP_AV_ARBEIDSGIVER"
+            avsluttetArbeidsforhold[0]["fiskeforedling"].asBoolean() shouldBe false
+            avsluttetArbeidsforhold[0]["land"].asText() shouldBe "NOR"
+            avsluttetArbeidsforhold[1]["sluttårsak"].asText() shouldBe "PERMITTERT"
+            avsluttetArbeidsforhold[1]["fiskeforedling"].asBoolean() shouldBe true
+            avsluttetArbeidsforhold[1]["land"].asText() shouldBe "SWE"
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
     @Test
     fun `Søker uten arbeidsforhold returneres med tom list for quiz søknad`() {
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"avsluttetArbeidsforhold\":[]"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["avsluttetArbeidsforhold"].size() shouldBe 0
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
         }
     }
 
@@ -601,12 +629,12 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"avsluttetArbeidsforhold\":[]"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["avsluttetArbeidsforhold"].size() shouldBe 0
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -632,12 +660,12 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"harBarn\":true"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["harBarn"].asBoolean() shouldBe true
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -663,12 +691,12 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"harBarn\":true"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["harBarn"].asBoolean() shouldBe true
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -694,12 +722,12 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"harBarn\":true"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["harBarn"].asBoolean() shouldBe true
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -724,12 +752,12 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"harBarn\":false"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["harBarn"].asBoolean() shouldBe false
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -765,12 +793,12 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(pdlBarnOpplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"harBarn\":true"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["harBarn"].asBoolean() shouldBe true
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -797,12 +825,12 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(pdlBarnOpplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"harBarn\":true"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["harBarn"].asBoolean() shouldBe true
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -829,12 +857,12 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(egneBarnOpplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"harBarn\":true"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["harBarn"].asBoolean() shouldBe true
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -852,13 +880,13 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
 
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"harBarn\":false"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["harBarn"].asBoolean() shouldBe false
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -890,12 +918,16 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"helse\":true,\"geografi\":false,\"deltid\":true,\"yrke\":false"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            val reellArbeidssøker = verdi["reellArbeidssøker"]
+            reellArbeidssøker["helse"].asBoolean() shouldBe true
+            reellArbeidssøker["geografi"].asBoolean() shouldBe false
+            reellArbeidssøker["deltid"].asBoolean() shouldBe true
+            reellArbeidssøker["yrke"].asBoolean() shouldBe false
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -927,12 +959,16 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"helse\":true,\"geografi\":true,\"deltid\":true,\"yrke\":true"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            val reellArbeidssøker = verdi["reellArbeidssøker"]
+            reellArbeidssøker["helse"].asBoolean() shouldBe true
+            reellArbeidssøker["geografi"].asBoolean() shouldBe true
+            reellArbeidssøker["deltid"].asBoolean() shouldBe true
+            reellArbeidssøker["yrke"].asBoolean() shouldBe true
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -964,12 +1000,16 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"helse\":false,\"geografi\":false,\"deltid\":false,\"yrke\":false"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            val reellArbeidssøker = verdi["reellArbeidssøker"]
+            reellArbeidssøker["helse"].asBoolean() shouldBe false
+            reellArbeidssøker["geografi"].asBoolean() shouldBe false
+            reellArbeidssøker["deltid"].asBoolean() shouldBe false
+            reellArbeidssøker["yrke"].asBoolean() shouldBe false
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -1008,12 +1048,16 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(erDuVilligTilÅBytteYrkeEllerGåNedILønn)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"helse\":true,\"geografi\":true,\"deltid\":true,\"yrke\":true"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            val reellArbeidssøker = verdi["reellArbeidssøker"]
+            reellArbeidssøker["helse"].asBoolean() shouldBe true
+            reellArbeidssøker["geografi"].asBoolean() shouldBe true
+            reellArbeidssøker["deltid"].asBoolean() shouldBe true
+            reellArbeidssøker["yrke"].asBoolean() shouldBe true
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -1052,12 +1096,16 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(erDuVilligTilÅBytteYrkeEllerGåNedILønn)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"helse\":true,\"geografi\":false,\"deltid\":true,\"yrke\":false"
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            val reellArbeidssøker = verdi["reellArbeidssøker"]
+            reellArbeidssøker["helse"].asBoolean() shouldBe true
+            reellArbeidssøker["geografi"].asBoolean() shouldBe false
+            reellArbeidssøker["deltid"].asBoolean() shouldBe true
+            reellArbeidssøker["yrke"].asBoolean() shouldBe false
+            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -1085,12 +1133,11 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(gjenopptarDagpengerOpplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt.toLocalDate()}\""
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+            verdi["søknadId"].asUUID() shouldBe søknadId
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -1118,12 +1165,11 @@ class SøknadsdataBehovløserTest {
         opplysningRepository.lagre(dagpengerFraDatoOpplysning)
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt.toLocalDate()}\""
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+            verdi["søknadId"].asUUID() shouldBe søknadId
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -1150,12 +1196,11 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt.toLocalDate()}\""
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+            verdi["søknadId"].asUUID() shouldBe søknadId
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
@@ -1181,12 +1226,11 @@ class SøknadsdataBehovløserTest {
                 innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
             )
 
-        behovløser.løs(lagBehovmelding(ident, søknadId, Søknadsdata))
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
-            løsning["verdi"].asText() shouldContain
-                "\"ønskerDagpengerFraDato\":\"${søknadstidspunkt.toLocalDate()}\""
-            løsning["verdi"].asText() shouldContain "\"søknadId\":\"$søknadId\""
-            løsning["verdi"].asText() shouldContain "\"ønskerDagpengerFraDato\":\"$now\""
+            val verdi = løsning["verdi"]
+            verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+            verdi["søknadId"].asUUID() shouldBe søknadId
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }

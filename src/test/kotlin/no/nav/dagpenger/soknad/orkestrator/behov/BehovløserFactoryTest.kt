@@ -73,7 +73,6 @@ class BehovløserFactoryTest {
             "PermittertGrensearbeider",
             "EgetGårdsbruk",
             "EgenNæringsvirksomhet",
-            "Søknadsdata",
         )
     }
 }

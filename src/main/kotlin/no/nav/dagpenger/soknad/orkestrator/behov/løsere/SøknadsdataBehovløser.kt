@@ -1,13 +1,14 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.ktor.server.plugins.NotFoundException
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdata
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
+import no.nav.dagpenger.soknad.orkestrator.behov.SøknadBehovmelding
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggV2BehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggV2BehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
@@ -28,10 +29,10 @@ class SøknadsdataBehovløser(
     seksjonRepository: SeksjonRepository,
     fellesBehovløserLøsninger: FellesBehovløserLøsninger,
 ) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository, fellesBehovløserLøsninger) {
-    override val behov = Søknadsdata.name
+    override val behov = "Søknadsdata"
     override val beskrivendeId = "behov.søknadsdata"
 
-    override fun løs(behovmelding: Behovmelding) {
+    override fun løs(behovmelding: SøknadBehovmelding) {
         if (fellesBehovløserLøsninger == null) {
             throw IllegalStateException(
                 "FellesBehovløserLøsninger er ikke satt for SøknadsdataBehovløser",
@@ -40,7 +41,7 @@ class SøknadsdataBehovløser(
 
         val journalpostId =
             behovmelding.innkommendePacket.get("journalpostId").asText() ?: throw IllegalStateException(
-                "Mangler journalpostId i behov for søknadsdata for søknadId: ${behovmelding.søknadId}",
+                "Mangler journalpostId i behov for søknadsdata for søknaden",
             )
 
         val søknadId =
@@ -89,8 +90,18 @@ class SøknadsdataBehovløser(
                 reellArbeidssøker = reellArbeidssøker,
             )
 
-        val søknadsdataJson = objectMapper.writeValueAsString(søknadsdataResultat)
-        return publiserLøsning(behovmelding, søknadsdataJson)
+        val søknadsdataMap: Map<String, Any> =
+            objectMapper.convertValue(
+                søknadsdataResultat,
+                object : TypeReference<Map<String, Any>>() {},
+            )
+        val behovmeldingMedSøknadId: Behovmelding =
+            Behovmelding(
+                behovmelding.innkommendePacket.apply {
+                    this["søknadId"] = søknadId.toString()
+                },
+            )
+        return publiserLøsning(behovmeldingMedSøknadId, søknadsdataMap)
     }
 
     private fun erReellArbeidssøker(

@@ -19,6 +19,7 @@ import no.nav.dagpenger.soknad.orkestrator.barn.BarnService
 import no.nav.dagpenger.soknad.orkestrator.barn.barnApi
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
+import no.nav.dagpenger.soknad.orkestrator.behov.SøknadsdataBehovMottak
 import no.nav.dagpenger.soknad.orkestrator.config.configure
 import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
@@ -159,6 +160,12 @@ internal class ApplicationBuilder(
                             søknadRepository,
                         ),
                     søknadService = søknadService,
+                )
+                SøknadsdataBehovMottak(
+                    rapidsConnection,
+                    QuizOpplysningRepositoryPostgres(dataSource),
+                    seksjonRepository,
+                    søknadRepository,
                 )
                 SøknadSlettetMottak(rapidsConnection, søknadService)
             }
