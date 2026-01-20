@@ -49,7 +49,7 @@ class SøknadsdataBehovMottak(
                     it.forbid("@løsning")
                 }
                 validate {
-                    it.requireKey("ident", "behandlingId", "@behovId")
+                    it.requireKey("ident", "@behovId")
                 }
             }.register(this)
     }
@@ -65,7 +65,6 @@ class SøknadsdataBehovMottak(
         withMDC(
             mapOf(
                 "søknadId" to packet["søknadId"].asText(),
-                "behandlingId" to packet["behandlingId"].asText(),
                 "behovId" to behovId,
             ),
         ) {
