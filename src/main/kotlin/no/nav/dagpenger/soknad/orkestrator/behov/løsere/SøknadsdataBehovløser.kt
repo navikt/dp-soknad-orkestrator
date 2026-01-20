@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
@@ -89,14 +90,18 @@ class SøknadsdataBehovløser(
                 reellArbeidssøker = reellArbeidssøker,
             )
 
-        val søknadsdataJson = objectMapper.writeValueAsString(søknadsdataResultat)
+        val søknadsdataMap: Map<String, Any> =
+            objectMapper.convertValue(
+                søknadsdataResultat,
+                object : TypeReference<Map<String, Any>>() {},
+            )
         val behovmeldingMedSøknadId: Behovmelding =
             Behovmelding(
                 behovmelding.innkommendePacket.apply {
                     this["søknadId"] = søknadId.toString()
                 },
             )
-        return publiserLøsning(behovmeldingMedSøknadId, søknadsdataJson)
+        return publiserLøsning(behovmeldingMedSøknadId, søknadsdataMap)
     }
 
     private fun erReellArbeidssøker(
