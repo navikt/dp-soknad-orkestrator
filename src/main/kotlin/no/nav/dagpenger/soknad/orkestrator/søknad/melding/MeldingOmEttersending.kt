@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.`søknad`.melding
+package no.nav.dagpenger.soknad.orkestrator.søknad.melding
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import no.nav.dagpenger.soknad.orkestrator.søknad.Dokument
@@ -9,6 +9,8 @@ class MeldingOmEttersending(
     private val søknadId: UUID,
     private val ident: String,
     private val dokumentKravene: List<Dokument>,
+    private val dokumentasjonskravJson: String,
+    private val seksjonId: String,
 ) {
     companion object {
         const val BEHOV = "journalfør_ettersending_av_dokumentasjon"
@@ -25,6 +27,8 @@ class MeldingOmEttersending(
                     BEHOV to
                         NyEttersendingJournalPost(
                             dokumenter = dokumentKravene,
+                            dokumentasjonskravJson = dokumentasjonskravJson,
+                            seksjonId = seksjonId,
                         ),
                 ),
         )

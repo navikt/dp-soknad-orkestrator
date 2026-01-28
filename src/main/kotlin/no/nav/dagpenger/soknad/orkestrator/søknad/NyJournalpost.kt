@@ -11,6 +11,8 @@ data class NyJournalpost(
 
 data class NyEttersendingJournalPost(
     val dokumenter: List<Dokument>,
+    val dokumentasjonskravJson: String,
+    val seksjonId: String,
 )
 
 data class Dokument(
