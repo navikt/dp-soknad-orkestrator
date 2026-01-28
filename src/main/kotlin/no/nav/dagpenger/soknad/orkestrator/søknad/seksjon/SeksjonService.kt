@@ -5,6 +5,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.søknad.Dokument
 import no.nav.dagpenger.soknad.orkestrator.søknad.Dokumentvariant
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmEttersending
 import java.util.UUID
@@ -65,8 +66,12 @@ class SeksjonService(
         seksjonId: String,
         dokumentasjonskrav: String,
     ) {
-        sendEttersendingMelding(søknadId, ident, dokumentasjonskrav)
-        seksjonRepository.lagreDokumentasjonskravEttersending(søknadId, ident, seksjonId, dokumentasjonskrav)
+        søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
+        søknadRepository.verifiserAtSøknadenHarEnAvTilstandene(
+            søknadId = søknadId,
+            forventedeTilstander = listOf(Tilstand.INNSENDT, Tilstand.JOURNALFØRT),
+        )
+        sendEttersendingMelding(søknadId, ident, seksjonId, dokumentasjonskrav)
     }
 
     fun hentDokumentasjonskrav(
@@ -75,18 +80,22 @@ class SeksjonService(
         seksjonId: String,
     ) = seksjonRepository.hentDokumentasjonskrav(søknadId, ident, seksjonId)
 
-    fun sendEttersendingMelding(
+    private fun sendEttersendingMelding(
         søknadId: UUID,
         ident: String,
+        seksjonId: String,
         dokumentasjonskrav: String,
     ) {
         val event =
             MeldingOmEttersending(
-                søknadId,
-                ident,
-                opprettDokumenterFraDokumentasjonskravEttersending(
-                    dokumentasjonskrav,
-                ),
+                søknadId = søknadId,
+                ident = ident,
+                dokumentKravene =
+                    opprettDokumenterFraDokumentasjonskravEttersending(
+                        dokumentasjonskrav,
+                    ),
+                dokumentasjonskravJson = dokumentasjonskrav,
+                seksjonId = seksjonId,
             )
         rapidsConnection.publish(
             ident,
@@ -104,15 +113,16 @@ class SeksjonService(
                     ?.let { bundleNode ->
                         if (!bundleNode.isEmpty) {
                             Dokument(
-                                rootNode.at("/skjemakode").textValue(),
-                                listOf(
-                                    Dokumentvariant(
-                                        filnavn = bundleNode.at("/filnavn").textValue(),
-                                        urn = bundleNode.at("/urn").textValue(),
-                                        variant = "ARKIV",
-                                        type = "PDF",
+                                skjemakode = rootNode.at("/skjemakode").textValue(),
+                                varianter =
+                                    listOf(
+                                        Dokumentvariant(
+                                            filnavn = bundleNode.at("/filnavn").textValue(),
+                                            urn = bundleNode.at("/urn").textValue(),
+                                            variant = "ARKIV",
+                                            type = "PDF",
+                                        ),
                                     ),
-                                ),
                             )
                         } else {
                             null

@@ -36,6 +36,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepositor
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.jobb.SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføringMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.MeldingOmEttersendingMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfGenerertOgMellomlagretMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfOgVedleggJournalførtMottak
@@ -162,6 +163,7 @@ internal class ApplicationBuilder(
                     søknadService = søknadService,
                 )
                 SøknadSlettetMottak(rapidsConnection, søknadService)
+                MeldingOmEttersendingMottak(rapidsConnection, søknadRepository, seksjonRepository)
             }
 
     init {
