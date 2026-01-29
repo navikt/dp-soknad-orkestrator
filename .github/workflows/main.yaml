@@ -51,7 +51,7 @@ jobs:
   deploy-dev:
     name: Deploy to dev
     needs: [ build ]
-    if: github.ref == 'fjern_soknad_id_for_soknadsdata_behovloser'
+    if: github.ref == 'refs/heads/fjern_soknad_id_for_soknadsdata_behovloser'
     runs-on: ubuntu-latest
     permissions:
       id-token: write
