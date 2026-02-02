@@ -309,4 +309,61 @@ class SeksjonApiTest {
             response.status shouldBe BadRequest
         }
     }
+
+    @Test
+    fun `PUT oppdatere dokumentasjonskrav ved ettersending returnerer 200 OK hvis med dokumentasjonskrav og seksjon er lagret OK`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon/dokumentasjonskrav/ettersending") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    setBody("{\"dokumentasjonskrav\": true}")
+                    contentType(ContentType.Application.Json)
+                }
+
+            response.status shouldBe OK
+        }
+    }
+
+    @Test
+    fun `PUT oppdatering dokumentasjonskrav ved ettersending returnerer 200 OK hvis dokumentasjonskrav er null seksjon er lagret OK`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.put("/seksjon/e857fa6d-b004-4e11-84df-ed7a17801ff7/din-situasjon/dokumentasjonskrav/ettersending") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    setBody(null)
+                    contentType(ContentType.Application.Json)
+                }
+
+            response.status shouldBe OK
+        }
+    }
+
+    @Test
+    fun `PUT oppdatering dokumentasjonskrav ved ettersending returnerer 400 Bad Request hvis søknadId ikke er en UUID`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.put("/seksjon/ikke-en-uuid/din-situasjon/dokumentasjonskrav/ettersending") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    setBody("{\"dokumentasjonskrav\": true}")
+                    contentType(ContentType.Application.Json)
+                }
+
+            response.status shouldBe BadRequest
+        }
+    }
+
+    @Test
+    fun `PUT oppdatering dokumentasjonskrav ved ettersending returnerer 400 Bad Request hvis ident ikke matcher ident i søknad`() {
+        every { seksjonService.lagreDokumentasjonskravEttersending(any(), any(), any(), any()) } throws IllegalArgumentException()
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.put("/seksjon/ikke-en-uuid/din-situasjon/dokumentasjonskrav/ettersending") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                    setBody("{\"dokumentasjonskrav\": true}")
+                    contentType(ContentType.Application.Json)
+                }
+
+            response.status shouldBe BadRequest
+        }
+    }
 }

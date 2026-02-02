@@ -37,6 +37,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepositor
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.jobb.SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføringMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.MeldingOmEttersendingMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfGenerertOgMellomlagretMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfOgVedleggJournalførtMottak
@@ -66,7 +67,7 @@ internal class ApplicationBuilder(
     private val søknadPersonaliaRepository = SøknadPersonaliaRepository(dataSource)
 
     private val seksjonRepository = SeksjonRepository(dataSource, søknadRepository)
-    private val seksjonService = SeksjonService(seksjonRepository)
+    private val seksjonService = SeksjonService(seksjonRepository, søknadRepository)
     private val personaliaService =
         PersonaliaService(
             personService =
@@ -140,6 +141,7 @@ internal class ApplicationBuilder(
                 },
             ).also { rapidsConnection ->
                 søknadService.setRapidsConnection(rapidsConnection)
+                seksjonService.setRapidsConnection(rapidsConnection)
                 journalføringService.setRapidsConnection(rapidsConnection)
                 SøknadMottak(rapidsConnection, søknadService, søknadRepository)
                 MeldingOmSøknadKlarTilJournalføringMottak(
@@ -168,6 +170,7 @@ internal class ApplicationBuilder(
                     søknadRepository,
                 )
                 SøknadSlettetMottak(rapidsConnection, søknadService)
+                MeldingOmEttersendingMottak(rapidsConnection, søknadRepository, seksjonRepository)
             }
 
     init {
