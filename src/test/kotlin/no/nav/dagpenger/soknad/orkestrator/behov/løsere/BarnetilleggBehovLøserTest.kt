@@ -175,6 +175,16 @@ class BarnetilleggBehovLøserTest {
             it["endretAv"].asText().shouldBe("null")
             it["begrunnelse"].asText().shouldBe("null")
         }
+        løsteBarn[1].also {
+            it["kvalifiserer"].asBoolean() shouldBe true
+            it["barnetilleggFom"].asText() shouldBe "2009-11-12"
+            it["barnetilleggTom"].asText() shouldBe "2027-11-12"
+        }
+        løsteBarn[2].also {
+            it["kvalifiserer"].asBoolean() shouldBe false
+            it["barnetilleggFom"].asText() shouldBe "null"
+            it["barnetilleggTom"].asText() shouldBe "null"
+        }
     }
 
     @Test
@@ -207,7 +217,7 @@ val barnetilleggseksjonsvar = """
                   "etternavn": "KJENNING",
                   "fødselsdato": "2013-05-26",
                   "bostedsland": "NOR",
-                  "forsørger-du-barnet": "ja"
+                  "forsørger-du-barnet": "nei"
                 },
                 {
                   "fornavn-og-mellomnavn": "ENGASJERT",

@@ -80,16 +80,19 @@ class BarnetilleggBehovLøser(
 
         val svar =
             (pdlBarn + egneBarn).map { barnJson ->
-                // TODO: Vi har vel ikke alt vi trenger her?
+                val kvalifisererTilBarnetillegg = barnJson["forsørger-du-barnet"]?.asText() == "ja"
+                val fødselsdato = barnJson["fødselsdato"].asLocalDate()
+                val barnetilleggperiode = if (kvalifisererTilBarnetillegg) barnetilleggperiode(fødselsdato) else null
+
                 Løsningsbarn(
                     søknadbarnId = randomUUID(),
                     fornavnOgMellomnavn = barnJson["fornavn-og-mellomnavn"].asText(),
                     etternavn = barnJson["etternavn"].asText(),
-                    fødselsdato = barnJson["fødselsdato"].asLocalDate(),
+                    fødselsdato = fødselsdato,
                     statsborgerskap = barnJson["bostedsland"].asText(),
-                    kvalifiserer = false,
-                    barnetilleggFom = null,
-                    barnetilleggTom = null,
+                    kvalifiserer = kvalifisererTilBarnetillegg,
+                    barnetilleggFom = barnetilleggperiode?.first,
+                    barnetilleggTom = barnetilleggperiode?.second,
                     endretAv = null,
                     begrunnelse = null,
                 )
@@ -97,6 +100,8 @@ class BarnetilleggBehovLøser(
 
         return svar
     }
+
+    internal fun barnetilleggperiode(fødselsdato: LocalDate): Pair<LocalDate, LocalDate> = fødselsdato to fødselsdato.plusYears(18)
 
     private fun hentBarnSvar(
         beskrivendeId: String,
