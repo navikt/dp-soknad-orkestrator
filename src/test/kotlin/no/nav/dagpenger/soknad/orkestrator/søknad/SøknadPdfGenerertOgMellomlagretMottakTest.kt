@@ -3,9 +3,11 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.søknad.behov.BehovForJournalføringAvSøknadPdfOgVedlegg
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfGenerertOgMellomlagretMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonService
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import org.junit.jupiter.api.BeforeEach
 import java.util.UUID
@@ -16,9 +18,10 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
     private val ident = "12345678903"
     private val rapidsConnection = TestRapid()
     private val søknadService: SøknadService = mockk<SøknadService>(relaxed = true)
+    private val seksjonService: SeksjonService = mockk<SeksjonService>(relaxed = true)
 
     init {
-        SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection, søknadService)
+        SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection, søknadService, seksjonService)
     }
 
     @BeforeEach
@@ -37,6 +40,117 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
             message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
         }
     }
+
+    @Test
+    fun `onPacket behandler er permittert og er gjenopptak korrekt`() {
+        every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erPermittertJson
+        every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erGjenopptakJson
+
+        rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
+
+        with(rapidsConnection.inspektør) {
+            message(0)["søknadId"].asUUID() shouldBe søknadId
+            message(0)["ident"].asText() shouldBe ident
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asText() shouldBe "04-16.04"
+        }
+    }
+
+    @Test
+    fun `onPacket behandler er permittert og er ikke gjenopptak korrekt`() {
+        every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erPermittertJson
+        every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erIkkeGjenopptakJson
+
+        rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
+
+        with(rapidsConnection.inspektør) {
+            message(0)["søknadId"].asUUID() shouldBe søknadId
+            message(0)["ident"].asText() shouldBe ident
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asText() shouldBe "04-01.04"
+        }
+    }
+
+    @Test
+    fun `onPacket behandler er ikke permittert og er gjenopptak  korrekt`() {
+        every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erIkkePermittertJson
+        every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erGjenopptakJson
+
+        rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
+
+        with(rapidsConnection.inspektør) {
+            message(0)["søknadId"].asUUID() shouldBe søknadId
+            message(0)["ident"].asText() shouldBe ident
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asText() shouldBe "04-16.03"
+        }
+    }
+
+    @Test
+    fun `onPacket behandler er ikke permittert og er ikke gjenopptak korrekt`() {
+        every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erIkkePermittertJson
+        every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erIkkeGjenopptakJson
+
+        rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
+        with(rapidsConnection.inspektør) {
+            message(0)["søknadId"].asUUID() shouldBe søknadId
+            message(0)["ident"].asText() shouldBe ident
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asText() shouldBe "04-01.03"
+        }
+    }
+
+    private val erPermittertJson =
+        """
+        {
+            "seksjonId": "arbeidsforhold",
+            "seksjon": {
+            "registrerteArbeidsforhold": [
+                {
+                    "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
+                }
+            ]
+            },
+            "versjon": 1
+        }
+        """.trimIndent()
+
+    private val erIkkePermittertJson =
+        """
+        {
+            "seksjonId": "arbeidsforhold",
+            "seksjon": {
+            "registrerteArbeidsforhold": [
+                {
+                    "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
+                }
+            ]
+            },
+            "versjon": 1
+        }
+        """.trimIndent()
+
+    private val erGjenopptakJson =
+        """
+        {
+          "seksjonId": "din-situasjon",
+          "seksjonsvar": {
+            "harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "ja"
+          },
+          "versjon": 1
+        }
+        """.trimIndent()
+
+    private val erIkkeGjenopptakJson =
+        """
+        {
+          "seksjonId": "din-situasjon",
+          "seksjonsvar": {
+            "harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "nei"
+          },
+          "versjon": 1
+        }
+        """.trimIndent()
 
     private val genererOgMellomlagreSøknadPdfLøsning =
         //language=json
