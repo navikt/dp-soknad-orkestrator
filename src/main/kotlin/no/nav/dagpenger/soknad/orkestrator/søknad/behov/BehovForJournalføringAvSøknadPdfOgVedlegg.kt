@@ -11,6 +11,7 @@ class BehovForJournalføringAvSøknadPdfOgVedlegg(
     private val ident: String,
     private val dokumentvarianter: List<Dokumentvariant>,
     private val dokumenter: List<Dokument> = emptyList(),
+    private val skjemakode: String,
 ) {
     companion object {
         const val BEHOV = "journalfør_søknad_pdf_og_vedlegg"
@@ -28,8 +29,7 @@ class BehovForJournalføringAvSøknadPdfOgVedlegg(
                         NyJournalpost(
                             hovedDokument =
                                 Dokument(
-                                    // TODO: Denne er sannsynligvis ikke den samme alltid, må inn noe logikk for å velge riktig
-                                    skjemakode = "04-01.04",
+                                    skjemakode = skjemakode,
                                     varianter = dokumentvarianter,
                                 ),
                             dokumenter = dokumenter,
