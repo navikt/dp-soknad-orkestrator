@@ -44,9 +44,10 @@ class SøknadsdataBehovMottak(
         River(rapidsConnection)
             .apply {
                 precondition {
-                    it.requireValue("@behov", søknadsdataBehovløser.behov)
+                    it.requireAllOrAny("@behov", listOf(søknadsdataBehovløser.behov))
                     it.requireValue("@event_name", "behov")
                     it.forbid("@løsning")
+                    it.requireKey("journalpostId")
                 }
                 validate {
                     it.requireKey("ident", "@behovId")
@@ -64,7 +65,6 @@ class SøknadsdataBehovMottak(
 
         withMDC(
             mapOf(
-                "søknadId" to packet["søknadId"].asText(),
                 "behovId" to behovId,
             ),
         ) {
