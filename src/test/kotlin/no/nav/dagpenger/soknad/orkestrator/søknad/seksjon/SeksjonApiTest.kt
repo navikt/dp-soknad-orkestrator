@@ -203,8 +203,22 @@ class SeksjonApiTest {
     fun `GET alle seksjoner gitt søknadId returnerer 200 OK og forventet respons hvis søknadId har seksjoner`() {
         every { seksjonService.hentAlleSeksjonsvar(any(), any()) } returns
             listOf(
-                Seksjon("seksjon-id", "{\"key\": \"value\"}"),
-                Seksjon("seksjon-id-2", "{\"key2\": \"value2\"}"),
+                Seksjon(
+                    "seksjon-id",
+                    SeksjonsvarDAO(
+                        seksjonId = "seksjonId",
+                        seksjonsvar = "{\"key\": \"value\"}",
+                        versjon = 1,
+                    ),
+                ),
+                Seksjon(
+                    "seksjon-id-2",
+                    SeksjonsvarDAO(
+                        seksjonId = "seksjonId",
+                        seksjonsvar = "{\"key2\": \"value2\"}",
+                        versjon = 1,
+                    ),
+                ),
             )
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
@@ -215,8 +229,10 @@ class SeksjonApiTest {
 
             response.status shouldBe OK
             with(response.body() as String) {
-                this shouldContain """{"seksjonId":"seksjon-id","data":"{\"key\": \"value\"}"}"""
-                this shouldContain """{"seksjonId":"seksjon-id-2","data":"{\"key2\": \"value2\"}"}"""
+                this shouldContain
+                    """{"seksjonId":"seksjon-id","data":{"seksjonId":"seksjonId","seksjonsvar":"{\"key\": \"value\"}","versjon":1}}"""
+                this shouldContain
+                    """{"seksjonId":"seksjon-id-2","data":{"seksjonId":"seksjonId","seksjonsvar":"{\"key2\": \"value2\"}","versjon":1}}"""
             }
         }
     }

@@ -35,12 +35,13 @@ class SeksjonRepository(
         transaction {
             søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
             søknadRepository.verifiserAtSøknadHarForventetTilstand(søknadId, PÅBEGYNT)
+            val seksjonsvarDao = SeksjonsvarDAO.fraJson(seksjonsvar)
 
             SeksjonV2Tabell.upsert(
                 SeksjonV2Tabell.søknadId,
                 SeksjonV2Tabell.seksjonId,
                 onUpdate = {
-                    it[SeksjonV2Tabell.seksjonsvar] = stringLiteral(seksjonsvar)
+                    it[SeksjonV2Tabell.seksjonsvar] = seksjonsvarDao
                     it[SeksjonV2Tabell.pdfGunnlag] = stringLiteral(pdfGrunnlag)
                     it[SeksjonV2Tabell.oppdatert] = dateTimeLiteral(now())
                     if (dokumentasjonskrav != null) {
@@ -52,7 +53,7 @@ class SeksjonRepository(
             ) {
                 it[SeksjonV2Tabell.søknadId] = søknadId
                 it[SeksjonV2Tabell.seksjonId] = seksjonId
-                it[SeksjonV2Tabell.seksjonsvar] = stringLiteral(seksjonsvar)
+                it[SeksjonV2Tabell.seksjonsvar] = seksjonsvarDao
                 if (dokumentasjonskrav != null) {
                     it[SeksjonV2Tabell.dokumentasjonskrav] = stringLiteral(dokumentasjonskrav)
                 }
@@ -67,7 +68,7 @@ class SeksjonRepository(
         søknadId: UUID,
         ident: String,
         seksjonId: String,
-    ): String? =
+    ): SeksjonsvarDAO? =
         transaction {
             SeksjonV2Tabell
                 .innerJoin(SøknadTabell)
@@ -85,7 +86,7 @@ class SeksjonRepository(
         seksjonId: String,
     ): String =
         transaction {
-            hentSeksjonsvar(søknadId, ident, seksjonId)
+            hentSeksjonsvar(søknadId, ident, seksjonId)?.seksjonsvar
                 ?: throw IllegalStateException("Fant ingen seksjonsvar på $seksjonId for søknad $søknadId")
         }
 

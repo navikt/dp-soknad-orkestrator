@@ -101,9 +101,9 @@ class SøknadsdataBehovløserTest {
             )
         cases.forEach { (borINorge, bostedsland, expectedEøsBostedsland) ->
             every {
-                seksjonRepository.hentSeksjonsvar(
-                    søknadId,
+                seksjonRepository.hentSeksjonsvarEllerKastException(
                     ident,
+                    søknadId,
                     "personalia",
                 )
             } returns personaliaOrkestratorJson(borINorge, bostedsland)
@@ -370,9 +370,9 @@ class SøknadsdataBehovløserTest {
             ),
             ->
             every {
-                seksjonRepository.hentSeksjonsvar(
-                    søknadId,
+                seksjonRepository.hentSeksjonsvarEllerKastException(
                     ident,
+                    søknadId,
                     "annen-pengestotte",
                 )
             } returns

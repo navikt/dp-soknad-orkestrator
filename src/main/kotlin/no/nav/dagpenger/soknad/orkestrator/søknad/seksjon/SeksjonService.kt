@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.Dokument
 import no.nav.dagpenger.soknad.orkestrator.søknad.Dokumentvariant
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
@@ -37,11 +38,15 @@ class SeksjonService(
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
     }
 
+    // Todo denne skal returnere objekt og ikke en string
     fun hentSeksjonsvar(
         søknadId: UUID,
         ident: String,
         seksjonId: String,
-    ): String? = seksjonRepository.hentSeksjonsvar(søknadId, ident, seksjonId)
+    ): String? =
+        seksjonRepository.hentSeksjonsvar(søknadId, ident, seksjonId) ?.let {
+            objectMapper.writeValueAsString(it)
+        }
 
     fun hentAlleSeksjonsvar(
         søknadId: UUID,
@@ -133,5 +138,5 @@ class SeksjonService(
 
 data class Seksjon(
     val seksjonId: String,
-    val data: String,
+    val data: SeksjonsvarDAO,
 )

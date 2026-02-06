@@ -29,11 +29,12 @@ class HarTilleggsopplysningerBehovløser(
         }
 
         val seksjonsvar =
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                behovmelding.ident,
-                behovmelding.søknadId,
-                "tilleggsopplysninger",
-            )
+            seksjonRepository
+                .hentSeksjonsvarEllerKastException(
+                    behovmelding.ident,
+                    behovmelding.søknadId,
+                    "tilleggsopplysninger",
+                )
 
         objectMapper.readTree(seksjonsvar).let { seksjonsJson ->
             seksjonsJson.findPath("harTilleggsopplysninger")?.let {

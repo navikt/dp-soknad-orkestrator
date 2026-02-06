@@ -62,11 +62,15 @@ class BarnetilleggBehovLøser(
         }
 
         val seksjonsvar =
-            seksjonRepository.hentSeksjonsvar(
-                søknadId,
-                ident,
-                "barnetillegg",
-            ) ?: return emptyList()
+            try {
+                seksjonRepository.hentSeksjonsvarEllerKastException(
+                    ident,
+                    søknadId,
+                    "barnetillegg",
+                )
+            } catch (e: Exception) {
+                return emptyList()
+            }
 
         val pdlBarn =
             objectMapper.readTree(seksjonsvar).let { seksjonJson ->

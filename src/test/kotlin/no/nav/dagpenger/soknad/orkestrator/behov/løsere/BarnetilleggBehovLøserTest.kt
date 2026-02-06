@@ -155,12 +155,12 @@ class BarnetilleggBehovLøserTest {
                 søknadId = søknadId,
             )
         opplysningRepository.lagre(søknadstidpsunktOpplysning)
-        every { seksjonRepository.hentSeksjonsvar(any(), any(), any()) } returns
+        every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns
             barnetilleggseksjonsvar.trimIndent()
 
         behovløser.løs(lagBehovmelding(ident, søknadId, Barnetillegg))
 
-        verify(exactly = 1) { seksjonRepository.hentSeksjonsvar(søknadId, ident, "barnetillegg") }
+        verify(exactly = 1) { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "barnetillegg") }
         val løsteBarn = testRapid.inspektør.field(0, "@løsning")[Barnetillegg.name]["verdi"]
         løsteBarn.size() shouldBe 3
         løsteBarn[0].also {

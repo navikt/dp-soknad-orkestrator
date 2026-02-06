@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import io.ktor.server.plugins.NotFoundException
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
@@ -190,11 +189,11 @@ class SøknadsdataBehovløser(
         }
 
         val seksjonsvar =
-            seksjonRepository.hentSeksjonsvar(
-                søknadId,
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
+                søknadId,
                 "annen-pengestotte",
-            ) ?: throw NotFoundException("Finner ikke seksjon annen-pengestotte for søknad $søknadId")
+            )
 
         val annenPengestøtteSeksjon = objectMapper.readTree(seksjonsvar)
 
@@ -345,9 +344,9 @@ class SøknadsdataBehovløser(
         }
 
         val seksjonsSvar =
-            seksjonRepository.hentSeksjonsvar(
-                søknadId,
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
+                søknadId,
                 "personalia",
             )
 
