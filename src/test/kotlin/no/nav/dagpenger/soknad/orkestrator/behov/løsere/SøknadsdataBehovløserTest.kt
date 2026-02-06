@@ -25,6 +25,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.manuelLagteBarnFraQuiz
 import no.nav.dagpenger.soknad.orkestrator.behov.pdlBarnFraQuiz
 import no.nav.dagpenger.soknad.orkestrator.behov.personaliaOrkestratorJson
 import no.nav.dagpenger.soknad.orkestrator.behov.reellArbeidssøkerOrkestratorJson
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
@@ -80,7 +81,7 @@ class SøknadsdataBehovløserTest {
                 any(),
                 "din-situasjon",
             )
-        } returns dinSituasjonMedGjenopptakelseOrkestratorJson(now)
+        } returns objectMapper.readTree(dinSituasjonMedGjenopptakelseOrkestratorJson(now))
 
         every {
             seksjonRepository.hentSeksjonsvarEllerKastException(
@@ -88,7 +89,7 @@ class SøknadsdataBehovløserTest {
                 any(),
                 "verneplikt",
             )
-        } returns avtjentVernepliktOrkestratorJson("ja")
+        } returns objectMapper.readTree(avtjentVernepliktOrkestratorJson("ja"))
     }
 
     @Test
@@ -194,7 +195,7 @@ class SøknadsdataBehovløserTest {
                     søknadId,
                     "arbeidsforhold",
                 )
-            } returns eøsArbeidsforholdOrkestratorJson(eøsArbeidsforhold)
+            } returns objectMapper.readTree(eøsArbeidsforholdOrkestratorJson(eøsArbeidsforhold))
 
             val søknadstidspunkt = ZonedDateTime.now()
             every {
@@ -281,7 +282,7 @@ class SøknadsdataBehovløserTest {
                     søknadId,
                     "verneplikt",
                 )
-            } returns avtjentVernepliktOrkestratorJson(avtjentVerneplikt)
+            } returns objectMapper.readTree(avtjentVernepliktOrkestratorJson(avtjentVerneplikt))
 
             val søknadstidspunkt = ZonedDateTime.now()
             every {
@@ -477,7 +478,7 @@ class SøknadsdataBehovløserTest {
                 søknadId,
                 "arbeidsforhold",
             )
-        } returns arbeidsforholdMedRegistrerteAvsluttedeArbeidsforholdOrkestratorJson()
+        } returns objectMapper.readTree(arbeidsforholdMedRegistrerteAvsluttedeArbeidsforholdOrkestratorJson())
 
         val søknadstidspunkt = ZonedDateTime.now()
         every {
@@ -515,7 +516,7 @@ class SøknadsdataBehovløserTest {
                 søknadId,
                 "arbeidsforhold",
             )
-        } returns arbeidsforholdMedRegistrerteAvsluttedeArbeidsforholdOrkestratorJson()
+        } returns objectMapper.readTree(arbeidsforholdMedRegistrerteAvsluttedeArbeidsforholdOrkestratorJson())
 
         val søknadstidspunkt = ZonedDateTime.now()
         every {
@@ -616,7 +617,7 @@ class SøknadsdataBehovløserTest {
                 søknadId,
                 "arbeidsforhold",
             )
-        } returns arbeidsforholdUtenRegistrerteAvsluttedeArbeidsforholdOrkestratorJson()
+        } returns objectMapper.readTree(arbeidsforholdUtenRegistrerteAvsluttedeArbeidsforholdOrkestratorJson())
 
         val søknadstidspunkt = ZonedDateTime.now()
         every {
@@ -647,7 +648,7 @@ class SøknadsdataBehovløserTest {
                 søknadId,
                 "barnetillegg",
             )
-        } returns barnetilleggMedToBarnFraPdlOgUtenManuelLagteBarn()
+        } returns objectMapper.readTree(barnetilleggMedToBarnFraPdlOgUtenManuelLagteBarn())
 
         val søknadstidspunkt = ZonedDateTime.now()
         every {
@@ -678,7 +679,7 @@ class SøknadsdataBehovløserTest {
                 søknadId,
                 "barnetillegg",
             )
-        } returns barnetilleggMedBarnFraPdlOgManueltLagteBarn()
+        } returns objectMapper.readTree(barnetilleggMedBarnFraPdlOgManueltLagteBarn())
 
         val søknadstidspunkt = ZonedDateTime.now()
         every {
@@ -709,7 +710,7 @@ class SøknadsdataBehovløserTest {
                 søknadId,
                 "barnetillegg",
             )
-        } returns barnetilleggMedBarnLagtManuelUtenBarnFraPdl()
+        } returns objectMapper.readTree(barnetilleggMedBarnLagtManuelUtenBarnFraPdl())
 
         val søknadstidspunkt = ZonedDateTime.now()
         every {
@@ -740,7 +741,7 @@ class SøknadsdataBehovløserTest {
                 søknadId,
                 "barnetillegg",
             )
-        } returns barnetilleggUtenBarn()
+        } returns objectMapper.readTree(barnetilleggUtenBarn())
         val søknadstidspunkt = ZonedDateTime.now()
         every {
             søknadRepository.hent(any())
@@ -900,11 +901,13 @@ class SøknadsdataBehovløserTest {
                 "reell-arbeidssoker",
             )
         } returns
-            reellArbeidssøkerOrkestratorJson(
-                kanDuTaAlleTyperArbeid = "ja",
-                kanDuJobbeIHeleNorge = "nei",
-                kanDuJobbeBådeHeltidOgDeltid = "ja",
-                erDuVilligTilÅBytteYrkeEllerGåNedILønn = "nei",
+            objectMapper.readTree(
+                reellArbeidssøkerOrkestratorJson(
+                    kanDuTaAlleTyperArbeid = "ja",
+                    kanDuJobbeIHeleNorge = "nei",
+                    kanDuJobbeBådeHeltidOgDeltid = "ja",
+                    erDuVilligTilÅBytteYrkeEllerGåNedILønn = "nei",
+                ),
             )
 
         val søknadstidspunkt = ZonedDateTime.now()
@@ -941,11 +944,13 @@ class SøknadsdataBehovløserTest {
                 "reell-arbeidssoker",
             )
         } returns
-            reellArbeidssøkerOrkestratorJson(
-                kanDuTaAlleTyperArbeid = "ja",
-                kanDuJobbeIHeleNorge = "ja",
-                kanDuJobbeBådeHeltidOgDeltid = "ja",
-                erDuVilligTilÅBytteYrkeEllerGåNedILønn = "ja",
+            objectMapper.readTree(
+                reellArbeidssøkerOrkestratorJson(
+                    kanDuTaAlleTyperArbeid = "ja",
+                    kanDuJobbeIHeleNorge = "ja",
+                    kanDuJobbeBådeHeltidOgDeltid = "ja",
+                    erDuVilligTilÅBytteYrkeEllerGåNedILønn = "ja",
+                ),
             )
 
         val søknadstidspunkt = ZonedDateTime.now()
@@ -982,11 +987,13 @@ class SøknadsdataBehovløserTest {
                 "reell-arbeidssoker",
             )
         } returns
-            reellArbeidssøkerOrkestratorJson(
-                kanDuTaAlleTyperArbeid = "nei",
-                kanDuJobbeIHeleNorge = "nei",
-                kanDuJobbeBådeHeltidOgDeltid = "nei",
-                erDuVilligTilÅBytteYrkeEllerGåNedILønn = "nei",
+            objectMapper.readTree(
+                reellArbeidssøkerOrkestratorJson(
+                    kanDuTaAlleTyperArbeid = "nei",
+                    kanDuJobbeIHeleNorge = "nei",
+                    kanDuJobbeBådeHeltidOgDeltid = "nei",
+                    erDuVilligTilÅBytteYrkeEllerGåNedILønn = "nei",
+                ),
             )
 
         val søknadstidspunkt = ZonedDateTime.now()
@@ -1184,7 +1191,7 @@ class SøknadsdataBehovløserTest {
                 "din-situasjon",
             )
         } returns
-            dinSituasjonMedDagpengerFraDato(søknadstidspunkt.toLocalDate())
+            objectMapper.readTree(dinSituasjonMedDagpengerFraDato(søknadstidspunkt.toLocalDate()))
 
         every {
             søknadRepository.hent(any())
@@ -1215,7 +1222,7 @@ class SøknadsdataBehovløserTest {
                 "din-situasjon",
             )
         } returns
-            dinSituasjonMedGjenopptakelseOrkestratorJson(søknadstidspunkt.toLocalDate())
+            objectMapper.readTree(dinSituasjonMedGjenopptakelseOrkestratorJson(søknadstidspunkt.toLocalDate()))
         every {
             søknadRepository.hent(any())
         } returns

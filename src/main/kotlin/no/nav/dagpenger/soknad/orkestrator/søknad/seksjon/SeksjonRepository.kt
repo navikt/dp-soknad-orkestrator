@@ -1,5 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 
+import com.fasterxml.jackson.databind.JsonNode
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -83,10 +85,14 @@ class SeksjonRepository(
         ident: String,
         søknadId: UUID,
         seksjonId: String,
-    ): String =
+    ): JsonNode =
         transaction {
-            hentSeksjonsvar(søknadId, ident, seksjonId)
-                ?: throw IllegalStateException("Fant ingen seksjonsvar på $seksjonId for søknad $søknadId")
+            var seksjonsSvar =
+                hentSeksjonsvar(søknadId, ident, seksjonId)
+                    ?: throw IllegalStateException("Fant ingen seksjonsvar på $seksjonId for søknad $søknadId")
+
+            val seksjonsvarJson = objectMapper.readTree(seksjonsSvar)
+            seksjonsvarJson.findPath("seksjonsvar")
         }
 
     fun hentSeksjoner(

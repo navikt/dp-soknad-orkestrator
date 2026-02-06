@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.AndreØkonomiskeYtelser
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
@@ -70,14 +71,13 @@ class AndreØkonomiskeYtelserBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {
-              "seksjon": {
-                "mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver": "ja"
-              },
-              "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver": "ja"
+                }
+                """.trimIndent(),
+            )
 
         val søknadstidspunkt = ZonedDateTime.now()
         every {

@@ -4,7 +4,6 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
-import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.BehovMetrikker
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -56,7 +55,7 @@ abstract class Behovløser(
                 seksjonId,
             )
 
-        objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
+        seksjonsSvar.let { seksjonsJson ->
             seksjonsJson.findPath(feltsnavn)?.let {
                 if (!it.isMissingOrNull()) {
                     return publiserLøsning(behovmelding, it.erBoolean())

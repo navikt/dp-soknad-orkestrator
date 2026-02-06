@@ -8,6 +8,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
@@ -79,14 +80,13 @@ class BostedslandErNorgeBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {
-              "seksjon": {
-                "folkeregistrertAdresseErNorgeStemmerDet": "$svar"
-              },
-              "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "folkeregistrertAdresseErNorgeStemmerDet": "$svar"
+                }
+                """.trimIndent(),
+            )
 
         val søknadstidspunkt = ZonedDateTime.now()
         every {

@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnsketArbeidstid
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Desimaltall
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
@@ -69,15 +70,14 @@ class ØnsketArbeidstidBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {
-              "seksjon": {
-                "kanDuJobbeBådeHeltidOgDeltid": "nei",
-                "kanIkkeJobbeBådeHeltidOgDeltidAntallTimer": "27"
-              },
-              "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "kanDuJobbeBådeHeltidOgDeltid": "nei",
+                    "kanIkkeJobbeBådeHeltidOgDeltidAntallTimer": "27"
+                }
+                """.trimIndent(),
+            )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()

@@ -90,6 +90,8 @@ class SøknadsdataBehovløser(
                 reellArbeidssøker = reellArbeidssøker,
             )
 
+        logger.info { søknadsdataResultat }
+
         val søknadsdataMap: Map<String, Any> =
             objectMapper.convertValue(
                 søknadsdataResultat,
@@ -142,14 +144,14 @@ class SøknadsdataBehovløser(
             )
         }
 
-        val seksjonsvar =
+        val reellArbeidssøkerSeksjon =
             seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
                 søknadId,
                 "reell-arbeidssoker",
             )
 
-        val reellArbeidssøkerSeksjon = objectMapper.readTree(seksjonsvar)
+        // val reellArbeidssøkerSeksjon = objectMapper.readTree(seksjonsvar)
 
         val kanDuTaAlleTyperArbeid =
             reellArbeidssøkerSeksjon.finnOpplysning("kanDuTaAlleTyperArbeid").asText() == "ja"
@@ -226,12 +228,12 @@ class SøknadsdataBehovløser(
             )
 
         val pdlBarn =
-            objectMapper.readTree(seksjonsvar).let { seksjonJson ->
+            seksjonsvar.let { seksjonJson ->
                 seksjonJson.findPath("barnFraPdl")?.toList() ?: emptyList()
             }
 
         val egneBarn =
-            objectMapper.readTree(seksjonsvar).let { seksjonJson ->
+            seksjonsvar.let { seksjonJson ->
                 seksjonJson.findPath("barnLagtManuelt")?.toList() ?: emptyList()
             }
 
@@ -284,7 +286,7 @@ class SøknadsdataBehovløser(
                 return emptyList()
             }
 
-        objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
+        seksjonsSvar.let { seksjonsJson ->
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.map {

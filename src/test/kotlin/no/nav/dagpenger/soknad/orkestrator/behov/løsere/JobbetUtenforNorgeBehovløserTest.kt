@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
@@ -64,21 +65,19 @@ class JobbetUtenforNorgeBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {
-                "seksjonId": "arbeidsforhold",
-                "seksjon": {
-                "hvordanHarDuJobbet": "jobbet-mer-igjennomsnitt-de-siste-36-månedene-enn-de-siste-12-månedenen",
-                "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "nei",
-                "registrerteArbeidsforhold": [
-                    {
-                        "hvilketLandJobbetDuI": "SWE"
-                    }
-                ]
-                },
-                "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "hvordanHarDuJobbet": "jobbet-mer-igjennomsnitt-de-siste-36-månedene-enn-de-siste-12-månedenen",
+                    "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "nei",
+                    "registrerteArbeidsforhold": [
+                        {
+                            "hvilketLandJobbetDuI": "SWE"
+                        }
+                    ]
+                }
+                """.trimIndent(),
+            )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()
@@ -112,21 +111,19 @@ class JobbetUtenforNorgeBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {
-                "seksjonId": "arbeidsforhold",
-                "seksjon": {
-                "hvordanHarDuJobbet": "jobbet-mer-igjennomsnitt-de-siste-36-månedene-enn-de-siste-12-månedenen",
-                "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "nei",
-                "registrerteArbeidsforhold": [
-                    {
-                        "hvilketLandJobbetDuI": "NOR"
-                    }
-                ]
-                },
-                "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "hvordanHarDuJobbet": "jobbet-mer-igjennomsnitt-de-siste-36-månedene-enn-de-siste-12-månedenen",
+                    "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "nei",
+                    "registrerteArbeidsforhold": [
+                        {
+                            "hvilketLandJobbetDuI": "NOR"
+                        }
+                    ]
+                }
+                """.trimIndent(),
+            )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()
@@ -159,9 +156,11 @@ class JobbetUtenforNorgeBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {"versjon":1,"seksjon":{"hvordan-har-du-jobbet":"fast-arbeidstid-i-mindre-enn-6-måneder","registrerteArbeidsforhold":[]}}
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {"hvordan-har-du-jobbet":"fast-arbeidstid-i-mindre-enn-6-måneder","registrerteArbeidsforhold":[]}
+                """.trimIndent(),
+            )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()

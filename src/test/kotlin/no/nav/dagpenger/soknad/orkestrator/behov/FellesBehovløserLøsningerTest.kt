@@ -4,6 +4,7 @@ import io.kotest.assertions.throwables.shouldThrow
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Dato
@@ -102,14 +103,15 @@ class FellesBehovløserLøsningerTest {
                     any(),
                 )
             } returns
-                """
-                {
-                  "seksjon": {
-                    "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "$arbeidsforholdSvar"
-                  },
-                  "versjon": 1
-                }
-                """.trimIndent()
+                objectMapper.readTree(
+                    """
+{
+  
+    "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "$arbeidsforholdSvar"
+  
+}
+                    """.trimIndent(),
+                )
 
             val result =
                 fellesBehovLøserLøsninger.harSøkerenHattArbeidsforholdIEøs(
@@ -153,14 +155,13 @@ class FellesBehovløserLøsningerTest {
                 any(),
             )
         } returns
-            """
-            {
-              "seksjon": {
-                "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritannia": "nei"
-              },
-              "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritannia": "nei"
+                }
+                """.trimIndent(),
+            )
 
         val result =
             fellesBehovLøserLøsninger.harSøkerenHattArbeidsforholdIEøs(
@@ -202,7 +203,7 @@ class FellesBehovløserLøsningerTest {
                 any(),
                 any(),
             )
-        } returns ""
+        } returns objectMapper.readTree("{}")
 
         val result =
             fellesBehovLøserLøsninger.harSøkerenHattArbeidsforholdIEøs(
@@ -278,7 +279,13 @@ class FellesBehovløserLøsningerTest {
                 søknadId = søknadId,
             )
         every { opplysningRepository.hent(any(), any(), any()) }.returns(null)
-        every { opplysningRepository.hent("faktum.arbeidsforhold.gjenopptak.soknadsdato-gjenopptak", any(), any()) }.returns(opplysning)
+        every {
+            opplysningRepository.hent(
+                "faktum.arbeidsforhold.gjenopptak.soknadsdato-gjenopptak",
+                any(),
+                any(),
+            )
+        }.returns(opplysning)
         val result =
             fellesBehovLøserLøsninger.ønskerDagpengerFraDato(
                 ident = ident,
@@ -317,15 +324,14 @@ class FellesBehovløserLøsningerTest {
         var forventetDato = LocalDate.now()
         every { opplysningRepository.hent(any(), any(), any()) }.returns(null)
         every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) }.returns(
-            """
-            {
-              "seksjon": {
-                "harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "nei",
-                "hvilkenDatoSøkerDuDagpengerFra": "$forventetDato"              
-              },
-              "versjon": 1
-            }
-            """.trimIndent(),
+            objectMapper.readTree(
+                """
+                {
+                    "harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "nei",
+                    "hvilkenDatoSøkerDuDagpengerFra": "$forventetDato"              
+                }
+                """.trimIndent(),
+            ),
         )
 
         val resultat =
@@ -364,14 +370,13 @@ class FellesBehovløserLøsningerTest {
         val forventetDato = LocalDate.now()
         every { opplysningRepository.hent(any(), any(), any()) }.returns(null)
         every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) }.returns(
-            """
-            {
-              "seksjon": {
-                "hvilkenDatoSøkerDuGjenopptakFra": "$forventetDato"
-              },
-              "versjon": 1
-            }
-            """.trimIndent(),
+            objectMapper.readTree(
+                """
+                {
+                    "hvilkenDatoSøkerDuGjenopptakFra": "$forventetDato"
+                }
+                """.trimIndent(),
+            ),
         )
 
         val resultat =
@@ -447,7 +452,7 @@ class FellesBehovløserLøsningerTest {
     @Test
     fun `Dagpenger fra dato kaster exception når verdien ikke finnes`() {
         every { opplysningRepository.hent(any(), any(), any()) }.returns(null)
-        every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns ""
+        every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns objectMapper.readTree("")
 
         shouldThrow<IllegalStateException> {
             fellesBehovLøserLøsninger.ønskerDagpengerFraDato(
@@ -536,14 +541,13 @@ class FellesBehovløserLøsningerTest {
                     any(),
                 )
             } returns
-                """
-                {
-                  "seksjon": {
-                    "avtjentVerneplikt": "$vernepliktSvar"
-                  },
-                  "versjon": 1
-                }
-                """.trimIndent()
+                objectMapper.readTree(
+                    """
+                    {
+                        "avtjentVerneplikt": "$vernepliktSvar"
+                    }
+                    """.trimIndent(),
+                )
 
             val result =
                 fellesBehovLøserLøsninger.harSøkerenAvtjentVerneplikt(
@@ -608,7 +612,13 @@ class FellesBehovløserLøsningerTest {
     @Test
     fun `Om søkeren har avtjent verneplikt kaster exception når verdien ikke finnes`() {
         every { opplysningRepository.hent(any(), any(), any()) }.returns(null)
-        every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns ""
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns objectMapper.readTree("")
 
         shouldThrow<IllegalStateException> {
             fellesBehovLøserLøsninger.harSøkerenAvtjentVerneplikt(

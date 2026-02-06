@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertFiskeforedling
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
@@ -63,20 +64,18 @@ class PermittertFiskeforedlingBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {
-                "seksjonId": "arbeidsforhold",
-                "seksjon": {
-                "registrerteArbeidsforhold": [
-                    {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert",
-                        "permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien": "ja"
-                    }
-                ]
-                },
-                "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "registrerteArbeidsforhold": [
+                        {
+                            "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert",
+                            "permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien": "ja"
+                        }
+                    ]
+                }
+                """.trimIndent(),
+            )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()
@@ -109,20 +108,18 @@ class PermittertFiskeforedlingBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {
-                "seksjonId": "arbeidsforhold",
-                "seksjon": {
-                "registrerteArbeidsforhold": [
-                    {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert",
-                        "permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien": "nei"
-                    }
-                ]
-                },
-                "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "registrerteArbeidsforhold": [
+                        {
+                            "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert",
+                            "permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien": "nei"
+                        }
+                    ]
+                }
+                """.trimIndent(),
+            )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()
@@ -155,19 +152,17 @@ class PermittertFiskeforedlingBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {
-                "seksjonId": "arbeidsforhold",
-                "seksjon": {
-                "registrerteArbeidsforhold": [
-                    {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
-                    }
-                ]
-                },
-                "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "registrerteArbeidsforhold": [
+                        {
+                            "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
+                        }
+                    ]
+                }
+                """.trimIndent(),
+            )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()

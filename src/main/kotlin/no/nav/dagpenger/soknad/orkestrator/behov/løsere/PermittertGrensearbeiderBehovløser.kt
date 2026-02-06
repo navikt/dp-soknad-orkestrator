@@ -5,7 +5,6 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertGrensearbeider
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
-import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
@@ -58,7 +57,7 @@ class PermittertGrensearbeiderBehovløser(
                 return false
             }
 
-        objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
+        seksjonsSvar.let { seksjonsJson ->
             val reistTilbakeEnGangEllerMerOpplysning =
                 seksjonsJson.findPath("reisteDuHjemTilLandetDuBorI")?.let {
                     if (!it.isMissingOrNull()) {

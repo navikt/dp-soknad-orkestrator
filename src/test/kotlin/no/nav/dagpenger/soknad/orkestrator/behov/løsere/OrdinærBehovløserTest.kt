@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Ordinær
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
@@ -64,22 +65,20 @@ class OrdinærBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {
-                "seksjonId": "arbeidsforhold",
-                "seksjon": {
-                "registrerteArbeidsforhold": [
-                    {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
-                    },
-                    {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
-                    }
-                ]
-                },
-                "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "registrerteArbeidsforhold": [
+                        {
+                            "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
+                        },
+                        {
+                            "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
+                        }
+                    ]
+                }
+                """.trimIndent(),
+            )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()
@@ -111,22 +110,20 @@ class OrdinærBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {
-                "seksjonId": "arbeidsforhold",
-                "seksjon": {
-                "registrerteArbeidsforhold": [
-                    {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "kontraktenErUgått"
-                    },
-                    {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
-                    }
-                ]
-                },
-                "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "registrerteArbeidsforhold": [
+                        {
+                            "hvordanHarDetteArbeidsforholdetEndretSeg": "kontraktenErUgått"
+                        },
+                        {
+                            "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
+                        }
+                    ]
+                }
+                """.trimIndent(),
+            )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()
@@ -158,15 +155,13 @@ class OrdinærBehovløserTest {
                 any(),
             )
         } returns
-            """
-            {
-                "seksjonId": "arbeidsforhold",
-                "seksjon": {
-                "registrerteArbeidsforhold": []
-                },
-                "versjon": 1
-            }
-            """.trimIndent()
+            objectMapper.readTree(
+                """
+                {
+                    "registrerteArbeidsforhold": []
+                }
+                """.trimIndent(),
+            )
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
         val søknadstidspunkt = ZonedDateTime.now()

@@ -9,6 +9,7 @@ import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertGrensearbeiderBehovløser.Companion.reistITaktMedRotasjonBeskrivendeId
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertGrensearbeiderBehovløser.Companion.reistTilbakeEnGangEllerMerBeskrivendeId
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
@@ -90,15 +91,14 @@ class PermittertGrensearbeiderBehovløserTest {
                     any(),
                 )
             } returns
-                """
-                {
-                  "seksjon": {
-                    "reisteDuHjemTilLandetDuBorI": "${testData.first}",
-                    "reisteDuITaktMedRotasjon": "${testData.second}"
-                  },
-                  "versjon": 1
-                }
-                """.trimIndent()
+                objectMapper.readTree(
+                    """
+                    {
+                        "reisteDuHjemTilLandetDuBorI": "${testData.first}",
+                        "reisteDuITaktMedRotasjon": "${testData.second}"
+                    }
+                    """.trimIndent(),
+                )
         }
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang

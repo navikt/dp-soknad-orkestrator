@@ -2,7 +2,6 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
-import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
@@ -38,7 +37,7 @@ open class FellesBehovløserLøsninger(
                 return false
             }
 
-        objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
+        seksjonsSvar.let { seksjonsJson ->
             seksjonsJson.findPath("harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.erBoolean()
@@ -74,7 +73,7 @@ open class FellesBehovløserLøsninger(
                 "din-situasjon",
             )
 
-        objectMapper.readTree(seksjonsSvar).let { seksjonssJson ->
+        seksjonsSvar.let { seksjonssJson ->
             val dagpengerFraDato = seksjonssJson.findPath(dagpengerFraDatoFelt)
             val gjenopptakFraDato = seksjonssJson.findPath(gjenopptakFraDatoFelt)
 
@@ -109,7 +108,7 @@ open class FellesBehovløserLøsninger(
                 "verneplikt",
             )
 
-        objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
+        seksjonsSvar.let { seksjonsJson ->
             seksjonsJson.findPath("avtjentVerneplikt")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.erBoolean()
