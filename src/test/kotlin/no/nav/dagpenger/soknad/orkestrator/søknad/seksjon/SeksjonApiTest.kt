@@ -22,6 +22,7 @@ import io.ktor.server.auth.jwt.jwt
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.testTokenXToken
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.withMockAuthServerAndTestApplication
 import kotlin.test.Test
@@ -207,7 +208,7 @@ class SeksjonApiTest {
                     "seksjon-id",
                     SeksjonsvarDAO(
                         seksjonId = "seksjonId",
-                        seksjonsvar = "{\"key\": \"value\"}",
+                        seksjonsvar = objectMapper.readTree("""{"key": "value"}"""),
                         versjon = 1,
                     ),
                 ),
@@ -215,7 +216,7 @@ class SeksjonApiTest {
                     "seksjon-id-2",
                     SeksjonsvarDAO(
                         seksjonId = "seksjonId",
-                        seksjonsvar = "{\"key2\": \"value2\"}",
+                        seksjonsvar = objectMapper.readTree("""{"key2": "value2"}"""),
                         versjon = 1,
                     ),
                 ),
@@ -230,9 +231,9 @@ class SeksjonApiTest {
             response.status shouldBe OK
             with(response.body() as String) {
                 this shouldContain
-                    """{"seksjonId":"seksjon-id","data":{"seksjonId":"seksjonId","seksjonsvar":"{\"key\": \"value\"}","versjon":1}}"""
+                    """{"seksjonId":"seksjon-id","data":{"seksjonId":"seksjonId","seksjonsvar":{"key":"value"},"versjon":1}}"""
                 this shouldContain
-                    """{"seksjonId":"seksjon-id-2","data":{"seksjonId":"seksjonId","seksjonsvar":"{\"key2\": \"value2\"}","versjon":1}}"""
+                    """{"seksjonId":"seksjon-id-2","data":{"seksjonId":"seksjonId","seksjonsvar":{"key2":"value2"},"versjon":1}}"""
             }
         }
     }

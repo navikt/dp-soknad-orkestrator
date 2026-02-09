@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -86,8 +87,11 @@ class SeksjonRepository(
         seksjonId: String,
     ): String =
         transaction {
-            hentSeksjonsvar(søknadId, ident, seksjonId)?.seksjonsvar
-                ?: throw IllegalStateException("Fant ingen seksjonsvar på $seksjonId for søknad $søknadId")
+            var seksjonsvar =
+                hentSeksjonsvar(søknadId, ident, seksjonId)?.seksjonsvar
+                    ?: throw IllegalStateException("Fant ingen seksjonsvar på $seksjonId for søknad $søknadId")
+
+            objectMapper.writeValueAsString(seksjonsvar)
         }
 
     fun hentSeksjoner(

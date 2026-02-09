@@ -27,29 +27,41 @@ class SeksjonRepositoryTest {
     private val seksjonId3 = "seksjon-id-3"
 
     private val ident = "1234567890"
-    private val seksjonsvar =
-        SeksjonsvarDAO(
-            seksjonId = seksjonId,
-            seksjonsvar = "{\"key\": \"value\"}",
-            versjon = 1,
-        )
-    private val seksjonsvarJsonForLagring = objectMapper.writeValueAsString(seksjonsvar)
+    val seksjonsvarJsonForLagring =
+        """
+        {
+            "seksjonId":"din-situasjon",
+            "seksjonsvar":{
+                "key": "value"
+            },
+            "versjon":1
+        }
+        """.trimIndent()
+    val seksjonSvarObjekt = objectMapper.readTree("""{"key": "value"}""")
 
-    private val seksjonsvar2 =
-        SeksjonsvarDAO(
-            seksjonId = seksjonId,
-            seksjonsvar = "{\"key2\": \"value2\"}",
-            versjon = 1,
-        )
-    private val seksjonsvar2JsonForLagring = objectMapper.writeValueAsString(seksjonsvar2)
+    private val seksjonsvar2JsonForLagring =
+        """
+        {
+            "seksjonId":"din-situasjon",
+            "seksjonsvar":{
+                "key2": "value2"
+            },
+            "versjon":1
+        }
+        """.trimIndent()
+    val seksjonSvar2Objekt = objectMapper.readTree("""{"key2": "value2"}""")
 
-    private val seksjonsvar3 =
-        SeksjonsvarDAO(
-            seksjonId = seksjonId,
-            seksjonsvar = "{\"key3\": \"value3\"}",
-            versjon = 1,
-        )
-    private val seksjonsvar3JsonForLagring = objectMapper.writeValueAsString(seksjonsvar3)
+    private val seksjonsvar3JsonForLagring =
+        """
+        {
+            "seksjonId":"din-situasjon",
+            "seksjonsvar":{
+                "key3": "value3"
+            },
+            "versjon":1
+        }
+        """.trimIndent()
+    val seksjonSvar3Objekt = objectMapper.readTree("""{"key3": "value3"}""")
 
     private val pdfGrunnlag = "{\"pdfGrunnlagKey\": \"pdfGrunnlagValue\"}"
     private val pdfGrunnlag2 = "{\"pdfGrunnlagKey2\": \"pdfGrunnlagValue2\"}"
@@ -76,9 +88,19 @@ class SeksjonRepositoryTest {
         søknadRepository.opprett(Søknad(søknadId, ident))
 
         shouldNotThrowAny {
-            seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
+            seksjonRepository.lagre(
+                søknadId,
+                ident,
+                seksjonId,
+                seksjonsvarJsonForLagring,
+                dokumentasjonskrav,
+                pdfGrunnlag,
+            )
         }
-        seksjonRepository.hentSeksjonsvar(søknadId, ident, seksjonId) shouldBe seksjonsvar
+        val seksjonssvar = seksjonRepository.hentSeksjonsvar(søknadId, ident, seksjonId)
+        println(seksjonssvar)
+        seksjonssvar shouldBe
+            SeksjonsvarDAO(seksjonId = "din-situasjon", seksjonsvar = seksjonSvarObjekt, versjon = 1)
     }
 
     @Test
@@ -96,7 +118,8 @@ class SeksjonRepositoryTest {
                 pdfGrunnlag = pdfGrunnlag,
             )
         }
-        seksjonRepository.hentSeksjonsvar(søknadId, ident, seksjonId) shouldBe seksjonsvar
+        seksjonRepository.hentSeksjonsvar(søknadId, ident, seksjonId) shouldBe
+            SeksjonsvarDAO(seksjonId = "din-situasjon", seksjonsvar = seksjonSvarObjekt, versjon = 1)
     }
 
     @Test
@@ -107,7 +130,14 @@ class SeksjonRepositoryTest {
 
         val exception =
             shouldThrow<IllegalArgumentException> {
-                seksjonRepository.lagre(requestSøknadId, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
+                seksjonRepository.lagre(
+                    requestSøknadId,
+                    ident,
+                    seksjonId,
+                    seksjonsvarJsonForLagring,
+                    dokumentasjonskrav,
+                    pdfGrunnlag,
+                )
             }
 
         exception.message shouldBe "Fant ikke søknad med ID $requestSøknadId"
@@ -158,9 +188,17 @@ class SeksjonRepositoryTest {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
-        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar2JsonForLagring, dokumentasjonskrav2, pdfGrunnlag2)
+        seksjonRepository.lagre(
+            søknadId,
+            ident,
+            seksjonId,
+            seksjonsvar2JsonForLagring,
+            dokumentasjonskrav2,
+            pdfGrunnlag2,
+        )
 
-        seksjonRepository.hentSeksjonsvar(søknadId, ident, seksjonId) shouldBe seksjonsvar2
+        seksjonRepository.hentSeksjonsvar(søknadId, ident, seksjonId) shouldBe
+            SeksjonsvarDAO(seksjonId = "din-situasjon", seksjonsvar = seksjonSvar2Objekt, versjon = 1)
     }
 
     @Test
@@ -179,7 +217,8 @@ class SeksjonRepositoryTest {
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
 
-        seksjonRepository.hentSeksjonsvar(søknadId, ident, seksjonId) shouldBe seksjonsvar
+        seksjonRepository.hentSeksjonsvar(søknadId, ident, seksjonId) shouldBe
+            SeksjonsvarDAO(seksjonId = "din-situasjon", seksjonsvar = seksjonSvarObjekt, versjon = 1)
     }
 
     @Test
@@ -218,14 +257,21 @@ class SeksjonRepositoryTest {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
-        seksjonRepository.lagre(søknadId, ident, seksjonId2, seksjonsvar2JsonForLagring, dokumentasjonskrav2, pdfGrunnlag2)
+        seksjonRepository.lagre(
+            søknadId,
+            ident,
+            seksjonId2,
+            seksjonsvar2JsonForLagring,
+            dokumentasjonskrav2,
+            pdfGrunnlag2,
+        )
 
         val seksjoner = seksjonRepository.hentSeksjoner(søknadId, ident)
 
         seksjoner shouldContainExactlyInAnyOrder
             listOf(
-                Seksjon(seksjonId, seksjonsvar),
-                Seksjon(seksjonId2, seksjonsvar2),
+                Seksjon(seksjonId, SeksjonsvarDAO(seksjonId = "din-situasjon", seksjonsvar = seksjonSvarObjekt, versjon = 1)),
+                Seksjon(seksjonId2, SeksjonsvarDAO(seksjonId = "din-situasjon", seksjonsvar = seksjonSvar2Objekt, versjon = 1)),
             )
     }
 
@@ -253,7 +299,14 @@ class SeksjonRepositoryTest {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
-        seksjonRepository.lagre(søknadId, ident, seksjonId2, seksjonsvarJsonForLagring, dokumentasjonskrav2, pdfGrunnlag2)
+        seksjonRepository.lagre(
+            søknadId,
+            ident,
+            seksjonId2,
+            seksjonsvarJsonForLagring,
+            dokumentasjonskrav2,
+            pdfGrunnlag2,
+        )
 
         val seksjoner = seksjonRepository.hentSeksjonIdForAlleLagredeSeksjoner(søknadId, ident)
 
@@ -289,7 +342,14 @@ class SeksjonRepositoryTest {
         søknadRepository.opprett(Søknad(søknadId, ident))
         søknadRepository.opprett(Søknad(søknadId2, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
-        seksjonRepository.lagre(søknadId, ident, seksjonId2, seksjonsvar2JsonForLagring, dokumentasjonskrav, pdfGrunnlag2)
+        seksjonRepository.lagre(
+            søknadId,
+            ident,
+            seksjonId2,
+            seksjonsvar2JsonForLagring,
+            dokumentasjonskrav,
+            pdfGrunnlag2,
+        )
         seksjonRepository.lagre(søknadId2, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
 
         val seksjonerFørSletting = seksjonRepository.hentSeksjoner(søknadId, ident)
@@ -344,7 +404,14 @@ class SeksjonRepositoryTest {
         val lagretSøknadId = randomUUID()
         val requestSøknadId = randomUUID()
         søknadRepository.opprett(Søknad(lagretSøknadId, ident))
-        seksjonRepository.lagre(lagretSøknadId, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(
+            lagretSøknadId,
+            ident,
+            seksjonId,
+            seksjonsvarJsonForLagring,
+            dokumentasjonskrav,
+            pdfGrunnlag,
+        )
 
         val exception =
             shouldThrow<IllegalArgumentException> {
@@ -420,12 +487,24 @@ class SeksjonRepositoryTest {
         val lagretSøknadId = randomUUID()
         val requestSøknadId = randomUUID()
         søknadRepository.opprett(Søknad(lagretSøknadId, ident))
-        seksjonRepository.lagre(lagretSøknadId, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(
+            lagretSøknadId,
+            ident,
+            seksjonId,
+            seksjonsvarJsonForLagring,
+            dokumentasjonskrav,
+            pdfGrunnlag,
+        )
         søknadRepository.markerSøknadSomInnsendt(lagretSøknadId, ident, now())
 
         val exception =
             shouldThrow<IllegalArgumentException> {
-                seksjonRepository.lagreDokumentasjonskravEttersending(requestSøknadId, ident, seksjonId, dokumentasjonskrav2)
+                seksjonRepository.lagreDokumentasjonskravEttersending(
+                    requestSøknadId,
+                    ident,
+                    seksjonId,
+                    dokumentasjonskrav2,
+                )
             }
 
         exception.message shouldBe "Fant ikke søknad med ID $requestSøknadId"
@@ -441,7 +520,12 @@ class SeksjonRepositoryTest {
 
         val exception =
             shouldThrow<IllegalArgumentException> {
-                seksjonRepository.lagreDokumentasjonskravEttersending(søknadId, "en-annen-ident", seksjonId, dokumentasjonskrav2)
+                seksjonRepository.lagreDokumentasjonskravEttersending(
+                    søknadId,
+                    "en-annen-ident",
+                    seksjonId,
+                    dokumentasjonskrav2,
+                )
             }
 
         exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
@@ -487,7 +571,14 @@ class SeksjonRepositoryTest {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
-        seksjonRepository.lagre(søknadId, ident, seksjonId2, seksjonsvar2JsonForLagring, dokumentasjonskrav2, pdfGrunnlag2)
+        seksjonRepository.lagre(
+            søknadId,
+            ident,
+            seksjonId2,
+            seksjonsvar2JsonForLagring,
+            dokumentasjonskrav2,
+            pdfGrunnlag2,
+        )
         seksjonRepository.lagre(søknadId, ident, seksjonId3, seksjonsvar3JsonForLagring, pdfGrunnlag = pdfGrunnlag3)
 
         val dokumentasjonskravForSøknad = seksjonRepository.hentDokumentasjonskrav(søknadId, ident)
@@ -522,7 +613,14 @@ class SeksjonRepositoryTest {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
-        seksjonRepository.lagre(søknadId, ident, seksjonId2, seksjonsvar2JsonForLagring, dokumentasjonskrav2, pdfGrunnlag2)
+        seksjonRepository.lagre(
+            søknadId,
+            ident,
+            seksjonId2,
+            seksjonsvar2JsonForLagring,
+            dokumentasjonskrav2,
+            pdfGrunnlag2,
+        )
 
         val dokumentasjonskravForSøknad = seksjonRepository.hentPdfGrunnlag(søknadId, ident)
 
@@ -558,9 +656,23 @@ class SeksjonRepositoryTest {
         søknadRepository.opprett(Søknad(søknadId1, ident))
         søknadRepository.opprett(Søknad(søknadId2, ident))
         seksjonRepository.lagre(søknadId1, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
-        seksjonRepository.lagre(søknadId1, ident, "seksjonId2", seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(
+            søknadId1,
+            ident,
+            "seksjonId2",
+            seksjonsvarJsonForLagring,
+            dokumentasjonskrav,
+            pdfGrunnlag,
+        )
         seksjonRepository.lagre(søknadId2, ident, seksjonId, seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
-        seksjonRepository.lagre(søknadId2, ident, "seksjonId2", seksjonsvarJsonForLagring, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(
+            søknadId2,
+            ident,
+            "seksjonId2",
+            seksjonsvarJsonForLagring,
+            dokumentasjonskrav,
+            pdfGrunnlag,
+        )
 
         seksjonRepository.slettAlleSeksjoner(søknadId1, ident)
 
