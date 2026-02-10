@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
-import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
@@ -8,7 +7,6 @@ import io.ktor.server.plugins.NotFoundException
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
-import no.nav.dagpenger.soknad.orkestrator.behov.SøknadBehovmelding
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggV2BehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggV2BehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
@@ -32,8 +30,15 @@ class SøknadsdataBehovløser(
     override val behov = "Søknadsdata"
     override val beskrivendeId = "behov.søknadsdata"
 
-    override fun løs(behovmelding: SøknadBehovmelding) {
-        if (fellesBehovløserLøsninger == null) {
+    override fun løs(behovmelding: Behovmelding) {
+        super.løs(behovmelding)
+    }
+
+    fun løs2(
+        søknadId: UUID,
+        ident: String,
+    ): SøknadsdataResultType {
+        /*if (fellesBehovløserLøsninger == null) {
             throw IllegalStateException(
                 "FellesBehovløserLøsninger er ikke satt for SøknadsdataBehovløser",
             )
@@ -43,58 +48,62 @@ class SøknadsdataBehovløser(
             behovmelding.innkommendePacket.get("journalpostId").asText() ?: throw IllegalStateException(
                 "Mangler journalpostId i behov for søknadsdata for søknaden",
             )
-
         val søknadId =
-            søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
+            søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, ident)
+*/
 
-        val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
+        val eøsBostedsland = eøsBostedsland(ident, søknadId)
 
         val eøsArbeidsforhold =
-            fellesBehovløserLøsninger.harSøkerenHattArbeidsforholdIEøs(
+            fellesBehovløserLøsninger?.harSøkerenHattArbeidsforholdIEøs(
                 "faktum.eos-arbeid-siste-36-mnd",
-                behovmelding.ident,
+                ident,
                 søknadId,
             )
 
-        val avsluttetArbeidsforhold = finnAvsluttedeArbeidsforhold(behovmelding.ident, søknadId)
+        val avsluttetArbeidsforhold = finnAvsluttedeArbeidsforhold(ident, søknadId)
 
-        val avtjentVerneplikt = avtjentVerneplikt(behovmelding.ident, søknadId)
+        val avtjentVerneplikt = avtjentVerneplikt(ident, søknadId)
 
-        val harBarn = harSøkerBarn(behovmelding.ident, søknadId)
+        val harBarn = harSøkerBarn(ident, søknadId)
 
-        val harAndreYtelser = harAndreYtelser(behovmelding.ident, søknadId)
+        val harAndreYtelser = harAndreYtelser(ident, søknadId)
 
         val ønskerDagpengerFraDato =
-            fellesBehovløserLøsninger.ønskerDagpengerFraDato(
-                behovmelding.ident,
+            fellesBehovløserLøsninger?.ønskerDagpengerFraDato(
+                ident,
                 søknadId,
                 behov,
             )
 
         val reellArbeidssøker =
             erReellArbeidssøker(
-                behovmelding.ident,
+                ident,
                 søknadId,
             )
 
         val søknadsdataResultat =
             SøknadsdataResultType(
                 eøsBostedsland = eøsBostedsland,
-                eøsArbeidsforhold = eøsArbeidsforhold,
+                eøsArbeidsforhold = eøsArbeidsforhold!!,
                 avtjentVerneplikt = avtjentVerneplikt,
                 avsluttetArbeidsforhold = avsluttetArbeidsforhold,
                 harBarn = harBarn,
                 harAndreYtelser = harAndreYtelser,
-                ønskerDagpengerFraDato = ønskerDagpengerFraDato,
+                ønskerDagpengerFraDato = ønskerDagpengerFraDato!!,
                 søknadId = søknadId.toString(),
                 reellArbeidssøker = reellArbeidssøker,
             )
+
+        return søknadsdataResultat
+/*
 
         val søknadsdataMap: Map<String, Any> =
             objectMapper.convertValue(
                 søknadsdataResultat,
                 object : TypeReference<Map<String, Any>>() {},
             )
+
         val behovmeldingMedSøknadId: Behovmelding =
             Behovmelding(
                 behovmelding.innkommendePacket.apply {
@@ -102,6 +111,7 @@ class SøknadsdataBehovløser(
                 },
             )
         return publiserLøsning(behovmeldingMedSøknadId, søknadsdataMap)
+ */
     }
 
     private fun erReellArbeidssøker(

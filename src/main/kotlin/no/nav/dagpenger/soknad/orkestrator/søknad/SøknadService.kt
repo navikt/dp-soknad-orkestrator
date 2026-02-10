@@ -5,8 +5,11 @@ import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
+import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdataBehovløser
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadInnsendt
@@ -20,6 +23,7 @@ class SøknadService(
     private val søknadRepository: SøknadRepository,
     private val søknadPersonaliaRepository: SøknadPersonaliaRepository,
     private val seksjonRepository: SeksjonRepository,
+    private val quizOpplysningRepositoryPostgres: QuizOpplysningRepositoryPostgres,
 ) {
     private companion object {
         private val logg = KotlinLogging.logger {}
@@ -28,9 +32,23 @@ class SøknadService(
     }
 
     private lateinit var rapidsConnection: RapidsConnection
+    private lateinit var søknadsdataBehovLøser: SøknadsdataBehovløser
 
     fun setRapidsConnection(rapidsConnection: RapidsConnection) {
         this.rapidsConnection = rapidsConnection
+        this.søknadsdataBehovLøser =
+            SøknadsdataBehovløser(
+                søknadRepository = søknadRepository,
+                seksjonRepository = seksjonRepository,
+                opplysningRepository = quizOpplysningRepositoryPostgres,
+                fellesBehovløserLøsninger =
+                    FellesBehovløserLøsninger(
+                        opplysningRepository = quizOpplysningRepositoryPostgres,
+                        søknadRepository = søknadRepository,
+                        seksjonRepository = seksjonRepository,
+                    ),
+                rapidsConnection = rapidsConnection,
+            )
     }
 
     fun søknadFinnes(søknadId: UUID) = søknadRepository.hent(søknadId) != null
@@ -98,6 +116,14 @@ class SøknadService(
         sikkerlogg.info { "Søknad $søknadId sendt inn av $ident" }
 
         val melding = MeldingOmSøknadKlarTilJournalføring(søknadId, ident)
+        val søknadsdata =
+            søknadsdataBehovLøser.løs2(
+                søknadId = søknadId,
+                ident = ident,
+            )
+
+        val json = objectMapper.writeValueAsString(søknadsdata)
+        logg.info { "data: $json" }
 
         rapidsConnection.publish(ident, melding.asMessage().toJson())
         SøknadMetrikker.mottatt.inc()

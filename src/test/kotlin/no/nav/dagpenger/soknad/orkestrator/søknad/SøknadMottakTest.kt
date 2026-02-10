@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.mockk.mockk
+import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadMottak
@@ -15,11 +16,13 @@ class SøknadMottakTest {
     private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     private val søknadPersonaliaRepository = mockk<SøknadPersonaliaRepository>(relaxed = true)
     private val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
+    private val quizOpplysningRepositoryPostgres = mockk<QuizOpplysningRepositoryPostgres>(relaxed = true)
     private val søknadService =
         SøknadService(
             søknadRepository = søknadRepository,
             søknadPersonaliaRepository = søknadPersonaliaRepository,
             seksjonRepository = seksjonRepository,
+            quizOpplysningRepositoryPostgres = quizOpplysningRepositoryPostgres,
         ).also {
             it.setRapidsConnection(testRapid)
         }

@@ -51,7 +51,8 @@ fun eøsArbeidsforholdOrkestratorJson(eøsArbeidsforhold: String): String =
     ).trimIndent()
 
 fun avtjentVernepliktOrkestratorJson(avtjentVerneplikt: String): String =
-    "{\"avtjentVerneplikt\":\"$avtjentVerneplikt\",\"dokumentasjonskrav\":\"null\"}".trimIndent()
+    "{\"seksjonId\":\"verneplikt\",\"versjon\":1,\"seksjonsvar\":{\"avtjentVerneplikt\":\"$avtjentVerneplikt\",\"dokumentasjonskrav\":\"[]\"}}"
+        .trimIndent()
 
 fun annenPengestøtteOrkestratorJson(
     mottarDuPengestøtteFraAndreEnnNav: String,

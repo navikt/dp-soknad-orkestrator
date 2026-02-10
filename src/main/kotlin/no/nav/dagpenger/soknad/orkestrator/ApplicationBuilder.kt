@@ -97,6 +97,7 @@ internal class ApplicationBuilder(
             søknadRepository = søknadRepository,
             søknadPersonaliaRepository = søknadPersonaliaRepository,
             seksjonRepository = seksjonRepository,
+            quizOpplysningRepositoryPostgres = quizOpplysningRepositoryPostgres,
         )
 
     private val journalføringService = JournalføringService()

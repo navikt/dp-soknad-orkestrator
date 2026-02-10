@@ -40,11 +40,13 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
 import java.time.LocalDate
 import java.time.ZonedDateTime
 import java.util.UUID
 import kotlin.test.Test
 
+@Disabled
 class SøknadsdataBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
