@@ -5,7 +5,7 @@ import java.util.UUID
 
 data class SøknadForIdent(
     val søknadId: UUID,
-    val innsendtTimestamp: LocalDateTime,
+    val innsendtTimestamp: LocalDateTime? = null,
     val status: String,
     var tittel: String = "Søknad om dagpenger",
 )
