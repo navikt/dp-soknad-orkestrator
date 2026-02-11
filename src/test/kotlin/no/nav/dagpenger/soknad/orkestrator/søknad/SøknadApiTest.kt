@@ -133,6 +133,69 @@ class SøknadApiTest {
     }
 
     @Test
+    fun `GET mine-soknader returnerer 401 Unauthorized hvis klient ikke er autentisert`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client.get("/soknad/mine-soknader").status shouldBe Unauthorized
+        }
+    }
+
+    @Test
+    fun `GET mine-soknader returnerer 200 OK og liste med søknader for brukeren`() {
+        val søknadId = randomUUID()
+        val innsendtTimestamp = LocalDateTime.now()
+        every { søknadService.hentSøknaderForIdent(any()) } returns
+            listOf(
+                SøknadForIdent(
+                    søknadId = søknadId,
+                    innsendtTimestamp = innsendtTimestamp,
+                    status = "Innsendt",
+                    tittel = "Søknad om dagpenger",
+                ),
+            )
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/mine-soknader") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe OK
+            response.body() as String shouldContain søknadId.toString()
+            response.body() as String shouldContain "Innsendt"
+            response.body() as String shouldContain "Søknad om dagpenger"
+        }
+    }
+
+    @Test
+    fun `GET mine-soknader returnerer 200 OK og tom liste hvis brukeren ikke har søknader`() {
+        every { søknadService.hentSøknaderForIdent(any()) } returns emptyList()
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/mine-soknader") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe OK
+            response.body() as String shouldBe "[]"
+        }
+    }
+
+    @Test
+    fun `GET mine-soknader returnerer 500 Internal Server Error hvis henting av søknader feiler`() {
+        every { søknadService.hentSøknaderForIdent(any()) } throws IllegalStateException()
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            val response =
+                client.get("/soknad/mine-soknader") {
+                    header(HttpHeaders.Authorization, "Bearer $testTokenXToken")
+                }
+
+            response.status shouldBe InternalServerError
+        }
+    }
+
+    @Test
     fun `GET søknad progress returnerer 200 OK og liste av seksjoner lagret`() {
         every { seksjonService.hentSeksjonIdForAlleLagredeSeksjoner(any(), any()) } returns
             listOf(

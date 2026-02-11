@@ -350,6 +350,18 @@ class SøknadServiceTest {
         søknader!!.tittel shouldBe "Søknad om dagpenger (ikke permittert)"
     }
 
+    @Test
+    fun `Returnerer tom liste hvis det ikke finnes søknad på søkeren`() {
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf()
+
+        val søknader =
+            søknadService
+                .hentSøknaderForIdent(ident)
+
+        søknader shouldNotBe null
+        søknader shouldBe emptyList()
+    }
+
     private val quizSeksjoner =
         //language=json
         """
