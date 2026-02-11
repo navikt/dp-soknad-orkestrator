@@ -43,9 +43,6 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
     @Test
     fun `onPacket behandler er permittert og er gjenopptak korrekt`() {
-        // every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erPermittertJson
-        // every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erGjenopptakJson
-
         every { søknadService.finnSkjemaKode(any(), any()) } returns "04-16.04"
 
         rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
@@ -60,8 +57,6 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
     @Test
     fun `onPacket behandler er permittert og er ikke gjenopptak korrekt`() {
-        // every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erPermittertJson
-        // every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erIkkeGjenopptakJson
         every { søknadService.finnSkjemaKode(any(), any()) } returns "04-01.04"
 
         rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
@@ -76,8 +71,6 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
     @Test
     fun `onPacket behandler er ikke permittert og er gjenopptak  korrekt`() {
-        // every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erIkkePermittertJson
-        // every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erGjenopptakJson
         every { søknadService.finnSkjemaKode(any(), any()) } returns "04-16.03"
 
         rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
@@ -92,9 +85,6 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
     @Test
     fun `onPacket behandler er ikke permittert og er ikke gjenopptak korrekt`() {
-        // every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erIkkePermittertJson
-        // every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erIkkeGjenopptakJson
-
         every { søknadService.finnSkjemaKode(any(), any()) } returns "04-01.03"
 
         rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)

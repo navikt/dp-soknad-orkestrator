@@ -288,9 +288,11 @@ class SøknadRepository(
     fun hentSoknaderForIdent(ident: String) =
         transaction {
             SøknadTabell
+                .innerJoin(SeksjonV2Tabell)
                 .select(SøknadTabell.søknadId, SøknadTabell.innsendtTidspunkt, tilstand, SøknadTabell.oppdatertTidspunkt)
                 .where { SøknadTabell.ident eq ident }
                 .andWhere { SøknadTabell.søknadId eq SeksjonV2Tabell.søknadId }
+                .distinctBy { it[SøknadTabell.søknadId] }
                 .map {
                     SøknadForIdent(
                         søknadId = it[SøknadTabell.søknadId],
