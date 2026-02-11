@@ -362,6 +362,52 @@ class SøknadServiceTest {
         søknader shouldBe emptyList()
     }
 
+    @Test
+    fun `Returnerer Søknad om dagpenger (ikke permittert) hvis det ikke finnes data for seksjonene`() {
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns null
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "din-situasjon") } returns null
+
+        val søknadForIdent =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+
+        val søknader =
+            søknadService
+                .hentSøknaderForIdent(ident)
+                .firstOrNull { it.søknadId == søknadForIdent.søknadId }
+
+        søknader shouldNotBe null
+        søknader!!.tittel shouldBe "Søknad om dagpenger (ikke permittert)"
+    }
+
+    @Test
+    fun `Returnerer Søknad om dagpenger (ikke permittert) hvis spørsmålene ikke har blitt svart`() {
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erPermittertIkkeSvartJson
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "din-situasjon") } returns gjenopptakJsonIkkeSvart
+
+        val søknadForIdent =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+
+        val søknader =
+            søknadService
+                .hentSøknaderForIdent(ident)
+                .firstOrNull { it.søknadId == søknadForIdent.søknadId }
+
+        søknader shouldNotBe null
+        søknader!!.tittel shouldBe "Søknad om dagpenger (ikke permittert)"
+    }
+
     private val quizSeksjoner =
         //language=json
         """
@@ -423,6 +469,20 @@ class SøknadServiceTest {
         }
         """.trimIndent()
 
+    private val erPermittertIkkeSvartJson =
+        """
+        {
+            "seksjonId": "arbeidsforhold",
+            "seksjon": {
+            "registrerteArbeidsforhold": [
+                {
+                }
+            ]
+            },
+            "versjon": 1
+        }
+        """.trimIndent()
+
     private val erGjenopptakJson =
         """
         {
@@ -440,6 +500,16 @@ class SøknadServiceTest {
           "seksjonId": "din-situasjon",
           "seksjonsvar": {
             "harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "nei"
+          },
+          "versjon": 1
+        }
+        """.trimIndent()
+
+    private val gjenopptakJsonIkkeSvart =
+        """
+        {
+          "seksjonId": "din-situasjon",
+          "seksjonsvar": {
           },
           "versjon": 1
         }

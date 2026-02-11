@@ -12,6 +12,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.SLETTET_AV_SYSTEM
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell.journalpostId
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell.tilstand
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonV2Tabell
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
@@ -287,12 +288,14 @@ class SøknadRepository(
     fun hentSoknaderForIdent(ident: String) =
         transaction {
             SøknadTabell
-                .select(SøknadTabell.søknadId, SøknadTabell.innsendtTidspunkt, tilstand)
+                .select(SøknadTabell.søknadId, SøknadTabell.innsendtTidspunkt, tilstand, SøknadTabell.oppdatertTidspunkt)
                 .where { SøknadTabell.ident eq ident }
+                .andWhere { SøknadTabell.søknadId eq SeksjonV2Tabell.søknadId }
                 .map {
                     SøknadForIdent(
                         søknadId = it[SøknadTabell.søknadId],
                         innsendtTimestamp = it[SøknadTabell.innsendtTidspunkt],
+                        oppdatertTidspunkt = it[SøknadTabell.oppdatertTidspunkt],
                         status = it[SøknadTabell.tilstand],
                     )
                 }.toList()

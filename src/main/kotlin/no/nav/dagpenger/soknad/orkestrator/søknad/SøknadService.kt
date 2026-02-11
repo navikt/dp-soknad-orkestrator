@@ -170,7 +170,7 @@ class SøknadService(
     fun hentSøknaderForIdent(ident: String): List<SøknadForIdent> {
         val alleSøknaderForSøkeren = søknadRepository.hentSoknaderForIdent(ident)
         alleSøknaderForSøkeren.forEach {
-            val skjemakode = finnSkjemaKode(ident, it.søknadId)
+            val skjemakode = finnSkjemaKode(ident, it.søknadId, forventetFullførtSøknad = false)
             val tittel = hentTittelForSkjemaKode(skjemakode)
             it.tittel = tittel
         }
@@ -189,9 +189,10 @@ class SøknadService(
     fun finnSkjemaKode(
         ident: String,
         søknadId: UUID,
+        forventetFullførtSøknad: Boolean = true,
     ): String {
-        val permittert = erSøkerenPermittert(ident, søknadId)
-        val gjenopptak = erSøknadGjenopptak(ident, søknadId)
+        val permittert = erSøkerenPermittert(ident, søknadId, forventetFullførtSøknad)
+        val gjenopptak = erSøknadGjenopptak(ident, søknadId, forventetFullførtSøknad)
 
         return when {
             permittert && gjenopptak -> "04-16.04"
@@ -204,6 +205,7 @@ class SøknadService(
     private fun erSøkerenPermittert(
         ident: String,
         søknadId: UUID,
+        forventetFullførtSøknad: Boolean,
     ): Boolean {
         val seksjonsSvar =
             try {
@@ -219,21 +221,27 @@ class SøknadService(
                 return false
             }
 
-        objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
+        if (seksjonsSvar == null && !forventetFullførtSøknad) {
+            return false
+        }
+
+        objectMapper.readTree(seksjonsSvar)?.let { seksjonsJson ->
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"].asText() == "jegErPermitert"
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() == "jegErPermitert"
                     }
                 }
             }
-        }
+        } ?: return false
+
         return false
     }
 
     private fun erSøknadGjenopptak(
         ident: String,
         søknadId: UUID,
+        forventetFullførtSøknad: Boolean,
     ): Boolean {
         val seksjonsvar =
             try {
@@ -248,6 +256,10 @@ class SøknadService(
                 }
                 return false
             }
+
+        if (seksjonsvar == null && !forventetFullførtSøknad) {
+            return false
+        }
 
         objectMapper.readTree(seksjonsvar).let { seksjonsJson ->
             val dagpengerFraDato = seksjonsJson.findPath("harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene")
