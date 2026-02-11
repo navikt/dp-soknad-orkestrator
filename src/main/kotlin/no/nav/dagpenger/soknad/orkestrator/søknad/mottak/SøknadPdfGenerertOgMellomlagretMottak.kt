@@ -64,7 +64,7 @@ internal class SøknadPdfGenerertOgMellomlagretMottak(
                 BehovForJournalføringAvSøknadPdfOgVedlegg(
                     søknadId = søknadId,
                     ident = ident,
-                    dokumentvarianter = packet["@løsning"][BEHOV].dokumentVarianter(),
+                    dokumentvarianter = packet["@løsning"][BEHOV].dokumentVarianter(søknadId = søknadId),
                     dokumenter = søknadService.opprettDokumenterFraDokumentasjonskrav(søknadId, ident),
                     skjemakode = finnSkjemaKode(ident, søknadId),
                 )
