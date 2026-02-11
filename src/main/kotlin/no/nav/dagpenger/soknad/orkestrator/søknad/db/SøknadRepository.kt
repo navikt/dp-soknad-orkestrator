@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadForIdent
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.JOURNALFØRT
@@ -149,9 +150,9 @@ class SøknadRepository(
         transaction {
             val tilstand =
                 SøknadTabell
-                    .select(SøknadTabell.tilstand)
+                    .select(tilstand)
                     .where { SøknadTabell.søknadId eq søknadId }
-                    .map { it[SøknadTabell.tilstand] }
+                    .map { it[tilstand] }
                     .firstOrNull()
             requireNotNull(tilstand) { "Fant ikke søknad med ID $søknadId" }
             check(forventetTilstand.name == tilstand) {
@@ -167,9 +168,9 @@ class SøknadRepository(
         transaction {
             val tilstand =
                 SøknadTabell
-                    .select(SøknadTabell.tilstand)
+                    .select(tilstand)
                     .where { SøknadTabell.søknadId eq søknadId }
-                    .map { it[SøknadTabell.tilstand] }
+                    .map { it[tilstand] }
                     .firstOrNull()
             requireNotNull(tilstand) { "Fant ikke søknad med ID $søknadId" }
             check(forventedeTilstander.map { it.name }.contains(tilstand)) {
@@ -281,6 +282,20 @@ class SøknadRepository(
                 .map { it[SøknadTabell.søknadId] }
                 .firstOrNull()
                 ?: throw IllegalStateException("Fant ikke søknad med journalpostId: $journalpostId for ident: $ident")
+        }
+
+    fun hentSoknaderForIdent(ident: String) =
+        transaction {
+            SøknadTabell
+                .select(SøknadTabell.søknadId, SøknadTabell.innsendtTidspunkt, tilstand)
+                .where { SøknadTabell.ident eq ident }
+                .map {
+                    SøknadForIdent(
+                        søknadId = it[SøknadTabell.søknadId],
+                        innsendtTimestamp = it[SøknadTabell.innsendtTidspunkt],
+                        status = it[SøknadTabell.tilstand],
+                    )
+                }.toList()
         }
 }
 
