@@ -74,6 +74,7 @@ spec:
       rules:
         - application: dp-brukerdialog-frontend
         - application: dp-saksbehandling-frontend
+        - application: dp-mine-dagpenger-frontend
         {{#if wonderwalled}}
         - application: tokenx-token-generator
           namespace: nais
