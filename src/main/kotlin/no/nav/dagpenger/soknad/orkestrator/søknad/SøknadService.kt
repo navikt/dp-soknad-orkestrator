@@ -3,6 +3,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.databind.node.ObjectNode
+import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
@@ -13,6 +14,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadInnse
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføring
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadSlettet
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
+import no.nav.dagpenger.soknad.orkestrator.utils.erBoolean
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -164,4 +166,107 @@ class SøknadService(
             }
 
     fun hentSistOppdatertTidspunkt(søknadId: UUID): LocalDateTime? = søknadRepository.hent(søknadId)?.oppdatertTidspunkt
+
+    fun hentSøknaderForIdent(ident: String): List<SøknadForIdent> {
+        val alleSøknaderForSøkeren = søknadRepository.hentSoknaderForIdent(ident)
+        alleSøknaderForSøkeren.forEach {
+            val skjemakode = finnSkjemaKode(ident, it.søknadId, forventetFullførtSøknad = false)
+            val tittel = hentTittelForSkjemaKode(skjemakode)
+            it.tittel = tittel
+        }
+        return alleSøknaderForSøkeren
+    }
+
+    private fun hentTittelForSkjemaKode(skjemakode: String) =
+        when (skjemakode) {
+            "04-16.04" -> "Søknad om gjenopptak av dagpenger ved permittering"
+            "04-01.04" -> "Søknad om dagpenger ved permittering"
+            "04-16.03" -> "Søknad om gjenopptak av dagpenger"
+            "04-01.03" -> "Søknad om dagpenger (ikke permittert)"
+            else -> "Søknad om dagpenger"
+        }
+
+    fun finnSkjemaKode(
+        ident: String,
+        søknadId: UUID,
+        forventetFullførtSøknad: Boolean = true,
+    ): String {
+        val permittert = erSøkerenPermittert(ident, søknadId, forventetFullførtSøknad)
+        val gjenopptak = erSøknadGjenopptak(ident, søknadId, forventetFullførtSøknad)
+
+        return when {
+            permittert && gjenopptak -> "04-16.04"
+            permittert && !gjenopptak -> "04-01.04"
+            !permittert && gjenopptak -> "04-16.03"
+            else -> "04-01.03"
+        }
+    }
+
+    private fun erSøkerenPermittert(
+        ident: String,
+        søknadId: UUID,
+        forventetFullførtSøknad: Boolean,
+    ): Boolean {
+        val seksjonsSvar =
+            try {
+                seksjonRepository.hentSeksjonsvar(
+                    søknadId = søknadId,
+                    ident = ident,
+                    seksjonId = "arbeidsforhold",
+                )
+            } catch (e: IllegalStateException) {
+                logg.info {
+                    "Fant ikke seksjonsvar for arbeidsforhold med søknadId-en: $søknadId"
+                }
+                return false
+            }
+
+        if (seksjonsSvar == null && !forventetFullførtSøknad) {
+            return false
+        }
+
+        objectMapper.readTree(seksjonsSvar)?.let { seksjonsJson ->
+            seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
+                if (!it.isMissingOrNull()) {
+                    return it.any { arbeidsforhold ->
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() == "jegErPermitert"
+                    }
+                }
+            }
+        } ?: return false
+
+        return false
+    }
+
+    private fun erSøknadGjenopptak(
+        ident: String,
+        søknadId: UUID,
+        forventetFullførtSøknad: Boolean,
+    ): Boolean {
+        val seksjonsvar =
+            try {
+                seksjonRepository.hentSeksjonsvar(
+                    søknadId,
+                    ident,
+                    "din-situasjon",
+                )
+            } catch (e: IllegalStateException) {
+                logg.info {
+                    "Fant ikke seksjonsvar for din-situasjon med søknadId-en: $søknadId"
+                }
+                return false
+            }
+
+        if (seksjonsvar == null && !forventetFullførtSøknad) {
+            return false
+        }
+
+        objectMapper.readTree(seksjonsvar).let { seksjonsJson ->
+            val dagpengerFraDato = seksjonsJson.findPath("harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene")
+            if (!dagpengerFraDato.isMissingOrNull()) {
+                return dagpengerFraDato.erBoolean()
+            }
+        }
+        return false
+    }
 }

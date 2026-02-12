@@ -21,6 +21,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import java.time.LocalDateTime
 import java.util.UUID.randomUUID
 import kotlin.test.Test
 
@@ -227,7 +228,7 @@ class SøknadServiceTest {
     @Test
     fun `hentSistOppdatertTidspunkt returnerer forventet tidspunkt`() {
         val søknadId = randomUUID()
-        val forventetTidspunkt = java.time.LocalDateTime.now()
+        val forventetTidspunkt = LocalDateTime.now()
 
         every { søknadRepository.hent(any()) } returns Søknad(ident = ident, oppdatertTidspunkt = forventetTidspunkt)
 
@@ -261,6 +262,152 @@ class SøknadServiceTest {
         verify(exactly = 1) { søknadRepository.hent(søknadId) }
     }
 
+    @Test
+    fun `Henter søknader for person og setter riktig skjemakode for permittert og gjenopptak søknad`() {
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erPermittertJson
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erGjenopptakJson
+        val søknadForIdent =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+
+        val søknader =
+            søknadService
+                .hentSøknaderForIdent(ident)
+                .firstOrNull { it.søknadId == søknadForIdent.søknadId }
+
+        søknader shouldNotBe null
+        søknader!!.tittel shouldBe "Søknad om gjenopptak av dagpenger ved permittering"
+    }
+
+    @Test
+    fun `Henter søknader for person og setter riktig skjemakode for permittert men ikke gjenopptak søknad`() {
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erPermittertJson
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erIkkeGjenopptakJson
+        val søknadForIdent =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+
+        val søknader =
+            søknadService
+                .hentSøknaderForIdent(ident)
+                .firstOrNull { it.søknadId == søknadForIdent.søknadId }
+
+        søknader shouldNotBe null
+        søknader!!.tittel shouldBe "Søknad om dagpenger ved permittering"
+    }
+
+    @Test
+    fun `Henter søknader for person og setter riktig skjemakode for ikke permittert men gjenopptak søknad`() {
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erIkkePermittertJson
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erGjenopptakJson
+        val søknadForIdent =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+
+        val søknader =
+            søknadService
+                .hentSøknaderForIdent(ident)
+                .firstOrNull { it.søknadId == søknadForIdent.søknadId }
+
+        søknader shouldNotBe null
+        søknader!!.tittel shouldBe "Søknad om gjenopptak av dagpenger"
+    }
+
+    @Test
+    fun `Henter søknader for person og setter riktig skjemakode for ikke permittert og ikk gjenopptak søknad`() {
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erIkkePermittertJson
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erIkkeGjenopptakJson
+        val søknadForIdent =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+
+        val søknader =
+            søknadService
+                .hentSøknaderForIdent(ident)
+                .firstOrNull { it.søknadId == søknadForIdent.søknadId }
+
+        søknader shouldNotBe null
+        søknader!!.tittel shouldBe "Søknad om dagpenger (ikke permittert)"
+    }
+
+    @Test
+    fun `Returnerer tom liste hvis det ikke finnes søknad på søkeren`() {
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf()
+
+        val søknader =
+            søknadService
+                .hentSøknaderForIdent(ident)
+
+        søknader shouldNotBe null
+        søknader shouldBe emptyList()
+    }
+
+    @Test
+    fun `Returnerer Søknad om dagpenger (ikke permittert) hvis det ikke finnes data for seksjonene`() {
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns null
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "din-situasjon") } returns null
+
+        val søknadForIdent =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+
+        val søknader =
+            søknadService
+                .hentSøknaderForIdent(ident)
+                .firstOrNull { it.søknadId == søknadForIdent.søknadId }
+
+        søknader shouldNotBe null
+        søknader!!.tittel shouldBe "Søknad om dagpenger (ikke permittert)"
+    }
+
+    @Test
+    fun `Returnerer Søknad om dagpenger (ikke permittert) hvis spørsmålene ikke har blitt svart`() {
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erPermittertIkkeSvartJson
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), "din-situasjon") } returns gjenopptakJsonIkkeSvart
+
+        val søknadForIdent =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+
+        val søknader =
+            søknadService
+                .hentSøknaderForIdent(ident)
+                .firstOrNull { it.søknadId == søknadForIdent.søknadId }
+
+        søknader shouldNotBe null
+        søknader!!.tittel shouldBe "Søknad om dagpenger (ikke permittert)"
+    }
+
     private val quizSeksjoner =
         //language=json
         """
@@ -289,6 +436,82 @@ class SøknadServiceTest {
               "beskrivendeId": "verneplikt"
             }
           ]
+        }
+        """.trimIndent()
+
+    private val erPermittertJson =
+        """
+        {
+            "seksjonId": "arbeidsforhold",
+            "seksjon": {
+            "registrerteArbeidsforhold": [
+                {
+                    "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
+                }
+            ]
+            },
+            "versjon": 1
+        }
+        """.trimIndent()
+
+    private val erIkkePermittertJson =
+        """
+        {
+            "seksjonId": "arbeidsforhold",
+            "seksjon": {
+            "registrerteArbeidsforhold": [
+                {
+                    "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
+                }
+            ]
+            },
+            "versjon": 1
+        }
+        """.trimIndent()
+
+    private val erPermittertIkkeSvartJson =
+        """
+        {
+            "seksjonId": "arbeidsforhold",
+            "seksjon": {
+            "registrerteArbeidsforhold": [
+                {
+                }
+            ]
+            },
+            "versjon": 1
+        }
+        """.trimIndent()
+
+    private val erGjenopptakJson =
+        """
+        {
+          "seksjonId": "din-situasjon",
+          "seksjonsvar": {
+            "harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "ja"
+          },
+          "versjon": 1
+        }
+        """.trimIndent()
+
+    private val erIkkeGjenopptakJson =
+        """
+        {
+          "seksjonId": "din-situasjon",
+          "seksjonsvar": {
+            "harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "nei"
+          },
+          "versjon": 1
+        }
+        """.trimIndent()
+
+    private val gjenopptakJsonIkkeSvart =
+        """
+        {
+          "seksjonId": "din-situasjon",
+          "seksjonsvar": {
+          },
+          "versjon": 1
         }
         """.trimIndent()
 }

@@ -43,8 +43,7 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
     @Test
     fun `onPacket behandler er permittert og er gjenopptak korrekt`() {
-        every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erPermittertJson
-        every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erGjenopptakJson
+        every { søknadService.finnSkjemaKode(any(), any()) } returns "04-16.04"
 
         rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
 
@@ -58,8 +57,7 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
     @Test
     fun `onPacket behandler er permittert og er ikke gjenopptak korrekt`() {
-        every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erPermittertJson
-        every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erIkkeGjenopptakJson
+        every { søknadService.finnSkjemaKode(any(), any()) } returns "04-01.04"
 
         rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
 
@@ -73,8 +71,7 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
     @Test
     fun `onPacket behandler er ikke permittert og er gjenopptak  korrekt`() {
-        every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erIkkePermittertJson
-        every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erGjenopptakJson
+        every { søknadService.finnSkjemaKode(any(), any()) } returns "04-16.03"
 
         rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
 
@@ -88,8 +85,7 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
     @Test
     fun `onPacket behandler er ikke permittert og er ikke gjenopptak korrekt`() {
-        every { seksjonService.hentSeksjonsvar(any(), any(), "arbeidsforhold") } returns erIkkePermittertJson
-        every { seksjonService.hentSeksjonsvar(any(), any(), "din-situasjon") } returns erIkkeGjenopptakJson
+        every { søknadService.finnSkjemaKode(any(), any()) } returns "04-01.03"
 
         rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
         with(rapidsConnection.inspektør) {
@@ -99,58 +95,6 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
             message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asText() shouldBe "04-01.03"
         }
     }
-
-    private val erPermittertJson =
-        """
-        {
-            "seksjonId": "arbeidsforhold",
-            "seksjon": {
-            "registrerteArbeidsforhold": [
-                {
-                    "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
-                }
-            ]
-            },
-            "versjon": 1
-        }
-        """.trimIndent()
-
-    private val erIkkePermittertJson =
-        """
-        {
-            "seksjonId": "arbeidsforhold",
-            "seksjon": {
-            "registrerteArbeidsforhold": [
-                {
-                    "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
-                }
-            ]
-            },
-            "versjon": 1
-        }
-        """.trimIndent()
-
-    private val erGjenopptakJson =
-        """
-        {
-          "seksjonId": "din-situasjon",
-          "seksjonsvar": {
-            "harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "ja"
-          },
-          "versjon": 1
-        }
-        """.trimIndent()
-
-    private val erIkkeGjenopptakJson =
-        """
-        {
-          "seksjonId": "din-situasjon",
-          "seksjonsvar": {
-            "harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "nei"
-          },
-          "versjon": 1
-        }
-        """.trimIndent()
 
     private val genererOgMellomlagreSøknadPdfLøsning =
         //language=json

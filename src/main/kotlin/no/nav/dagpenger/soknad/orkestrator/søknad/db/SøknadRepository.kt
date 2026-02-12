@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadForIdent
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.JOURNALFØRT
@@ -11,6 +12,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.SLETTET_AV_SYSTEM
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell.journalpostId
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadTabell.tilstand
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonV2Tabell
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
@@ -149,9 +151,9 @@ class SøknadRepository(
         transaction {
             val tilstand =
                 SøknadTabell
-                    .select(SøknadTabell.tilstand)
+                    .select(tilstand)
                     .where { SøknadTabell.søknadId eq søknadId }
-                    .map { it[SøknadTabell.tilstand] }
+                    .map { it[tilstand] }
                     .firstOrNull()
             requireNotNull(tilstand) { "Fant ikke søknad med ID $søknadId" }
             check(forventetTilstand.name == tilstand) {
@@ -167,9 +169,9 @@ class SøknadRepository(
         transaction {
             val tilstand =
                 SøknadTabell
-                    .select(SøknadTabell.tilstand)
+                    .select(tilstand)
                     .where { SøknadTabell.søknadId eq søknadId }
-                    .map { it[SøknadTabell.tilstand] }
+                    .map { it[tilstand] }
                     .firstOrNull()
             requireNotNull(tilstand) { "Fant ikke søknad med ID $søknadId" }
             check(forventedeTilstander.map { it.name }.contains(tilstand)) {
@@ -281,6 +283,24 @@ class SøknadRepository(
                 .map { it[SøknadTabell.søknadId] }
                 .firstOrNull()
                 ?: throw IllegalStateException("Fant ikke søknad med journalpostId: $journalpostId for ident: $ident")
+        }
+
+    fun hentSoknaderForIdent(ident: String) =
+        transaction {
+            SøknadTabell
+                .innerJoin(SeksjonV2Tabell)
+                .select(SøknadTabell.søknadId, SøknadTabell.innsendtTidspunkt, tilstand, SøknadTabell.oppdatertTidspunkt)
+                .where { SøknadTabell.ident eq ident }
+                .andWhere { SøknadTabell.søknadId eq SeksjonV2Tabell.søknadId }
+                .distinctBy { it[SøknadTabell.søknadId] }
+                .map {
+                    SøknadForIdent(
+                        søknadId = it[SøknadTabell.søknadId],
+                        innsendtTimestamp = it[SøknadTabell.innsendtTidspunkt],
+                        oppdatertTidspunkt = it[SøknadTabell.oppdatertTidspunkt],
+                        status = it[SøknadTabell.tilstand],
+                    )
+                }.toList()
         }
 }
 

@@ -21,6 +21,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.JOURNALFØRT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.SLETTET_AV_SYSTEM
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -34,6 +35,7 @@ import kotlin.test.Test
 class SøknadRepositoryTest {
     private lateinit var søknadRepository: SøknadRepository
     private lateinit var opplysningRepository: QuizOpplysningRepository
+    private lateinit var seksjonRepository: SeksjonRepository
     private val ident = "1234567890"
 
     @BeforeTest
@@ -45,6 +47,7 @@ class SøknadRepositoryTest {
                     dataSource,
                     opplysningRepository,
                 )
+            seksjonRepository = SeksjonRepository(dataSource, søknadRepository)
         }
     }
 
@@ -470,6 +473,97 @@ class SøknadRepositoryTest {
             }
 
         exception.message shouldBe "Søknad $søknadId tilhører ikke identen som gjør kallet"
+    }
+
+    @Test
+    fun `hentSoknaderForIdent returnerer tom liste når det ikke finnes noen søknader med seksjoner for gitt ident`() {
+        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+
+        søknader shouldBe emptyList()
+    }
+
+    @Test
+    fun `hentSoknaderForIdent returnerer tom liste når søknad eksisterer men ikke har seksjoner`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+
+        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+
+        søknader shouldBe emptyList()
+    }
+
+    @Test
+    fun `hentSoknaderForIdent returnerer søknader som har seksjoner for gitt ident`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, "seksjon-id", "{}", null, "{}")
+
+        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+
+        søknader.size shouldBe 1
+        søknader[0].søknadId shouldBe søknadId
+        søknader[0].status shouldBe PÅBEGYNT.name
+    }
+
+    @Test
+    fun `hentSoknaderForIdent returnerer riktig status og tidspunkter for innsendt søknad`() {
+        val søknadId = randomUUID()
+        val innsendtTidspunkt = now().withNano(0)
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, "seksjon-id", "{}", null, "{}")
+        søknadRepository.markerSøknadSomInnsendt(søknadId, ident, innsendtTidspunkt)
+
+        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+
+        søknader.size shouldBe 1
+        søknader[0].søknadId shouldBe søknadId
+        søknader[0].status shouldBe INNSENDT.name
+        søknader[0].innsendtTimestamp shouldBe innsendtTidspunkt
+    }
+
+    @Test
+    fun `hentSoknaderForIdent returnerer flere søknader for samme ident`() {
+        val søknadId1 = randomUUID()
+        val søknadId2 = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId1, ident))
+        søknadRepository.opprett(Søknad(søknadId2, ident))
+        seksjonRepository.lagre(søknadId1, ident, "seksjon-id-1", "{}", null, "{}")
+        seksjonRepository.lagre(søknadId2, ident, "seksjon-id-2", "{}", null, "{}")
+
+        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+
+        søknader.size shouldBe 2
+        søknader.map { it.søknadId }.shouldContainAll(søknadId1, søknadId2)
+    }
+
+    @Test
+    fun `hentSoknaderForIdent returnerer ikke søknader som tilhører andre identer`() {
+        val søknadIdForIdent = randomUUID()
+        val søknadIdForAnnenIdent = randomUUID()
+        val annenIdent = "9876543210"
+        søknadRepository.opprett(Søknad(søknadIdForIdent, ident))
+        søknadRepository.opprett(Søknad(søknadIdForAnnenIdent, annenIdent))
+        seksjonRepository.lagre(søknadIdForIdent, ident, "seksjon-id", "{}", null, "{}")
+        seksjonRepository.lagre(søknadIdForAnnenIdent, annenIdent, "seksjon-id", "{}", null, "{}")
+
+        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+
+        søknader.size shouldBe 1
+        søknader[0].søknadId shouldBe søknadIdForIdent
+    }
+
+    @Test
+    fun `hentSoknaderForIdent returnerer kun en søknad selv om den har flere seksjoner`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, "seksjon-id-1", "{}", null, "{}")
+        seksjonRepository.lagre(søknadId, ident, "seksjon-id-2", "{}", null, "{}")
+        seksjonRepository.lagre(søknadId, ident, "seksjon-id-3", "{}", null, "{}")
+
+        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+
+        søknader.size shouldBe 1
+        søknader[0].søknadId shouldBe søknadId
     }
 
     private fun opprettSøknad(
