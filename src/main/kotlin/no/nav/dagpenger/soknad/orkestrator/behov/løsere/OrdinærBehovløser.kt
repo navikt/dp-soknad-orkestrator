@@ -69,7 +69,7 @@ class OrdinærBehovløser(
                     sikkerlogg.info { "Løste behov med orkestrator-data" }
 
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"].asText() !in ikkeOrdinæreRettighetstyper
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() !in ikkeOrdinæreRettighetstyper
                     }
                 }
             }
