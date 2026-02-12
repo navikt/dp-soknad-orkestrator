@@ -44,6 +44,8 @@ class BarnetilleggV2BehovLøser(
         val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
 
         if ((pdlBarnSvar + egneBarnSvar).isNotEmpty()) {
+            logger.info { "Løste behov med quiz-data" }
+            sikkerlogg.info { "Løste behov med quiz-data" }
             val alleBarn =
                 (pdlBarnSvar + egneBarnSvar).map {
                     LøsningsbarnV2(
@@ -75,10 +77,6 @@ class BarnetilleggV2BehovLøser(
                 barn = emptyList(),
             )
 
-
-        logger.info { "Løste behov med quiz-data" }
-        sikkerlogg.info { "Løste behov med quiz-data" }
-
         val pdlBarn =
             objectMapper.readTree(seksjonsvar).let { seksjonJson ->
                 seksjonJson.findPath("barnFraPdl")?.toList() ?: emptyList()
@@ -106,6 +104,9 @@ class BarnetilleggV2BehovLøser(
                     begrunnelse = null,
                 )
             }
+
+        logger.info { "Løste behov med orkestrator-data" }
+        sikkerlogg.info { "Løste behov med orkestrator-data" }
         return BarnetilleggV2Løsning(
             søknadbarnId = søknadbarnId,
             barn = svar,

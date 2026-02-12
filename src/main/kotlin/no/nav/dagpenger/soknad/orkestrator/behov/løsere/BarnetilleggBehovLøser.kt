@@ -83,13 +83,13 @@ class BarnetilleggBehovLøser(
 
         val svar =
             (pdlBarn + egneBarn).map { barnJson ->
-                val kvalifisererTilBarnetillegg = barnJson["forsørger-du-barnet"]?.asText() == "ja"
+                val kvalifisererTilBarnetillegg = barnJson["forsørgerDuBarnet"]?.asText() == "ja"
                 val fødselsdato = barnJson["fødselsdato"].asLocalDate()
                 val barnetilleggperiode = if (kvalifisererTilBarnetillegg) barnetilleggperiode(fødselsdato) else null
 
                 Løsningsbarn(
                     søknadbarnId = randomUUID(),
-                    fornavnOgMellomnavn = barnJson["fornavn-og-mellomnavn"].asText(),
+                    fornavnOgMellomnavn = barnJson["fornavnOgMellomnavn"].asText(),
                     etternavn = barnJson["etternavn"].asText(),
                     fødselsdato = fødselsdato,
                     statsborgerskap = barnJson["bostedsland"].asText(),
