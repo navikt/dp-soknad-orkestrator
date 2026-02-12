@@ -5,6 +5,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.spyk
 import io.mockk.verify
@@ -21,6 +22,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
+import org.intellij.lang.annotations.Language
 import org.junit.jupiter.api.Test
 import java.time.ZonedDateTime
 import java.util.UUID
@@ -32,7 +34,8 @@ class BarnetilleggV2BehovLøserTest {
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
     val testRapid = TestRapid()
-    val behovløser = BarnetilleggV2BehovLøser(testRapid, quizOpplysningRepositorySpy, søknadRepository, seksjonRepository)
+    val behovløser =
+        BarnetilleggV2BehovLøser(testRapid, quizOpplysningRepositorySpy, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId: UUID = randomUUID()
 
@@ -163,4 +166,91 @@ class BarnetilleggV2BehovLøserTest {
         barnetilleggV2Løsning["søknadbarnId"] shouldNotBe null
         løsteBarn.shouldBeEmpty()
     }
+
+    @Test
+    fun `Løser behov med data fra seksjonV2`() {
+        val søknadstidspunkt = ZonedDateTime.now()
+        val søknadstidpsunktOpplysning =
+            QuizOpplysning(
+                beskrivendeId = "søknadstidspunkt",
+                type = Tekst,
+                svar = søknadstidspunkt.toString(),
+                ident = ident,
+                søknadId = søknadId,
+            )
+        opplysningRepository.lagre(søknadstidpsunktOpplysning)
+        every { seksjonRepository.hentSeksjonsvar(any(), any(), any()) } returns
+            barnetilleggseksjonsvar.trimIndent()
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, BarnetilleggV2))
+
+        verify(exactly = 1) { seksjonRepository.hentSeksjonsvar(søknadId, ident, "barnetillegg") }
+        val barnetilleggV2Løsning = testRapid.inspektør.field(0, "@løsning")[BarnetilleggV2.name]["verdi"]
+        val løsteBarn = barnetilleggV2Løsning["barn"]
+
+        barnetilleggV2Løsning["søknadbarnId"] shouldNotBe null
+        løsteBarn.size() shouldBe 3
+        løsteBarn[0].also {
+            it["fornavnOgMellomnavn"].asText() shouldBe "SMISKENDE"
+            it["etternavn"].asText() shouldBe "KJENNING"
+            it["fødselsdato"].asText() shouldBe "2013-05-26"
+            it["statsborgerskap"].asText() shouldBe "NOR"
+            it["kvalifiserer"].asBoolean() shouldBe false
+            it["barnetilleggFom"].asText().shouldBe("null")
+            it["barnetilleggTom"].asText().shouldBe("null")
+            it["endretAv"].asText().shouldBe("null")
+            it["begrunnelse"].asText().shouldBe("null")
+        }
+        løsteBarn[1].also {
+            it["kvalifiserer"].asBoolean() shouldBe true
+            it["barnetilleggFom"].asText() shouldBe "2009-11-12"
+            it["barnetilleggTom"].asText() shouldBe "2027-11-12"
+        }
+        løsteBarn[2].also {
+            it["kvalifiserer"].asBoolean() shouldBe false
+            it["barnetilleggFom"].asText() shouldBe "null"
+            it["barnetilleggTom"].asText() shouldBe "null"
+        }
+    }
+
+    @Language("JSON")
+    val barnetilleggseksjonsvar = """
+{
+  "barnFraPdl": [
+    {
+      "id": "b6d35e04-f34f-4713-8972-5e8e2a9a40ed",
+      "fornavn": "SMISKENDE",
+      "mellomnavn": "",
+      "fornavnOgMellomnavn": "SMISKENDE",
+      "etternavn": "KJENNING",
+      "fødselsdato": "2013-05-26",
+      "alder": 12,
+      "bostedsland": "NOR",
+      "forsørgerDuBarnet": "nei"
+    },
+    {
+      "id": "c145d5e9-ff51-47a0-b393-2752bf17855f",
+      "fornavn": "ENGASJERT",
+      "mellomnavn": "",
+      "fornavnOgMellomnavn": "ENGASJERT",
+      "etternavn": "BUSSTOPP",
+      "fødselsdato": "2009-11-12",
+      "alder": 16,
+      "bostedsland": "NOR",
+      "forsørgerDuBarnet": "ja"
+    }
+  ],
+  "forsørgerDuBarnSomIkkeVisesHer": "ja",
+  "barnLagtManuelt": [
+    {
+      "id": "601b9124-183f-4e9a-a3a3-c49389451255",
+      "dokumentasjonskravId": "fe1024f5-7f62-4b7a-94c9-b9cc38205432",
+      "fornavnOgMellomnavn": "l",
+      "etternavn": "l",
+      "fødselsdato": "2025-10-21",
+      "bostedsland": "ARG"
+    }
+  ]
+}
+            """
 }

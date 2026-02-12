@@ -213,26 +213,34 @@ val barnetilleggseksjonsvar = """
             {
               "barnFraPdl": [
                 {
-                  "fornavn-og-mellomnavn": "SMISKENDE",
+                  "id": "b6d35e04-f34f-4713-8972-5e8e2a9a40ed",
+                  "fornavn": "SMISKENDE",
+                  "mellomnavn": "",
+                  "fornavnOgMellomnavn": "SMISKENDE",
                   "etternavn": "KJENNING",
                   "fødselsdato": "2013-05-26",
+                  "alder": 12,
                   "bostedsland": "NOR",
-                  "forsørger-du-barnet": "nei"
+                  "forsørgerDuBarnet": "nei"
                 },
                 {
-                  "fornavn-og-mellomnavn": "ENGASJERT",
+                  "id": "c145d5e9-ff51-47a0-b393-2752bf17855f",
+                  "fornavn": "ENGASJERT",
+                  "mellomnavn": "",
+                  "fornavnOgMellomnavn": "ENGASJERT",
                   "etternavn": "BUSSTOPP",
                   "fødselsdato": "2009-11-12",
+                  "alder": 16,
                   "bostedsland": "NOR",
-                  "forsørger-du-barnet": "ja"
+                  "forsørgerDuBarnet": "ja"
                 }
               ],
-              "forsørger-du-barn-som-ikke-vises-her": "ja",
+              "forsørgerDuBarnSomIkkeVisesHer": "ja",
               "barnLagtManuelt": [
                 {
                   "id": "601b9124-183f-4e9a-a3a3-c49389451255",
                   "dokumentasjonskravId": "fe1024f5-7f62-4b7a-94c9-b9cc38205432",
-                  "fornavn-og-mellomnavn": "l",
+                  "fornavnOgMellomnavn": "l",
                   "etternavn": "l",
                   "fødselsdato": "2025-10-21",
                   "bostedsland": "ARG"
