@@ -2,6 +2,8 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
+import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser.Companion.logger
+import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser.Companion.sikkerlogg
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -24,6 +26,9 @@ open class FellesBehovløserLøsninger(
             opplysningRepository.hent(beskrivendeId, ident, søknadId)?.svar
 
         if (svarPåBehov != null) {
+            logger.info { "Løste behov med quiz-data" }
+            sikkerlogg.info { "Løste behov med quiz-data" }
+
             return svarPåBehov.toString().toBoolean()
         }
 
@@ -41,6 +46,9 @@ open class FellesBehovløserLøsninger(
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene")?.let {
                 if (!it.isMissingOrNull()) {
+                    logger.info { "Løste behov med orkestrator-data" }
+                    sikkerlogg.info { "Løste behov med orkestrator-data" }
+
                     return it.erBoolean()
                 }
             }
@@ -64,6 +72,9 @@ open class FellesBehovløserLøsninger(
                 ?: opplysningRepository.hent(beskrivendeIdGjenopptaksdato, ident, søknadId)?.svar
 
         if (svarPåBehov != null) {
+            logger.info { "Løste behov med quiz-data" }
+            sikkerlogg.info { "Løste behov med quiz-data" }
+
             return svarPåBehov.toString().let { LocalDate.parse(it) }
         }
 
@@ -79,8 +90,14 @@ open class FellesBehovløserLøsninger(
             val gjenopptakFraDato = seksjonssJson.findPath(gjenopptakFraDatoFelt)
 
             if (!dagpengerFraDato.isMissingOrNull()) {
+                logger.info { "Løste behov med orkestrator-data" }
+                sikkerlogg.info { "Løste behov med orkestrator-data" }
+
                 return dagpengerFraDato.asLocalDate()
             } else if (!gjenopptakFraDato.isMissingOrNull()) {
+                logger.info { "Løste behov med orkestrator-data" }
+                sikkerlogg.info { "Løste behov med orkestrator-data" }
+
                 return gjenopptakFraDato.asLocalDate()
             }
         }
@@ -100,6 +117,9 @@ open class FellesBehovløserLøsninger(
             opplysningRepository.hent(beskrivendeId, ident, søknadId)?.svar
 
         if (svarPåBehov != null) {
+            logger.info { "Løste behov med quiz-data" }
+            sikkerlogg.info { "Løste behov med quiz-data" }
+
             return svarPåBehov.toString().toBoolean()
         }
         val seksjonsSvar =
@@ -112,6 +132,9 @@ open class FellesBehovløserLøsninger(
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("avtjentVerneplikt")?.let {
                 if (!it.isMissingOrNull()) {
+                    logger.info { "Løste behov med orkestrator-data" }
+                    sikkerlogg.info { "Løste behov med orkestrator-data" }
+
                     return it.erBoolean()
                 }
             }

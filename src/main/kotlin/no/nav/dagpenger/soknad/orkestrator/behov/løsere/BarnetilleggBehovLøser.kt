@@ -45,6 +45,9 @@ class BarnetilleggBehovLøser(
         if ((pdlBarnSvar + egneBarnSvar).isNotEmpty()) {
             val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
 
+            logger.info { "Løste behov med quiz-data" }
+            sikkerlogg.info { "Løste behov med quiz-data" }
+
             return (pdlBarnSvar + egneBarnSvar).map {
                 Løsningsbarn(
                     søknadbarnId = søknadbarnId,
@@ -97,6 +100,9 @@ class BarnetilleggBehovLøser(
                     begrunnelse = null,
                 )
             }
+
+        logger.info { "Løste behov med orkestrator-data" }
+        sikkerlogg.info { "Løste behov med orkestrator-data" }
 
         return svar
     }

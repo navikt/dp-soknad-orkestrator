@@ -35,6 +35,9 @@ class OrdinærBehovløser(
         val arbeidsforholdOpplysning = opplysningRepository.hent(beskrivendeId, ident, søknadId)
 
         if (arbeidsforholdOpplysning != null) {
+            logger.info { "Løste behov med quiz-data" }
+            sikkerlogg.info { "Løste behov med quiz-data" }
+
             val ikkeOrdinæreRettighetstyper =
                 setOf(Sluttårsak.PERMITTERT, Sluttårsak.PERMITTERT_FISKEFOREDLING, Sluttårsak.ARBEIDSGIVER_KONKURS)
             return arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>().any {
@@ -62,6 +65,9 @@ class OrdinærBehovløser(
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
+                    logger.info { "Løste behov med orkestrator-data" }
+                    sikkerlogg.info { "Løste behov med orkestrator-data" }
+
                     return it.any { arbeidsforhold ->
                         arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"].asText() !in ikkeOrdinæreRettighetstyper
                     }

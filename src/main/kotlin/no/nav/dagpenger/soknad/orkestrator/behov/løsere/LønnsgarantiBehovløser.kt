@@ -34,6 +34,9 @@ class LønnsgarantiBehovløser(
     ): Boolean {
         val arbeidsforholdOpplysning = opplysningRepository.hent(beskrivendeId, ident, søknadId)
         if (arbeidsforholdOpplysning != null) {
+            logger.info { "Løste behov med quiz-data" }
+            sikkerlogg.info { "Løste behov med quiz-data" }
+
             return arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>().any {
                 it.sluttårsak == Sluttårsak.ARBEIDSGIVER_KONKURS
             }
@@ -53,6 +56,9 @@ class LønnsgarantiBehovløser(
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
+                    logger.info { "Løste behov med orkestrator-data" }
+                    sikkerlogg.info { "Løste behov med orkestrator-data" }
+
                     return it.any { arbeidsforhold ->
                         arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"].asText() == "arbeidsgiverErKonkurs"
                     }
