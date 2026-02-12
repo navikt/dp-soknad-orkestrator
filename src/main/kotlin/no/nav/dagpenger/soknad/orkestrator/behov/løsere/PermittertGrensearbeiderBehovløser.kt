@@ -43,6 +43,9 @@ class PermittertGrensearbeiderBehovløser(
             opplysningRepository.hent(reistITaktMedRotasjonBeskrivendeId, ident, søknadId)
 
         if (reistTilbakeEnGangEllerMerOpplysning != null || reistITaktMedRotasjonOpplysning != null) {
+            logger.info { "Løste behov med quiz-data" }
+            sikkerlogg.info { "Løste behov med quiz-data" }
+
             return reistTilbakeEnGangEllerMerOpplysning?.svar as? Boolean ?: false ||
                 reistITaktMedRotasjonOpplysning?.svar as? Boolean ?: false
         }
@@ -76,6 +79,9 @@ class PermittertGrensearbeiderBehovløser(
                         false
                     }
                 }
+
+            logger.info { "Løste behov med orkestrator-data" }
+            sikkerlogg.info { "Løste behov med orkestrator-data" }
 
             return reistTilbakeEnGangEllerMerOpplysning as? Boolean ?: false ||
                 reistITaktMedRotasjonOpplysning as? Boolean ?: false

@@ -35,6 +35,9 @@ class BostedslandErNorgeBehovløser(
             opplysningRepository.hent(beskrivendeId, ident, søknadId)
 
         if (bostedslandOpplysning != null) {
+            logger.info { "Løste behov med quiz-data" }
+            sikkerlogg.info { "Løste behov med quiz-data" }
+
             return bostedslandOpplysning.svar as String == landkodeNorge
         }
 
@@ -48,6 +51,9 @@ class BostedslandErNorgeBehovløser(
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("folkeregistrertAdresseErNorgeStemmerDet")?.let {
                 if (!it.isMissingOrNull()) {
+                    logger.info { "Løste behov med orkestrator-data" }
+                    sikkerlogg.info { "Løste behov med orkestrator-data" }
+
                     return it.erBoolean()
                 }
             }

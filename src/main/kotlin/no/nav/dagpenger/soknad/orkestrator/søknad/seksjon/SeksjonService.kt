@@ -34,6 +34,8 @@ class SeksjonService(
         dokumentasjonskrav: String? = null,
         pdfGrunnlag: String,
     ) {
+        logg.info { "Lagrer seksjon $seksjonId" }
+        sikkerlogg.info { "Lagrer seksjon $seksjonId, for ident: $ident, med svar: $seksjonsvar, dokumentasjonskrav: $dokumentasjonskrav" }
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
     }
 

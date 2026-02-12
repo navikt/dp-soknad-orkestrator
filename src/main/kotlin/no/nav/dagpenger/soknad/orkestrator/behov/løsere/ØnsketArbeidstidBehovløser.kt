@@ -24,6 +24,9 @@ class ØnsketArbeidstidBehovløser(
             opplysningRepository.hent(beskrivendeId, behovmelding.ident, behovmelding.søknadId)
 
         if (opplysning != null) {
+            logger.info { "Løste behov med quiz-data" }
+            sikkerlogg.info { "Løste behov med quiz-data" }
+
             val svarPåBehov = opplysning?.svar ?: 40.0
             return publiserLøsning(behovmelding, svarPåBehov)
         }
@@ -41,6 +44,9 @@ class ØnsketArbeidstidBehovløser(
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("kanIkkeJobbeBådeHeltidOgDeltidAntallTimer")?.let {
                 if (!it.isMissingOrNull()) {
+                    logger.info { "Løste behov med orkestrator-data" }
+                    sikkerlogg.info { "Løste behov med orkestrator-data" }
+
                     return publiserLøsning(behovmelding, it)
                 }
             }

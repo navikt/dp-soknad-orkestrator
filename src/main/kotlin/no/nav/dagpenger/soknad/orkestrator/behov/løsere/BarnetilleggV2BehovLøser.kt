@@ -55,6 +55,9 @@ class BarnetilleggV2BehovLøser(
                 )
             }
 
+        logger.info { "Løste behov med quiz-data" }
+        sikkerlogg.info { "Løste behov med quiz-data" }
+
         return BarnetilleggV2Løsning(
             søknadbarnId = søknadbarnId,
             barn = alleBarn,

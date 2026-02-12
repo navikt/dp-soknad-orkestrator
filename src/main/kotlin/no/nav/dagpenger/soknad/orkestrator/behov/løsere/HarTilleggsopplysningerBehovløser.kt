@@ -25,6 +25,9 @@ class HarTilleggsopplysningerBehovløser(
             opplysningRepository.hent(beskrivendeId, behovmelding.ident, behovmelding.søknadId)?.svar
 
         if (quizOpplysningsvar != null) {
+            logger.info { "Løste behov med quiz-data" }
+            sikkerlogg.info { "Løste behov med quiz-data" }
+
             return publiserLøsning(behovmelding, quizOpplysningsvar)
         }
 
@@ -38,6 +41,9 @@ class HarTilleggsopplysningerBehovløser(
         objectMapper.readTree(seksjonsvar).let { seksjonsJson ->
             seksjonsJson.findPath("harTilleggsopplysninger")?.let {
                 if (!it.isMissingOrNull()) {
+                    logger.info { "Løste behov med orkestrator-data" }
+                    sikkerlogg.info { "Løste behov med orkestrator-data" }
+
                     return publiserLøsning(behovmelding, it.erBoolean())
                 }
             }
