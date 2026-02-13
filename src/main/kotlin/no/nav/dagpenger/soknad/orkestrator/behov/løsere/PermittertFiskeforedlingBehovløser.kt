@@ -12,7 +12,6 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
-import no.nav.dagpenger.soknad.orkestrator.utils.erBoolean
 import java.util.UUID
 
 class PermittertFiskeforedlingBehovløser(
@@ -61,8 +60,8 @@ class PermittertFiskeforedlingBehovløser(
 
                     return it
                         .any { arbeidsforhold ->
-                            arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"].asText() == "jegErPermitert" &&
-                                arbeidsforhold["permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien"].erBoolean()
+                            arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() == "jegErPermitert" &&
+                                arbeidsforhold["permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien"]?.asText() == "ja"
                         }
                 }
             }

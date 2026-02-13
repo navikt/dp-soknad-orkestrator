@@ -60,7 +60,7 @@ class LønnsgarantiBehovløser(
                     sikkerlogg.info { "Løste behov med orkestrator-data" }
 
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"].asText() == "arbeidsgiverErKonkurs"
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() == "arbeidsgiverErKonkurs"
                     }
                 }
             }

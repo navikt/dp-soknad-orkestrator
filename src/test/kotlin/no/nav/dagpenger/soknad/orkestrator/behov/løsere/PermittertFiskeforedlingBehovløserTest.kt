@@ -190,6 +190,52 @@ class PermittertFiskeforedlingBehovløserTest {
         }
     }
 
+    @Suppress("ktlint:standard:max-line-length")
+    @Test
+    fun `Behovløser publiserer løsning på behov PermittertFiskeforedling med verdi og gjelderFra med arbeidsforhold uten hvordanHarDetteArbeidsforholdetEndretSeg`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+                "seksjonId": "arbeidsforhold",
+                "seksjon": {
+                "registrerteArbeidsforhold": [
+                    {
+                        "DetteErIkkeEkteNøkkel": "jegErPermitert",
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
+                        }
+                    ]
+                },
+                "versjon": 1
+            }
+            """.trimIndent()
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+        behovløser.løs(lagBehovmelding(ident, søknadId, PermittertFiskeforedling))
+
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
+        testRapid.inspektør.message(0)["@løsning"]["PermittertFiskeforedling"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe false
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
     @Test
     fun `Behovløser setter løsning til true når minst 1 arbeidsforhold har sluttårsak PERMITTERT_FISKEFOREDLING`() {
         val svarMedEttPermittertFiskeforedlingArbeidsforhold =

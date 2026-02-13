@@ -56,140 +56,6 @@ class OrdinærBehovløserTest {
     }
 
     @Test
-    fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata med ikke ordinær arbeidsforhold avslutning`() {
-        every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                any(),
-                any(),
-                any(),
-            )
-        } returns
-            """
-            {
-                "seksjonId": "arbeidsforhold",
-                "seksjon": {
-                "registrerteArbeidsforhold": [
-                    {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
-                    },
-                    {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
-                    }
-                ]
-                },
-                "versjon": 1
-            }
-            """.trimIndent()
-
-        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
-        val søknadstidspunkt = ZonedDateTime.now()
-        every {
-            søknadRepository.hent(any())
-        } returns
-            Søknad(
-                søknadId = søknadId,
-                ident = ident,
-                tilstand = Tilstand.INNSENDT,
-                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
-            )
-        behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))
-
-        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
-        verify { søknadRepository.hent(søknadId) }
-        testRapid.inspektør.message(0)["@løsning"]["Ordinær"].also { løsning ->
-            løsning["verdi"].asBoolean() shouldBe false
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
-        }
-    }
-
-    @Test
-    fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata med bare ordinære arbeidsforhold`() {
-        every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                any(),
-                any(),
-                any(),
-            )
-        } returns
-            """
-            {
-                "seksjonId": "arbeidsforhold",
-                "seksjon": {
-                "registrerteArbeidsforhold": [
-                    {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "kontraktenErUgått"
-                    },
-                    {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
-                    }
-                ]
-                },
-                "versjon": 1
-            }
-            """.trimIndent()
-
-        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
-        val søknadstidspunkt = ZonedDateTime.now()
-        every {
-            søknadRepository.hent(any())
-        } returns
-            Søknad(
-                søknadId = søknadId,
-                ident = ident,
-                tilstand = Tilstand.INNSENDT,
-                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
-            )
-        behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))
-
-        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
-        verify { søknadRepository.hent(søknadId) }
-        testRapid.inspektør.message(0)["@løsning"]["Ordinær"].also { løsning ->
-            løsning["verdi"].asBoolean() shouldBe true
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
-        }
-    }
-
-    @Test
-    fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata uten arbeidsforhold`() {
-        every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                any(),
-                any(),
-                any(),
-            )
-        } returns
-            """
-            {
-                "seksjonId": "arbeidsforhold",
-                "seksjon": {
-                "registrerteArbeidsforhold": []
-                },
-                "versjon": 1
-            }
-            """.trimIndent()
-
-        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
-        val søknadstidspunkt = ZonedDateTime.now()
-        every {
-            søknadRepository.hent(any())
-        } returns
-            Søknad(
-                søknadId = søknadId,
-                ident = ident,
-                tilstand = Tilstand.INNSENDT,
-                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
-            )
-        behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))
-
-        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
-        verify { søknadRepository.hent(søknadId) }
-        testRapid.inspektør.message(0)["@løsning"]["Ordinær"].also { løsning ->
-            løsning["verdi"].asBoolean() shouldBe false
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
-        }
-    }
-
-    @Test
     fun `Behovløser setter løsning til true når minst ett arbeidsforhold har en ordinær sluttårsak`() {
         val svarMedIkkeOrdinærRettighetstype =
             listOf(
@@ -260,5 +126,184 @@ class OrdinærBehovløserTest {
                 søknadId = søknadId,
             )
         return opplysning
+    }
+
+    @Test
+    fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata med ikke ordinær arbeidsforhold avslutning`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+                "seksjonId": "arbeidsforhold",
+                "seksjon": {
+                "registrerteArbeidsforhold": [
+                    {
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
+                    },
+                    {
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
+                    }
+                ]
+                },
+                "versjon": 1
+            }
+            """.trimIndent()
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+        behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))
+
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
+        testRapid.inspektør.message(0)["@løsning"]["Ordinær"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe false
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
+    @Test
+    fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata med bare ordinære arbeidsforhold`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+                "seksjonId": "arbeidsforhold",
+                "seksjon": {
+                "registrerteArbeidsforhold": [
+                    {
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "kontraktenErUgått"
+                    },
+                    {
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
+                    }
+                ]
+                },
+                "versjon": 1
+            }
+            """.trimIndent()
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+        behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))
+
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
+        testRapid.inspektør.message(0)["@løsning"]["Ordinær"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe true
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
+    @Test
+    fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata uten arbeidsforhold`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+                "seksjonId": "arbeidsforhold",
+                "seksjon": {
+                "registrerteArbeidsforhold": []
+                },
+                "versjon": 1
+            }
+            """.trimIndent()
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+        behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))
+
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
+        testRapid.inspektør.message(0)["@løsning"]["Ordinær"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe false
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
+    // TODO - Denne testen må sees nærmere på
+    @Test
+    fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata uten hvordanHarDetteArbeidsforholdetEndretSeg i arbeidsforhold`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+                "seksjonId": "arbeidsforhold",
+                "seksjon": {
+                    "registrerteArbeidsforhold": [
+                        {
+                            "ThisIsNotIt": "kontraktenErUgått"
+                        }
+                    ]
+                },
+                "versjon": 1
+            }
+            """.trimIndent()
+
+        // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+        behovløser.løs(lagBehovmelding(ident, søknadId, Ordinær))
+
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
+        verify { søknadRepository.hent(søknadId) }
+        testRapid.inspektør.message(0)["@løsning"]["Ordinær"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe false
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
     }
 }
