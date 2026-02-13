@@ -56,6 +56,79 @@ class OrdinærBehovløserTest {
     }
 
     @Test
+    fun `Behovløser setter løsning til true når minst ett arbeidsforhold har en ordinær sluttårsak`() {
+        val svarMedIkkeOrdinærRettighetstype =
+            listOf(
+                ArbeidsforholdSvar(
+                    navn = "arbeidsforhold",
+                    land = "NOR",
+                    sluttårsak = Sluttårsak.KONTRAKT_UTGAATT,
+                ),
+                ArbeidsforholdSvar(
+                    navn = "arbeidsforhold",
+                    land = "NOR",
+                    sluttårsak = Sluttårsak.PERMITTERT,
+                ),
+            )
+
+        opplysningRepository.lagre(opplysning(svar = svarMedIkkeOrdinærRettighetstype))
+        behovløser.rettTilOrdinæreDagpenger(ident, søknadId) shouldBe true
+    }
+
+    @Test
+    fun `Behovløser setter løsning til false når ingen arbeidsforhold har en ordinær sluttårsak`() {
+        val svarMedIkkeOrdinærRettighetstype =
+            listOf(
+                ArbeidsforholdSvar(
+                    navn = "arbeidsforhold",
+                    land = "NOR",
+                    sluttårsak = Sluttårsak.ARBEIDSGIVER_KONKURS,
+                ),
+                ArbeidsforholdSvar(
+                    navn = "arbeidsforhold",
+                    land = "NOR",
+                    sluttårsak = Sluttårsak.PERMITTERT,
+                ),
+            )
+
+        opplysningRepository.lagre(opplysning(svar = svarMedIkkeOrdinærRettighetstype))
+        behovløser.rettTilOrdinæreDagpenger(ident, søknadId) shouldBe false
+    }
+
+    @Test
+    fun `Behovløser setter løsning til false når det ikke er noen opplysning om arbeidsforhold`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } throws IllegalStateException("Fant ingen seksjonsvar på arbeidsforhold for søknad=$søknadId")
+        behovløser.rettTilOrdinæreDagpenger(ident, søknadId) shouldBe false
+    }
+
+    private fun opplysning(
+        svar: List<ArbeidsforholdSvar> =
+            listOf(
+                ArbeidsforholdSvar(
+                    navn = "arbeidsforhold",
+                    land = "NOR",
+                    sluttårsak = Sluttårsak.KONTRAKT_UTGAATT,
+                ),
+            ),
+    ): QuizOpplysning<List<ArbeidsforholdSvar>> {
+        val opplysning =
+            QuizOpplysning(
+                beskrivendeId = behovløser.beskrivendeId,
+                type = Arbeidsforhold,
+                svar = svar,
+                ident = ident,
+                søknadId = søknadId,
+            )
+        return opplysning
+    }
+
+    @Test
     fun `Behovløser publiserer løsning på behov Ordinær med verdi og gjelderFra fra seksjonsdata med ikke ordinær arbeidsforhold avslutning`() {
         every {
             seksjonRepository.hentSeksjonsvarEllerKastException(
@@ -120,7 +193,7 @@ class OrdinærBehovløserTest {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "kontraktenErUgått"
                     },
                     {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
                     }
                 ]
                 },
@@ -229,81 +302,8 @@ class OrdinærBehovløserTest {
         verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") }
         verify { søknadRepository.hent(søknadId) }
         testRapid.inspektør.message(0)["@løsning"]["Ordinær"].also { løsning ->
-            løsning["verdi"].asBoolean() shouldBe true
+            løsning["verdi"].asBoolean() shouldBe false
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
-    }
-
-    @Test
-    fun `Behovløser setter løsning til true når minst ett arbeidsforhold har en ordinær sluttårsak`() {
-        val svarMedIkkeOrdinærRettighetstype =
-            listOf(
-                ArbeidsforholdSvar(
-                    navn = "arbeidsforhold",
-                    land = "NOR",
-                    sluttårsak = Sluttårsak.KONTRAKT_UTGAATT,
-                ),
-                ArbeidsforholdSvar(
-                    navn = "arbeidsforhold",
-                    land = "NOR",
-                    sluttårsak = Sluttårsak.PERMITTERT,
-                ),
-            )
-
-        opplysningRepository.lagre(opplysning(svar = svarMedIkkeOrdinærRettighetstype))
-        behovløser.rettTilOrdinæreDagpenger(ident, søknadId) shouldBe true
-    }
-
-    @Test
-    fun `Behovløser setter løsning til false når ingen arbeidsforhold har en ordinær sluttårsak`() {
-        val svarMedIkkeOrdinærRettighetstype =
-            listOf(
-                ArbeidsforholdSvar(
-                    navn = "arbeidsforhold",
-                    land = "NOR",
-                    sluttårsak = Sluttårsak.ARBEIDSGIVER_KONKURS,
-                ),
-                ArbeidsforholdSvar(
-                    navn = "arbeidsforhold",
-                    land = "NOR",
-                    sluttårsak = Sluttårsak.PERMITTERT,
-                ),
-            )
-
-        opplysningRepository.lagre(opplysning(svar = svarMedIkkeOrdinærRettighetstype))
-        behovløser.rettTilOrdinæreDagpenger(ident, søknadId) shouldBe false
-    }
-
-    @Test
-    fun `Behovløser setter løsning til false når det ikke er noen opplysning om arbeidsforhold`() {
-        every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                any(),
-                any(),
-                any(),
-            )
-        } throws IllegalStateException("Fant ingen seksjonsvar på arbeidsforhold for søknad=$søknadId")
-        behovløser.rettTilOrdinæreDagpenger(ident, søknadId) shouldBe false
-    }
-
-    private fun opplysning(
-        svar: List<ArbeidsforholdSvar> =
-            listOf(
-                ArbeidsforholdSvar(
-                    navn = "arbeidsforhold",
-                    land = "NOR",
-                    sluttårsak = Sluttårsak.KONTRAKT_UTGAATT,
-                ),
-            ),
-    ): QuizOpplysning<List<ArbeidsforholdSvar>> {
-        val opplysning =
-            QuizOpplysning(
-                beskrivendeId = behovløser.beskrivendeId,
-                type = Arbeidsforhold,
-                svar = svar,
-                ident = ident,
-                søknadId = søknadId,
-            )
-        return opplysning
     }
 }
