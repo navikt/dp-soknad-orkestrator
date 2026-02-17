@@ -1,0 +1,48 @@
+[
+  {
+    "id": "c024d1d2-afda-4b86-91cb-387ac50e7690",
+    "seksjonId": "barnetillegg",
+    "spørsmålId": "forsørgerDuBarnSomIkkeVisesHer",
+    "skjemakode": "X8",
+    "tittel": "Fødselsattest/bostedsbevis for barn 1",
+    "type": "Barn",
+    "svar": "dokumentkravSvarSendNå",
+    "filer": [
+      {
+        "id": "eb6795e7-a91f-4e47-8be0-0495a5992162",
+        "filnavn": "fodselsattest.pdf",
+        "urn": "urn:vedlegg:test-soknad-id/c024d1d2-afda-4b86-91cb-387ac50e7690/file1",
+        "filsti": "test-soknad-id/c024d1d2-afda-4b86-91cb-387ac50e7690/file1",
+        "storrelse": 125000,
+        "tidspunkt": "2026-02-17T10:30:00+01:00"
+      }
+    ],
+    "bundle": {
+      "filnavn": "c024d1d2-afda-4b86-91cb-387ac50e7690",
+      "urn": "urn:vedlegg:test-soknad-id/bundle1",
+      "filsti": "test-soknad-id/bundle1",
+      "storrelse": 125000,
+      "tidspunkt": "2026-02-17T10:31:00+01:00"
+    }
+  },
+  {
+    "id": "a1b2c3d4-5678-90ab-cdef-123456789abc",
+    "seksjonId": "arbeidsforhold",
+    "spørsmålId": "oppsigelsesdokument",
+    "skjemakode": "N6",
+    "tittel": "Oppsigelse fra arbeidsgiver",
+    "type": "Arbeidsforhold",
+    "svar": "dokumentkravSvarSenderSenere",
+    "begrunnelse": "Må få dokumentet fra arbeidsgiver først",
+    "filer": null,
+    "bundle": null
+  }
+]
+
+
+
+
+
+
+
+

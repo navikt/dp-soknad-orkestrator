@@ -53,6 +53,11 @@ class PdfPayloadService(
                 .also { if (it.isEmpty()) throw IllegalStateException("Fant ikke PDF-grunnlag for søknad $søknadId") }
                 .joinToString(",")
 
+        val dokumentasjonskrav =
+            seksjonRepository
+                .hentDokumentasjonskrav(søknadId, ident)
+                .joinToString(",")
+
         val pdfGrunnlagMedSøknadMetadata =
             //language=json
             """
@@ -64,7 +69,8 @@ class PdfPayloadService(
                   "kontonummer": "${søknadPersonalia.kontonummer}"
               },
               "innsendtTidspunkt": "${søknad.innsendtTidspunkt?.format(dateTimeFormatter)}",
-              "seksjoner": [$pdfGrunnlag]
+              "seksjoner": [$pdfGrunnlag],
+              "dokumentasjonskrav": [$dokumentasjonskrav]
             }
             """.trimIndent()
 
