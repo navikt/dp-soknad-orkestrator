@@ -66,7 +66,7 @@ class PermittertFiskeforedlingBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert",
@@ -112,7 +112,7 @@ class PermittertFiskeforedlingBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert",
@@ -158,7 +158,7 @@ class PermittertFiskeforedlingBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
@@ -203,7 +203,7 @@ class PermittertFiskeforedlingBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "DetteErIkkeEkteNøkkel": "jegErPermitert",

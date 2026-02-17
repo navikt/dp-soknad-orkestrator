@@ -72,7 +72,8 @@ class KanJobbeHvorSomHelstBehovløserTest {
         } returns
             """
             {
-              "seksjon": {
+              "seksjonId":"reell-arbeidssoker",
+              "seksjonsvar": {
                 "kanDuJobbeIHeleNorge": "ja"
               },
               "versjon": 1

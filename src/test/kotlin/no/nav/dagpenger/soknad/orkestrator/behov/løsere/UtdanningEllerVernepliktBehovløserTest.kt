@@ -73,7 +73,8 @@ class UtdanningEllerVernepliktBehovløserTest {
         } returns
             """
             {
-                 "seksjon": {
+                 "seksjonId":"utdanning",
+                 "seksjonsvar": {
                      "tarUtdanningEllerOpplæring": "ja"
                  },
                  "versjon": 1

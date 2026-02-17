@@ -66,7 +66,7 @@ class PermittertBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
@@ -111,7 +111,7 @@ class PermittertBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
@@ -155,7 +155,7 @@ class PermittertBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "DetteErIkkeEkteNøkkel": "arbeidsgiverErKonkurs"
@@ -200,7 +200,7 @@ class PermittertBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": []
                 },
                 "versjon": 1

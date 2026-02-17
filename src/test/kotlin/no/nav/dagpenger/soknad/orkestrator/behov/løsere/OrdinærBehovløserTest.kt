@@ -140,7 +140,7 @@ class OrdinærBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
@@ -187,7 +187,7 @@ class OrdinærBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "kontraktenErUgått"
@@ -234,7 +234,7 @@ class OrdinærBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": []
                 },
                 "versjon": 1
@@ -275,7 +275,7 @@ class OrdinærBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                     "registrerteArbeidsforhold": [
                         {
                             "ThisIsNotIt": "kontraktenErUgått"

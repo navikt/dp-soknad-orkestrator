@@ -104,7 +104,8 @@ class FellesBehovløserLøsningerTest {
             } returns
                 """
                 {
-                  "seksjon": {
+                  "seksjonId":"arbeidsforhold",
+                  "seksjonsvar": {
                     "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "$arbeidsforholdSvar"
                   },
                   "versjon": 1
@@ -155,7 +156,8 @@ class FellesBehovløserLøsningerTest {
         } returns
             """
             {
-              "seksjon": {
+              "seksjonId":"arbeidsforhold",
+              "seksjonsvar": {
                 "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritannia": "nei"
               },
               "versjon": 1
@@ -319,7 +321,8 @@ class FellesBehovløserLøsningerTest {
         every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) }.returns(
             """
             {
-              "seksjon": {
+              "seksjonId":"din-situasjon",
+              "seksjonsvar": {
                 "harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "nei",
                 "hvilkenDatoSøkerDuDagpengerFra": "$forventetDato"              
               },
@@ -366,7 +369,8 @@ class FellesBehovløserLøsningerTest {
         every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) }.returns(
             """
             {
-              "seksjon": {
+              "seksjonId":"din-situasjon",
+              "seksjonsvar": {
                 "hvilkenDatoSøkerDuGjenopptakFra": "$forventetDato"
               },
               "versjon": 1

@@ -92,7 +92,8 @@ class PermittertGrensearbeiderBehovløserTest {
             } returns
                 """
                 {
-                  "seksjon": {
+                  "seksjonId":"personalia",
+                  "seksjonsvar": {
                     "reisteDuHjemTilLandetDuBorI": "${testData.first}",
                     "reisteDuITaktMedRotasjon": "${testData.second}"
                   },

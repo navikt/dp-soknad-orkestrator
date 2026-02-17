@@ -72,7 +72,8 @@ class KanJobbeDeltidBehovløserTest {
         } returns
             """
             {
-              "seksjon": {
+              "seksjonId":"reell-arbeidssoker",
+              "seksjonsvar": {
                 "kanDuJobbeBådeHeltidOgDeltid": "ja"
               },
               "versjon": 1

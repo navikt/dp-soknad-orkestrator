@@ -72,7 +72,8 @@ class AndreØkonomiskeYtelserBehovløserTest {
         } returns
             """
             {
-              "seksjon": {
+              "seksjonId": "annen-pengestotte",
+              "seksjonsvar": {
                 "mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver": "ja"
               },
               "versjon": 1

@@ -67,7 +67,7 @@ class JobbetUtenforNorgeBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "hvordanHarDuJobbet": "jobbet-mer-igjennomsnitt-de-siste-36-månedene-enn-de-siste-12-månedenen",
                 "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "nei",
                 "registrerteArbeidsforhold": [
@@ -115,7 +115,7 @@ class JobbetUtenforNorgeBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "hvordanHarDuJobbet": "jobbet-mer-igjennomsnitt-de-siste-36-månedene-enn-de-siste-12-månedenen",
                 "harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene": "nei",
                 "registrerteArbeidsforhold": [
@@ -160,7 +160,7 @@ class JobbetUtenforNorgeBehovløserTest {
             )
         } returns
             """
-            {"versjon":1,"seksjon":{"hvordan-har-du-jobbet":"fast-arbeidstid-i-mindre-enn-6-måneder","registrerteArbeidsforhold":[]}}
+            {"seksjonId": "arbeidsforhold", "versjon":1,"seksjonsvar":{"hvordan-har-du-jobbet":"fast-arbeidstid-i-mindre-enn-6-måneder","registrerteArbeidsforhold":[]}}
             """.trimIndent()
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang
