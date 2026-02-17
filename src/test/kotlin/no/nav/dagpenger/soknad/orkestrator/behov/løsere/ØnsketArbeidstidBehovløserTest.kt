@@ -71,7 +71,8 @@ class ØnsketArbeidstidBehovløserTest {
         } returns
             """
             {
-              "seksjon": {
+              "seksjonId":"reell-arbeidssoker",  
+              "seksjonsvar": {
                 "kanDuJobbeBådeHeltidOgDeltid": "nei",
                 "kanIkkeJobbeBådeHeltidOgDeltidAntallTimer": "27"
               },

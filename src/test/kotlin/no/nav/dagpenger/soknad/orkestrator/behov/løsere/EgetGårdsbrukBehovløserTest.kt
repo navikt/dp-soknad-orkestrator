@@ -72,7 +72,8 @@ class EgetGårdsbrukBehovløserTest {
         } returns
             """
             {
-              "seksjon": {
+              "seksjonId":"egen-naring",
+              "seksjonsvar": {
                 "driverDuEgetGårdsbruk": "ja"
               },
               "versjon": 1

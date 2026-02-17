@@ -72,7 +72,8 @@ class EgenNæringsvirksomhetBehovløserTest {
         } returns
             """
             {
-              "seksjon": {
+              "seksjonId":"egen-naring",
+              "seksjonsvar": {
                 "driverDuEgenNæringsvirksomhet": "ja"
               },
               "versjon": 1

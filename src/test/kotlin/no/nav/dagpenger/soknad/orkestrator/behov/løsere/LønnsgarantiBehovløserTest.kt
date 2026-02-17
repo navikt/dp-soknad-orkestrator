@@ -66,7 +66,7 @@ class LønnsgarantiBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
@@ -111,7 +111,7 @@ class LønnsgarantiBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "jegHarFåttAvskjed"
@@ -156,7 +156,7 @@ class LønnsgarantiBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
                         "hvordanHarDetteArbeidsforholdet": "JegHarFåttAvskjed"
@@ -201,7 +201,7 @@ class LønnsgarantiBehovløserTest {
             """
             {
                 "seksjonId": "arbeidsforhold",
-                "seksjon": {
+                "seksjonsvar": {
                 "registrerteArbeidsforhold": []
                 },
                 "versjon": 1

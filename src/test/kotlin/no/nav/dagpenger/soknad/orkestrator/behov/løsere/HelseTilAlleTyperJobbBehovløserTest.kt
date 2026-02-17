@@ -72,7 +72,8 @@ class HelseTilAlleTyperJobbBehovløserTest {
         } returns
             """
             {
-              "seksjon": {
+              "seksjonId":"reell-arbeidssoker",
+              "seksjonsvar": {
                 "kanDuTaAlleTyperArbeid": "ja"
               },
               "versjon": 1

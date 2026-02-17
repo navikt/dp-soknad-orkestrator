@@ -76,7 +76,8 @@ class HarTilleggsopplysningerBehovløserTest {
         val seksjonsvar =
             """
             {
-                "seksjon": {
+                "seksjonId":"tilleggsopplysninger",
+                "seksjonsvar": {
                     "harTilleggsopplysninger": "ja"
                 }
             }

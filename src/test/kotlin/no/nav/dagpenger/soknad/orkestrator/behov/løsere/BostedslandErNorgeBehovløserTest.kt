@@ -81,7 +81,8 @@ class BostedslandErNorgeBehovløserTest {
         } returns
             """
             {
-              "seksjon": {
+              "seksjonId":"personalia",
+              "seksjonsvar": {
                 "folkeregistrertAdresseErNorgeStemmerDet": "$svar"
               },
               "versjon": 1

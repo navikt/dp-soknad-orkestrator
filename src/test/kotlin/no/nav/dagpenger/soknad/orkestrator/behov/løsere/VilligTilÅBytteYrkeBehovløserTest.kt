@@ -72,7 +72,8 @@ class VilligTilÅBytteYrkeBehovløserTest {
         } returns
             """
             {
-              "seksjon": {
+              "seksjonId":"reell-arbeidssoker",
+              "seksjonsvar": {
                 "erDuVilligTilÅBytteYrkeEllerGåNedILønn": "ja"
               },
               "versjon": 1

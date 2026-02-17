@@ -78,7 +78,8 @@ class OppgittAndreYtelserUtenforNavBehovløserTest {
         } returns
             """
             {
-              "seksjon": {
+              "seksjonId":"annen-pengestotte",
+              "seksjonsvar": {
                 "mottarDuPengestøtteFraAndreEnnNav": "ja"
               },
               "versjon": 1

@@ -23,15 +23,19 @@ class SeksjonRepositoryTest {
     private lateinit var søknadRepository: SøknadRepository
 
     private val ident = "1234567890"
-    private val seksjonsvar = "{\"key\": \"value\"}"
-    private val seksjonsvar2 = "{\"key2\": \"value2\"}"
-    private val seksjonsvar3 = "{\"key3\": \"value3\"}"
     private val pdfGrunnlag = "{\"pdfGrunnlagKey\": \"pdfGrunnlagValue\"}"
     private val pdfGrunnlag2 = "{\"pdfGrunnlagKey2\": \"pdfGrunnlagValue2\"}"
     private val pdfGrunnlag3 = "{\"pdfGrunnlagKey3\": \"pdfGrunnlagValue3\"}"
     private val seksjonId = "seksjon-id"
     private val seksjonId2 = "seksjon-id-2"
     private val seksjonId3 = "seksjon-id-3"
+
+    private val seksjonsvar = """{"seksjonId":"$seksjonId","seksjonsvar":{"key":"value"},"versjon":1}""".trimIndent()
+    private val seksjonsvar2 =
+        """{"seksjonId":"$seksjonId2","seksjonsvar":{"key2": "value2"},"versjon":1}""".trimIndent()
+    private val seksjonsvar3 =
+        """{"seksjonId":"$seksjonId3","seksjonsvar":{"key3": "value3"},"versjon":1}""".trimIndent()
+
     private val dokumentasjonskrav = "{\"dokumentasjonskravKey\": \"dokumentasjonskravValue\"}"
     private val dokumentasjonskrav2 = "{\"dokumentasjonskravKey2\": \"dokumentasjonskravValue2\"}"
 
