@@ -11,6 +11,10 @@
             color: rgb(38, 38, 38);
         }
 
+        h2 {
+            margin-top: 2rem;
+        }
+
         .modalSpørsmål {
             background: #eee;
             padding: 1rem;
