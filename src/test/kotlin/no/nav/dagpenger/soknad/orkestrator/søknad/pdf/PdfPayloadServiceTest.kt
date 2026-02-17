@@ -65,6 +65,12 @@ class PdfPayloadServiceTest {
                     .getResource("/testdata/pdf-service-test-pdf-grunnlag-annen-pengestøtte.json")!!
                     .readText(Charsets.UTF_8),
             )
+        every { seksjonRepository.hentDokumentasjonskrav(any(), any()) } returns
+            listOf(
+                this::class.java
+                    .getResource("/testdata/pdf-service-test-dokumentasjonskrav.json")!!
+                    .readText(Charsets.UTF_8),
+            )
     }
 
     @Test

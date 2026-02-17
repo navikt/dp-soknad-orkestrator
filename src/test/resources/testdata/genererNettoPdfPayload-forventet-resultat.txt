@@ -435,5 +435,18 @@
     Svar:
         En ost
         </p>
+    <h2>Dokumentasjonskrav</h2>
+            <p>
+                    <strong>Fødselsattest/bostedsbevis for barn 1</strong>
+                <br/>
+                    Svar: Jeg vil laste opp nå
+            </p>
+            <p>
+                    <strong>Oppsigelse fra arbeidsgiver</strong>
+                <br/>
+                    Svar: Jeg sender det senere
+                    <br/>
+                    Begrunnelse: Må få dokumentet fra arbeidsgiver først
+            </p>
 </body>
 </html>
