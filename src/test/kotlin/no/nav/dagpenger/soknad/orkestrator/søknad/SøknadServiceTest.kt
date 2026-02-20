@@ -107,14 +107,25 @@ class SøknadServiceTest {
     fun `slettSøknadInkrementerMetrikkOgSendMeldingOmSletting gjør kall til repository med forventet søknadId og sender forventet melding`() {
         val søknadId = randomUUID()
 
+        val søknad = Søknad(ident = ident, søknadId = søknadId)
+
+        every {
+            søknadRepository.hent(søknad.søknadId)
+        } returns søknad
+
         søknadService.slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(søknadId, ident)
 
         verify { søknadRepository.slett(søknadId, ident) }
         with(testRapid.inspektør) {
-            size shouldBe 1
-            field(0, "@event_name").asText() shouldBe "søknad_slettet"
+            size shouldBe 2
+
+            field(0, "@event_name").asText() shouldBe "søknad_endret_tilstand"
             field(0, "søknad_uuid").asText() shouldBe søknadId.toString()
             field(0, "ident").asText() shouldBe ident
+
+            field(1, "@event_name").asText() shouldBe "søknad_slettet"
+            field(1, "søknad_uuid").asText() shouldBe søknadId.toString()
+            field(1, "ident").asText() shouldBe ident
         }
     }
 
@@ -153,13 +164,22 @@ class SøknadServiceTest {
         verify { seksjonRepository.slettAlleSeksjoner(søknadId2, ident2) }
         verify { søknadRepository.slettSøknadSomSystem(søknadId2, ident2, any()) }
         with(testRapid.inspektør) {
-            size shouldBe 2
+            size shouldBe 4
             field(0, "@event_name").asText() shouldBe "søknad_slettet"
             field(0, "søknad_uuid").asText() shouldBe søknadId1.toString()
             field(0, "ident").asText() shouldBe ident1
-            field(1, "@event_name").asText() shouldBe "søknad_slettet"
-            field(1, "søknad_uuid").asText() shouldBe søknadId2.toString()
-            field(1, "ident").asText() shouldBe ident2
+
+            field(1, "@event_name").asText() shouldBe "søknad_endret_tilstand"
+            field(1, "søknad_uuid").asText() shouldBe søknadId1.toString()
+            field(1, "ident").asText() shouldBe ident1
+
+            field(2, "@event_name").asText() shouldBe "søknad_slettet"
+            field(2, "søknad_uuid").asText() shouldBe søknadId2.toString()
+            field(2, "ident").asText() shouldBe ident2
+
+            field(3, "@event_name").asText() shouldBe "søknad_endret_tilstand"
+            field(3, "søknad_uuid").asText() shouldBe søknadId2.toString()
+            field(3, "ident").asText() shouldBe ident2
         }
     }
 

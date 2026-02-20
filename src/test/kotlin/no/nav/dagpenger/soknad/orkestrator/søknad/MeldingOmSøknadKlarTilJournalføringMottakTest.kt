@@ -40,8 +40,9 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         verify { søknadRepository.markerSøknadSomInnsendt(søknadId, ident, innsendtTidspunkt) }
         verify { pdfPayloadService.genererBruttoPdfPayload(søknadId, ident) }
         verify { pdfPayloadService.genererNettoPdfPayload(søknadId, ident) }
-        rapidsConnection.inspektør.size shouldBe 1
+        rapidsConnection.inspektør.size shouldBe 2
         rapidsConnection.inspektør.message(0)["@behov"][0].asText() shouldBe "generer_og_mellomlagre_søknad_pdf"
+        rapidsConnection.inspektør.message(1)["@event_name"].asText() shouldBe "søknad_endret_tilstand"
     }
 
     @Test
