@@ -23,7 +23,7 @@
 
         .pageHeaderRight {
             position: running(pageHeaderRight);
-            font-size: 0.6em;
+            font-size: 1em;
             padding: 4px;
             text-align: right;
         }
@@ -45,7 +45,7 @@
 </head>
 <body>
 <div class="pageHeaderRight">
-    Innsendt elektronisk 2020-12-31 23:59:59<br/>
+    Innsendt elektronisk 31.12.2020 23:59<br/>
     Fødselsnummer: 987654321
 </div><h1>Søknad om dagpenger</h1>
 <p>fornavn mellomnavn etternavn<br/>987654321<br/>adresselinje1, adresselinje2, adresselinje3, 1234 poststed, land<br/>Kontonummer: 97143830733</p>

@@ -26,7 +26,7 @@ class PdfPayloadService(
         }
     }
 
-    private val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    private val dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm")
 
     fun genererBruttoPdfPayload(
         søknadId: UUID,
