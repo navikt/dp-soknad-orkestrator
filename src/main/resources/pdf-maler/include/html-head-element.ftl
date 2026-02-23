@@ -21,7 +21,7 @@
 
         .pageHeaderRight {
             position: running(pageHeaderRight);
-            font-size: 0.6em;
+            font-size: 1em;
             padding: 4px;
             text-align: right;
         }
