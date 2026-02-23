@@ -47,9 +47,6 @@ abstract class Behovløser(
             opplysningRepository.hent(beskrivendeId, behovmelding.ident, behovmelding.søknadId)?.svar
 
         if (svarPåBehov != null) {
-            logger.info { "Løste behov med quiz-data" }
-            sikkerlogg.info { "Løste behov med quiz-data" }
-
             return publiserLøsning(behovmelding, svarPåBehov)
         }
         val seksjonsSvar =
@@ -62,9 +59,6 @@ abstract class Behovløser(
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath(feltsnavn)?.let {
                 if (!it.isMissingOrNull()) {
-                    logger.info { "Løste behov med orkestrator-data" }
-                    sikkerlogg.info { "Løste behov med orkestrator-data" }
-
                     return publiserLøsning(behovmelding, it.erBoolean())
                 }
             }
