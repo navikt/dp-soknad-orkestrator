@@ -147,6 +147,7 @@ internal class ApplicationBuilder(
                 MeldingOmSøknadKlarTilJournalføringMottak(
                     rapidsConnection,
                     søknadRepository,
+                    seksjonRepository,
                     PdfPayloadService(søknadRepository, søknadPersonaliaRepository, seksjonRepository),
                 )
                 SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection, søknadService, seksjonService)

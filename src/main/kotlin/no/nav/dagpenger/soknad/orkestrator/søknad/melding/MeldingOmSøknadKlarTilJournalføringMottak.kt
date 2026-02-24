@@ -15,11 +15,13 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.behov.BehovForGenereringOgMellomlagringAvSøknadPdf
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.pdf.PdfPayloadService
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 
 class MeldingOmSøknadKlarTilJournalføringMottak(
     private val rapidsConnection: RapidsConnection,
     private val søknadRepository: SøknadRepository,
+    private val seksjonRepository: SeksjonRepository,
     private val pdfPayloadService: PdfPayloadService,
 ) : River.PacketListener {
     companion object {
@@ -111,6 +113,22 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                         )
                         logg.info { "Publiserte endret tilstand til Innsendt melding for $søknadId" }
                         sikkerLogg.info { "Publiserte endret tilstand til Innsendt melding for $søknadId innsendt av $ident" }
+
+                        val dokumentasjonsKravLister = seksjonRepository.hentDokumentasjonskrav(søknadId, ident)
+                        val dokumentasjonsKravInnsendtMelding =
+                            DokumentKravInnsendtMelding(
+                                søknadId = søknadId,
+                                ident = ident,
+                                dokumenter = dokumentasjonsKravLister,
+                            )
+                        rapidsConnection.publish(
+                            ident,
+                            dokumentasjonsKravInnsendtMelding.asMessage().toJson(),
+                        )
+                        logg.info { "Publiserte melding om dokumentasjonskrav for søknad $søknadId" }
+                        sikkerLogg.info {
+                            "Publiserte melding om dokumentasjonskrav for søknad $søknadId innsendt av $ident: $dokumentasjonsKravInnsendtMelding"
+                        }
                     } ?: also {
                     logg.warn { "Fant ikke søknad $søknadId" }
                     sikkerLogg.warn { "Fant ikke søknad $søknadId innsendt av $ident" }
