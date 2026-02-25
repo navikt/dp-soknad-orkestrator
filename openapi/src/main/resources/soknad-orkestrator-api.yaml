@@ -11,9 +11,58 @@ servers:
   - url: https://dp-soknad-orkestrator.intern.nav.no
     description: prod
 paths:
+  /opplysninger/barn/{soknadbarnId}:
+    get:
+      summary: Hent opplysning om barn
+      parameters:
+        - in: path
+          name: soknadbarnId
+          required: true
+          description: id for hele listen med barn på en gitt søknad, tilsvarende inntektId
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BarnResponse'
+        '400':
+          description: SøknadId mangler eller har feil format
+    put:
+      summary: Oppdater opplysning om barn
+      parameters:
+        - in: path
+          name: soknadbarnId
+          required: true
+          description: id for hele listen med barn på en gitt søknad, tilsvarende inntektId
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OppdatertBarnRequest'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: barnetilleggFom og barnetilleggTom må være satt når kvalifisererTilBarnetillegg er true
+        '404':
+          description: Fant ikke opplysningen som skal oppdateres
+        '304':
+          description: Opplysningen inneholder ingen endringer, kan ikke oppdatere
   /opplysninger/{soknadId}/barn:
     get:
       summary: Hent opplysning om barn
+      description: Deprekert! Bruk /opplysninger/barn/{soknadbarnId} i stedet
+      deprecated: true
       parameters:
         - in: path
           name: soknadId
@@ -35,6 +84,8 @@ paths:
   /opplysninger/{soknadId}/barn/oppdater:
     put:
       summary: Oppdater opplysning om barn
+      description: Deprekert! Bruk /opplysninger/barn/{soknadbarnId} i stedet
+      deprecated: true
       parameters:
         - in: path
           name: soknadId
