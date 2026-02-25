@@ -40,7 +40,8 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
 
     @Test
     fun `onPacket leser melding og behandler den som forventet`() {
-        coEvery { søknadRepository.hent(any()) } returns Søknad(søknadId, ident)
+        coEvery { søknadRepository.hent(any()) } returns Søknad(søknadId, ident) andThen (Søknad(søknadId, ident, INNSENDT))
+
         coEvery { seksjonRepository.hentDokumentasjonskrav(any(), any()) } returns dokumentasjonskrav
 
         rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
@@ -52,6 +53,8 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         rapidsConnection.inspektør.message(0)["@behov"][0].asText() shouldBe "generer_og_mellomlagre_søknad_pdf"
         rapidsConnection.inspektør.message(1)["@event_name"].asText() shouldBe "søknad_endret_tilstand"
         rapidsConnection.inspektør.message(2)["@event_name"].asText() shouldBe "dokumentkrav_innsendt"
+        rapidsConnection.inspektør.message(2)["innsendingsType"].asText() shouldBe "INNSENDT"
+        rapidsConnection.inspektør.message(2)["ferdigBesvart"].asText() shouldBe "true"
 
         val dokumenstasjonskrav = rapidsConnection.inspektør.message(2)["dokumentkrav"]
         dokumenstasjonskrav.size() shouldBe 5

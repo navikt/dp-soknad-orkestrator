@@ -120,6 +120,8 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                                 søknadId = søknadId,
                                 ident = ident,
                                 dokumenter = dokumentasjonsKravLister,
+                                innsendtTidspunkt = innsendtTidspunkt,
+                                tilstand = Tilstand.INNSENDT,
                             )
                         rapidsConnection.publish(
                             ident,
@@ -132,6 +134,7 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                     } ?: also {
                     logg.warn { "Fant ikke søknad $søknadId" }
                     sikkerLogg.warn { "Fant ikke søknad $søknadId innsendt av $ident" }
+                    return@withMDC
                 }
             } catch (exception: Exception) {
                 logg.info { "Mottak av $EVENT_NAME hendelse for søknad ${packet["søknadId"]} feilet" }
