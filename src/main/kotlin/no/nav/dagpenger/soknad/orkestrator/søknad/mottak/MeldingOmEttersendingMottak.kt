@@ -9,8 +9,10 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.melding.DokumentKravInnsendtMelding
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
+import java.time.LocalDateTime
 
 internal class MeldingOmEttersendingMottak(
     val rapidsConnection: RapidsConnection,
@@ -67,13 +69,36 @@ internal class MeldingOmEttersendingMottak(
             logg.info { "Mottok løsning for $BEHOV for søknad $søknadId" }
             sikkerLogg.info { "Mottok løsning for $BEHOV for søknad $søknadId innsendt av $ident" }
 
-            søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
-            seksjonRepository.lagreDokumentasjonskravEttersending(
-                søknadId = søknadId,
-                ident = ident,
-                seksjonId = seksjonId,
-                dokumentasjonskrav = dokumentasjonskravJson,
-            )
+            søknadRepository.hent(søknadId)?.let {
+                if (it.ident != ident) {
+                    sikkerLogg.error { "Søknad $søknadId tilhører ikke ident $ident. " }
+                    throw IllegalArgumentException("Søknad $søknadId tilhører ikke identen som gjør kallet")
+                }
+
+                val oppdatertTidspunkt = LocalDateTime.now()
+                seksjonRepository.lagreDokumentasjonskravEttersending(
+                    søknadId = søknadId,
+                    ident = ident,
+                    seksjonId = seksjonId,
+                    dokumentasjonskrav = dokumentasjonskravJson,
+                    oppdatertTidspunkt = oppdatertTidspunkt,
+                )
+                val dokumentKravInnsendtMelding =
+                    DokumentKravInnsendtMelding(
+                        søknadId = søknadId,
+                        ident = ident,
+                        dokumenter = listOf(dokumentasjonskravJson),
+                        innsendtTidspunkt = oppdatertTidspunkt,
+                        tilstand = it.tilstand,
+                    )
+                rapidsConnection.publish(
+                    ident,
+                    dokumentKravInnsendtMelding.asMessage().toJson(),
+                )
+            } ?: also {
+                logg.error { "Fant ikke søknad med ID $søknadId" }
+                throw IllegalArgumentException("Fant ikke søknad med ID $søknadId")
+            }
         }
     }
 }

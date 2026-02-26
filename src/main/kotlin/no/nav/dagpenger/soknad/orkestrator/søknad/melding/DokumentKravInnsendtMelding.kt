@@ -54,6 +54,7 @@ class DokumentKravInnsendtMelding(
                     "innsendttidspunkt" to innsendtTidspunkt,
                     "ferdigBesvart" to erFerdigBesvart,
                     "hendelseId" to UUID.randomUUID(),
+                    "kilde" to "orkestrator",
                     "dokumentkrav" to
                         alleDokumentasjonskrav
                             .map {

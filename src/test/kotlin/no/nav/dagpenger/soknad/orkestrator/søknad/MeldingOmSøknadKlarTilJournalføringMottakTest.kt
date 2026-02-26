@@ -55,6 +55,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         rapidsConnection.inspektør.message(2)["@event_name"].asText() shouldBe "dokumentkrav_innsendt"
         rapidsConnection.inspektør.message(2)["innsendingsType"].asText() shouldBe "INNSENDT"
         rapidsConnection.inspektør.message(2)["ferdigBesvart"].asText() shouldBe "true"
+        rapidsConnection.inspektør.message(2)["kilde"].asText() shouldBe "orkestrator"
 
         val dokumenstasjonskrav = rapidsConnection.inspektør.message(2)["dokumentkrav"]
         dokumenstasjonskrav.size() shouldBe 5
