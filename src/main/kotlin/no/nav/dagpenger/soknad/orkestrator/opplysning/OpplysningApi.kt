@@ -7,10 +7,12 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.respond
 import io.ktor.server.routing.RoutingContext
 import io.ktor.server.routing.get
+import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.nav.dagpenger.soknad.orkestrator.api.auth.saksbehandlerId
+import no.nav.dagpenger.soknad.orkestrator.api.models.NyttBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.metrikker.OpplysningMetrikker
 import java.util.UUID
@@ -52,10 +54,41 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
 
                         oppdaterBarn(opplysningService, søknadId)
                     }
+
+                    post {
+                        val søknadbarnId = validerOgFormaterUuidParameter(parameternavn) ?: return@post
+                        val søknadId = opplysningService.mapTilSøknadId(søknadbarnId)
+
+                        leggTilBarn(opplysningService, søknadId)
+                    }
                 }
             }
         }
     }
+}
+
+private suspend fun RoutingContext.leggTilBarn(
+    opplysningService: OpplysningService,
+    søknadId: UUID,
+) {
+    val token =
+        call.request.headers["Authorization"]?.removePrefix("Bearer ")
+            ?: throw IllegalArgumentException("Fant ikke token i request header")
+
+    val nyttBarnRequest: NyttBarnRequestDTO
+    try {
+        nyttBarnRequest = call.receive<NyttBarnRequestDTO>()
+    } catch (e: Exception) {
+        call.respond(
+            HttpStatusCode.BadRequest,
+            "Kunne ikke parse request body til NyttBarnRequestDTO. Feilmelding: $e",
+        )
+        return
+    }
+
+    val saksbehandlerId = call.saksbehandlerId()
+    val barnListe = opplysningService.leggTilBarn(nyttBarnRequest, søknadId, saksbehandlerId, token)
+    call.respond(HttpStatusCode.Created, barnListe)
 }
 
 private suspend fun RoutingContext.oppdaterBarn(

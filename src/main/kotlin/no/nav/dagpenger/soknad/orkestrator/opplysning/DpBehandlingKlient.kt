@@ -12,8 +12,8 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.oauth2.CachedOauth2Client
-import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.utils.configureHttpClient
+import java.util.UUID
 
 class DpBehandlingKlient(
     val azureAdKlient: CachedOauth2Client,
@@ -22,13 +22,11 @@ class DpBehandlingKlient(
     val httpKlient: HttpClient = configureHttpClient(),
 ) {
     fun oppdaterBarnOpplysning(
-        oppdatertBarnRequest: OppdatertBarnRequestDTO,
+        opplysningId: UUID?,
+        behandlingId: UUID?,
         dpBehandlingOpplysning: DpBehandlingOpplysning,
         token: String,
     ) {
-        val behandlingId = oppdatertBarnRequest.behandlingId
-        val opplysningId = oppdatertBarnRequest.opplysningId
-
         val oboToken = azureAdKlient.onBehalfOf(token, dpBehandlingScope).access_token
 
         sikkerlogg.info {
