@@ -59,6 +59,32 @@ paths:
         '304':
           description: Opplysningen inneholder ingen endringer, kan ikke oppdatere
   /opplysninger/{soknadId}/barn:
+    post:
+      summary: Legg til nytt barn på søknad
+      parameters:
+        - in: path
+          name: soknadId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NyttBarnRequest'
+      responses:
+        '201':
+          description: Barn lagt til
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BarnResponse'
+        '400':
+          description: Ugyldig request body
     get:
       summary: Hent opplysning om barn
       description: Deprekert! Bruk /opplysninger/barn/{soknadbarnId} i stedet
@@ -213,6 +239,51 @@ components:
           type: string
       required:
         - barnId
+        - fornavnOgMellomnavn
+        - etternavn
+        - fodselsdato
+        - oppholdssted
+        - forsorgerBarnet
+        - kvalifisererTilBarnetillegg
+        - begrunnelse
+    NyttBarnRequest:
+      type: object
+      properties:
+        opplysningId:
+          type: string
+          format: uuid
+        behandlingId:
+          type: string
+          format: uuid
+        nyttBarn:
+          $ref: '#/components/schemas/NyttBarn'
+      required:
+        - nyttBarn
+    NyttBarn:
+      type: object
+      properties:
+        fornavnOgMellomnavn:
+          type: string
+        etternavn:
+          type: string
+        fodselsdato:
+          type: string
+          format: date
+        oppholdssted:
+          type: string
+        forsorgerBarnet:
+          type: boolean
+        kvalifisererTilBarnetillegg:
+          type: boolean
+        barnetilleggFom:
+          type: string
+          format: date
+        barnetilleggTom:
+          type: string
+          format: date
+        begrunnelse:
+          type: string
+      required:
         - fornavnOgMellomnavn
         - etternavn
         - fodselsdato
