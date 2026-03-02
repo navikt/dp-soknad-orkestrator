@@ -5,6 +5,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.DataType
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.Kilde
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.NyttBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
@@ -15,11 +16,13 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.util.UUID
 
 class OpplysningService(
     val opplysningRepository: QuizOpplysningRepository,
     val dpBehandlingKlient: DpBehandlingKlient,
+    val søknadRepository: SøknadRepository,
 ) {
     fun hentBarn(søknadId: UUID): List<BarnResponseDTO> {
         val registerBarn =
@@ -150,6 +153,76 @@ class OpplysningService(
         opplysningRepository.oppdaterBarn(søknadId, oppdatertBarnSvar)
     }
 
+    fun leggTilBarn(
+        nyttBarnRequest: NyttBarnRequestDTO,
+        søknadId: UUID,
+        saksbehandlerId: String,
+        token: String,
+    ): List<BarnResponseDTO> {
+        val brukerident =
+            søknadRepository.hent(søknadId)?.ident
+                ?: throw IllegalArgumentException("Fant ikke søknad med id $søknadId")
+
+        val nyttBarn = nyttBarnRequest.nyttBarn
+        val nyttBarnSvar =
+            BarnSvar(
+                barnSvarId = UUID.randomUUID(),
+                fornavnOgMellomnavn = nyttBarn.fornavnOgMellomnavn,
+                etternavn = nyttBarn.etternavn,
+                fødselsdato = nyttBarn.fodselsdato,
+                statsborgerskap = nyttBarn.oppholdssted,
+                forsørgerBarnet = nyttBarn.forsorgerBarnet,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = nyttBarn.forsorgerBarnet,
+                barnetilleggFom = if (nyttBarn.forsorgerBarnet) Barn.barnetilleggperiode(nyttBarn.fodselsdato).first else null,
+                barnetilleggTom = if (nyttBarn.forsorgerBarnet) Barn.barnetilleggperiode(nyttBarn.fodselsdato).second else null,
+                endretAv = saksbehandlerId,
+            )
+
+        val eksisterendeBarn =
+            opplysningRepository.hentAlle(søknadId).filter { it.type == Barn }.flatMap { it.svar.asListOf<BarnSvar>() }
+
+        val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
+
+        val løsningsbarn =
+            (eksisterendeBarn + nyttBarnSvar).map {
+                Løsningsbarn(
+                    søknadbarnId = søknadbarnId,
+                    fornavnOgMellomnavn = it.fornavnOgMellomnavn,
+                    etternavn = it.etternavn,
+                    fødselsdato = it.fødselsdato,
+                    statsborgerskap = it.statsborgerskap,
+                    kvalifiserer = it.kvalifisererTilBarnetillegg,
+                    barnetilleggFom = it.barnetilleggFom,
+                    barnetilleggTom = it.barnetilleggTom,
+                    endretAv = it.endretAv,
+                    begrunnelse = it.begrunnelse,
+                )
+            }
+
+        val dpBehandlingOpplysning =
+            DpBehandlingOpplysning(
+                verdi = objectMapper.writeValueAsString(løsningsbarn),
+                begrunnelse = nyttBarn.begrunnelse,
+            )
+
+        try {
+            dpBehandlingKlient.oppdaterBarnOpplysning(
+                opplysningId = nyttBarnRequest.opplysningId,
+                behandlingId = nyttBarnRequest.behandlingId,
+                dpBehandlingOpplysning = dpBehandlingOpplysning,
+                token = token,
+            )
+        } catch (e: Exception) {
+            logger.error { e.message }
+            throw IllegalStateException("Feil ved sending av barn til dp-behandling", e)
+        }
+
+        opplysningRepository.leggTilBarn(søknadId, brukerident, nyttBarnSvar)
+
+        return hentBarn(søknadId)
+    }
+
     fun sendbarnTilDpBehandling(
         oppdatertBarnRequest: OppdatertBarnRequestDTO,
         token: String,
@@ -196,7 +269,8 @@ class OpplysningService(
             )
 
         dpBehandlingKlient.oppdaterBarnOpplysning(
-            oppdatertBarnRequest = oppdatertBarnRequest,
+            opplysningId = oppdatertBarnRequest.opplysningId,
+            behandlingId = oppdatertBarnRequest.behandlingId,
             dpBehandlingOpplysning = dpBehandlingOpplysning,
             token = token,
         )

@@ -39,6 +39,7 @@ class OpplysningApiTest {
         OpplysningService(
             opplysningRepository = opplysningRepository,
             dpBehandlingKlient = mockk(relaxed = true),
+            søknadRepository = mockk(relaxed = true),
         )
     val søknadId = UUID.randomUUID()
     val søknadbarnId = UUID.randomUUID()

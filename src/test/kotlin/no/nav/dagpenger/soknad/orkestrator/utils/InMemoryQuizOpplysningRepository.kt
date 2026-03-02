@@ -58,6 +58,32 @@ class InMemoryQuizOpplysningRepository : QuizOpplysningRepository {
         opplysninger.add(oppdatertOpplysning)
     }
 
+    override fun leggTilBarn(
+        søknadId: UUID,
+        brukerident: String,
+        nyttBarn: BarnSvar,
+    ) {
+        val beskrivendeId = "faktum.barn-liste"
+        val eksisterendeBarneopplysning = opplysninger.find { it.beskrivendeId == beskrivendeId && it.søknadId == søknadId }
+        if (eksisterendeBarneopplysning != null) {
+            @Suppress("UNCHECKED_CAST")
+            val barnListe = (eksisterendeBarneopplysning as QuizOpplysning<List<BarnSvar>>).svar.toMutableList()
+            barnListe.add(nyttBarn)
+            opplysninger.remove(eksisterendeBarneopplysning)
+            opplysninger.add(eksisterendeBarneopplysning.copy(svar = barnListe))
+        } else {
+            opplysninger.add(
+                QuizOpplysning(
+                    beskrivendeId = beskrivendeId,
+                    type = Barn,
+                    svar = listOf(nyttBarn),
+                    ident = brukerident,
+                    søknadId = søknadId,
+                ),
+            )
+        }
+    }
+
     override fun lagreBarnSøknadMapping(søknadId: UUID): UUID {
         val søknadbarnId = randomUUID()
         barnSøknadMapper[søknadId] = søknadbarnId
