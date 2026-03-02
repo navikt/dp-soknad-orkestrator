@@ -95,6 +95,10 @@ internal class MeldingOmEttersendingMottak(
                     ident,
                     dokumentKravInnsendtMelding.asMessage().toJson(),
                 )
+
+                sikkerLogg.info {
+                    "Søknad $søknadId har fått oppdatert dokumentasjonskrav etter ettersending, ${dokumentKravInnsendtMelding.asMessage().toJson()}"
+                }
             } ?: also {
                 logg.error { "Fant ikke søknad med ID $søknadId" }
                 throw IllegalArgumentException("Fant ikke søknad med ID $søknadId")

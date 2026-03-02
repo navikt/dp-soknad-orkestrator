@@ -129,7 +129,7 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                         )
                         logg.info { "Publiserte melding om dokumentasjonskrav for søknad $søknadId" }
                         sikkerLogg.info {
-                            "Publiserte melding om dokumentasjonskrav for søknad $søknadId innsendt av $ident: $dokumentasjonsKravInnsendtMelding"
+                            "Publiserte melding om dokumentasjonskrav for søknad $søknadId innsendt av $ident: ${dokumentasjonsKravInnsendtMelding.asMessage().toJson()}"
                         }
                     } ?: also {
                     logg.warn { "Fant ikke søknad $søknadId" }

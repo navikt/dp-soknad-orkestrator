@@ -83,17 +83,7 @@ class SøknadService(
 
         søknadRepository.slett(søknadId, ident)
 
-        val varsleOmEndringTilstandTilSlettet =
-            SøknadEndretTilstandMelding(
-                søknadId = søknadId,
-                ident = ident,
-                forrigeTilstand = søknad.tilstand.name,
-                nyTilstand = "Slettet",
-            )
-        rapidsConnection.publish(
-            søknad.ident,
-            varsleOmEndringTilstandTilSlettet.asMessage().toJson(),
-        )
+        sendEndretTilstandTilSlettetMelding(søknadId, ident, søknad)
 
         SøknadMetrikker.slettet.inc()
         logg.info { "Slettet søknad med søknadId: $søknadId" }
@@ -154,20 +144,28 @@ class SøknadService(
                 MeldingOmSøknadSlettet(søknad.søknadId, søknad.ident).asMessage().toJson(),
             )
 
-            val varsleOmEndringTilstandTilSlettet =
-                SøknadEndretTilstandMelding(
-                    søknadId = søknad.søknadId,
-                    ident = søknad.ident,
-                    forrigeTilstand = søknad.tilstand.name,
-                    nyTilstand = "Slettet",
-                )
-            rapidsConnection.publish(
-                søknad.ident,
-                varsleOmEndringTilstandTilSlettet.asMessage().toJson(),
-            )
+            sendEndretTilstandTilSlettetMelding(søknad.søknadId, søknad.ident, søknad)
 
             sikkerlogg.info { "Automatisk jobb slettet søknad ${søknad.søknadId} og tilhørende seksjoner opprettet av ${søknad.ident}" }
         }
+    }
+
+    private fun sendEndretTilstandTilSlettetMelding(
+        søknadId: UUID,
+        ident: String,
+        søknad: Søknad,
+    ) {
+        val varsleOmEndringTilstandTilSlettet =
+            SøknadEndretTilstandMelding(
+                søknadId = søknadId,
+                ident = ident,
+                forrigeTilstand = søknad.tilstand.name,
+                nyTilstand = "Slettet",
+            )
+        rapidsConnection.publish(
+            søknad.ident,
+            varsleOmEndringTilstandTilSlettet.asMessage().toJson(),
+        )
     }
 
     fun hentDokumentasjonskrav(
