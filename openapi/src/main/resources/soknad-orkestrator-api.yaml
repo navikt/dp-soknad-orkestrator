@@ -58,13 +58,13 @@ paths:
           description: Fant ikke opplysningen som skal oppdateres
         '304':
           description: Opplysningen inneholder ingen endringer, kan ikke oppdatere
-  /opplysninger/{soknadId}/barn:
     post:
       summary: Legg til nytt barn på søknad
       parameters:
         - in: path
-          name: soknadId
+          name: soknadbarnId
           required: true
+          description: id for hele listen med barn på en gitt søknad, tilsvarende inntektId
           schema:
             type: string
             format: uuid
@@ -85,6 +85,7 @@ paths:
                   $ref: '#/components/schemas/BarnResponse'
         '400':
           description: Ugyldig request body
+  /opplysninger/{soknadId}/barn:
     get:
       summary: Hent opplysning om barn
       description: Deprekert! Bruk /opplysninger/barn/{soknadbarnId} i stedet
