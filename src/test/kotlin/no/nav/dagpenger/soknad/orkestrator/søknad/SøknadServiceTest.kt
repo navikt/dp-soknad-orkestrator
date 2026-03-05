@@ -104,7 +104,7 @@ class SøknadServiceTest {
 
     @Test
     @Suppress("ktlint:standard:max-line-length")
-    fun `slettSøknadInkrementerMetrikkOgSendMeldingOmSletting gjør kall til repository med forventet søknadId og sender forventet melding`() {
+    fun `slettSøknadOgInkrementerMetrikk gjør kall til repository med forventet søknadId og sender forventet melding`() {
         val søknadId = randomUUID()
 
         val søknad = Søknad(ident = ident, søknadId = søknadId)
@@ -113,7 +113,7 @@ class SøknadServiceTest {
             søknadRepository.hent(søknad.søknadId)
         } returns søknad
 
-        søknadService.slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(søknadId, ident)
+        søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident)
 
         verify { søknadRepository.slett(søknadId, ident) }
         with(testRapid.inspektør) {
@@ -126,6 +126,23 @@ class SøknadServiceTest {
             field(1, "@event_name").asText() shouldBe "søknad_slettet"
             field(1, "søknad_uuid").asText() shouldBe søknadId.toString()
             field(1, "ident").asText() shouldBe ident
+        }
+    }
+
+    @Test
+    @Suppress("ktlint:standard:max-line-length")
+    fun `slettSøknadOgInkrementerMetrikk returner uten å gjøre noe om søknaden ikke eksisterer`() {
+        val søknadId = randomUUID()
+
+        every {
+            søknadRepository.hent(søknadId)
+        } returns null
+
+        søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident)
+
+        verify(exactly = 0) { søknadRepository.slett(søknadId, ident) }
+        with(testRapid.inspektør) {
+            size shouldBe 0
         }
     }
 

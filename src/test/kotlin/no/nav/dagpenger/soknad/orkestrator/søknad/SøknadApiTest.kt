@@ -334,7 +334,7 @@ class SøknadApiTest {
     fun `DELETE søknad med søknadId returnerer 200 OK hvis sletting av seksjoner går bra`() {
         val søknadId = randomUUID()
         every {
-            søknadService.slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(søknadId, any())
+            søknadService.slettSøknadOgInkrementerMetrikk(søknadId, any())
         } returns Unit
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
@@ -376,7 +376,7 @@ class SøknadApiTest {
     fun `DELETE søknad returnerer 500 Internal Server Error hvis sletting av seksjoner feiler`() {
         val søknadId = randomUUID()
         every {
-            søknadService.slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(søknadId, any())
+            søknadService.slettSøknadOgInkrementerMetrikk(søknadId, any())
         } throws IllegalStateException()
 
         withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {

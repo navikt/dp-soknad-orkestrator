@@ -65,25 +65,21 @@ class SøknadService(
         sikkerlogg.info { "Publiserte melding om ny søknad med søknadId: $søknadId og ident: $ident" }
     }
 
-    internal fun slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(
-        søknadId: UUID,
-        ident: String,
-    ) {
-        slettSøknadOgInkrementerMetrikk(søknadId, ident)
-        rapidsConnection.publish(ident, MeldingOmSøknadSlettet(søknadId, ident).asMessage().toJson())
-    }
-
     internal fun slettSøknadOgInkrementerMetrikk(
         søknadId: UUID,
         ident: String,
     ) {
         val søknad =
             søknadRepository.hent(søknadId)
-                ?: throw IllegalStateException("Finner ikke søknad med id $søknadId for sletting")
 
+        if (søknad == null) {
+            logg.warn { "Kunne ikke finne søknad med søknadId: $søknadId for sletting" }
+            return
+        }
         søknadRepository.slett(søknadId, ident)
 
         sendEndretTilstandTilSlettetMelding(søknadId, ident, søknad)
+        sendSøknadSlettetMelding(søknadId, ident)
 
         SøknadMetrikker.slettet.inc()
         logg.info { "Slettet søknad med søknadId: $søknadId" }
@@ -139,10 +135,7 @@ class SøknadService(
         søknader.forEach { søknad ->
             seksjonRepository.slettAlleSeksjoner(søknad.søknadId, søknad.ident)
             søknadRepository.slettSøknadSomSystem(søknad.søknadId, søknad.ident)
-            rapidsConnection.publish(
-                søknad.ident,
-                MeldingOmSøknadSlettet(søknad.søknadId, søknad.ident).asMessage().toJson(),
-            )
+            sendSøknadSlettetMelding(søknad.søknadId, søknad.ident)
 
             sendEndretTilstandTilSlettetMelding(søknad.søknadId, søknad.ident, søknad)
 
@@ -166,6 +159,14 @@ class SøknadService(
             søknad.ident,
             varsleOmEndringTilstandTilSlettet.asMessage().toJson(),
         )
+    }
+
+    private fun sendSøknadSlettetMelding(
+        søknadId: UUID,
+        ident: String,
+    ) {
+        val slettetSøknadMelding = MeldingOmSøknadSlettet(søknadId, ident)
+        rapidsConnection.publish(ident, slettetSøknadMelding.asMessage().toJson())
     }
 
     fun hentDokumentasjonskrav(
