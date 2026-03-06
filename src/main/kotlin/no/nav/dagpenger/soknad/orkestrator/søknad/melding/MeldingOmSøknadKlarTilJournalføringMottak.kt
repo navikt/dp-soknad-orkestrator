@@ -10,15 +10,18 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
+import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.behov.BehovForGenereringOgMellomlagringAvSøknadPdf
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.pdf.PdfPayloadService
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 
 class MeldingOmSøknadKlarTilJournalføringMottak(
     private val rapidsConnection: RapidsConnection,
     private val søknadRepository: SøknadRepository,
+    private val seksjonRepository: SeksjonRepository,
     private val pdfPayloadService: PdfPayloadService,
 ) : River.PacketListener {
     companion object {
@@ -96,9 +99,42 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                         sikkerLogg.info {
                             "Publiserte melding om behov for generering av søknad-PDF for søknad $søknadId innsendt av $ident "
                         }
+
+                        val søknadEndretTilstandMelding =
+                            SøknadEndretTilstandMelding(
+                                søknadId = søknadId,
+                                ident = ident,
+                                forrigeTilstand = PÅBEGYNT.name,
+                                nyTilstand = Tilstand.INNSENDT.name,
+                            )
+                        rapidsConnection.publish(
+                            ident,
+                            søknadEndretTilstandMelding.asMessage().toJson(),
+                        )
+                        logg.info { "Publiserte endret tilstand til Innsendt melding for $søknadId" }
+                        sikkerLogg.info { "Publiserte endret tilstand til Innsendt melding for $søknadId innsendt av $ident" }
+
+                        val dokumentasjonsKravLister = seksjonRepository.hentDokumentasjonskrav(søknadId, ident)
+                        val dokumentasjonsKravInnsendtMelding =
+                            DokumentKravInnsendtMelding(
+                                søknadId = søknadId,
+                                ident = ident,
+                                dokumenter = dokumentasjonsKravLister,
+                                innsendtTidspunkt = innsendtTidspunkt,
+                                tilstand = Tilstand.INNSENDT,
+                            )
+                        rapidsConnection.publish(
+                            ident,
+                            dokumentasjonsKravInnsendtMelding.asMessage().toJson(),
+                        )
+                        logg.info { "Publiserte melding om dokumentasjonskrav for søknad $søknadId" }
+                        sikkerLogg.info {
+                            "Publiserte melding om dokumentasjonskrav for søknad $søknadId innsendt av $ident: ${dokumentasjonsKravInnsendtMelding.asMessage().toJson()}"
+                        }
                     } ?: also {
                     logg.warn { "Fant ikke søknad $søknadId" }
                     sikkerLogg.warn { "Fant ikke søknad $søknadId innsendt av $ident" }
+                    return@withMDC
                 }
             } catch (exception: Exception) {
                 logg.info { "Mottak av $EVENT_NAME hendelse for søknad ${packet["søknadId"]} feilet" }

@@ -104,17 +104,45 @@ class SøknadServiceTest {
 
     @Test
     @Suppress("ktlint:standard:max-line-length")
-    fun `slettSøknadInkrementerMetrikkOgSendMeldingOmSletting gjør kall til repository med forventet søknadId og sender forventet melding`() {
+    fun `slettSøknadOgInkrementerMetrikk gjør kall til repository med forventet søknadId og sender forventet melding`() {
         val søknadId = randomUUID()
 
-        søknadService.slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(søknadId, ident)
+        val søknad = Søknad(ident = ident, søknadId = søknadId)
+
+        every {
+            søknadRepository.hent(søknad.søknadId)
+        } returns søknad
+
+        søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident)
 
         verify { søknadRepository.slett(søknadId, ident) }
         with(testRapid.inspektør) {
-            size shouldBe 1
-            field(0, "@event_name").asText() shouldBe "søknad_slettet"
+            size shouldBe 2
+
+            field(0, "@event_name").asText() shouldBe "søknad_endret_tilstand"
             field(0, "søknad_uuid").asText() shouldBe søknadId.toString()
             field(0, "ident").asText() shouldBe ident
+
+            field(1, "@event_name").asText() shouldBe "søknad_slettet"
+            field(1, "søknad_uuid").asText() shouldBe søknadId.toString()
+            field(1, "ident").asText() shouldBe ident
+        }
+    }
+
+    @Test
+    @Suppress("ktlint:standard:max-line-length")
+    fun `slettSøknadOgInkrementerMetrikk returner uten å gjøre noe om søknaden ikke eksisterer`() {
+        val søknadId = randomUUID()
+
+        every {
+            søknadRepository.hent(søknadId)
+        } returns null
+
+        søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident)
+
+        verify(exactly = 0) { søknadRepository.slett(søknadId, ident) }
+        with(testRapid.inspektør) {
+            size shouldBe 0
         }
     }
 
@@ -153,13 +181,22 @@ class SøknadServiceTest {
         verify { seksjonRepository.slettAlleSeksjoner(søknadId2, ident2) }
         verify { søknadRepository.slettSøknadSomSystem(søknadId2, ident2, any()) }
         with(testRapid.inspektør) {
-            size shouldBe 2
+            size shouldBe 4
             field(0, "@event_name").asText() shouldBe "søknad_slettet"
             field(0, "søknad_uuid").asText() shouldBe søknadId1.toString()
             field(0, "ident").asText() shouldBe ident1
-            field(1, "@event_name").asText() shouldBe "søknad_slettet"
-            field(1, "søknad_uuid").asText() shouldBe søknadId2.toString()
-            field(1, "ident").asText() shouldBe ident2
+
+            field(1, "@event_name").asText() shouldBe "søknad_endret_tilstand"
+            field(1, "søknad_uuid").asText() shouldBe søknadId1.toString()
+            field(1, "ident").asText() shouldBe ident1
+
+            field(2, "@event_name").asText() shouldBe "søknad_slettet"
+            field(2, "søknad_uuid").asText() shouldBe søknadId2.toString()
+            field(2, "ident").asText() shouldBe ident2
+
+            field(3, "@event_name").asText() shouldBe "søknad_endret_tilstand"
+            field(3, "søknad_uuid").asText() shouldBe søknadId2.toString()
+            field(3, "ident").asText() shouldBe ident2
         }
     }
 

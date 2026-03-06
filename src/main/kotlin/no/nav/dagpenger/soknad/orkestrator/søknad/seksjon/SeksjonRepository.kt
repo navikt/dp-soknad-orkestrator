@@ -14,6 +14,7 @@ import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsert
+import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.util.UUID
 import javax.sql.DataSource
@@ -147,6 +148,7 @@ class SeksjonRepository(
         ident: String,
         seksjonId: String,
         dokumentasjonskrav: String?,
+        oppdatertTidspunkt: LocalDateTime = now(),
     ) = transaction {
         søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
         søknadRepository.verifiserAtSøknadenHarEnAvTilstandene(søknadId, listOf(Tilstand.INNSENDT, Tilstand.JOURNALFØRT))
@@ -158,7 +160,7 @@ class SeksjonRepository(
             } else {
                 it[SeksjonV2Tabell.dokumentasjonskrav] = null
             }
-            it[SeksjonV2Tabell.oppdatert] = dateTimeLiteral(now())
+            it[SeksjonV2Tabell.oppdatert] = dateTimeLiteral(oppdatertTidspunkt)
         }
 
         søknadRepository.markerSøknadSomOppdatert(søknadId, ident)

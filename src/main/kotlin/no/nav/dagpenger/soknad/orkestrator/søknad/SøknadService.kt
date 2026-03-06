@@ -13,6 +13,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadInnsendt
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføring
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadSlettet
+import no.nav.dagpenger.soknad.orkestrator.søknad.melding.SøknadEndretTilstandMelding
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.erBoolean
 import java.time.LocalDateTime
@@ -64,31 +65,47 @@ class SøknadService(
         sikkerlogg.info { "Publiserte melding om ny søknad med søknadId: $søknadId og ident: $ident" }
     }
 
-    internal fun slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(
-        søknadId: UUID,
-        ident: String,
-    ) {
-        slettSøknadOgInkrementerMetrikk(søknadId, ident)
-        rapidsConnection.publish(ident, MeldingOmSøknadSlettet(søknadId, ident).asMessage().toJson())
-    }
-
     internal fun slettSøknadOgInkrementerMetrikk(
         søknadId: UUID,
         ident: String,
     ) {
-        val antallSøknaderSlettet = søknadRepository.slett(søknadId, ident)
+        val søknad =
+            søknadRepository.hent(søknadId)
 
-        if (antallSøknaderSlettet > 0) {
-            SøknadMetrikker.slettet.inc()
-            logg.info { "Slettet søknad med søknadId: $søknadId" }
-            sikkerlogg.info { "Slettet søknad med søknadId: $søknadId og ident: $ident" }
+        if (søknad == null) {
+            logg.warn { "Kunne ikke finne søknad med søknadId: $søknadId for sletting" }
+            return
         }
+        søknadRepository.slett(søknadId, ident)
+
+        sendEndretTilstandTilSlettetMelding(søknadId, ident, søknad)
+        sendSøknadSlettetMelding(søknadId, ident)
+
+        SøknadMetrikker.slettet.inc()
+        logg.info { "Slettet søknad med søknadId: $søknadId" }
+        sikkerlogg.info { "Slettet søknad med søknadId: $søknadId og ident: $ident" }
     }
 
     fun opprett(ident: String): UUID {
         val søknadId = søknadRepository.opprett(Søknad(ident = ident))
         logg.info { "Opprettet søknad med søknadId $søknadId" }
         sikkerlogg.info { "Opprettet søknad med søknadId $søknadId for $ident" }
+
+        val varslePåbegyntMelding =
+            SøknadEndretTilstandMelding(
+                søknadId = søknadId,
+                ident = ident,
+                forrigeTilstand = "OPPRETTET",
+                nyTilstand = Tilstand.PÅBEGYNT.name,
+            )
+        rapidsConnection.publish(
+            ident,
+            varslePåbegyntMelding.asMessage().toJson(),
+        )
+
+        logg.info { "Publiserte endret tilstand til Påbegynt melding for $søknadId" }
+        sikkerlogg.info { "Publiserte endret tilstand til Påbegynt melding for $søknadId av $ident: $varslePåbegyntMelding" }
+
         return søknadId
     }
 
@@ -118,13 +135,38 @@ class SøknadService(
         søknader.forEach { søknad ->
             seksjonRepository.slettAlleSeksjoner(søknad.søknadId, søknad.ident)
             søknadRepository.slettSøknadSomSystem(søknad.søknadId, søknad.ident)
-            rapidsConnection.publish(
-                søknad.ident,
-                MeldingOmSøknadSlettet(søknad.søknadId, søknad.ident).asMessage().toJson(),
-            )
+            sendSøknadSlettetMelding(søknad.søknadId, søknad.ident)
+
+            sendEndretTilstandTilSlettetMelding(søknad.søknadId, søknad.ident, søknad)
 
             sikkerlogg.info { "Automatisk jobb slettet søknad ${søknad.søknadId} og tilhørende seksjoner opprettet av ${søknad.ident}" }
         }
+    }
+
+    private fun sendEndretTilstandTilSlettetMelding(
+        søknadId: UUID,
+        ident: String,
+        søknad: Søknad,
+    ) {
+        val varsleOmEndringTilstandTilSlettet =
+            SøknadEndretTilstandMelding(
+                søknadId = søknadId,
+                ident = ident,
+                forrigeTilstand = søknad.tilstand.name,
+                nyTilstand = "Slettet",
+            )
+        rapidsConnection.publish(
+            søknad.ident,
+            varsleOmEndringTilstandTilSlettet.asMessage().toJson(),
+        )
+    }
+
+    private fun sendSøknadSlettetMelding(
+        søknadId: UUID,
+        ident: String,
+    ) {
+        val slettetSøknadMelding = MeldingOmSøknadSlettet(søknadId, ident)
+        rapidsConnection.publish(ident, slettetSøknadMelding.asMessage().toJson())
     }
 
     fun hentDokumentasjonskrav(
