@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.module.kotlin.readValue
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.inspectors.forAll
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -8,6 +9,8 @@ import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.NyttBarnDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.NyttBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
@@ -18,6 +21,8 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.Test
@@ -25,10 +30,12 @@ import kotlin.test.Test
 class OpplysningServiceTest {
     private val opplysningRepository = mockk<QuizOpplysningRepository>()
     private val dpBehandlingKlient = mockk<DpBehandlingKlient>(relaxed = true)
+    private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     private val opplysningService =
         OpplysningService(
             opplysningRepository = opplysningRepository,
             dpBehandlingKlient = dpBehandlingKlient,
+            søknadRepository = søknadRepository,
         )
 
     @Test
@@ -416,14 +423,172 @@ class OpplysningServiceTest {
             )
         every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
         every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
-        every { dpBehandlingKlient.oppdaterBarnOpplysning(any(), capture(dpBehandlingOpplysningSlot), any()) } returns Unit
+        every { dpBehandlingKlient.oppdaterBarnOpplysning(any(), any(), capture(dpBehandlingOpplysningSlot), any()) } returns Unit
 
         opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId", "token")
 
         val fangetDpBehandlingOpplysning = dpBehandlingOpplysningSlot.captured
         val løsningsbarn = objectMapper.readValue<List<Løsningsbarn>>(fangetDpBehandlingOpplysning.verdi)
         verify(exactly = 1) {
-            dpBehandlingKlient.oppdaterBarnOpplysning(oppdatertBarnRequest, fangetDpBehandlingOpplysning, "token")
+            dpBehandlingKlient.oppdaterBarnOpplysning(
+                oppdatertBarnRequest.opplysningId,
+                oppdatertBarnRequest.behandlingId,
+                fangetDpBehandlingOpplysning,
+                "token",
+            )
+        }
+        løsningsbarn.forAll { it.søknadbarnId shouldBe søknadbarnId }
+    }
+
+    @Test
+    fun `leggTilBarn kaster feil dersom søknad ikke finnes`() {
+        val søknadId = UUID.randomUUID()
+        every { søknadRepository.hent(søknadId) } returns null
+
+        val nyttBarnRequest =
+            NyttBarnRequestDTO(
+                nyttBarn =
+                    NyttBarnDTO(
+                        fornavnOgMellomnavn = "Nytt",
+                        etternavn = "Barn",
+                        fodselsdato = LocalDate.of(2020, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        shouldThrow<IllegalArgumentException> {
+            opplysningService.leggTilBarn(nyttBarnRequest, søknadId, "saksbehandlerId", "token")
+        }
+    }
+
+    @Test
+    fun `leggTilBarn legger til nytt barn i repository`() {
+        val søknadId = UUID.randomUUID()
+        val brukerident = "12345678910"
+
+        every { søknadRepository.hent(søknadId) } returns Søknad(søknadId = søknadId, ident = brukerident)
+        every { opplysningRepository.hentAlle(søknadId) } returns emptyList()
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns UUID.randomUUID()
+        every { opplysningRepository.leggTilBarn(søknadId, brukerident, any()) } returns Unit
+        every { opplysningRepository.hent(any(), søknadId) } returns null
+
+        val fødselsdato = LocalDate.of(2020, 1, 1)
+        val nyttBarnRequest =
+            NyttBarnRequestDTO(
+                nyttBarn =
+                    NyttBarnDTO(
+                        fornavnOgMellomnavn = "Nytt",
+                        etternavn = "Barn",
+                        fodselsdato = fødselsdato,
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        opplysningService.leggTilBarn(nyttBarnRequest, søknadId, "saksbehandlerId", "token")
+
+        verify {
+            opplysningRepository.leggTilBarn(
+                søknadId,
+                brukerident,
+                match {
+                    it.fornavnOgMellomnavn == "Nytt" &&
+                        it.etternavn == "Barn" &&
+                        it.fødselsdato == fødselsdato &&
+                        it.statsborgerskap == "NOR" &&
+                        it.forsørgerBarnet == true &&
+                        it.fraRegister == false &&
+                        it.endretAv == "saksbehandlerId"
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `leggTilBarn setter ikke barnetilleggperiode når forsørgerBarnet er false`() {
+        val søknadId = UUID.randomUUID()
+        val brukerident = "12345678910"
+
+        every { søknadRepository.hent(søknadId) } returns Søknad(søknadId = søknadId, ident = brukerident)
+        every { opplysningRepository.hentAlle(søknadId) } returns emptyList()
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns UUID.randomUUID()
+        every { opplysningRepository.leggTilBarn(søknadId, brukerident, any()) } returns Unit
+        every { opplysningRepository.hent(any(), søknadId) } returns null
+
+        val nyttBarnRequest =
+            NyttBarnRequestDTO(
+                nyttBarn =
+                    NyttBarnDTO(
+                        fornavnOgMellomnavn = "Nytt",
+                        etternavn = "Barn",
+                        fodselsdato = LocalDate.of(2020, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = false,
+                        kvalifisererTilBarnetillegg = false,
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        opplysningService.leggTilBarn(nyttBarnRequest, søknadId, "saksbehandlerId", "token")
+
+        verify {
+            opplysningRepository.leggTilBarn(
+                søknadId,
+                brukerident,
+                match {
+                    it.forsørgerBarnet == false &&
+                        it.kvalifisererTilBarnetillegg == false &&
+                        it.barnetilleggFom == null &&
+                        it.barnetilleggTom == null
+                },
+            )
+        }
+    }
+
+    @Test
+    fun `leggTilBarn sender barn til dp-behandling`() {
+        val søknadId = UUID.randomUUID()
+        val søknadbarnId = UUID.randomUUID()
+        val brukerident = "12345678910"
+        val opplysningId = UUID.randomUUID()
+        val behandlingId = UUID.randomUUID()
+        val dpBehandlingOpplysningSlot = slot<DpBehandlingOpplysning>()
+
+        every { søknadRepository.hent(søknadId) } returns Søknad(søknadId = søknadId, ident = brukerident)
+        every { opplysningRepository.hentAlle(søknadId) } returns emptyList()
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
+        every { opplysningRepository.leggTilBarn(søknadId, brukerident, any()) } returns Unit
+        every { opplysningRepository.hent(any(), søknadId) } returns null
+        every { dpBehandlingKlient.oppdaterBarnOpplysning(any(), any(), capture(dpBehandlingOpplysningSlot), any()) } returns Unit
+
+        val nyttBarnRequest =
+            NyttBarnRequestDTO(
+                opplysningId = opplysningId,
+                behandlingId = behandlingId,
+                nyttBarn =
+                    NyttBarnDTO(
+                        fornavnOgMellomnavn = "Nytt",
+                        etternavn = "Barn",
+                        fodselsdato = LocalDate.of(2020, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        opplysningService.leggTilBarn(nyttBarnRequest, søknadId, "saksbehandlerId", "token")
+
+        val fangetOpplysning = dpBehandlingOpplysningSlot.captured
+        val løsningsbarn = objectMapper.readValue<List<Løsningsbarn>>(fangetOpplysning.verdi)
+
+        verify(exactly = 1) {
+            dpBehandlingKlient.oppdaterBarnOpplysning(opplysningId, behandlingId, fangetOpplysning, "token")
         }
         løsningsbarn.forAll { it.søknadbarnId shouldBe søknadbarnId }
     }

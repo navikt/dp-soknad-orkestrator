@@ -112,6 +112,7 @@ internal class ApplicationBuilder(
         OpplysningService(
             opplysningRepository = quizOpplysningRepositoryPostgres,
             dpBehandlingKlient = dpBehandlingKlient,
+            søknadRepository = søknadRepository,
         )
 
     private val rapidsConnection =
