@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.coEvery
 import io.mockk.mockk
 import io.mockk.verify
@@ -9,6 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføringMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.pdf.PdfPayloadService
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.Seksjon
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import org.junit.jupiter.api.BeforeEach
 import java.time.LocalDateTime
@@ -43,6 +45,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         coEvery { søknadRepository.hent(any()) } returns Søknad(søknadId, ident) andThen (Søknad(søknadId, ident, INNSENDT))
 
         coEvery { seksjonRepository.hentDokumentasjonskrav(any(), any()) } returns dokumentasjonskrav
+        coEvery { seksjonRepository.hentSeksjoner(any(), any()) } returns seksjoner
 
         rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
 
@@ -52,6 +55,16 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         rapidsConnection.inspektør.size shouldBe 3
         rapidsConnection.inspektør.message(0)["@behov"][0].asText() shouldBe "generer_og_mellomlagre_søknad_pdf"
         rapidsConnection.inspektør.message(1)["@event_name"].asText() shouldBe "søknad_endret_tilstand"
+
+        val søknadsdata = rapidsConnection.inspektør.message(1)["søknadsdata"]
+        søknadsdata shouldNotBe null
+        søknadsdata["opprettet"] shouldNotBe null
+        søknadsdata["innsendt"] shouldNotBe null
+        søknadsdata["verneplikt"] shouldNotBe null
+        søknadsdata["verneplikt"].asText() shouldBe seksjoner.find { it.seksjonId == "verneplikt" }?.data
+        søknadsdata["din-situasjon"] shouldNotBe null
+        søknadsdata["din-situasjon"].asText() shouldBe seksjoner.find { it.seksjonId == "din-situasjon" }?.data
+
         rapidsConnection.inspektør.message(2)["@event_name"].asText() shouldBe "dokumentkrav_innsendt"
         rapidsConnection.inspektør.message(2)["innsendingsType"].asText() shouldBe "INNSENDT"
         rapidsConnection.inspektør.message(2)["ferdigBesvart"].asText() shouldBe "true"
@@ -108,6 +121,21 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
           "innsendtTidspunkt": "$innsendtTidspunkt"
         }
         """.trimIndent()
+
+    private val seksjoner: List<Seksjon> =
+        listOf(
+            Seksjon(
+                seksjonId = "din-situasjon",
+                data =
+                    """{"seksjonId": "din-situasjon","seksjonsvar": {"harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "ja","årsakTilAtDagpengeneBleStanset": "dfg","hvilkenDatoSøkerDuGjenopptakFra": "2024-02-21",},"versjon": 1}"""
+                        .trim(),
+            ),
+            Seksjon(
+                seksjonId = "verneplikt",
+                data =
+                    """{"seksjonId": "din-situasjon","seksjon": {"avtjentVerneplikt": "ja"},"versjon": 1}""".trim(),
+            ),
+        )
 
     private val dokumentasjonskrav =
         listOf(
