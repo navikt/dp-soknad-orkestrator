@@ -10,7 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Løsningsbarn
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggV2BehovLøser
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
@@ -187,8 +187,7 @@ class OpplysningService(
 
         val løsningsbarn =
             (eksisterendeBarn + nyttBarnSvar).map {
-                Løsningsbarn(
-                    søknadbarnId = søknadbarnId,
+                BarnetilleggV2BehovLøser.LøsningsbarnV2(
                     fornavnOgMellomnavn = it.fornavnOgMellomnavn,
                     etternavn = it.etternavn,
                     fødselsdato = it.fødselsdato,
@@ -202,21 +201,27 @@ class OpplysningService(
             }
 
         val dpBehandlingOpplysning =
-            DpBehandlingOpplysning(
-                verdi = objectMapper.writeValueAsString(løsningsbarn),
+            NyOpplysningDTO(
+                verdi = objectMapper.writeValueAsString(BarnetilleggV2BehovLøser.BarnetilleggV2Løsning(søknadbarnId, løsningsbarn)),
                 begrunnelse = nyttBarn.begrunnelse,
+                gyldigFraOgMed = nyttBarnSvar.barnetilleggFom,
+                gyldigTilOgMed = nyttBarnSvar.barnetilleggTom,
             )
 
-        try {
-            dpBehandlingKlient.oppdaterBarnOpplysning(
-                opplysningId = nyttBarnRequest.opplysningId,
-                behandlingId = nyttBarnRequest.behandlingId,
-                dpBehandlingOpplysning = dpBehandlingOpplysning,
-                token = token,
-            )
-        } catch (e: Exception) {
-            logger.error { e.message }
-            throw IllegalStateException("Feil ved sending av barn til dp-behandling", e)
+        val behandlingId = nyttBarnRequest.behandlingId
+        if (behandlingId == null) {
+            logger.warn { "behandlingId er null, sender ikke barn til dp-behandling" }
+        } else {
+            try {
+                dpBehandlingKlient.oppdaterBarnOpplysning(
+                    behandlingId = behandlingId,
+                    dpBehandlingOpplysning = dpBehandlingOpplysning,
+                    token = token,
+                )
+            } catch (e: Exception) {
+                logger.error { e.message }
+                throw IllegalStateException("Feil ved sending av barn til dp-behandling", e)
+            }
         }
 
         opplysningRepository.leggTilBarn(søknadId, brukerident, nyttBarnSvar)
@@ -235,8 +240,7 @@ class OpplysningService(
         val løsningsbarn =
             uendredeBarn
                 .map {
-                    Løsningsbarn(
-                        søknadbarnId = søknadbarnId,
+                    BarnetilleggV2BehovLøser.LøsningsbarnV2(
                         fornavnOgMellomnavn = it.fornavnOgMellomnavn,
                         etternavn = it.etternavn,
                         fødselsdato = it.fødselsdato,
@@ -249,8 +253,7 @@ class OpplysningService(
                     )
                 }.toMutableList()
                 .plus(
-                    Løsningsbarn(
-                        søknadbarnId = søknadbarnId,
+                    BarnetilleggV2BehovLøser.LøsningsbarnV2(
                         fornavnOgMellomnavn = oppdatertBarn.fornavnOgMellomnavn,
                         etternavn = oppdatertBarn.etternavn,
                         fødselsdato = oppdatertBarn.fodselsdato,
@@ -264,13 +267,14 @@ class OpplysningService(
                 )
 
         val dpBehandlingOpplysning =
-            DpBehandlingOpplysning(
-                verdi = objectMapper.writeValueAsString(løsningsbarn),
+            NyOpplysningDTO(
+                verdi = objectMapper.writeValueAsString(BarnetilleggV2BehovLøser.BarnetilleggV2Løsning(søknadbarnId, løsningsbarn)),
                 begrunnelse = oppdatertBarnRequest.oppdatertBarn.begrunnelse,
+                gyldigFraOgMed = oppdatertBarnRequest.oppdatertBarn.barnetilleggFom,
+                gyldigTilOgMed = oppdatertBarnRequest.oppdatertBarn.barnetilleggTom,
             )
 
         dpBehandlingKlient.oppdaterBarnOpplysning(
-            opplysningId = oppdatertBarnRequest.opplysningId,
             behandlingId = oppdatertBarnRequest.behandlingId,
             dpBehandlingOpplysning = dpBehandlingOpplysning,
             token = token,

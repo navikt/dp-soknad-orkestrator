@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.Application
 import io.ktor.server.auth.authenticate
@@ -16,6 +17,8 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.NyttBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.metrikker.OpplysningMetrikker
 import java.util.UUID
+
+private val sikkerlogg = KotlinLogging.logger("tjenestekall.OpplysningApi")
 
 internal fun Application.opplysningApi(opplysningService: OpplysningService) {
     routing {
@@ -45,13 +48,16 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                         val søknadbarnId = validerOgFormaterUuidParameter(parameternavn) ?: return@get
                         val søknadId = opplysningService.mapTilSøknadId(søknadbarnId)
 
-                        call.respond(HttpStatusCode.OK, opplysningService.hentBarn(søknadId))
+                        val barn = opplysningService.hentBarn(søknadId)
+                        sikkerlogg.info { "GET /barn/$søknadbarnId: søknadId=$søknadId, returnerer ${barn.size} barn: $barn" }
+                        call.respond(HttpStatusCode.OK, barn)
                     }
 
                     put {
                         val søknadbarnId = validerOgFormaterUuidParameter(parameternavn) ?: return@put
                         val søknadId = opplysningService.mapTilSøknadId(søknadbarnId)
 
+                        sikkerlogg.info { "PUT /barn/$søknadbarnId: søknadId=$søknadId" }
                         oppdaterBarn(opplysningService, søknadId)
                     }
 
@@ -59,6 +65,7 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
                         val søknadbarnId = validerOgFormaterUuidParameter(parameternavn) ?: return@post
                         val søknadId = opplysningService.mapTilSøknadId(søknadbarnId)
 
+                        sikkerlogg.info { "POST /barn/$søknadbarnId: søknadId=$søknadId" }
                         leggTilBarn(opplysningService, søknadId)
                     }
                 }
@@ -87,6 +94,7 @@ private suspend fun RoutingContext.leggTilBarn(
     }
 
     val saksbehandlerId = call.saksbehandlerId()
+    sikkerlogg.info { "POST /barn leggTilBarn: saksbehandlerId=$saksbehandlerId, request=$nyttBarnRequest" }
     val barnListe = opplysningService.leggTilBarn(nyttBarnRequest, søknadId, saksbehandlerId, token)
     call.respond(HttpStatusCode.Created, barnListe)
 }
@@ -112,6 +120,7 @@ private suspend fun RoutingContext.oppdaterBarn(
 
     val oppdatertBarn = oppdatertBarnRequest.oppdatertBarn
     val saksbehandlerId = call.saksbehandlerId()
+    sikkerlogg.info { "PUT /barn oppdaterBarn: saksbehandlerId=$saksbehandlerId, request=$oppdatertBarnRequest" }
 
     if (opplysningService.hentBarn(søknadId).none { it.barnId == oppdatertBarn.barnId }) {
         call.respond(
