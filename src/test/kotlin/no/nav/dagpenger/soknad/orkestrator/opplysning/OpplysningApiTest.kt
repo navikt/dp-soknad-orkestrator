@@ -4,6 +4,7 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
 import io.ktor.client.request.header
+import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
@@ -14,9 +15,12 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.testing.testApplication
+import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.NyttBarnDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.NyttBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
@@ -24,6 +28,8 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
+import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.testAzureADToken
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.withMockAuthServerAndTestApplication
@@ -35,10 +41,12 @@ import kotlin.test.Test
 
 class OpplysningApiTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
+    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val opplysningService =
         OpplysningService(
             opplysningRepository = opplysningRepository,
             dpBehandlingKlient = mockk(relaxed = true),
+            søknadRepository = søknadRepository,
         )
     val søknadId = UUID.randomUUID()
     val søknadbarnId = UUID.randomUUID()
@@ -362,6 +370,59 @@ class OpplysningApiTest {
                     }
             }
         }
+
+    @Test
+    fun `Legg til barn returnerer 401 Unauthorized uten auth`() {
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client.post("/opplysninger/barn/${UUID.randomUUID()}").status shouldBe HttpStatusCode.Unauthorized
+        }
+    }
+
+    @Test
+    fun `Legg til barn returnerer 400 Bad Request ved ugyldig body`() {
+        val actualSøknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client
+                .post("/opplysninger/barn/$actualSøknadbarnId") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                    header(HttpHeaders.ContentType, "application/json")
+                    setBody("ikke gyldig json")
+                }.status shouldBe HttpStatusCode.BadRequest
+        }
+    }
+
+    @Test
+    fun `Legg til barn returnerer 201 Created`() {
+        val actualSøknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
+        every { søknadRepository.hent(søknadId) } returns Søknad(søknadId = søknadId, ident = ident)
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client
+                .post("/opplysninger/barn/$actualSøknadbarnId") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                    header(HttpHeaders.ContentType, "application/json")
+                    setBody(
+                        NyttBarnRequestDTO(
+                            nyttBarn =
+                                NyttBarnDTO(
+                                    fornavnOgMellomnavn = "Nytt",
+                                    etternavn = "Barn",
+                                    fodselsdato = LocalDate.of(2020, 1, 1),
+                                    oppholdssted = "NOR",
+                                    forsorgerBarnet = true,
+                                    kvalifisererTilBarnetillegg = true,
+                                    begrunnelse = "Begrunnelse",
+                                ),
+                        ),
+                    )
+                }.let { response ->
+                    response.status shouldBe HttpStatusCode.Created
+                    val barn = objectMapper.readValue<List<BarnResponseDTO>>(response.bodyAsText())
+                    barn.size shouldBe 1
+                }
+        }
+    }
 }
 
 val oppdatertBarnRequestDTO =
