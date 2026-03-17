@@ -86,6 +86,7 @@ private suspend fun RoutingContext.leggTilBarn(
     try {
         nyttBarnRequest = call.receive<NyttBarnRequestDTO>()
     } catch (e: Exception) {
+        sikkerlogg.error(e) { "POST /barn leggTilBarn: Kunne ikke parse request body" }
         call.respond(
             HttpStatusCode.BadRequest,
             "Kunne ikke parse request body til NyttBarnRequestDTO. Feilmelding: $e",

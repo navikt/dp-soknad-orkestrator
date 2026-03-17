@@ -42,11 +42,22 @@ import kotlin.test.Test
 class OpplysningApiTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val saksbehandlerBarnRepository =
+        mockk<SaksbehandlerBarnRepository>(relaxed = true).also { mock ->
+            val storedBarn = mutableMapOf<UUID, List<BarnSvar>>()
+            every { mock.hentBarn(any()) } answers { storedBarn[firstArg()] }
+            every { mock.lagreBarn(any(), any(), any()) } answers {
+                storedBarn[firstArg()] = secondArg()
+            }
+        }
+    val seksjonRepository = mockk<no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository>(relaxed = true)
     val opplysningService =
         OpplysningService(
             opplysningRepository = opplysningRepository,
             dpBehandlingKlient = mockk(relaxed = true),
             søknadRepository = søknadRepository,
+            saksbehandlerBarnRepository = saksbehandlerBarnRepository,
+            seksjonRepository = seksjonRepository,
         )
     val søknadId = UUID.randomUUID()
     val søknadbarnId = UUID.randomUUID()

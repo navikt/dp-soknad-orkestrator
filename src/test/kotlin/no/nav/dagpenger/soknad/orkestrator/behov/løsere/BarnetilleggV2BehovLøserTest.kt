@@ -12,6 +12,7 @@ import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BarnetilleggV2
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
+import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepository
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
@@ -33,9 +34,13 @@ class BarnetilleggV2BehovLøserTest {
     val quizOpplysningRepositorySpy = spyk<QuizOpplysningRepository>(opplysningRepository)
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
+    val saksbehandlerBarnRepository =
+        mockk<SaksbehandlerBarnRepository>(relaxed = true).also {
+            every { it.hentBarn(any()) } returns null
+        }
     val testRapid = TestRapid()
     val behovløser =
-        BarnetilleggV2BehovLøser(testRapid, quizOpplysningRepositorySpy, søknadRepository, seksjonRepository)
+        BarnetilleggV2BehovLøser(testRapid, quizOpplysningRepositorySpy, søknadRepository, seksjonRepository, saksbehandlerBarnRepository)
     val ident = "12345678910"
     val søknadId: UUID = randomUUID()
 
@@ -211,6 +216,61 @@ class BarnetilleggV2BehovLøserTest {
             it["barnetilleggFom"].asText() shouldBe "null"
             it["barnetilleggTom"].asText() shouldBe "null"
         }
+    }
+
+    @Test
+    fun `saksbehandler-redigerte barn har prioritet over quiz-opplysninger`() {
+        val saksbehandlerBarn =
+            listOf(
+                BarnSvar(
+                    barnSvarId = randomUUID(),
+                    fornavnOgMellomnavn = "Saksbehandler-redigert",
+                    etternavn = "Barn",
+                    fødselsdato = 1.januar(2010),
+                    statsborgerskap = "NOR",
+                    forsørgerBarnet = true,
+                    fraRegister = true,
+                    kvalifisererTilBarnetillegg = true,
+                    barnetilleggFom = 1.januar(2010),
+                    barnetilleggTom = 1.januar(2028),
+                    endretAv = "Z991234",
+                    begrunnelse = "Endret av saksbehandler",
+                ),
+            )
+        every { saksbehandlerBarnRepository.hentBarn(søknadId) } returns saksbehandlerBarn
+
+        // Legg til quiz-barn som IKKE skal brukes
+        val pdlBarn =
+            QuizOpplysning(
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
+                type = Barn,
+                ident = ident,
+                søknadId = søknadId,
+                svar =
+                    listOf(
+                        BarnSvar(
+                            barnSvarId = randomUUID(),
+                            fornavnOgMellomnavn = "Quiz",
+                            etternavn = "Barn",
+                            fødselsdato = 1.januar(2000),
+                            statsborgerskap = "NOR",
+                            forsørgerBarnet = false,
+                            fraRegister = true,
+                            kvalifisererTilBarnetillegg = false,
+                        ),
+                    ),
+            )
+        opplysningRepository.lagre(pdlBarn)
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, BarnetilleggV2))
+
+        val barnetilleggV2Løsning = testRapid.inspektør.field(0, "@løsning")[BarnetilleggV2.name]["verdi"]
+        val løsteBarn = barnetilleggV2Løsning["barn"]
+        løsteBarn.size() shouldBe 1
+        løsteBarn[0]["fornavnOgMellomnavn"].asText() shouldBe "Saksbehandler-redigert"
+        løsteBarn[0]["kvalifiserer"].asBoolean() shouldBe true
+        løsteBarn[0]["endretAv"].asText() shouldBe "Z991234"
+        løsteBarn[0]["begrunnelse"].asText() shouldBe "Endret av saksbehandler"
     }
 
     @Language("JSON")
