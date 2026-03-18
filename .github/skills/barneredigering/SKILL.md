@@ -77,13 +77,17 @@ Uses `JSON` (not `JSONB`) for consistency with `seksjon_v2` and to preserve key 
 - `openapi/src/main/resources/soknad-orkestrator-api.yaml` — OpenAPI spec defining all
   request/response schemas. The frontend (dp-saksbehandling-frontend) consumes these
   endpoints. DTOs in `openapi/build/generated/` are auto-generated from this spec.
+  - **`BarnRequest`** — Unified request wrapper for both POST and PUT. Contains `barn: BarnData`
+    and optional `behandlingId: UUID?`.
+  - **`BarnData`** — The barn fields (fornavnOgMellomnavn, etternavn, fodselsdato, etc.).
+    No `barnId` — that's in the path for PUT.
 
 ### API
 - `src/main/kotlin/.../opplysning/OpplysningApi.kt` — Route handlers. Endpoints:
-  - `GET /opplysninger/{soknadId}/barn` — Fetch barn by søknadId
-  - `PUT /opplysninger/{soknadId}/barn/oppdater` — Update a barn
+  - `GET /opplysninger/{soknadId}/barn` — Fetch barn by søknadId (deprecated)
+  - `PUT /opplysninger/{soknadId}/barn/oppdater` — Deprecated, returns 400
   - `GET /opplysninger/barn/{soknadbarnId}` — Fetch barn by søknadbarnId
-  - `PUT /opplysninger/barn/{soknadbarnId}` — Update barn by søknadbarnId
+  - `PUT /opplysninger/barn/{soknadbarnId}/{barnId}` — Update specific barn
   - `POST /opplysninger/barn/{soknadbarnId}` — Add new barn
 - Authentication: Azure AD (`saksbehandler` group required)
 
@@ -213,7 +217,8 @@ Requires `System.setProperty("Grupper.saksbehandler", "saksbehandler")` in setup
 
 ## Important conventions
 
-- `behandlingId` can be null in `NyttBarnRequestDTO`. When null, skip the dp-behandling call.
+- `behandlingId` can be null in `BarnRequestDTO`. When null, skip the dp-behandling call.
+- `barnId` is a path parameter for PUT, not in the request body.
 - `barnetilleggFom`/`Tom` are set from `Barn.barnetilleggperiode(fødselsdato)` only when
   `kvalifisererTilBarnetillegg == true`. Otherwise null.
 - Begrunnelse is per-barn (inside JSON), not per-snapshot.

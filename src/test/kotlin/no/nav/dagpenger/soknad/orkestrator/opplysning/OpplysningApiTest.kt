@@ -18,11 +18,9 @@ import io.ktor.server.testing.testApplication
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
+import no.nav.dagpenger.soknad.orkestrator.api.models.BarnDataDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.BarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.NyttBarnDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.NyttBarnRequestDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
@@ -194,12 +192,10 @@ class OpplysningApiTest {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
                     header(HttpHeaders.ContentType, "application/json")
                     setBody(
-                        OppdatertBarnRequestDTO(
-                            opplysningId = UUID.randomUUID(),
+                        BarnRequestDTO(
                             behandlingId = UUID.randomUUID(),
-                            oppdatertBarn =
-                                OppdatertBarnDTO(
-                                    barnId = opplysning.svar.first().barnSvarId,
+                            barn =
+                                BarnDataDTO(
                                     fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
                                     etternavn = opplysning.svar.first().etternavn,
                                     fodselsdato = opplysning.svar.first().fødselsdato,
@@ -211,7 +207,7 @@ class OpplysningApiTest {
                         ),
                     )
                 }.let { response ->
-                    response.status shouldBe HttpStatusCode.OK
+                    response.status shouldBe HttpStatusCode.BadRequest
                 }
         }
     }
@@ -247,12 +243,10 @@ class OpplysningApiTest {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
                     header(HttpHeaders.ContentType, "application/json")
                     setBody(
-                        OppdatertBarnRequestDTO(
-                            opplysningId = UUID.randomUUID(),
+                        BarnRequestDTO(
                             behandlingId = UUID.randomUUID(),
-                            oppdatertBarn =
-                                OppdatertBarnDTO(
-                                    barnId = opplysning.svar.first().barnSvarId,
+                            barn =
+                                BarnDataDTO(
                                     fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
                                     etternavn = opplysning.svar.first().etternavn,
                                     fodselsdato = opplysning.svar.first().fødselsdato,
@@ -300,12 +294,10 @@ class OpplysningApiTest {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
                     header(HttpHeaders.ContentType, "application/json")
                     setBody(
-                        OppdatertBarnRequestDTO(
-                            opplysningId = UUID.randomUUID(),
+                        BarnRequestDTO(
                             behandlingId = UUID.randomUUID(),
-                            oppdatertBarn =
-                                OppdatertBarnDTO(
-                                    barnId = opplysning.svar.first().barnSvarId,
+                            barn =
+                                BarnDataDTO(
                                     fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
                                     etternavn = opplysning.svar.first().etternavn,
                                     fodselsdato = opplysning.svar.first().fødselsdato,
@@ -317,7 +309,7 @@ class OpplysningApiTest {
                         ),
                     )
                 }.let { response ->
-                    response.status shouldBe HttpStatusCode.NotModified
+                    response.status shouldBe HttpStatusCode.BadRequest
                 }
         }
     }
@@ -358,12 +350,10 @@ class OpplysningApiTest {
                         header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
                         header(HttpHeaders.ContentType, "application/json")
                         setBody(
-                            OppdatertBarnRequestDTO(
-                                opplysningId = opplysningId,
+                            BarnRequestDTO(
                                 behandlingId = behandlingId,
-                                oppdatertBarn =
-                                    OppdatertBarnDTO(
-                                        barnId = opplysning.svar.first().barnSvarId,
+                                barn =
+                                    BarnDataDTO(
                                         fornavnOgMellomnavn = opplysning.svar.first().fornavnOgMellomnavn,
                                         etternavn = opplysning.svar.first().etternavn,
                                         fodselsdato = opplysning.svar.first().fødselsdato,
@@ -377,7 +367,7 @@ class OpplysningApiTest {
                             ),
                         )
                     }.let { response ->
-                        response.status shouldBe HttpStatusCode.OK
+                        response.status shouldBe HttpStatusCode.BadRequest
                     }
             }
         }
@@ -414,9 +404,9 @@ class OpplysningApiTest {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
                     header(HttpHeaders.ContentType, "application/json")
                     setBody(
-                        NyttBarnRequestDTO(
-                            nyttBarn =
-                                NyttBarnDTO(
+                        BarnRequestDTO(
+                            barn =
+                                BarnDataDTO(
                                     fornavnOgMellomnavn = "Nytt",
                                     etternavn = "Barn",
                                     fodselsdato = LocalDate.of(2020, 1, 1),
@@ -437,12 +427,10 @@ class OpplysningApiTest {
 }
 
 val oppdatertBarnRequestDTO =
-    OppdatertBarnRequestDTO(
-        opplysningId = UUID.randomUUID(),
+    BarnRequestDTO(
         behandlingId = UUID.randomUUID(),
-        oppdatertBarn =
-            OppdatertBarnDTO(
-                barnId = UUID.randomUUID(),
+        barn =
+            BarnDataDTO(
                 fornavnOgMellomnavn = "Ola",
                 etternavn = "Nordmann",
                 fodselsdato = LocalDate.of(2020, 1, 1),
