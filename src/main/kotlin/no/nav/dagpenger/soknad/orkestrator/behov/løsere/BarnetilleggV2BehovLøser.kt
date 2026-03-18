@@ -6,6 +6,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BarnetilleggV2
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
+import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepository
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.asListOf
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn.barnetilleggperiode
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
@@ -20,6 +21,7 @@ class BarnetilleggV2BehovLøser(
     opplysningRepository: QuizOpplysningRepository,
     søknadRepository: SøknadRepository,
     seksjonRepository: SeksjonRepository,
+    private val saksbehandlerBarnRepository: SaksbehandlerBarnRepository,
 ) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository) {
     override val behov = BarnetilleggV2.name
     override val beskrivendeId
@@ -39,9 +41,30 @@ class BarnetilleggV2BehovLøser(
         ident: String,
         søknadId: UUID,
     ): BarnetilleggV2Løsning {
+        val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
+
+        // 1. Saksbehandler-redigerte barn (nyeste snapshot)
+        saksbehandlerBarnRepository.hentBarn(søknadId)?.let { saksbehandlerBarn ->
+            val barn =
+                saksbehandlerBarn.map {
+                    LøsningsbarnV2(
+                        fornavnOgMellomnavn = it.fornavnOgMellomnavn,
+                        etternavn = it.etternavn,
+                        fødselsdato = it.fødselsdato,
+                        statsborgerskap = it.statsborgerskap,
+                        kvalifiserer = it.kvalifisererTilBarnetillegg,
+                        barnetilleggFom = it.barnetilleggFom,
+                        barnetilleggTom = it.barnetilleggTom,
+                        endretAv = it.endretAv,
+                        begrunnelse = it.begrunnelse,
+                    )
+                }
+            return BarnetilleggV2Løsning(søknadbarnId = søknadbarnId, barn = barn)
+        }
+
+        // 2. Quiz-opplysninger (gammel søknad)
         val pdlBarnSvar = hentBarnSvar(BESKRIVENDE_ID_PDL_BARN, ident, søknadId)
         val egneBarnSvar = hentBarnSvar(BESKRIVENDE_ID_EGNE_BARN, ident, søknadId)
-        val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
 
         if ((pdlBarnSvar + egneBarnSvar).isNotEmpty()) {
             val alleBarn =

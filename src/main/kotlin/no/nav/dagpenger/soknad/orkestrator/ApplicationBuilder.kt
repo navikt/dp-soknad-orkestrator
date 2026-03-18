@@ -25,6 +25,7 @@ import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
 import no.nav.dagpenger.soknad.orkestrator.opplysning.DpBehandlingKlient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
+import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.opplysning.landApi
 import no.nav.dagpenger.soknad.orkestrator.opplysning.opplysningApi
 import no.nav.dagpenger.soknad.orkestrator.personalia.KontonummerService
@@ -108,11 +109,15 @@ internal class ApplicationBuilder(
             dpBehandlingScope = Configuration.miljøVariabler.dpBehandlingScope,
         )
 
+    private val saksbehandlerBarnRepository = SaksbehandlerBarnRepositoryPostgres(dataSource)
+
     private val opplysningService: OpplysningService =
         OpplysningService(
             opplysningRepository = quizOpplysningRepositoryPostgres,
             dpBehandlingKlient = dpBehandlingKlient,
             søknadRepository = søknadRepository,
+            saksbehandlerBarnRepository = saksbehandlerBarnRepository,
+            seksjonRepository = seksjonRepository,
         )
 
     private val rapidsConnection =
@@ -162,6 +167,7 @@ internal class ApplicationBuilder(
                             QuizOpplysningRepositoryPostgres(dataSource),
                             seksjonRepository,
                             søknadRepository,
+                            saksbehandlerBarnRepository,
                         ),
                     søknadService = søknadService,
                 )
