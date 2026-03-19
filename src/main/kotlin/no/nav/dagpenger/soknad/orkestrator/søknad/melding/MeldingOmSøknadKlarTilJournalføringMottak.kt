@@ -99,7 +99,7 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                         sikkerLogg.info {
                             "Publiserte melding om behov for generering av søknad-PDF for søknad $søknadId innsendt av $ident "
                         }
-                        var seksjonsdata = seksjonRepository.hentSeksjoner(søknadId, ident)
+                        var seksjonsdata = seksjonRepository.hentSeksjonerMedTidstempler(søknadId, ident)
 
                         val søknadEndretTilstandMelding =
                             SøknadEndretTilstandMelding(

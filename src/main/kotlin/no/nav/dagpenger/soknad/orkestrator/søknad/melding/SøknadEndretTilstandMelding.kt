@@ -2,7 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.melding
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
-import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.Seksjon
+import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonMedTidstempler
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -11,7 +11,7 @@ class SøknadEndretTilstandMelding(
     private val ident: String,
     private val forrigeTilstand: String,
     private val nyTilstand: String,
-    private val søknadsdata: List<Seksjon> = emptyList(),
+    private val søknadsdata: List<SeksjonMedTidstempler> = emptyList(),
     private val søknad: Søknad? = null,
 ) {
     @Suppress("UNCHECKED_CAST")
@@ -48,6 +48,10 @@ class SøknadEndretTilstandMelding(
             mapOf(
                 "opprettet" to LocalDateTime.now(),
                 "innsendt" to (søknad.innsendtTidspunkt?.toString() ?: "null"),
-            ) + søknadsdata.associate { it.seksjonId to it.data }
+            ) +
+                søknadsdata.associate {
+                    it.seksjonId to
+                        mapOf("seksjonsdata" to it.data, "opprettet" to it.opprettet, "oppdatert" to it.oppdatert)
+                }
         }
 }
