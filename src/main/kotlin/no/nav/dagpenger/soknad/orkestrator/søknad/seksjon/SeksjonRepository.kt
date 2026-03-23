@@ -107,6 +107,29 @@ class SeksjonRepository(
                 }.toList()
         }
 
+    fun hentSeksjonerMedTidstempler(
+        søknadId: UUID,
+        ident: String,
+    ): List<SeksjonMedTidstempler> =
+        transaction {
+            SeksjonV2Tabell
+                .innerJoin(SøknadTabell)
+                .select(
+                    SeksjonV2Tabell.seksjonsvar,
+                    SeksjonV2Tabell.seksjonId,
+                    SeksjonV2Tabell.opprettet,
+                    SeksjonV2Tabell.oppdatert,
+                ).where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
+                .map {
+                    SeksjonMedTidstempler(
+                        seksjonId = it[SeksjonV2Tabell.seksjonId],
+                        data = it[SeksjonV2Tabell.seksjonsvar],
+                        opprettet = it[SeksjonV2Tabell.opprettet],
+                        oppdatert = it[SeksjonV2Tabell.oppdatert],
+                    )
+                }.toList()
+        }
+
     fun hentSeksjonIdForAlleLagredeSeksjoner(
         søknadId: UUID,
         ident: String,

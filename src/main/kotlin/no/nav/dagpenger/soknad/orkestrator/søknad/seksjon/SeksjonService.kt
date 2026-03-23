@@ -8,6 +8,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Dokumentvariant
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmEttersending
+import java.time.LocalDateTime
 import java.util.UUID
 
 class SeksjonService(
@@ -136,4 +137,11 @@ class SeksjonService(
 data class Seksjon(
     val seksjonId: String,
     val data: String,
+)
+
+data class SeksjonMedTidstempler(
+    val seksjonId: String,
+    val data: String,
+    val opprettet: LocalDateTime,
+    val oppdatert: LocalDateTime?,
 )
