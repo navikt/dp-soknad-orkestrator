@@ -96,7 +96,14 @@ class OpplysningService(
     }
 
     private fun BarnSvar.tilBarnResponseDTO(): BarnResponseDTO {
-        val fraRegister = if (this.fraRegister) Kilde.register else Kilde.soknad
+        val kilde =
+            when {
+                fraRegister -> Kilde.register
+                endretAv != null -> Kilde.saksbehandler
+                else -> Kilde.soknad
+            }
+        // forsørgerBarnet kommer alltid fra søker eller saksbehandler, aldri fra register
+        val forsørgerKilde = if (endretAv != null) Kilde.saksbehandler else Kilde.soknad
         return BarnResponseDTO(
             barnId = barnSvarId,
             opplysninger =
@@ -105,16 +112,16 @@ class OpplysningService(
                         BarnOpplysningDTO.Id.fornavnOgMellomnavn,
                         fornavnOgMellomnavn,
                         DataType.tekst,
-                        fraRegister,
+                        kilde,
                     ),
-                    BarnOpplysningDTO(BarnOpplysningDTO.Id.etternavn, etternavn, DataType.tekst, fraRegister),
-                    BarnOpplysningDTO(BarnOpplysningDTO.Id.fodselsdato, fødselsdato.toString(), DataType.dato, fraRegister),
-                    BarnOpplysningDTO(BarnOpplysningDTO.Id.oppholdssted, statsborgerskap, DataType.land, fraRegister),
+                    BarnOpplysningDTO(BarnOpplysningDTO.Id.etternavn, etternavn, DataType.tekst, kilde),
+                    BarnOpplysningDTO(BarnOpplysningDTO.Id.fodselsdato, fødselsdato.toString(), DataType.dato, kilde),
+                    BarnOpplysningDTO(BarnOpplysningDTO.Id.oppholdssted, statsborgerskap, DataType.land, kilde),
                     BarnOpplysningDTO(
                         BarnOpplysningDTO.Id.forsorgerBarnet,
                         forsørgerBarnet.toString(),
                         DataType.boolsk,
-                        Kilde.soknad,
+                        forsørgerKilde,
                     ),
                     BarnOpplysningDTO(
                         BarnOpplysningDTO.Id.kvalifisererTilBarnetillegg,
