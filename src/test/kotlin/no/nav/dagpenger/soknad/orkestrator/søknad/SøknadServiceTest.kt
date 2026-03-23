@@ -117,17 +117,13 @@ class SøknadServiceTest {
 
         verify { søknadRepository.slett(søknadId, ident) }
         with(testRapid.inspektør) {
-            size shouldBe 2
+            size shouldBe 1
 
             field(0, "@event_name").asText() shouldBe "søknad_endret_tilstand"
             field(0, "gjeldendeTilstand").asText() shouldBe "Slettet"
             field(0, "søknad_uuid").asText() shouldBe søknadId.toString()
             field(0, "ident").asText() shouldBe ident
             testRapid.inspektør.message(0).has("søknadsdata") shouldBe false
-
-            field(1, "@event_name").asText() shouldBe "søknad_slettet"
-            field(1, "søknad_uuid").asText() shouldBe søknadId.toString()
-            field(1, "ident").asText() shouldBe ident
         }
     }
 

@@ -79,7 +79,6 @@ class SøknadService(
         søknadRepository.slett(søknadId, ident)
 
         sendEndretTilstandTilSlettetMelding(søknadId, ident, søknad)
-        sendSøknadSlettetMelding(søknadId, ident)
 
         SøknadMetrikker.slettet.inc()
         logg.info { "Slettet søknad med søknadId: $søknadId" }
