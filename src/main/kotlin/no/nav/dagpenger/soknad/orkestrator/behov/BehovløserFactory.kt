@@ -154,7 +154,14 @@ class BehovløserFactory(
             Søknadsdato to SøknadsdatoBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             TarUtdanningEllerOpplæring to
                 UtdanningEllerOpplæringBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
-            Barnetillegg to BarnetilleggBehovLøser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            Barnetillegg to
+                BarnetilleggBehovLøser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                    saksbehandlerBarnRepository,
+                ),
             BarnetilleggV2 to
                 BarnetilleggV2BehovLøser(
                     rapidsConnection,
