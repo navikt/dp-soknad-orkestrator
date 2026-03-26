@@ -12,6 +12,7 @@ import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Barnetillegg
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
+import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepository
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
@@ -32,8 +33,13 @@ class BarnetilleggBehovLøserTest {
     val quizOpplysningRepositorySpy = spyk<QuizOpplysningRepository>(opplysningRepository)
     val seksjonRepository = mockk<SeksjonRepository>()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val saksbehandlerBarnRepository =
+        mockk<SaksbehandlerBarnRepository>(relaxed = true).also {
+            every { it.hentBarn(any()) } returns null
+        }
     val testRapid = TestRapid()
-    val behovløser = BarnetilleggBehovLøser(testRapid, quizOpplysningRepositorySpy, søknadRepository, seksjonRepository)
+    val behovløser =
+        BarnetilleggBehovLøser(testRapid, quizOpplysningRepositorySpy, søknadRepository, seksjonRepository, saksbehandlerBarnRepository)
     val ident = "12345678910"
     val søknadId: UUID = randomUUID()
 
