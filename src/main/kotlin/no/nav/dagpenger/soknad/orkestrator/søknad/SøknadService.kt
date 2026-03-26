@@ -94,7 +94,7 @@ class SøknadService(
             SøknadEndretTilstandMelding(
                 søknadId = søknadId,
                 ident = ident,
-                forrigeTilstand = "OPPRETTET",
+                forrigeTilstand = "UnderOpprettelse",
                 nyTilstand = Tilstand.PÅBEGYNT.name,
             )
         rapidsConnection.publish(
