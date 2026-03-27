@@ -142,6 +142,16 @@ private suspend fun RoutingContext.oppdaterBarn(
         return
     }
 
+    val fom = barn.barnetilleggFom
+    val tom = barn.barnetilleggTom
+    if (fom != null && tom != null && fom > tom) {
+        call.respond(
+            HttpStatusCode.BadRequest,
+            "barnetilleggTom kan ikke være før barnetilleggFom",
+        )
+        return
+    }
+
     if (opplysningService.erEndret(barn, barnId, søknadId)) {
         opplysningService.oppdaterBarn(barnRequest, barnId, søknadId, saksbehandlerId, token)
         OpplysningMetrikker.endringBarn.inc()
