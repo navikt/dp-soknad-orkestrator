@@ -46,6 +46,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
 
         coEvery { seksjonRepository.hentDokumentasjonskrav(any(), any()) } returns dokumentasjonskrav
         coEvery { seksjonRepository.hentSeksjonerMedTidstempler(any(), any()) } returns seksjoner
+        coEvery { seksjonRepository.hentAllePdfGrunnlag(any(), any()) } returns pdfGrunnlag
 
         rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
 
@@ -63,7 +64,8 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         søknadsdata["verneplikt"] shouldNotBe null
         søknadsdata["verneplikt"]["seksjonsdata"].asText() shouldBe seksjoner.find { it.seksjonId == "verneplikt" }?.data
         søknadsdata["din-situasjon"] shouldNotBe null
-        søknadsdata["din-situasjon"]["seksjonsdata"].asText() shouldBe seksjoner.find { it.seksjonId == "din-situasjon" }?.data
+        søknadsdata["din-situasjon"]["seksjonsdata"].asText().trim() shouldBe
+            """{"seksjonId":"din-situasjon","seksjonsvar":{"harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene":"ja","hvilkenDatoSøkerDuGjenopptakFra":"2024-02-21"},"versjon":1}"""
 
         rapidsConnection.inspektør.message(2)["@event_name"].asText() shouldBe "dokumentkrav_innsendt"
         rapidsConnection.inspektør.message(2)["innsendingsType"].asText() shouldBe "INNSENDT"
@@ -127,7 +129,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
             SeksjonMedTidstempler(
                 seksjonId = "din-situasjon",
                 data =
-                    """{"seksjonId": "din-situasjon","seksjonsvar": {"harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene": "ja","årsakTilAtDagpengeneBleStanset": "dfg","hvilkenDatoSøkerDuGjenopptakFra": "2024-02-21",},"versjon": 1}"""
+                    """{"seksjonId":"din-situasjon","seksjonsvar":{"harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene":"ja","årsakTilAtDagpengeneBleStanset":"dfg","hvilkenDatoSøkerDuGjenopptakFra":"2024-02-21"},"versjon":1}"""
                         .trim(),
                 opprettet = LocalDateTime.now(),
                 oppdatert = LocalDateTime.now(),
@@ -135,10 +137,16 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
             SeksjonMedTidstempler(
                 seksjonId = "verneplikt",
                 data =
-                    """{"seksjonId": "verneplikt","seksjon": {"avtjentVerneplikt": "ja"},"versjon": 1}""".trim(),
+                    """{"seksjonId":"verneplikt","seksjonsvar":{"avtjentVerneplikt":"ja"},"versjon":1}""".trim(),
                 opprettet = LocalDateTime.now(),
                 oppdatert = LocalDateTime.now(),
             ),
+        )
+
+    private val pdfGrunnlag: List<String> =
+        listOf(
+            """{"navn":"Din-situasjon","spørsmål":[{"id":"harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene","type":"envalg","label":"Har du mottatt dagpenger fra Nav i løpet av de siste 52 ukene?","options":[{"value":"ja","label":"Ja"},{"value":"nei","label":"Nei"},{"value":"vetikke","label":"Vet ikke"}],"svar":"ja"},{"id":"årsakTilAtDagpengeneBleStanset","type":"langTekst","label":"Skriv om årsaken til at dagpengene ble stanset","description":"For eksempel om du har hatt arbeid, vært syk, på ferie, glemt å sende meldekort, vært i utdanning eller hatt foreldrepermisjon.","svar":"test"},{"id":"hvilkenDatoSøkerDuGjenopptakFra","type":"dato","label":"Hvilken dato søker du gjenopptak av dagpenger fra?","description":"Hvis du har jobbet siden sist skal du oppgi den første dagen du ble helt eller delvis arbeidsledig.","svar":"25. mars 2026"},{"id":"hvilkenDatoSøkerDuGjenopptakFraLesMer","type":"lesMer","label":"Les om når du tidligst kan få dagpenger fra","description":"Du kan tidligst få dagpenger fra den dagen du sender inn søknaden om gjenopptak om dagpenger."}]}""",
+            """{"navn":"Verneplikt","spørsmål":[{"id":"avtjentVerneplikt","type":"envalg","label":"Har du avtjent verneplikt i minst tre måneder de siste tolv månedene?","description":"Du kan ha rett til dagpenger hvis du har avtjent militærtjeneste eller obligatorisk sivilforsvarstjeneste i minst tre av de siste tolv månedene.","options":[{"value":"ja","label":"Ja"},{"value":"nei","label":"Nei"}],"svar":"ja"},{"id":"avtjentVernepliktDokumentasjonskravindikator","type":"dokumentasjonskravindikator","label":"Tjenestebevis"}]}""",
         )
 
     private val dokumentasjonskrav =

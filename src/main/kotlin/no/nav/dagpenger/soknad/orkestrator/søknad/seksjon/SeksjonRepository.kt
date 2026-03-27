@@ -233,6 +233,21 @@ class SeksjonRepository(
                 }.toList()
         }
 
+    fun hentAllePdfGrunnlag(
+        søknadId: UUID,
+        ident: String,
+    ): List<String> =
+        transaction {
+            SeksjonV2Tabell
+                .innerJoin(SøknadTabell)
+                .select(SeksjonV2Tabell.pdfGunnlag)
+                .where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
+                .orderBy(SeksjonV2Tabell.opprettet, ASC)
+                .map {
+                    it[SeksjonV2Tabell.pdfGunnlag]
+                }.toList()
+        }
+
     fun slettAlleSeksjoner(
         søknadId: UUID,
         ident: String,
