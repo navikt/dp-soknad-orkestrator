@@ -379,6 +379,85 @@ class OpplysningServiceTest {
     }
 
     @Test
+    fun `oppdaterBarn bevarer rekkefølgen på barn`() {
+        val søknadId = UUID.randomUUID()
+        val søknadbarnId = UUID.randomUUID()
+        val barnId1 = UUID.randomUUID()
+        val barnId2 = UUID.randomUUID()
+        val barnId3 = UUID.randomUUID()
+
+        val barn1 =
+            BarnSvar(
+                barnSvarId = barnId1,
+                fornavnOgMellomnavn = "Barn En",
+                etternavn = "En",
+                fødselsdato = LocalDate.of(2010, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = true,
+                kvalifisererTilBarnetillegg = false,
+            )
+        val barn2 =
+            BarnSvar(
+                barnSvarId = barnId2,
+                fornavnOgMellomnavn = "Barn To",
+                etternavn = "To",
+                fødselsdato = LocalDate.of(2012, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = false,
+            )
+        val barn3 =
+            BarnSvar(
+                barnSvarId = barnId3,
+                fornavnOgMellomnavn = "Barn Tre",
+                etternavn = "Tre",
+                fødselsdato = LocalDate.of(2014, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = false,
+            )
+
+        every { saksbehandlerBarnRepository.hentBarn(søknadId) } returns listOf(barn1, barn2, barn3)
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
+
+        val barnRequest =
+            BarnRequestDTO(
+                behandlingId = UUID.randomUUID(),
+                barn =
+                    BarnDataDTO(
+                        fornavnOgMellomnavn = "Oppdatert To",
+                        etternavn = "To",
+                        fodselsdato = LocalDate.of(2012, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        barnetilleggFom = LocalDate.of(2020, 1, 1),
+                        barnetilleggTom = LocalDate.of(2038, 1, 1),
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        opplysningService.oppdaterBarn(barnRequest, barnId2, søknadId, "saksbehandlerId", "token")
+
+        verify {
+            saksbehandlerBarnRepository.lagreBarn(
+                søknadId,
+                match { barn ->
+                    barn.size == 3 &&
+                        barn[0].barnSvarId == barnId1 &&
+                        barn[1].barnSvarId == barnId2 &&
+                        barn[1].fornavnOgMellomnavn == "Oppdatert To" &&
+                        barn[2].barnSvarId == barnId3
+                },
+                "saksbehandlerId",
+            )
+        }
+    }
+
+    @Test
     fun `Oppdaterer eget barn`() {
         val søknadId = UUID.randomUUID()
         val søknadbarnId = UUID.randomUUID()

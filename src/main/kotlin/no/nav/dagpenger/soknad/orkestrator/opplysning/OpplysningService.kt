@@ -191,19 +191,16 @@ class OpplysningService(
                 endretAv = saksbehandlerId,
             )
 
-        val uendredeBarn = alleBarnSvar.filter { it.barnSvarId != barnId }
-        val alleBarnEtterEndring = uendredeBarn + oppdatertBarnSvar
+        val alleBarnEtterEndring = alleBarnSvar.map { if (it.barnSvarId == barnId) oppdatertBarnSvar else it }
 
         val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
 
         try {
             sendbarnTilDpBehandling(
                 barnRequest = barnRequest,
-                barnId = barnId,
+                alleBarn = alleBarnEtterEndring,
                 token = token,
                 søknadbarnId = søknadbarnId,
-                uendredeBarn = uendredeBarn,
-                oppdatertBarnEndretAv = saksbehandlerId,
             )
         } catch (e: Exception) {
             logger.error { e.message }
@@ -289,41 +286,25 @@ class OpplysningService(
 
     fun sendbarnTilDpBehandling(
         barnRequest: BarnRequestDTO,
-        barnId: UUID,
+        alleBarn: List<BarnSvar>,
         token: String,
-        uendredeBarn: List<BarnSvar>,
-        oppdatertBarnEndretAv: String,
         søknadbarnId: UUID,
     ) {
         val barn = barnRequest.barn
         val løsningsbarn =
-            uendredeBarn
-                .map {
-                    LøsningsbarnV2(
-                        fornavnOgMellomnavn = it.fornavnOgMellomnavn,
-                        etternavn = it.etternavn,
-                        fødselsdato = it.fødselsdato,
-                        statsborgerskap = it.statsborgerskap,
-                        kvalifiserer = it.kvalifisererTilBarnetillegg,
-                        barnetilleggFom = it.barnetilleggFom,
-                        barnetilleggTom = it.barnetilleggTom,
-                        endretAv = it.endretAv,
-                        begrunnelse = it.begrunnelse,
-                    )
-                }.toMutableList()
-                .plus(
-                    LøsningsbarnV2(
-                        fornavnOgMellomnavn = barn.fornavnOgMellomnavn,
-                        etternavn = barn.etternavn,
-                        fødselsdato = barn.fodselsdato,
-                        statsborgerskap = barn.oppholdssted,
-                        kvalifiserer = barn.kvalifisererTilBarnetillegg,
-                        barnetilleggFom = barn.barnetilleggFom,
-                        barnetilleggTom = barn.barnetilleggTom,
-                        endretAv = oppdatertBarnEndretAv,
-                        begrunnelse = barn.begrunnelse,
-                    ),
+            alleBarn.map {
+                LøsningsbarnV2(
+                    fornavnOgMellomnavn = it.fornavnOgMellomnavn,
+                    etternavn = it.etternavn,
+                    fødselsdato = it.fødselsdato,
+                    statsborgerskap = it.statsborgerskap,
+                    kvalifiserer = it.kvalifisererTilBarnetillegg,
+                    barnetilleggFom = it.barnetilleggFom,
+                    barnetilleggTom = it.barnetilleggTom,
+                    endretAv = it.endretAv,
+                    begrunnelse = it.begrunnelse,
                 )
+            }
 
         val dpBehandlingOpplysning =
             NyOpplysningDTO(
