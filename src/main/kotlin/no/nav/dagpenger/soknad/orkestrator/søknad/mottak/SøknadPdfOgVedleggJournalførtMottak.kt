@@ -9,12 +9,14 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdataBehovløser
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 
 internal class SøknadPdfOgVedleggJournalførtMottak(
     val rapidsConnection: RapidsConnection,
     val søknadRepository: SøknadRepository,
+    val søknadsdataBehovløser: SøknadsdataBehovløser? = null,
 ) : River.PacketListener {
     companion object {
         private val logg = KotlinLogging.logger {}
@@ -66,6 +68,7 @@ internal class SøknadPdfOgVedleggJournalførtMottak(
                     søknadRepository.markerSøknadSomJournalført(søknadId, ident, journalpostId, journalførtTidspunkt)
                     logg.info { "Søknad $søknadId markert som journalført" }
                     sikkerLogg.info { "Søknad $søknadId innsendt av $ident markert som journaført med journalpostId $journalpostId" }
+                    søknadsdataBehovløser?.beregnSøknadsdata(ident, søknadId)
                 } else {
                     logg.warn {
                         "Søknad $søknadId har ikke samme registrerte ident som ident i mottatt melding, meldingen behandles ikke."

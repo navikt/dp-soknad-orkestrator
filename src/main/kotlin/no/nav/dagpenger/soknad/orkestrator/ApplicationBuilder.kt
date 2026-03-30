@@ -157,7 +157,18 @@ internal class ApplicationBuilder(
                     PdfPayloadService(søknadRepository, søknadPersonaliaRepository, seksjonRepository),
                 )
                 SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection, søknadService, seksjonService)
-                SøknadPdfOgVedleggJournalførtMottak(rapidsConnection, søknadRepository)
+                val søknadsdataBehovMottak =
+                    SøknadsdataBehovMottak(
+                        rapidsConnection,
+                        QuizOpplysningRepositoryPostgres(dataSource),
+                        seksjonRepository,
+                        søknadRepository,
+                    )
+                SøknadPdfOgVedleggJournalførtMottak(
+                    rapidsConnection,
+                    søknadRepository,
+                    søknadsdataBehovMottak.søknadsdataBehovløser,
+                )
                 MinidialogJournalførtMottak(rapidsConnection)
                 BehovMottak(
                     rapidsConnection = rapidsConnection,
@@ -170,12 +181,6 @@ internal class ApplicationBuilder(
                             saksbehandlerBarnRepository,
                         ),
                     søknadService = søknadService,
-                )
-                SøknadsdataBehovMottak(
-                    rapidsConnection,
-                    QuizOpplysningRepositoryPostgres(dataSource),
-                    seksjonRepository,
-                    søknadRepository,
                 )
                 SøknadSlettetMottak(rapidsConnection, søknadService)
                 MeldingOmEttersendingMottak(rapidsConnection, søknadRepository, seksjonRepository)

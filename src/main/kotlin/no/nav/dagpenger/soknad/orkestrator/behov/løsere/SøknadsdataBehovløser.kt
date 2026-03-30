@@ -44,60 +44,8 @@ class SøknadsdataBehovløser(
                 "Mangler journalpostId i behov for søknadsdata for søknaden",
             )
 
-        val søknadId =
-            søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
-
-        val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
-
-        val eøsArbeidsforhold =
-            fellesBehovløserLøsninger.harSøkerenHattArbeidsforholdIEøs(
-                "faktum.eos-arbeid-siste-36-mnd",
-                behovmelding.ident,
-                søknadId,
-            )
-
-        val avsluttetArbeidsforhold = finnAvsluttedeArbeidsforhold(behovmelding.ident, søknadId)
-
-        val avtjentVerneplikt = avtjentVerneplikt(behovmelding.ident, søknadId)
-
-        val harBarn = harSøkerBarn(behovmelding.ident, søknadId)
-
-        val harAndreYtelser = harAndreYtelser(behovmelding.ident, søknadId)
-
-        val ønskerDagpengerFraDato =
-            fellesBehovløserLøsninger.ønskerDagpengerFraDato(
-                behovmelding.ident,
-                søknadId,
-                behov,
-            )
-
-        val reellArbeidssøker =
-            erReellArbeidssøker(
-                behovmelding.ident,
-                søknadId,
-            )
-
-        sikkerlogg.info {
-            "Løser Søknadsdata for ident=${behovmelding.ident}, søknadId=$søknadId: " +
-                "eøsBostedsland=$eøsBostedsland, eøsArbeidsforhold=$eøsArbeidsforhold, " +
-                "avtjentVerneplikt=$avtjentVerneplikt, avsluttetArbeidsforhold (antall)=${avsluttetArbeidsforhold.size}, " +
-                "harBarn=$harBarn, harAndreYtelser=$harAndreYtelser, ønskerDagpengerFraDato=$ønskerDagpengerFraDato, " +
-                "reellArbeidssøker: helse=${reellArbeidssøker.helse}, geografi=${reellArbeidssøker.geografi}, " +
-                "deltid=${reellArbeidssøker.deltid}, yrke=${reellArbeidssøker.yrke}"
-        }
-
-        val søknadsdataResultat =
-            SøknadsdataResultType(
-                eøsBostedsland = eøsBostedsland,
-                eøsArbeidsforhold = eøsArbeidsforhold,
-                avtjentVerneplikt = avtjentVerneplikt,
-                avsluttetArbeidsforhold = avsluttetArbeidsforhold,
-                harBarn = harBarn,
-                harAndreYtelser = harAndreYtelser,
-                ønskerDagpengerFraDato = ønskerDagpengerFraDato,
-                søknadId = søknadId.toString(),
-                reellArbeidssøker = reellArbeidssøker,
-            )
+        val søknadId = søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
+        val søknadsdataResultat = beregnSøknadsdata(behovmelding.ident, søknadId)
 
         val søknadsdataMap: Map<String, Any> =
             objectMapper.convertValue(
@@ -111,6 +59,59 @@ class SøknadsdataBehovløser(
                 },
             )
         return publiserLøsning(behovmeldingMedSøknadId, søknadsdataMap)
+    }
+
+    fun beregnSøknadsdata(
+        ident: String,
+        søknadId: UUID,
+    ): SøknadsdataResultType {
+        if (fellesBehovløserLøsninger == null) {
+            throw IllegalStateException(
+                "FellesBehovløserLøsninger er ikke satt for SøknadsdataBehovløser",
+            )
+        }
+
+        val eøsBostedsland = eøsBostedsland(ident, søknadId)
+
+        val eøsArbeidsforhold =
+            fellesBehovløserLøsninger.harSøkerenHattArbeidsforholdIEøs(
+                "faktum.eos-arbeid-siste-36-mnd",
+                ident,
+                søknadId,
+            )
+
+        val avsluttetArbeidsforhold = finnAvsluttedeArbeidsforhold(ident, søknadId)
+
+        val avtjentVerneplikt = avtjentVerneplikt(ident, søknadId)
+
+        val harBarn = harSøkerBarn(ident, søknadId)
+
+        val harAndreYtelser = harAndreYtelser(ident, søknadId)
+
+        val ønskerDagpengerFraDato = fellesBehovløserLøsninger.ønskerDagpengerFraDato(ident, søknadId, behov)
+
+        val reellArbeidssøker = erReellArbeidssøker(ident, søknadId)
+
+        sikkerlogg.info {
+            "Søknadsdata for ident=$ident, søknadId=$søknadId: " +
+                "eøsBostedsland=$eøsBostedsland, eøsArbeidsforhold=$eøsArbeidsforhold, " +
+                "avtjentVerneplikt=$avtjentVerneplikt, avsluttetArbeidsforhold (antall)=${avsluttetArbeidsforhold.size}, " +
+                "harBarn=$harBarn, harAndreYtelser=$harAndreYtelser, ønskerDagpengerFraDato=$ønskerDagpengerFraDato, " +
+                "reellArbeidssøker: helse=${reellArbeidssøker.helse}, geografi=${reellArbeidssøker.geografi}, " +
+                "deltid=${reellArbeidssøker.deltid}, yrke=${reellArbeidssøker.yrke}"
+        }
+
+        return SøknadsdataResultType(
+            eøsBostedsland = eøsBostedsland,
+            eøsArbeidsforhold = eøsArbeidsforhold,
+            avtjentVerneplikt = avtjentVerneplikt,
+            avsluttetArbeidsforhold = avsluttetArbeidsforhold,
+            harBarn = harBarn,
+            harAndreYtelser = harAndreYtelser,
+            ønskerDagpengerFraDato = ønskerDagpengerFraDato,
+            søknadId = søknadId.toString(),
+            reellArbeidssøker = reellArbeidssøker,
+        )
     }
 
     private fun erReellArbeidssøker(
