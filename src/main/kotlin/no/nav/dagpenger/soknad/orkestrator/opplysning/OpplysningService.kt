@@ -157,7 +157,8 @@ class OpplysningService(
             opprinneligOpplysning.opplysninger.find { it.id == BarnOpplysningDTO.Id.barnetilleggFom }?.verdi !=
             (barn.barnetilleggFom?.toString() ?: "") ||
             opprinneligOpplysning.opplysninger.find { it.id == BarnOpplysningDTO.Id.barnetilleggTom }?.verdi !=
-            (barn.barnetilleggTom?.toString() ?: "")
+            (barn.barnetilleggTom?.toString() ?: "") ||
+            opprinneligOpplysning.opplysninger.find { it.id == BarnOpplysningDTO.Id.etternavn }?.verdi != barn.etternavn
     }
 
     fun oppdaterBarn(
