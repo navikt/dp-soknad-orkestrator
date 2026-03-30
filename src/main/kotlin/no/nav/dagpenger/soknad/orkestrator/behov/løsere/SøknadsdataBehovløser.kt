@@ -77,6 +77,15 @@ class SøknadsdataBehovløser(
                 søknadId,
             )
 
+        sikkerlogg.info {
+            "Løser Søknadsdata for ident=${behovmelding.ident}, søknadId=$søknadId: " +
+                "eøsBostedsland=$eøsBostedsland, eøsArbeidsforhold=$eøsArbeidsforhold, " +
+                "avtjentVerneplikt=$avtjentVerneplikt, avsluttetArbeidsforhold (antall)=${avsluttetArbeidsforhold.size}, " +
+                "harBarn=$harBarn, harAndreYtelser=$harAndreYtelser, ønskerDagpengerFraDato=$ønskerDagpengerFraDato, " +
+                "reellArbeidssøker: helse=${reellArbeidssøker.helse}, geografi=${reellArbeidssøker.geografi}, " +
+                "deltid=${reellArbeidssøker.deltid}, yrke=${reellArbeidssøker.yrke}"
+        }
+
         val søknadsdataResultat =
             SøknadsdataResultType(
                 eøsBostedsland = eøsBostedsland,
