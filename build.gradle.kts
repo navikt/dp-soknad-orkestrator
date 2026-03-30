@@ -16,7 +16,7 @@ val naisfulTestAppVersion: String by project
 plugins {
     kotlin("jvm") version "2.3.0"
     id("io.ktor.plugin") version "3.3.3"
-    id("org.jlleitschuh.gradle.ktlint") version "14.0.1"
+    id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 }
 
 group = "no.nav"
