@@ -318,7 +318,7 @@ class SøknadsdataBehovløser(
             "kontraktenErUtgått" -> Sluttårsak.KONTRAKT_UTGAATT
             "jegHarSagtOppSelv" -> Sluttårsak.SAGT_OPP_SELV
             "arbeidstidenErRedusert" -> Sluttårsak.REDUSERT_ARBEIDSTID
-            "jegErPermitert" -> Sluttårsak.PERMITTERT
+            "jegErPermittert" -> Sluttårsak.PERMITTERT
             else -> throw IllegalArgumentException("Ukjent sluttårsak: $string")
         }
 

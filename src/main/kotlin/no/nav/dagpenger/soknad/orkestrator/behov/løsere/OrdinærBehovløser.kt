@@ -55,7 +55,7 @@ class OrdinærBehovløser(
 
         val ikkeOrdinæreRettighetstyper =
             setOf(
-                "jegErPermitert",
+                "jegErPermittert",
                 "permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien",
                 "arbeidsgiverErKonkurs",
             )

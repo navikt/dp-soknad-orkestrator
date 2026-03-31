@@ -113,7 +113,7 @@ fun arbeidsforholdMedRegistrerteAvsluttedeArbeidsforholdOrkestratorJson(): Strin
       "hvilketLandJobbetDuI": "SWE",
       "oppgiPersonnummeretPinDuHaddeIDetteLandet": "12431441",
       "varighetPåArbeidsforholdetFraOgMedDato": "2025-11-05",
-      "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert",
+      "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermittert",
       "permittertErDetteEtMidlertidigArbeidsforholdMedEnKontraktfestetSluttdato": "ja",
       "permittertOppgiDenKontraktsfestedeSluttdatoenPåDetteArbeidsforholdet": "2025-11-03",
       "permittertNårStartetDuIDenneJobben": "2025-11-27",
