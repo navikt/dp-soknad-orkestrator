@@ -174,6 +174,77 @@ class QuizOpplysningRepositoryPostgres(
 
     override fun lagreBarnSøknadMapping(søknadId: UUID) = hentEllerOpprettSøknadbarnId(søknadId)
 
+    override fun leggTilBarn(
+        søknadId: UUID,
+        brukerident: String,
+        nyttBarn: BarnSvar,
+    ) {
+        transaction {
+            val opplysningId = hentEllerOpprettBarnOpplysningId(søknadId, brukerident)
+            val barnId = hentEllerOpprettBarnId(opplysningId)
+
+            BarnSvarTabell.insert {
+                it[barnSvarId] = nyttBarn.barnSvarId
+                it[BarnSvarTabell.barnId] = barnId
+                it[fornavnMellomnavn] = nyttBarn.fornavnOgMellomnavn
+                it[etternavn] = nyttBarn.etternavn
+                it[fødselsdato] = nyttBarn.fødselsdato
+                it[statsborgerskap] = nyttBarn.statsborgerskap
+                it[forsørgerBarnet] = nyttBarn.forsørgerBarnet
+                it[fraRegister] = nyttBarn.fraRegister
+                it[kvalifisererTilBarnetillegg] = nyttBarn.kvalifisererTilBarnetillegg
+                it[barnetilleggFom] = nyttBarn.barnetilleggFom
+                it[barnetilleggTom] = nyttBarn.barnetilleggTom
+                it[endretAv] = nyttBarn.endretAv
+                it[begrunnelse] = nyttBarn.begrunnelse
+            }
+        }
+    }
+
+    private fun hentEllerOpprettBarnOpplysningId(
+        søknadId: UUID,
+        brukerident: String,
+    ): Int {
+        val beskrivendeIdEgneBarn = "faktum.barn-liste"
+
+        val eksisterendeId =
+            QuizOpplysningTabell
+                .select(QuizOpplysningTabell.id)
+                .where {
+                    (QuizOpplysningTabell.søknadId eq søknadId) and
+                        (QuizOpplysningTabell.beskrivendeId eq beskrivendeIdEgneBarn)
+                }.firstOrNull()
+                ?.get(QuizOpplysningTabell.id)
+                ?.value
+
+        if (eksisterendeId != null) return eksisterendeId
+
+        return QuizOpplysningTabell
+            .insertAndGetId {
+                it[beskrivendeId] = beskrivendeIdEgneBarn
+                it[type] = Barn::class.java.simpleName
+                it[QuizOpplysningTabell.ident] = brukerident
+                it[QuizOpplysningTabell.søknadId] = søknadId
+            }.value
+    }
+
+    private fun hentEllerOpprettBarnId(opplysningId: Int): Int {
+        val eksisterendeId =
+            BarnTabell
+                .select(BarnTabell.id)
+                .where { BarnTabell.quizOpplysningId eq opplysningId }
+                .firstOrNull()
+                ?.get(BarnTabell.id)
+                ?.value
+
+        if (eksisterendeId != null) return eksisterendeId
+
+        return BarnTabell
+            .insertAndGetId {
+                it[quizOpplysningId] = opplysningId
+            }.value
+    }
+
     override fun hentEllerOpprettSøknadbarnId(søknadId: UUID): UUID =
         transaction {
             var søknadbarnId =

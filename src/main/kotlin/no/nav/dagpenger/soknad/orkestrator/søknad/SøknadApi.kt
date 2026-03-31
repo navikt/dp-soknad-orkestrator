@@ -56,7 +56,7 @@ internal fun Application.søknadApi(
                 delete {
                     val søknadId = validerOgFormaterSøknadIdParam() ?: return@delete
 
-                    søknadService.slettSøknadInkrementerMetrikkOgSendMeldingOmSletting(søknadId, call.ident())
+                    søknadService.slettSøknadOgInkrementerMetrikk(søknadId, call.ident())
 
                     call.respond(OK, "Søknad $søknadId er slettet")
                 }

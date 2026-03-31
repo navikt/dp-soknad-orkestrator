@@ -6,6 +6,7 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.kotest.matchers.equals.shouldNotBeEqual
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.shouldNotBe
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.dataSource
 import no.nav.dagpenger.soknad.orkestrator.db.Postgres.withMigratedDb
@@ -226,6 +227,61 @@ class SeksjonRepositoryTest {
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
 
         seksjonRepository.hentSeksjoner(randomUUID(), ident) shouldBe emptyList()
+    }
+
+    @Test
+    fun `hentSeksjonerMedTidstempler returnerer forventede seksjoner med tidsstempler hvis søknaden tilhører bruker som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(søknadId, ident, seksjonId2, seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
+
+        val seksjoner = seksjonRepository.hentSeksjonerMedTidstempler(søknadId, ident)
+
+        seksjoner.size shouldBe 2
+        seksjoner.map { it.seksjonId } shouldContainExactlyInAnyOrder listOf(seksjonId, seksjonId2)
+        seksjoner.map { it.data } shouldContainExactlyInAnyOrder listOf(seksjonsvar, seksjonsvar2)
+        seksjoner.forEach { seksjon ->
+            seksjon.opprettet shouldNotBe null
+        }
+    }
+
+    @Test
+    fun `hentSeksjonerMedTidstempler returnerer tom liste hvis søknaden tilhører en annen bruker enn den som gjør kallet`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        seksjonRepository.hentSeksjonerMedTidstempler(søknadId, "en-annen-ident") shouldBe emptyList()
+    }
+
+    @Test
+    fun `hentSeksjonerMedTidstempler returnerer tom liste hvis søknaden ikke eksisterer`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        seksjonRepository.hentSeksjonerMedTidstempler(randomUUID(), ident) shouldBe emptyList()
+    }
+
+    @Test
+    fun `hentSeksjonerMedTidstempler returnerer oppdatert tidsstempel etter oppdatering av seksjon`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        val seksjonerFørOppdatering = seksjonRepository.hentSeksjonerMedTidstempler(søknadId, ident)
+        val opprettetTidspunkt = seksjonerFørOppdatering.first().opprettet
+
+        // Oppdater seksjonen
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
+
+        val seksjonerEtterOppdatering = seksjonRepository.hentSeksjonerMedTidstempler(søknadId, ident)
+        val oppdatertSeksjon = seksjonerEtterOppdatering.first()
+
+        oppdatertSeksjon.opprettet shouldBe opprettetTidspunkt
+        oppdatertSeksjon.oppdatert shouldNotBe null
+        oppdatertSeksjon.data shouldBe seksjonsvar2
     }
 
     @Test

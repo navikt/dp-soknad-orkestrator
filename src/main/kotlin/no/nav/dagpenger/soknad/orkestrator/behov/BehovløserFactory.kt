@@ -49,6 +49,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VilligTilÅBytteYrkeBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnskerDagpengerFraDatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.ØnsketArbeidstidBehovløser
+import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepository
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
@@ -58,6 +59,7 @@ class BehovløserFactory(
     opplysningRepository: QuizOpplysningRepositoryPostgres,
     seksjonRepository: SeksjonRepository,
     søknadRepository: SøknadRepository,
+    saksbehandlerBarnRepository: SaksbehandlerBarnRepository,
 ) {
     private val fellesBehovløserLøsninger =
         FellesBehovløserLøsninger(
@@ -152,8 +154,22 @@ class BehovløserFactory(
             Søknadsdato to SøknadsdatoBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             TarUtdanningEllerOpplæring to
                 UtdanningEllerOpplæringBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
-            Barnetillegg to BarnetilleggBehovLøser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
-            BarnetilleggV2 to BarnetilleggV2BehovLøser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            Barnetillegg to
+                BarnetilleggBehovLøser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                    saksbehandlerBarnRepository,
+                ),
+            BarnetilleggV2 to
+                BarnetilleggV2BehovLøser(
+                    rapidsConnection,
+                    opplysningRepository,
+                    søknadRepository,
+                    seksjonRepository,
+                    saksbehandlerBarnRepository,
+                ),
             AndreØkonomiskeYtelser to
                 AndreØkonomiskeYtelserBehovløser(
                     rapidsConnection,

@@ -1,23 +1,25 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.module.kotlin.readValue
-import io.kotest.inspectors.forAll
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import no.nav.dagpenger.soknad.orkestrator.api.models.BarnDataDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnDTO
-import no.nav.dagpenger.soknad.orkestrator.api.models.OppdatertBarnRequestDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.BarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
-import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Løsningsbarn
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggV2BehovLøser.BarnetilleggV2Løsning
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Barn
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.Test
@@ -25,10 +27,19 @@ import kotlin.test.Test
 class OpplysningServiceTest {
     private val opplysningRepository = mockk<QuizOpplysningRepository>()
     private val dpBehandlingKlient = mockk<DpBehandlingKlient>(relaxed = true)
+    private val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    private val saksbehandlerBarnRepository =
+        mockk<SaksbehandlerBarnRepository>(relaxed = true).also {
+            every { it.hentBarn(any()) } returns null
+        }
+    private val seksjonRepository = mockk<no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository>(relaxed = true)
     private val opplysningService =
         OpplysningService(
             opplysningRepository = opplysningRepository,
             dpBehandlingKlient = dpBehandlingKlient,
+            søknadRepository = søknadRepository,
+            saksbehandlerBarnRepository = saksbehandlerBarnRepository,
+            seksjonRepository = seksjonRepository,
         )
 
     @Test
@@ -101,6 +112,116 @@ class OpplysningServiceTest {
     }
 
     @Test
+    fun `hentBarn returnerer saksbehandler-redigerte barn fremfor quiz-opplysninger`() {
+        val søknadId = UUID.randomUUID()
+        val barnId = UUID.randomUUID()
+
+        every { saksbehandlerBarnRepository.hentBarn(søknadId) } returns
+            listOf(
+                BarnSvar(
+                    barnSvarId = barnId,
+                    fornavnOgMellomnavn = "Saksbehandler-redigert",
+                    etternavn = "Barn",
+                    fødselsdato = LocalDate.of(2010, 1, 1),
+                    statsborgerskap = "NOR",
+                    forsørgerBarnet = true,
+                    fraRegister = true,
+                    kvalifisererTilBarnetillegg = true,
+                    barnetilleggFom = LocalDate.of(2010, 1, 1),
+                    barnetilleggTom = LocalDate.of(2028, 1, 1),
+                    endretAv = "Z991234",
+                    begrunnelse = "Endret av saksbehandler",
+                ),
+            )
+
+        // Quiz-barn finnes, men skal ikke brukes
+        every { opplysningRepository.hent(BESKRIVENDE_ID_PDL_BARN, søknadId) } returns
+            QuizOpplysning(
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
+                type = Barn,
+                svar =
+                    listOf(
+                        BarnSvar(
+                            barnSvarId = UUID.randomUUID(),
+                            fornavnOgMellomnavn = "Quiz",
+                            etternavn = "Barn",
+                            fødselsdato = LocalDate.of(2000, 1, 1),
+                            statsborgerskap = "NOR",
+                            forsørgerBarnet = false,
+                            fraRegister = true,
+                            kvalifisererTilBarnetillegg = false,
+                        ),
+                    ),
+                ident = "12345678910",
+                søknadId = søknadId,
+            )
+
+        val hentedeBarn = opplysningService.hentBarn(søknadId)
+
+        hentedeBarn.size shouldBe 1
+        hentedeBarn
+            .first()
+            .opplysninger
+            .find { it.id == BarnOpplysningDTO.Id.fornavnOgMellomnavn }
+            ?.verdi shouldBe "Saksbehandler-redigert"
+    }
+
+    @Test
+    fun `oppdaterBarn lagrer snapshot i saksbehandlerBarnRepository`() {
+        val søknadId = UUID.randomUUID()
+        val søknadbarnId = UUID.randomUUID()
+        val barnId = UUID.randomUUID()
+
+        every { saksbehandlerBarnRepository.hentBarn(søknadId) } returns
+            listOf(
+                BarnSvar(
+                    barnSvarId = barnId,
+                    fornavnOgMellomnavn = "Opprinnelig",
+                    etternavn = "Barn",
+                    fødselsdato = LocalDate.of(2010, 1, 1),
+                    statsborgerskap = "NOR",
+                    forsørgerBarnet = false,
+                    fraRegister = true,
+                    kvalifisererTilBarnetillegg = false,
+                ),
+            )
+
+        val barnRequest =
+            BarnRequestDTO(
+                behandlingId = UUID.randomUUID(),
+                barn =
+                    BarnDataDTO(
+                        fornavnOgMellomnavn = "Oppdatert",
+                        etternavn = "Barn",
+                        fodselsdato = LocalDate.of(2010, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        barnetilleggFom = LocalDate.of(2010, 1, 1),
+                        barnetilleggTom = LocalDate.of(2028, 1, 1),
+                        begrunnelse = "Test",
+                    ),
+            )
+
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
+
+        opplysningService.oppdaterBarn(barnRequest, barnId, søknadId, "saksbehandlerId", "token")
+
+        verify {
+            saksbehandlerBarnRepository.lagreBarn(
+                søknadId,
+                match { barn ->
+                    barn.size == 1 &&
+                        barn[0].fornavnOgMellomnavn == "Oppdatert" &&
+                        barn[0].kvalifisererTilBarnetillegg == true &&
+                        barn[0].endretAv == "saksbehandlerId"
+                },
+                "saksbehandlerId",
+            )
+        }
+    }
+
+    @Test
     fun `erEndret returnerer true dersom dersom det er gjort endringer`() {
         val søknadId = UUID.randomUUID()
         val barnId = UUID.randomUUID()
@@ -116,9 +237,8 @@ class OpplysningServiceTest {
                 fraRegister = false,
                 kvalifisererTilBarnetillegg = false,
             )
-        val oppdatertBarn =
-            OppdatertBarnDTO(
-                barnId = barnId,
+        val barn =
+            BarnDataDTO(
                 fornavnOgMellomnavn = "Kari",
                 etternavn = "Nordmann",
                 fodselsdato = LocalDate.of(2020, 1, 1),
@@ -141,7 +261,7 @@ class OpplysningServiceTest {
 
         every { opplysningRepository.hent(BESKRIVENDE_ID_EGNE_BARN, søknadId) } returns null
 
-        opplysningService.erEndret(oppdatertBarn, søknadId) shouldBe true
+        opplysningService.erEndret(barn, barnId, søknadId) shouldBe true
     }
 
     @Test
@@ -160,9 +280,8 @@ class OpplysningServiceTest {
                 fraRegister = false,
                 kvalifisererTilBarnetillegg = false,
             )
-        val oppdatertBarn =
-            OppdatertBarnDTO(
-                barnId = barnId,
+        val barn =
+            BarnDataDTO(
                 fornavnOgMellomnavn = "Kari",
                 etternavn = "Nordmann",
                 fodselsdato = LocalDate.of(2020, 1, 1),
@@ -183,7 +302,7 @@ class OpplysningServiceTest {
 
         every { opplysningRepository.hent(BESKRIVENDE_ID_EGNE_BARN, søknadId) } returns null
 
-        opplysningService.erEndret(oppdatertBarn, søknadId) shouldBe false
+        opplysningService.erEndret(barn, barnId, søknadId) shouldBe false
     }
 
     @Test
@@ -206,13 +325,11 @@ class OpplysningServiceTest {
                 begrunnelse = null,
                 endretAv = null,
             )
-        val oppdatertBarnRequest =
-            OppdatertBarnRequestDTO(
-                opplysningId = UUID.randomUUID(),
+        val barnRequest =
+            BarnRequestDTO(
                 behandlingId = UUID.randomUUID(),
-                oppdatertBarn =
-                    OppdatertBarnDTO(
-                        barnId = barnId,
+                barn =
+                    BarnDataDTO(
                         fornavnOgMellomnavn = "Oppdatert Navn",
                         etternavn = "Oppdatert Etternavn",
                         fodselsdato = LocalDate.of(2010, 1, 1),
@@ -233,28 +350,109 @@ class OpplysningServiceTest {
                 søknadId = søknadId,
             )
 
-        every { opplysningRepository.hentAlle(søknadId) } returns listOf(opprinneligOpplysning)
-        every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
+        every { opplysningRepository.hent(BESKRIVENDE_ID_PDL_BARN, søknadId) } returns opprinneligOpplysning
+        every { opplysningRepository.hent(BESKRIVENDE_ID_EGNE_BARN, søknadId) } returns null
         every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
 
-        opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId", "token")
+        opplysningService.oppdaterBarn(barnRequest, barnId, søknadId, "saksbehandlerId", "token")
 
         verify {
-            opplysningRepository.oppdaterBarn(
+            saksbehandlerBarnRepository.lagreBarn(
                 søknadId,
-                match {
-                    it.barnSvarId == barnId &&
-                        it.fornavnOgMellomnavn == "Oppdatert Navn" &&
-                        it.etternavn == "Oppdatert Etternavn" &&
-                        it.fødselsdato == LocalDate.of(2010, 1, 1) &&
-                        it.statsborgerskap == "NOR" &&
-                        it.forsørgerBarnet == true &&
-                        it.kvalifisererTilBarnetillegg == true &&
-                        it.barnetilleggFom == LocalDate.of(2020, 1, 1) &&
-                        it.barnetilleggTom == LocalDate.of(2038, 1, 1) &&
-                        it.begrunnelse == "Begrunnelse" &&
-                        it.endretAv == "saksbehandlerId"
+                match { barn ->
+                    barn.size == 1 &&
+                        barn[0].barnSvarId == barnId &&
+                        barn[0].fornavnOgMellomnavn == "Oppdatert Navn" &&
+                        barn[0].etternavn == "Oppdatert Etternavn" &&
+                        barn[0].fødselsdato == LocalDate.of(2010, 1, 1) &&
+                        barn[0].statsborgerskap == "NOR" &&
+                        barn[0].forsørgerBarnet == true &&
+                        barn[0].kvalifisererTilBarnetillegg == true &&
+                        barn[0].barnetilleggFom == LocalDate.of(2020, 1, 1) &&
+                        barn[0].barnetilleggTom == LocalDate.of(2038, 1, 1) &&
+                        barn[0].begrunnelse == "Begrunnelse" &&
+                        barn[0].endretAv == "saksbehandlerId"
                 },
+                "saksbehandlerId",
+            )
+        }
+    }
+
+    @Test
+    fun `oppdaterBarn bevarer rekkefølgen på barn`() {
+        val søknadId = UUID.randomUUID()
+        val søknadbarnId = UUID.randomUUID()
+        val barnId1 = UUID.randomUUID()
+        val barnId2 = UUID.randomUUID()
+        val barnId3 = UUID.randomUUID()
+
+        val barn1 =
+            BarnSvar(
+                barnSvarId = barnId1,
+                fornavnOgMellomnavn = "Barn En",
+                etternavn = "En",
+                fødselsdato = LocalDate.of(2010, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = true,
+                kvalifisererTilBarnetillegg = false,
+            )
+        val barn2 =
+            BarnSvar(
+                barnSvarId = barnId2,
+                fornavnOgMellomnavn = "Barn To",
+                etternavn = "To",
+                fødselsdato = LocalDate.of(2012, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = false,
+            )
+        val barn3 =
+            BarnSvar(
+                barnSvarId = barnId3,
+                fornavnOgMellomnavn = "Barn Tre",
+                etternavn = "Tre",
+                fødselsdato = LocalDate.of(2014, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = false,
+            )
+
+        every { saksbehandlerBarnRepository.hentBarn(søknadId) } returns listOf(barn1, barn2, barn3)
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
+
+        val barnRequest =
+            BarnRequestDTO(
+                behandlingId = UUID.randomUUID(),
+                barn =
+                    BarnDataDTO(
+                        fornavnOgMellomnavn = "Oppdatert To",
+                        etternavn = "To",
+                        fodselsdato = LocalDate.of(2012, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        barnetilleggFom = LocalDate.of(2020, 1, 1),
+                        barnetilleggTom = LocalDate.of(2038, 1, 1),
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        opplysningService.oppdaterBarn(barnRequest, barnId2, søknadId, "saksbehandlerId", "token")
+
+        verify {
+            saksbehandlerBarnRepository.lagreBarn(
+                søknadId,
+                match { barn ->
+                    barn.size == 3 &&
+                        barn[0].barnSvarId == barnId1 &&
+                        barn[1].barnSvarId == barnId2 &&
+                        barn[1].fornavnOgMellomnavn == "Oppdatert To" &&
+                        barn[2].barnSvarId == barnId3
+                },
+                "saksbehandlerId",
             )
         }
     }
@@ -296,13 +494,11 @@ class OpplysningServiceTest {
                 begrunnelse = null,
                 endretAv = null,
             )
-        val oppdatertBarnRequest =
-            OppdatertBarnRequestDTO(
-                opplysningId = UUID.randomUUID(),
+        val barnRequest =
+            BarnRequestDTO(
                 behandlingId = UUID.randomUUID(),
-                oppdatertBarn =
-                    OppdatertBarnDTO(
-                        barnId = egetBarnId,
+                barn =
+                    BarnDataDTO(
                         fornavnOgMellomnavn = "Oppdatert Eget Navn",
                         etternavn = "Oppdatert Eget Etternavn",
                         fodselsdato = LocalDate.of(2010, 1, 1),
@@ -331,32 +527,33 @@ class OpplysningServiceTest {
                 søknadId = søknadId,
             )
 
-        every { opplysningRepository.hentAlle(søknadId) } returns
-            listOf(
-                opprinneligOpplysning,
-                opprinneligEgetbarnOpplysning,
-            )
-        every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
+        every { opplysningRepository.hent(BESKRIVENDE_ID_PDL_BARN, søknadId) } returns opprinneligOpplysning
+        every { opplysningRepository.hent(BESKRIVENDE_ID_EGNE_BARN, søknadId) } returns opprinneligEgetbarnOpplysning
         every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
 
-        opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId", "token")
+        opplysningService.oppdaterBarn(barnRequest, egetBarnId, søknadId, "saksbehandlerId", "token")
 
         verify {
-            opplysningRepository.oppdaterBarn(
+            saksbehandlerBarnRepository.lagreBarn(
                 søknadId,
-                match {
-                    it.barnSvarId == egetBarnId &&
-                        it.fornavnOgMellomnavn == "Oppdatert Eget Navn" &&
-                        it.etternavn == "Oppdatert Eget Etternavn" &&
-                        it.fødselsdato == LocalDate.of(2010, 1, 1) &&
-                        it.statsborgerskap == "NOR" &&
-                        it.forsørgerBarnet &&
-                        it.kvalifisererTilBarnetillegg &&
-                        it.barnetilleggFom == LocalDate.of(2020, 1, 1) &&
-                        it.barnetilleggTom == LocalDate.of(2038, 1, 1) &&
-                        it.begrunnelse == "Begrunnelse" &&
-                        it.endretAv == "saksbehandlerId"
+                match { barn ->
+                    barn.size == 2 &&
+                        barn.any {
+                            it.barnSvarId == egetBarnId &&
+                                it.fornavnOgMellomnavn == "Oppdatert Eget Navn" &&
+                                it.etternavn == "Oppdatert Eget Etternavn" &&
+                                it.fødselsdato == LocalDate.of(2010, 1, 1) &&
+                                it.statsborgerskap == "NOR" &&
+                                it.forsørgerBarnet &&
+                                it.kvalifisererTilBarnetillegg &&
+                                it.barnetilleggFom == LocalDate.of(2020, 1, 1) &&
+                                it.barnetilleggTom == LocalDate.of(2038, 1, 1) &&
+                                it.begrunnelse == "Begrunnelse" &&
+                                it.endretAv == "saksbehandlerId"
+                        } &&
+                        barn.any { it.barnSvarId == barnId }
                 },
+                "saksbehandlerId",
             )
         }
     }
@@ -366,7 +563,8 @@ class OpplysningServiceTest {
         val søknadId = UUID.randomUUID()
         val søknadbarnId = UUID.randomUUID()
         val egetBarnId = UUID.randomUUID()
-        val dpBehandlingOpplysningSlot = slot<DpBehandlingOpplysning>()
+        val behandlingId = UUID.randomUUID()
+        val dpBehandlingOpplysningSlot = slot<NyOpplysningDTO>()
 
         val opprinneligEgetBarnSvar =
             BarnSvar(
@@ -383,13 +581,11 @@ class OpplysningServiceTest {
                 begrunnelse = null,
                 endretAv = null,
             )
-        val oppdatertBarnRequest =
-            OppdatertBarnRequestDTO(
-                opplysningId = UUID.randomUUID(),
-                behandlingId = UUID.randomUUID(),
-                oppdatertBarn =
-                    OppdatertBarnDTO(
-                        barnId = egetBarnId,
+        val barnRequest =
+            BarnRequestDTO(
+                behandlingId = behandlingId,
+                barn =
+                    BarnDataDTO(
                         fornavnOgMellomnavn = "Oppdatert Eget Navn",
                         etternavn = "Oppdatert Eget Etternavn",
                         fodselsdato = LocalDate.of(2010, 1, 1),
@@ -410,21 +606,249 @@ class OpplysningServiceTest {
                 søknadId = søknadId,
             )
 
-        every { opplysningRepository.hentAlle(søknadId) } returns
-            listOf(
-                opprinneligEgetbarnOpplysning,
-            )
-        every { opplysningRepository.oppdaterBarn(søknadId, any()) } returns Unit
+        every { opplysningRepository.hent(BESKRIVENDE_ID_PDL_BARN, søknadId) } returns null
+        every { opplysningRepository.hent(BESKRIVENDE_ID_EGNE_BARN, søknadId) } returns opprinneligEgetbarnOpplysning
         every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
         every { dpBehandlingKlient.oppdaterBarnOpplysning(any(), capture(dpBehandlingOpplysningSlot), any()) } returns Unit
 
-        opplysningService.oppdaterBarn(oppdatertBarnRequest, søknadId, "saksbehandlerId", "token")
+        opplysningService.oppdaterBarn(barnRequest, egetBarnId, søknadId, "saksbehandlerId", "token")
 
         val fangetDpBehandlingOpplysning = dpBehandlingOpplysningSlot.captured
-        val løsningsbarn = objectMapper.readValue<List<Løsningsbarn>>(fangetDpBehandlingOpplysning.verdi)
+        val løsning = objectMapper.readValue<BarnetilleggV2Løsning>(fangetDpBehandlingOpplysning.verdi)
         verify(exactly = 1) {
-            dpBehandlingKlient.oppdaterBarnOpplysning(oppdatertBarnRequest, fangetDpBehandlingOpplysning, "token")
+            dpBehandlingKlient.oppdaterBarnOpplysning(
+                behandlingId,
+                fangetDpBehandlingOpplysning,
+                "token",
+            )
         }
-        løsningsbarn.forAll { it.søknadbarnId shouldBe søknadbarnId }
+        løsning.søknadbarnId shouldBe søknadbarnId
+    }
+
+    @Test
+    fun `leggTilBarn kaster feil dersom søknad ikke finnes`() {
+        val søknadId = UUID.randomUUID()
+        every { søknadRepository.hent(søknadId) } returns null
+
+        val barnRequest =
+            BarnRequestDTO(
+                barn =
+                    BarnDataDTO(
+                        fornavnOgMellomnavn = "Nytt",
+                        etternavn = "Barn",
+                        fodselsdato = LocalDate.of(2020, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        shouldThrow<IllegalArgumentException> {
+            opplysningService.leggTilBarn(barnRequest, søknadId, "saksbehandlerId", "token")
+        }
+    }
+
+    @Test
+    fun `leggTilBarn legger til nytt barn i repository`() {
+        val søknadId = UUID.randomUUID()
+        val brukerident = "12345678910"
+
+        every { søknadRepository.hent(søknadId) } returns Søknad(søknadId = søknadId, ident = brukerident)
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns UUID.randomUUID()
+        every { opplysningRepository.hent(any(), søknadId) } returns null
+
+        val fødselsdato = LocalDate.of(2020, 1, 1)
+        val barnRequest =
+            BarnRequestDTO(
+                barn =
+                    BarnDataDTO(
+                        fornavnOgMellomnavn = "Nytt",
+                        etternavn = "Barn",
+                        fodselsdato = fødselsdato,
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        opplysningService.leggTilBarn(barnRequest, søknadId, "saksbehandlerId", "token")
+
+        verify {
+            saksbehandlerBarnRepository.lagreBarn(
+                søknadId,
+                match { barn ->
+                    barn.size == 1 &&
+                        barn[0].fornavnOgMellomnavn == "Nytt" &&
+                        barn[0].etternavn == "Barn" &&
+                        barn[0].fødselsdato == fødselsdato &&
+                        barn[0].statsborgerskap == "NOR" &&
+                        barn[0].forsørgerBarnet == true &&
+                        barn[0].fraRegister == false &&
+                        barn[0].endretAv == "saksbehandlerId" &&
+                        barn[0].begrunnelse == "Begrunnelse" &&
+                        barn[0].kvalifisererTilBarnetillegg == true &&
+                        barn[0].barnetilleggFom != null &&
+                        barn[0].barnetilleggTom != null
+                },
+                "saksbehandlerId",
+            )
+        }
+    }
+
+    @Test
+    fun `leggTilBarn setter ikke barnetilleggperiode når kvalifisererTilBarnetillegg er false`() {
+        val søknadId = UUID.randomUUID()
+        val brukerident = "12345678910"
+
+        every { søknadRepository.hent(søknadId) } returns Søknad(søknadId = søknadId, ident = brukerident)
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns UUID.randomUUID()
+        every { opplysningRepository.hent(any(), søknadId) } returns null
+
+        val barnRequest =
+            BarnRequestDTO(
+                barn =
+                    BarnDataDTO(
+                        fornavnOgMellomnavn = "Nytt",
+                        etternavn = "Barn",
+                        fodselsdato = LocalDate.of(2020, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = false,
+                        kvalifisererTilBarnetillegg = false,
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        opplysningService.leggTilBarn(barnRequest, søknadId, "saksbehandlerId", "token")
+
+        verify {
+            saksbehandlerBarnRepository.lagreBarn(
+                søknadId,
+                match { barn ->
+                    barn.size == 1 &&
+                        barn[0].forsørgerBarnet == false &&
+                        barn[0].kvalifisererTilBarnetillegg == false &&
+                        barn[0].barnetilleggFom == null &&
+                        barn[0].barnetilleggTom == null &&
+                        barn[0].begrunnelse == "Begrunnelse"
+                },
+                "saksbehandlerId",
+            )
+        }
+    }
+
+    @Test
+    fun `leggTilBarn bruker kvalifisererTilBarnetillegg fra request, ikke forsorgerBarnet`() {
+        val søknadId = UUID.randomUUID()
+        val brukerident = "12345678910"
+
+        every { søknadRepository.hent(søknadId) } returns Søknad(søknadId = søknadId, ident = brukerident)
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns UUID.randomUUID()
+        every { opplysningRepository.hent(any(), søknadId) } returns null
+
+        val barnRequest =
+            BarnRequestDTO(
+                barn =
+                    BarnDataDTO(
+                        fornavnOgMellomnavn = "Nytt",
+                        etternavn = "Barn",
+                        fodselsdato = LocalDate.of(2020, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = false,
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        opplysningService.leggTilBarn(barnRequest, søknadId, "saksbehandlerId", "token")
+
+        verify {
+            saksbehandlerBarnRepository.lagreBarn(
+                søknadId,
+                match { barn ->
+                    barn.size == 1 &&
+                        barn[0].forsørgerBarnet == true &&
+                        barn[0].kvalifisererTilBarnetillegg == false &&
+                        barn[0].barnetilleggFom == null &&
+                        barn[0].barnetilleggTom == null &&
+                        barn[0].begrunnelse == "Begrunnelse"
+                },
+                "saksbehandlerId",
+            )
+        }
+    }
+
+    @Test
+    fun `leggTilBarn sender barn til dp-behandling`() {
+        val søknadId = UUID.randomUUID()
+        val søknadbarnId = UUID.randomUUID()
+        val brukerident = "12345678910"
+        val behandlingId = UUID.randomUUID()
+        val dpBehandlingOpplysningSlot = slot<NyOpplysningDTO>()
+
+        every { søknadRepository.hent(søknadId) } returns Søknad(søknadId = søknadId, ident = brukerident)
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
+        every { opplysningRepository.hent(any(), søknadId) } returns null
+        every { dpBehandlingKlient.oppdaterBarnOpplysning(any(), capture(dpBehandlingOpplysningSlot), any()) } returns Unit
+
+        val barnRequest =
+            BarnRequestDTO(
+                behandlingId = behandlingId,
+                barn =
+                    BarnDataDTO(
+                        fornavnOgMellomnavn = "Nytt",
+                        etternavn = "Barn",
+                        fodselsdato = LocalDate.of(2020, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        opplysningService.leggTilBarn(barnRequest, søknadId, "saksbehandlerId", "token")
+
+        val fangetOpplysning = dpBehandlingOpplysningSlot.captured
+        val løsning = objectMapper.readValue<BarnetilleggV2Løsning>(fangetOpplysning.verdi)
+
+        verify(exactly = 1) {
+            dpBehandlingKlient.oppdaterBarnOpplysning(behandlingId, fangetOpplysning, "token")
+        }
+        løsning.søknadbarnId shouldBe søknadbarnId
+        løsning.barn.size shouldBe 1
+        løsning.barn[0].fornavnOgMellomnavn shouldBe "Nytt"
+        fangetOpplysning.begrunnelse shouldBe "Begrunnelse"
+        fangetOpplysning.gyldigFraOgMed shouldBe Barn.barnetilleggperiode(LocalDate.of(2020, 1, 1)).first
+        fangetOpplysning.gyldigTilOgMed shouldBe Barn.barnetilleggperiode(LocalDate.of(2020, 1, 1)).second
+    }
+
+    @Test
+    fun `leggTilBarn sender ikke barn til dp-behandling når behandlingId er null`() {
+        val søknadId = UUID.randomUUID()
+        val brukerident = "12345678910"
+
+        every { søknadRepository.hent(søknadId) } returns Søknad(søknadId = søknadId, ident = brukerident)
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns UUID.randomUUID()
+        every { opplysningRepository.hent(any(), søknadId) } returns null
+
+        val barnRequest =
+            BarnRequestDTO(
+                behandlingId = null,
+                barn =
+                    BarnDataDTO(
+                        fornavnOgMellomnavn = "Nytt",
+                        etternavn = "Barn",
+                        fodselsdato = LocalDate.of(2020, 1, 1),
+                        oppholdssted = "NOR",
+                        forsorgerBarnet = true,
+                        kvalifisererTilBarnetillegg = true,
+                        begrunnelse = "Begrunnelse",
+                    ),
+            )
+
+        opplysningService.leggTilBarn(barnRequest, søknadId, "saksbehandlerId", "token")
+
+        verify(exactly = 0) { dpBehandlingKlient.oppdaterBarnOpplysning(any(), any(), any()) }
     }
 }

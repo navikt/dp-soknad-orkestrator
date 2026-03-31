@@ -27,6 +27,12 @@ interface QuizOpplysningRepository {
         oppdatertBarn: BarnSvar,
     )
 
+    fun leggTilBarn(
+        søknadId: UUID,
+        brukerident: String,
+        nyttBarn: BarnSvar,
+    )
+
     fun lagreBarnSøknadMapping(søknadId: UUID): UUID
 
     fun hentEllerOpprettSøknadbarnId(søknadId: UUID): UUID

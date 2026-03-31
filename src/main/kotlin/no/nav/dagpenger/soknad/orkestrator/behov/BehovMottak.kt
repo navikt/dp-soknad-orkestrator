@@ -46,10 +46,17 @@ class BehovMottak(
         meterRegistry: MeterRegistry,
     ) {
         val behovId = packet["@behovId"].asText()
+        val søknadId =
+            try {
+                packet["søknadId"].asUUID()
+            } catch (e: IllegalArgumentException) {
+                logger.error(e) { "SøknadId i behovet er ikke en gyldig UUID: ${packet["søknadId"].asText()}" }
+                return
+            }
 
         withMDC(
             mapOf(
-                "søknadId" to packet["søknadId"].asText(),
+                "søknadId" to søknadId.toString(),
                 "behandlingId" to packet["behandlingId"].asText(),
                 "behovId" to behovId,
             ),
@@ -61,8 +68,8 @@ class BehovMottak(
                 return@withMDC
             }
 
-            if (!søknadService.søknadFinnes(packet["søknadId"].asUUID())) {
-                logger.warn { "Søknad med søknadId: ${packet["søknadId"].asText()} finnes ikke, kan ikke løse behov" }
+            if (!søknadService.søknadFinnes(søknadId)) {
+                logger.warn { "Søknad med søknadId: $søknadId finnes ikke, kan ikke løse behov" }
             } else {
                 packet.løsBehov()
             }

@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db
 
+import BarnSøknadMappingTabell
 import QuizOpplysningTabell
 import TekstTabell
 import io.kotest.matchers.shouldBe
@@ -451,6 +452,82 @@ class QuizOpplysningRepositoryPostgresTest {
                 it.endretAv shouldBe "123"
                 it.begrunnelse shouldBe "Begrunnelse"
             }
+        }
+    }
+
+    @Test
+    fun `leggTilBarn legger til nytt barn i databasen`() {
+        val nyttBarnSvarId = randomUUID()
+        val nyttBarn =
+            BarnSvar(
+                barnSvarId = nyttBarnSvarId,
+                fornavnOgMellomnavn = "Nytt Barn",
+                etternavn = "Etternavn",
+                fødselsdato = LocalDate.of(2020, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = true,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = true,
+                barnetilleggFom = LocalDate.of(2020, 1, 1),
+                barnetilleggTom = LocalDate.of(2038, 1, 1),
+                endretAv = "saksbehandlerId",
+                begrunnelse = "Begrunnelse",
+            )
+
+        withMigratedDb {
+            opplysningRepository.leggTilBarn(søknadId, ident, nyttBarn)
+
+            val opplysning = opplysningRepository.hent("faktum.barn-liste", søknadId)
+            val lagretBarn = opplysning?.svar.asListOf<BarnSvar>().first()
+
+            lagretBarn.barnSvarId shouldBe nyttBarnSvarId
+            lagretBarn.fornavnOgMellomnavn shouldBe "Nytt Barn"
+            lagretBarn.etternavn shouldBe "Etternavn"
+            lagretBarn.fødselsdato shouldBe LocalDate.of(2020, 1, 1)
+            lagretBarn.statsborgerskap shouldBe "NOR"
+            lagretBarn.forsørgerBarnet shouldBe true
+            lagretBarn.fraRegister shouldBe false
+            lagretBarn.kvalifisererTilBarnetillegg shouldBe true
+            lagretBarn.barnetilleggFom shouldBe LocalDate.of(2020, 1, 1)
+            lagretBarn.barnetilleggTom shouldBe LocalDate.of(2038, 1, 1)
+            lagretBarn.endretAv shouldBe "saksbehandlerId"
+            lagretBarn.begrunnelse shouldBe "Begrunnelse"
+        }
+    }
+
+    @Test
+    fun `leggTilBarn kan legge til flere barn for samme søknad`() {
+        val barn1 =
+            BarnSvar(
+                barnSvarId = randomUUID(),
+                fornavnOgMellomnavn = "Første",
+                etternavn = "Barn",
+                fødselsdato = LocalDate.of(2018, 6, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = true,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = true,
+            )
+        val barn2 =
+            BarnSvar(
+                barnSvarId = randomUUID(),
+                fornavnOgMellomnavn = "Andre",
+                etternavn = "Barn",
+                fødselsdato = LocalDate.of(2020, 3, 15),
+                statsborgerskap = "SWE",
+                forsørgerBarnet = false,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = false,
+            )
+
+        withMigratedDb {
+            opplysningRepository.leggTilBarn(søknadId, ident, barn1)
+            opplysningRepository.leggTilBarn(søknadId, ident, barn2)
+
+            val lagredeBarn = opplysningRepository.hent("faktum.barn-liste", søknadId)?.svar.asListOf<BarnSvar>()
+
+            lagredeBarn.size shouldBe 2
+            lagredeBarn.map { it.fornavnOgMellomnavn } shouldBe listOf("Første", "Andre")
         }
     }
 

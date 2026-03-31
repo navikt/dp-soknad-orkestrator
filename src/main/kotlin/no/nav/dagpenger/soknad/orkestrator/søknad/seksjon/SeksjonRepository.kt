@@ -14,6 +14,7 @@ import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsert
+import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.util.UUID
 import javax.sql.DataSource
@@ -106,6 +107,29 @@ class SeksjonRepository(
                 }.toList()
         }
 
+    fun hentSeksjonerMedTidstempler(
+        søknadId: UUID,
+        ident: String,
+    ): List<SeksjonMedTidstempler> =
+        transaction {
+            SeksjonV2Tabell
+                .innerJoin(SøknadTabell)
+                .select(
+                    SeksjonV2Tabell.seksjonsvar,
+                    SeksjonV2Tabell.seksjonId,
+                    SeksjonV2Tabell.opprettet,
+                    SeksjonV2Tabell.oppdatert,
+                ).where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
+                .map {
+                    SeksjonMedTidstempler(
+                        seksjonId = it[SeksjonV2Tabell.seksjonId],
+                        data = it[SeksjonV2Tabell.seksjonsvar],
+                        opprettet = it[SeksjonV2Tabell.opprettet],
+                        oppdatert = it[SeksjonV2Tabell.oppdatert],
+                    )
+                }.toList()
+        }
+
     fun hentSeksjonIdForAlleLagredeSeksjoner(
         søknadId: UUID,
         ident: String,
@@ -147,6 +171,7 @@ class SeksjonRepository(
         ident: String,
         seksjonId: String,
         dokumentasjonskrav: String?,
+        oppdatertTidspunkt: LocalDateTime = now(),
     ) = transaction {
         søknadRepository.verifiserAtSøknadEksistererOgTilhørerIdent(søknadId, ident)
         søknadRepository.verifiserAtSøknadenHarEnAvTilstandene(søknadId, listOf(Tilstand.INNSENDT, Tilstand.JOURNALFØRT))
@@ -158,7 +183,7 @@ class SeksjonRepository(
             } else {
                 it[SeksjonV2Tabell.dokumentasjonskrav] = null
             }
-            it[SeksjonV2Tabell.oppdatert] = dateTimeLiteral(now())
+            it[SeksjonV2Tabell.oppdatert] = dateTimeLiteral(oppdatertTidspunkt)
         }
 
         søknadRepository.markerSøknadSomOppdatert(søknadId, ident)
