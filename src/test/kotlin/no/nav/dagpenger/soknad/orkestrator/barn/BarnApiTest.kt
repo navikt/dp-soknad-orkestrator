@@ -71,7 +71,7 @@ class BarnApiTest {
             barnDtoer shouldHaveSize 2
             barnDtoer.forExactly(1) { it.fornavnOgMellomnavn shouldBe "fornavn1 mellomnavn1" }
             barnDtoer.forExactly(1) { it.fornavnOgMellomnavn shouldBe "fornavn2 mellomnavn2" }
-            response.headers["Content-Type"] shouldBe "application/json; charset=UTF-8"
+            response.headers["Content-Type"] shouldBe "application/json"
         }
     }
 }

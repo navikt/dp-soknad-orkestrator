@@ -63,7 +63,7 @@ class PersonaliaApiTest {
 
             response.status shouldBe OK
             response.body() as PersonaliaDto shouldNotBe null
-            response.headers["Content-Type"] shouldBe "application/json; charset=UTF-8"
+            response.headers["Content-Type"] shouldBe "application/json"
         }
     }
 }
