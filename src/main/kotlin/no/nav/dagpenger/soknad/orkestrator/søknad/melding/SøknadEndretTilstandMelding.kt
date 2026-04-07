@@ -49,7 +49,7 @@ class SøknadEndretTilstandMelding(
         if (søknadsdata.isEmpty() || søknad == null) {
             null
         } else {
-            val gyldigeFelter = gyldigeFelterForStatistikk()
+            val aktuelleFelter = filtrerUaktuelleFelter()
 
             mapOf(
                 "opprettet" to LocalDateTime.now(),
@@ -60,14 +60,14 @@ class SøknadEndretTilstandMelding(
                         return@associate it.seksjonId to
                             mapOf("seksjonsdata" to null, "opprettet" to it.opprettet, "oppdatert" to it.oppdatert)
                     }
-                    val gyldigeFelterForSeksjon =
-                        gyldigeFelter
+
+                    val aktuelleFelterForSeksjon =
+                        aktuelleFelter
                             .find { pg ->
-                                pg.seksjonId.replace(" ", "-").toLowerCasePreservingASCIIRules() ==
-                                    it.seksjonId.toLowerCasePreservingASCIIRules()
+                                pg.seksjonId == it.seksjonId.toLowerCasePreservingASCIIRules()
                             }?.spørsmål
                             ?: emptyList()
-                    val seksjonsdataKlarTilStatistikk = filtrerSeksjonsdataForStatistikk(it.seksjonId, it.data, gyldigeFelterForSeksjon)
+                    val seksjonsdataKlarTilStatistikk = filtrerSeksjonsdataForStatistikk(it.seksjonId, it.data, aktuelleFelterForSeksjon)
 
                     it.seksjonId to
                         mapOf("seksjonsdata" to seksjonsdataKlarTilStatistikk, "opprettet" to it.opprettet, "oppdatert" to it.oppdatert)
@@ -87,7 +87,13 @@ class SøknadEndretTilstandMelding(
                         hentFeltFraSeksjon(seksjonsdataJson, "folkeregistrertAdresseErNorgeStemmerDet"),
                     "bostedsland" to hentFeltFraSeksjon(seksjonsdataJson, "bostedsland"),
                 ).filterValues { it != "" }
-            return objectMapper.writeValueAsString(filtrertPersonalia)
+            return objectMapper.writeValueAsString(
+                mapOf(
+                    "seksjonId" to "personalia",
+                    "seksjonsvar" to filtrertPersonalia,
+                    "versjon" to seksjonsdataJson["versjon"].asInt(),
+                ),
+            )
         }
 
         val tillatteFelter = gyldigeFeltIder + listOf("registrerteArbeidsforhold")
@@ -135,7 +141,7 @@ class SøknadEndretTilstandMelding(
         }
     }
 
-    fun gyldigeFelterForStatistikk(): List<SeksjonMedGyldigeFeltIder> {
+    fun filtrerUaktuelleFelter(): List<SeksjonMedGyldigeFeltIder> {
         val listOverGyldigeTyper =
             listOf(
                 "envalg",
@@ -174,11 +180,20 @@ class SøknadEndretTilstandMelding(
 
             traverse(seksjon)
             SeksjonMedGyldigeFeltIder(
-                seksjonId = seksjon["navn"].asText(),
+                seksjonId = hentSeksjonIdFraNavn(seksjon["navn"].asText()),
                 spørsmål = seksjonMappet,
             )
         }
     }
+
+    private fun hentSeksjonIdFraNavn(seksjonNavn: String): String =
+        when (seksjonNavn) {
+            "Reell arbeidssøker" -> "reell-arbeidssoker"
+            "Egen næring" -> "egen-naring"
+            "Annen pengestøtte" -> "annen-pengestotte"
+            "Din situasjon" -> "din-situasjon"
+            else -> seksjonNavn.toLowerCasePreservingASCIIRules()
+        }
 
     private fun hentFeltFraSeksjon(
         jsonNode: JsonNode,
