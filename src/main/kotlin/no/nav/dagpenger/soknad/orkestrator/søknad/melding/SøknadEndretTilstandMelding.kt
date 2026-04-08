@@ -114,9 +114,8 @@ class SøknadEndretTilstandMelding(
     fun filtrerUgyldigeSpørsmålBasertPåType(
         seksjonssvarJson: JsonNode,
         tillatteFelter: List<String>,
-    ): Any? {
-        println("seksjonssvarJson: $seksjonssvarJson")
-        return when {
+    ): Any? =
+        when {
             seksjonssvarJson.isObject -> {
                 val result = mutableMapOf<String, Any?>()
                 seksjonssvarJson.properties().forEach { (key, value) ->
@@ -139,7 +138,6 @@ class SøknadEndretTilstandMelding(
                 seksjonssvarJson.asText()
             }
         }
-    }
 
     fun filtrerUaktuelleFelter(): List<SeksjonMedGyldigeFeltIder> {
         val listOverGyldigeTyper =

@@ -229,12 +229,14 @@ class SeksjonRepositoryTest {
         seksjonRepository.hentSeksjoner(randomUUID(), ident) shouldBe emptyList()
     }
 
+    @Suppress("ktlint:standard:max-line-length")
     @Test
-    fun `hentSeksjonerMedTidstempler returnerer forventede seksjoner med tidsstempler hvis søknaden tilhører bruker som gjør kallet`() {
+    fun `hentSeksjonerMedTidstempler returnerer forventede seksjoner (utenom Dokumentasjon) med tidsstempler hvis søknaden tilhører bruker som gjør kallet`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
         seksjonRepository.lagre(søknadId, ident, seksjonId2, seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
+        seksjonRepository.lagre(søknadId, ident, "Dokumentasjon,1", seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
 
         val seksjoner = seksjonRepository.hentSeksjonerMedTidstempler(søknadId, ident)
 
