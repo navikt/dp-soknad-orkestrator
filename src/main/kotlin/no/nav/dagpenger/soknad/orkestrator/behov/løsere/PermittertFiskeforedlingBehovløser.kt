@@ -54,7 +54,7 @@ class PermittertFiskeforedlingBehovløser(
                 if (!it.isMissingOrNull()) {
                     return it
                         .any { arbeidsforhold ->
-                            arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() == "jegErPermitert" &&
+                            arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() == "jegErPermittert" &&
                                 arbeidsforhold["permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien"]?.asText() == "ja"
                         }
                 }

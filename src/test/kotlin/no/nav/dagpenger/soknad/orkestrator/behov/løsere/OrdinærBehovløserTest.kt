@@ -146,7 +146,7 @@ class OrdinærBehovløserTest {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverErKonkurs"
                     },
                     {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermittert"
                     }
                 ]
                 },
@@ -193,7 +193,7 @@ class OrdinærBehovløserTest {
                         "hvordanHarDetteArbeidsforholdetEndretSeg": "kontraktenErUgått"
                     },
                     {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermittert"
                     }
                 ]
                 },

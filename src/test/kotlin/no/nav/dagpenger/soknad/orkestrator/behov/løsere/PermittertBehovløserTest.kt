@@ -69,7 +69,7 @@ class PermittertBehovløserTest {
                 "seksjonsvar": {
                 "registrerteArbeidsforhold": [
                     {
-                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
+                        "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermittert"
                     }
                 ]
                 },

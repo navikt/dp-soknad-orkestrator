@@ -55,7 +55,7 @@ class PermittertBehovløser(
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() == "jegErPermitert"
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() == "jegErPermittert"
                     }
                 }
             }

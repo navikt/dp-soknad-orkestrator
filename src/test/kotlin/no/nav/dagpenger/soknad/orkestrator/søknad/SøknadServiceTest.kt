@@ -481,7 +481,7 @@ class SøknadServiceTest {
             "seksjon": {
             "registrerteArbeidsforhold": [
                 {
-                    "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermitert"
+                    "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErPermittert"
                 }
             ]
             },
