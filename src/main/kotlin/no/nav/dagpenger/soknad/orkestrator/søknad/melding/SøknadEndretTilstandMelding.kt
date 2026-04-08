@@ -96,7 +96,7 @@ class SøknadEndretTilstandMelding(
             )
         }
 
-        val tillatteFelter = gyldigeFeltIder + listOf("registrerteArbeidsforhold")
+        val tillatteFelter = gyldigeFeltIder + idPåFelterSomErArrayOgMåLeggesManueltPåGyldigeFelter()
         val filtrertSeksjonsdata =
             filtrerUgyldigeSpørsmålBasertPåType(
                 seksjonssvarJson = seksjonsdataJson["seksjonsvar"],
@@ -185,6 +185,19 @@ class SøknadEndretTilstandMelding(
             )
         }
     }
+
+    private fun idPåFelterSomErArrayOgMåLeggesManueltPåGyldigeFelter(): List<String> =
+        listOf(
+            "registrerteArbeidsforhold",
+            "barnFraPdl",
+            "barnLagtManuelt",
+            "kanIkkeJobbeHeltidOgDeltidSituasjonenSomGjelderDeg",
+            "kanIkkeJobbeIHeleNorgeSituasjonenSomGjelderDeg",
+            "næringsvirksomheter",
+            "gårdsbruk",
+            "pengestøtteFraAndreEøsLand",
+            "pengestøtteFraNorge",
+        )
 
     private fun hentSeksjonIdFraNavn(seksjonNavn: String): String =
         when (seksjonNavn) {

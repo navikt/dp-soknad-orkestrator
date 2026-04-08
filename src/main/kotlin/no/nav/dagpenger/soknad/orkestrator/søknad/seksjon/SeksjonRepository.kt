@@ -119,8 +119,12 @@ class SeksjonRepository(
                     SeksjonV2Tabell.seksjonId,
                     SeksjonV2Tabell.opprettet,
                     SeksjonV2Tabell.oppdatert,
-                ).where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
-                .map {
+                ).where {
+                    SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) and (
+                        SeksjonV2Tabell.seksjonId notLike
+                            "Dokumentasjon%"
+                    )
+                }.map {
                     SeksjonMedTidstempler(
                         seksjonId = it[SeksjonV2Tabell.seksjonId],
                         data = it[SeksjonV2Tabell.seksjonsvar],
