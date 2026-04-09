@@ -43,19 +43,26 @@ class SafKlient(
 
     fun hentSøknadUuid(journalpostId: String): UUID =
         runBlocking {
-            val journalpost = hentJournalpost(journalpostId)
-            val dokumentInfoId = journalpost.hovedDokument.dokumentInfoId
+            try {
+                logger.info { "Slår opp journalpost i SAF for journalpostId: $journalpostId" }
+                val journalpost = hentJournalpost(journalpostId)
+                val dokumentInfoId = journalpost.hovedDokument.dokumentInfoId
 
-            sikkerlogg.info { "Henter søknadsdata fra SAF for journalpostId: $journalpostId, dokumentInfoId: $dokumentInfoId" }
+                sikkerlogg.info { "Henter søknadsdata fra SAF for journalpostId: $journalpostId, dokumentInfoId: $dokumentInfoId" }
 
-            val søknadsData = hentSøknadsData(journalpostId, dokumentInfoId)
-            val søknadUuid =
-                søknadsData["søknad_uuid"]?.textValue()
-                    ?: throw IllegalStateException(
-                        "Fant ikke søknad_uuid i SAF-dokument for journalpostId: $journalpostId",
-                    )
+                val søknadsData = hentSøknadsData(journalpostId, dokumentInfoId)
+                sikkerlogg.info { "Søknadsdata fra SAF for journalpostId: $journalpostId: $søknadsData" }
+                val søknadUuid =
+                    søknadsData["søknad_uuid"]?.textValue()
+                        ?: throw IllegalStateException(
+                            "Fant ikke søknad_uuid i SAF-dokument for journalpostId: $journalpostId",
+                        )
 
-            UUID.fromString(søknadUuid)
+                UUID.fromString(søknadUuid)
+            } catch (e: Exception) {
+                logger.error(e) { "SAF-oppslag feilet for journalpostId: $journalpostId" }
+                throw e
+            }
         }
 
     private suspend fun hentJournalpost(journalpostId: String): SafJournalpost {
