@@ -100,6 +100,7 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                             "Publiserte melding om behov for generering av søknad-PDF for søknad $søknadId innsendt av $ident "
                         }
                         var seksjonsdata = seksjonRepository.hentSeksjonerMedTidstempler(søknadId, ident)
+                        var pdfGrunnlag = seksjonRepository.hentAllePdfGrunnlag(søknadId, ident)
 
                         val søknadEndretTilstandMelding =
                             SøknadEndretTilstandMelding(
@@ -109,6 +110,7 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                                 nyTilstand = Tilstand.INNSENDT.name,
                                 søknad = it,
                                 søknadsdata = seksjonsdata,
+                                pdfGrunnlag = pdfGrunnlag,
                             )
                         rapidsConnection.publish(
                             ident,

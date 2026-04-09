@@ -119,8 +119,12 @@ class SeksjonRepository(
                     SeksjonV2Tabell.seksjonId,
                     SeksjonV2Tabell.opprettet,
                     SeksjonV2Tabell.oppdatert,
-                ).where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
-                .map {
+                ).where {
+                    SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) and (
+                        SeksjonV2Tabell.seksjonId notLike
+                            "Dokumentasjon%"
+                    )
+                }.map {
                     SeksjonMedTidstempler(
                         seksjonId = it[SeksjonV2Tabell.seksjonId],
                         data = it[SeksjonV2Tabell.seksjonsvar],
@@ -219,6 +223,21 @@ class SeksjonRepository(
     }
 
     fun hentPdfGrunnlag(
+        søknadId: UUID,
+        ident: String,
+    ): List<String> =
+        transaction {
+            SeksjonV2Tabell
+                .innerJoin(SøknadTabell)
+                .select(SeksjonV2Tabell.pdfGunnlag)
+                .where { SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) }
+                .orderBy(SeksjonV2Tabell.opprettet, ASC)
+                .map {
+                    it[SeksjonV2Tabell.pdfGunnlag]
+                }.toList()
+        }
+
+    fun hentAllePdfGrunnlag(
         søknadId: UUID,
         ident: String,
     ): List<String> =

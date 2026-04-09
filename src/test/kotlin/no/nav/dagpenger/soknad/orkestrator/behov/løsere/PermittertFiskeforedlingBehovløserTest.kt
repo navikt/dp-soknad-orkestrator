@@ -101,7 +101,7 @@ class PermittertFiskeforedlingBehovløserTest {
 
     @Suppress("ktlint:standard:max-line-length")
     @Test
-    fun `Behovløser publiserer løsning på behov PermittertFiskeforedling med verdi og gjelderFra fra seksjonsdata hvor ikke permitert pga fiskforedling`() {
+    fun `Behovløser publiserer løsning på behov PermittertFiskeforedling med verdi og gjelderFra fra seksjonsdata hvor ikke permittert pga fiskforedling`() {
         every {
             seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
