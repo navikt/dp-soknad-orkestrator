@@ -19,23 +19,19 @@ class SøknadEndretTilstandMelding(
     private val søknad: Søknad? = null,
 ) {
     @Suppress("UNCHECKED_CAST")
-    fun asMessage(): JsonMessage {
-        var response =
-            JsonMessage.newMessage(
-                eventName = "søknad_endret_tilstand",
-                map =
-                    mapOf(
-                        "søknad_uuid" to søknadId,
-                        "ident" to ident,
-                        "forrigeTilstand" to mapTilstandsNavn(forrigeTilstand),
-                        "gjeldendeTilstand" to mapTilstandsNavn(nyTilstand),
-                        "kilde" to "orkestrator",
-                        "søknadsdata" to lagSøknadsdataForStatistikk(),
-                    ).filterValues { it != null } as Map<String, Any>,
-            )
-
-        return response
-    }
+    fun asMessage(): JsonMessage =
+        JsonMessage.newMessage(
+            eventName = "søknad_endret_tilstand",
+            map =
+                mapOf(
+                    "søknad_uuid" to søknadId,
+                    "ident" to ident,
+                    "forrigeTilstand" to mapTilstandsNavn(forrigeTilstand),
+                    "gjeldendeTilstand" to mapTilstandsNavn(nyTilstand),
+                    "kilde" to "orkestrator",
+                    "søknadsdata" to lagSøknadsdataForStatistikk(),
+                ).filterValues { it != null } as Map<String, Any>,
+        )
 
     private fun mapTilstandsNavn(tilstand: String): String =
         when (tilstand) {
@@ -81,22 +77,10 @@ class SøknadEndretTilstandMelding(
     ): String {
         val seksjonsdataJson = objectMapper.readTree(seksjonsdata)
         if (seksjonsId == "personalia") {
-            val filtrertPersonalia =
-                mapOf(
-                    "folkeregistrertAdresseErNorgeStemmerDet" to
-                        hentFeltFraSeksjon(seksjonsdataJson, "folkeregistrertAdresseErNorgeStemmerDet"),
-                    "bostedsland" to hentFeltFraSeksjon(seksjonsdataJson, "bostedsland"),
-                ).filterValues { it != "" }
-            return objectMapper.writeValueAsString(
-                mapOf(
-                    "seksjonId" to "personalia",
-                    "seksjonsvar" to filtrertPersonalia,
-                    "versjon" to seksjonsdataJson["versjon"].asInt(),
-                ),
-            )
+            return filtrerPersonaliaSeksjon(seksjonsdataJson)
         }
 
-        val tillatteFelter = gyldigeFeltIder + idPåFelterSomErArrayOgMåLeggesManueltPåGyldigeFelter()
+        val tillatteFelter = gyldigeFeltIder + ARRAY_ID_FELTER_SOM_MÅ_LEGGES_MANUELT
         val filtrertSeksjonsdata =
             filtrerUgyldigeSpørsmålBasertPåType(
                 seksjonssvarJson = seksjonsdataJson["seksjonsvar"],
@@ -109,6 +93,22 @@ class SøknadEndretTilstandMelding(
                 "versjon" to seksjonsdataJson["versjon"].asInt(),
             )
         return objectMapper.writeValueAsString(seksjon)
+    }
+
+    private fun filtrerPersonaliaSeksjon(seksjonsdataJson: JsonNode): String {
+        val filtrertPersonalia =
+            mapOf(
+                "folkeregistrertAdresseErNorgeStemmerDet" to
+                    hentFeltFraSeksjon(seksjonsdataJson, "folkeregistrertAdresseErNorgeStemmerDet"),
+                "bostedsland" to hentFeltFraSeksjon(seksjonsdataJson, "bostedsland"),
+            ).filterValues { it != "" }
+        return objectMapper.writeValueAsString(
+            mapOf(
+                "seksjonId" to "personalia",
+                "seksjonsvar" to filtrertPersonalia,
+                "versjon" to seksjonsdataJson["versjon"].asInt(),
+            ),
+        )
     }
 
     fun filtrerUgyldigeSpørsmålBasertPåType(
@@ -184,19 +184,6 @@ class SøknadEndretTilstandMelding(
         }
     }
 
-    private fun idPåFelterSomErArrayOgMåLeggesManueltPåGyldigeFelter(): List<String> =
-        listOf(
-            "registrerteArbeidsforhold",
-            "barnFraPdl",
-            "barnLagtManuelt",
-            "kanIkkeJobbeHeltidOgDeltidSituasjonenSomGjelderDeg",
-            "kanIkkeJobbeIHeleNorgeSituasjonenSomGjelderDeg",
-            "næringsvirksomheter",
-            "gårdsbruk",
-            "pengestøtteFraAndreEøsLand",
-            "pengestøtteFraNorge",
-        )
-
     private fun hentSeksjonIdFraNavn(seksjonNavn: String): String =
         when (seksjonNavn) {
             "Reell arbeidssøker" -> "reell-arbeidssoker"
@@ -215,4 +202,19 @@ class SøknadEndretTilstandMelding(
         val seksjonId: String,
         val spørsmål: List<String> = emptyList(),
     )
+
+    companion object {
+        private val ARRAY_ID_FELTER_SOM_MÅ_LEGGES_MANUELT =
+            listOf(
+                "registrerteArbeidsforhold",
+                "barnFraPdl",
+                "barnLagtManuelt",
+                "kanIkkeJobbeHeltidOgDeltidSituasjonenSomGjelderDeg",
+                "kanIkkeJobbeIHeleNorgeSituasjonenSomGjelderDeg",
+                "næringsvirksomheter",
+                "gårdsbruk",
+                "pengestøtteFraAndreEøsLand",
+                "pengestøtteFraNorge",
+            )
+    }
 }
