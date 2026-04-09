@@ -282,7 +282,7 @@ class SøknadRepository(
                 .andWhere { SøknadTabell.ident eq ident }
                 .map { it[SøknadTabell.søknadId] }
                 .firstOrNull()
-                ?: throw IllegalStateException("Fant ikke søknad med journalpostId: $journalpostId for ident: $ident")
+                ?: throw IllegalStateException("Fant ikke søknad med journalpostId: $journalpostId")
         }
 
     fun hentSoknaderForIdent(ident: String) =
