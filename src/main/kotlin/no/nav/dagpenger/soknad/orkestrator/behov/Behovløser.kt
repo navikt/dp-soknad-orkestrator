@@ -81,6 +81,25 @@ abstract class Behovløser(
         sikkerlogg.info { "Løste behov $behov med løsning: $svarPåBehov" }
     }
 
+    internal fun publiserLøsningUtenSøknadId(
+        behovmelding: SøknadBehovmelding,
+        svarPåBehov: Any,
+    ) {
+        behovmelding.innkommendePacket["@løsning"] =
+            mapOf(
+                behov to
+                    mapOf(
+                        "verdi" to svarPåBehov,
+                        "gjelderFra" to null,
+                    ),
+            )
+        rapidsConnection.publish(behovmelding.ident, behovmelding.innkommendePacket.toJson())
+
+        BehovMetrikker.løst.labelValues(behov).inc()
+        logger.info { "Løste behov $behov" }
+        sikkerlogg.info { "Løste behov $behov med løsning: $svarPåBehov" }
+    }
+
     private fun leggLøsningPåBehovmelding(
         behovmelding: Behovmelding,
         svarPåBehov: Any,

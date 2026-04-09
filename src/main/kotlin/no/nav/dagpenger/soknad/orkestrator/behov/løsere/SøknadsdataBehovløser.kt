@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
@@ -46,6 +47,16 @@ class SøknadsdataBehovløser(
 
         val søknadId =
             søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
+
+        if (søknadId == null) {
+            logger.info { "Fant ikke søknadId for journalpostId $journalpostId – returnerer standardverdier (gammel søknad)" }
+            val standardResultatMap: Map<String, Any> =
+                objectMapper.convertValue(
+                    lagStandardSøknadsdataResultat(),
+                    object : TypeReference<Map<String, Any>>() {},
+                )
+            return publiserLøsningUtenSøknadId(behovmelding, standardResultatMap)
+        }
 
         val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
 
@@ -359,6 +370,19 @@ class SøknadsdataBehovløser(
         return eøsLandOgSveits.contains(bostedsland)
     }
 
+    private fun lagStandardSøknadsdataResultat() =
+        SøknadsdataResultType(
+            eøsBostedsland = false,
+            eøsArbeidsforhold = false,
+            avtjentVerneplikt = false,
+            avsluttetArbeidsforhold = emptyList(),
+            harBarn = false,
+            harAndreYtelser = false,
+            ønskerDagpengerFraDato = LocalDate.now(),
+            søknadId = null,
+            reellArbeidssøker = ReellArbeidssøker(helse = false, geografi = false, deltid = false, yrke = false),
+        )
+
     val eøsLandOgSveits =
         listOf(
             "BEL",
@@ -402,7 +426,8 @@ data class SøknadsdataResultType(
     val harBarn: Boolean,
     val harAndreYtelser: Boolean,
     val ønskerDagpengerFraDato: LocalDate,
-    val søknadId: String,
+    @field:JsonInclude(JsonInclude.Include.NON_NULL)
+    val søknadId: String?,
     val reellArbeidssøker: ReellArbeidssøker,
 )
 

@@ -92,6 +92,31 @@ class SøknadsdataBehovløserTest {
     }
 
     @Test
+    fun `skal returnere standardverdier når journalpostId ikke finnes i databasen`() {
+        every {
+            søknadRepository.hentSøknadIdFraJournalPostId(any(), any())
+        } returns null
+
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
+
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            val verdi = løsning["verdi"]
+            verdi["eøsBostedsland"].asBoolean() shouldBe false
+            verdi["eøsArbeidsforhold"].asBoolean() shouldBe false
+            verdi["avtjentVerneplikt"].asBoolean() shouldBe false
+            verdi["avsluttetArbeidsforhold"].size() shouldBe 0
+            verdi["harBarn"].asBoolean() shouldBe false
+            verdi["harAndreYtelser"].asBoolean() shouldBe false
+            verdi["søknadId"] shouldBe null
+            verdi["reellArbeidssøker"]["helse"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["geografi"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["deltid"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["yrke"].asBoolean() shouldBe false
+            løsning["gjelderFra"].isNull shouldBe true
+        }
+    }
+
+    @Test
     fun `EøsBostedsland fra orkestrator søknad`() {
         val cases =
             listOf(
