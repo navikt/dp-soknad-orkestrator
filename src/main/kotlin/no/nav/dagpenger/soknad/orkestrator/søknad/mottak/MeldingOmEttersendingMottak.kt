@@ -61,8 +61,6 @@ internal class MeldingOmEttersendingMottak(
             packet["@løsning"][BEHOV]["dokumentasjonskravJson"].asText()
         val seksjonId = packet["@løsning"][BEHOV]["seksjonId"].asText()
 
-        println("Mottok melding om ettersending for søknad $søknadId fra $ident")
-
         withLoggingContext(
             "søknadId" to søknadId.toString(),
         ) {
