@@ -35,6 +35,9 @@ internal object Configuration {
     val personKontoRegisterUrl by lazy { properties[Key("PERSON_KONTO_REGISTER_URL", stringType)] }
     val personKontoRegisterScope by lazy { properties[Key("PERSON_KONTO_REGISTER_SCOPE", stringType)] }
 
+    val safUrl by lazy { properties[Key("SAF_URL", stringType)] }
+    val safScope by lazy { properties[Key("SAF_SCOPE", stringType)] }
+
     val miljøVariabler =
         Variabler(
             dpBehandlingBaseUrl = properties[Key("DP_BEHANDLING_BASE_URL", stringType)],

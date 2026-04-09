@@ -1,5 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
@@ -17,6 +18,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforho
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.saf.SafKlient
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import java.time.LocalDate
@@ -28,6 +30,7 @@ class SøknadsdataBehovløser(
     søknadRepository: SøknadRepository,
     seksjonRepository: SeksjonRepository,
     fellesBehovløserLøsninger: FellesBehovløserLøsninger,
+    private val safKlient: SafKlient,
 ) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository, fellesBehovløserLøsninger) {
     override val behov = "Søknadsdata"
     override val beskrivendeId = "behov.søknadsdata"
@@ -46,6 +49,10 @@ class SøknadsdataBehovløser(
 
         val søknadId =
             søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
+                ?: run {
+                    logger.info { "Fant ikke søknadId for journalpostId: $journalpostId, slår opp i SAF" }
+                    safKlient.hentSøknadUuid(journalpostId)
+                }
 
         val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
 
@@ -86,7 +93,7 @@ class SøknadsdataBehovløser(
                 harBarn = harBarn,
                 harAndreYtelser = harAndreYtelser,
                 ønskerDagpengerFraDato = ønskerDagpengerFraDato,
-                søknadId = søknadId.toString(),
+                søknadUuid = søknadId.toString(),
                 reellArbeidssøker = reellArbeidssøker,
             )
 
@@ -95,6 +102,7 @@ class SøknadsdataBehovløser(
                 søknadsdataResultat,
                 object : TypeReference<Map<String, Any>>() {},
             )
+
         val behovmeldingMedSøknadId: Behovmelding =
             Behovmelding(
                 behovmelding.innkommendePacket.apply {
@@ -402,7 +410,8 @@ data class SøknadsdataResultType(
     val harBarn: Boolean,
     val harAndreYtelser: Boolean,
     val ønskerDagpengerFraDato: LocalDate,
-    val søknadId: String,
+    @field:JsonProperty("søknad_uuid")
+    val søknadUuid: String,
     val reellArbeidssøker: ReellArbeidssøker,
 )
 
