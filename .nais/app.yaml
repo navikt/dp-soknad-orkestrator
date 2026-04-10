@@ -59,6 +59,10 @@ spec:
       value: {{PDL_API_SYSTEM_SCOPE}}
     - name: PERSON_KONTO_REGISTER_SCOPE
       value: {{PERSON_KONTO_REGISTER_SCOPE}}
+    - name: SAF_URL
+      value: "https://{{SAF_INGRESS}}"
+    - name: SAF_SCOPE
+      value: "{{SAF_SCOPE}}"
   azure:
     application:
       enabled: true
@@ -92,6 +96,7 @@ spec:
           namespace: nais-system
       external:
         - host: {{PDL_API_HOST}}
+        - host: {{SAF_INGRESS}}
   tokenx:
     enabled: true
   {{#if ingresses}}
