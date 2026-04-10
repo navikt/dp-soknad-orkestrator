@@ -5,7 +5,6 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import io.ktor.server.plugins.NotFoundException
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
@@ -54,6 +53,8 @@ class SøknadsdataBehovløser(
                     safKlient.hentSøknadUuid(journalpostId)
                 }
 
+        val erOrkestratorSøknad = opplysningRepository.hentAlle(søknadId).isEmpty()
+
         val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
 
         val eøsArbeidsforhold =
@@ -67,9 +68,9 @@ class SøknadsdataBehovløser(
 
         val avtjentVerneplikt = avtjentVerneplikt(behovmelding.ident, søknadId)
 
-        val harBarn = harSøkerBarn(behovmelding.ident, søknadId)
+        val harBarn = harSøkerBarn(behovmelding.ident, søknadId, erOrkestratorSøknad)
 
-        val harAndreYtelser = harAndreYtelser(behovmelding.ident, søknadId)
+        val harAndreYtelser = harAndreYtelser(behovmelding.ident, søknadId, erOrkestratorSøknad)
 
         val ønskerDagpengerFraDato =
             fellesBehovløserLøsninger.ønskerDagpengerFraDato(
@@ -82,6 +83,7 @@ class SøknadsdataBehovløser(
             erReellArbeidssøker(
                 behovmelding.ident,
                 søknadId,
+                erOrkestratorSøknad,
             )
 
         val søknadsdataResultat =
@@ -115,6 +117,7 @@ class SøknadsdataBehovløser(
     private fun erReellArbeidssøker(
         ident: String,
         søknadId: UUID,
+        erOrkestratorSøknad: Boolean,
     ): ReellArbeidssøker {
         val kanTaAlleTypeArbeid =
             opplysningRepository.hent("faktum.alle-typer-arbeid", ident, søknadId)?.svar
@@ -182,6 +185,7 @@ class SøknadsdataBehovløser(
     private fun harAndreYtelser(
         ident: String,
         søknadId: UUID,
+        erOrkestratorSøknad: Boolean,
     ): Boolean {
         val tidligereArbeidsgiverYtelseFraQuiz =
             opplysningRepository.hent("faktum.utbetaling-eller-okonomisk-gode-tidligere-arbeidsgiver", ident, søknadId)?.svar
@@ -197,12 +201,14 @@ class SøknadsdataBehovløser(
             return andreYtelserFraQuiz || tidligereArbeidsgiver
         }
 
+        if (!erOrkestratorSøknad) return false
+
         val seksjonsvar =
             seksjonRepository.hentSeksjonsvar(
                 søknadId,
                 ident,
                 "annen-pengestotte",
-            ) ?: throw NotFoundException("Finner ikke seksjon annen-pengestotte for søknad $søknadId")
+            ) ?: return false
 
         val annenPengestøtteSeksjon = objectMapper.readTree(seksjonsvar)
 
@@ -219,6 +225,7 @@ class SøknadsdataBehovløser(
     private fun harSøkerBarn(
         ident: String,
         søknadId: UUID,
+        erOrkestratorSøknad: Boolean,
     ): Boolean {
         val pdlBarnSvar = hentBarnSvar(BESKRIVENDE_ID_PDL_BARN, ident, søknadId)
         val egneBarnSvar = hentBarnSvar(BESKRIVENDE_ID_EGNE_BARN, ident, søknadId)
@@ -226,12 +233,14 @@ class SøknadsdataBehovløser(
             return true
         }
 
+        if (!erOrkestratorSøknad) return false
+
         val seksjonsvar =
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                ident,
+            seksjonRepository.hentSeksjonsvar(
                 søknadId,
+                ident,
                 "barnetillegg",
-            )
+            ) ?: return false
 
         val pdlBarn =
             objectMapper.readTree(seksjonsvar).let { seksjonJson ->

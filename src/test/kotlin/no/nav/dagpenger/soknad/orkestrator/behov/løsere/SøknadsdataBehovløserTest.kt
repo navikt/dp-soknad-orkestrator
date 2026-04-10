@@ -634,9 +634,9 @@ class SøknadsdataBehovløserTest {
     @Test
     fun `Søker med kun barn fra PDL får harBarn verdien satt til true`() {
         every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                ident,
+            seksjonRepository.hentSeksjonsvar(
                 søknadId,
+                ident,
                 "barnetillegg",
             )
         } returns barnetilleggMedToBarnFraPdlOgUtenManuelLagteBarn()
@@ -664,9 +664,9 @@ class SøknadsdataBehovløserTest {
     @Test
     fun `Søker med barn fra PDL og manuel lagte barn får harBarn verdien satt til true`() {
         every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                ident,
+            seksjonRepository.hentSeksjonsvar(
                 søknadId,
+                ident,
                 "barnetillegg",
             )
         } returns barnetilleggMedBarnFraPdlOgManueltLagteBarn()
@@ -694,9 +694,9 @@ class SøknadsdataBehovløserTest {
     @Test
     fun `Søker med kun barn lagt manuel uten barn fra PDL får harBarn verdien satt til true`() {
         every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                ident,
+            seksjonRepository.hentSeksjonsvar(
                 søknadId,
+                ident,
                 "barnetillegg",
             )
         } returns barnetilleggMedBarnLagtManuelUtenBarnFraPdl()
@@ -724,9 +724,9 @@ class SøknadsdataBehovløserTest {
     @Test
     fun `Søker med ingen barn får harBarn verdien satt til false`() {
         every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(
-                ident,
+            seksjonRepository.hentSeksjonsvar(
                 søknadId,
+                ident,
                 "barnetillegg",
             )
         } returns barnetilleggUtenBarn()
