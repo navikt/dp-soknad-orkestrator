@@ -231,14 +231,15 @@ class SeksjonRepositoryTest {
 
     @Suppress("ktlint:standard:max-line-length")
     @Test
-    fun `hentSeksjonerMedTidstempler returnerer forventede seksjoner (utenom Dokumentasjon) med tidsstempler hvis søknaden tilhører bruker som gjør kallet`() {
+    fun `hentSeksjonForStatistikk returnerer forventede seksjoner (utenom Dokumentasjon) med tidsstempler hvis søknaden tilhører bruker som gjør kallet`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
         seksjonRepository.lagre(søknadId, ident, seksjonId2, seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
-        seksjonRepository.lagre(søknadId, ident, "Dokumentasjon,1", seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
+        seksjonRepository.lagre(søknadId, ident, "dokumentasjon", seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
+        seksjonRepository.lagre(søknadId, ident, "startside", seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
 
-        val seksjoner = seksjonRepository.hentSeksjonerMedTidstempler(søknadId, ident)
+        val seksjoner = seksjonRepository.hentSeksjonForStatistikk(søknadId, ident)
 
         seksjoner.size shouldBe 2
         seksjoner.map { it.seksjonId } shouldContainExactlyInAnyOrder listOf(seksjonId, seksjonId2)
@@ -249,36 +250,36 @@ class SeksjonRepositoryTest {
     }
 
     @Test
-    fun `hentSeksjonerMedTidstempler returnerer tom liste hvis søknaden tilhører en annen bruker enn den som gjør kallet`() {
+    fun `hentSeksjonForStatistikk returnerer tom liste hvis søknaden tilhører en annen bruker enn den som gjør kallet`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
 
-        seksjonRepository.hentSeksjonerMedTidstempler(søknadId, "en-annen-ident") shouldBe emptyList()
+        seksjonRepository.hentSeksjonForStatistikk(søknadId, "en-annen-ident") shouldBe emptyList()
     }
 
     @Test
-    fun `hentSeksjonerMedTidstempler returnerer tom liste hvis søknaden ikke eksisterer`() {
+    fun `hentSeksjonForStatistikk returnerer tom liste hvis søknaden ikke eksisterer`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
 
-        seksjonRepository.hentSeksjonerMedTidstempler(randomUUID(), ident) shouldBe emptyList()
+        seksjonRepository.hentSeksjonForStatistikk(randomUUID(), ident) shouldBe emptyList()
     }
 
     @Test
-    fun `hentSeksjonerMedTidstempler returnerer oppdatert tidsstempel etter oppdatering av seksjon`() {
+    fun `hentSeksjonForStatistikk returnerer oppdatert tidsstempel etter oppdatering av seksjon`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
 
-        val seksjonerFørOppdatering = seksjonRepository.hentSeksjonerMedTidstempler(søknadId, ident)
+        val seksjonerFørOppdatering = seksjonRepository.hentSeksjonForStatistikk(søknadId, ident)
         val opprettetTidspunkt = seksjonerFørOppdatering.first().opprettet
 
         // Oppdater seksjonen
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
 
-        val seksjonerEtterOppdatering = seksjonRepository.hentSeksjonerMedTidstempler(søknadId, ident)
+        val seksjonerEtterOppdatering = seksjonRepository.hentSeksjonForStatistikk(søknadId, ident)
         val oppdatertSeksjon = seksjonerEtterOppdatering.first()
 
         oppdatertSeksjon.opprettet shouldBe opprettetTidspunkt
