@@ -107,7 +107,7 @@ class SeksjonRepository(
                 }.toList()
         }
 
-    fun hentSeksjonerMedTidstempler(
+    fun hentSeksjonForStatistikk(
         søknadId: UUID,
         ident: String,
     ): List<SeksjonMedTidstempler> =
@@ -122,7 +122,7 @@ class SeksjonRepository(
                 ).where {
                     SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) and (
                         SeksjonV2Tabell.seksjonId notLike
-                            "Dokumentasjon%"
+                            "dokumentasjon" and (SeksjonV2Tabell.seksjonId notLike "startside")
                     )
                 }.map {
                     SeksjonMedTidstempler(

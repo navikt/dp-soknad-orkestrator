@@ -45,7 +45,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         coEvery { søknadRepository.hent(any()) } returns Søknad(søknadId, ident) andThen (Søknad(søknadId, ident, INNSENDT))
 
         coEvery { seksjonRepository.hentDokumentasjonskrav(any(), any()) } returns dokumentasjonskrav
-        coEvery { seksjonRepository.hentSeksjonerMedTidstempler(any(), any()) } returns seksjoner
+        coEvery { seksjonRepository.hentSeksjonForStatistikk(any(), any()) } returns seksjoner
         coEvery { seksjonRepository.hentAllePdfGrunnlag(any(), any()) } returns pdfGrunnlag
 
         rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
