@@ -102,6 +102,8 @@ class SøknadEndretTilstandMelding(
                     hentFeltFraSeksjon(seksjonsdataJson, "folkeregistrertAdresseErNorgeStemmerDet"),
                 "bostedsland" to hentFeltFraSeksjon(seksjonsdataJson, "bostedsland"),
                 "postnummerFraPdl" to hentFeltFraSeksjon(seksjonsdataJson, "postnummerFraPdl"),
+                "landFraPdl" to hentFeltFraSeksjon(seksjonsdataJson, "landFraPdl"),
+                "landkodeFraPdl" to hentFeltFraSeksjon(seksjonsdataJson, "landkodeFraPdl"),
             ).filterValues { it != "" }
         return objectMapper.writeValueAsString(
             mapOf(
