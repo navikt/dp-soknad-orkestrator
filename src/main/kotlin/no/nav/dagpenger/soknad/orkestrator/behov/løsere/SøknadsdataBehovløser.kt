@@ -83,7 +83,6 @@ class SøknadsdataBehovløser(
             erReellArbeidssøker(
                 behovmelding.ident,
                 søknadId,
-                erOrkestratorSøknad,
             )
 
         val søknadsdataResultat =
@@ -117,7 +116,6 @@ class SøknadsdataBehovløser(
     private fun erReellArbeidssøker(
         ident: String,
         søknadId: UUID,
-        erOrkestratorSøknad: Boolean,
     ): ReellArbeidssøker {
         val kanTaAlleTypeArbeid =
             opplysningRepository.hent("faktum.alle-typer-arbeid", ident, søknadId)?.svar
@@ -204,11 +202,11 @@ class SøknadsdataBehovløser(
         if (!erOrkestratorSøknad) return false
 
         val seksjonsvar =
-            seksjonRepository.hentSeksjonsvar(
-                søknadId,
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
+                søknadId,
                 "annen-pengestotte",
-            ) ?: return false
+            )
 
         val annenPengestøtteSeksjon = objectMapper.readTree(seksjonsvar)
 
@@ -236,11 +234,11 @@ class SøknadsdataBehovløser(
         if (!erOrkestratorSøknad) return false
 
         val seksjonsvar =
-            seksjonRepository.hentSeksjonsvar(
-                søknadId,
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
+                søknadId,
                 "barnetillegg",
-            ) ?: return false
+            )
 
         val pdlBarn =
             objectMapper.readTree(seksjonsvar).let { seksjonJson ->
