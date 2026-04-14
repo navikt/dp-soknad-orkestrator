@@ -135,7 +135,13 @@ class SøknadEndretTilstandMeldingTest {
 
         val personaliaSeksjonsvar = hentSøknadsdataSomJson(søknadsdataJson, "personalia")?.get("seksjonsvar")!!
         personaliaSeksjonsvar["folkeregistrertAdresseErNorgeStemmerDet"].shouldNotBeNull()
+        personaliaSeksjonsvar["postnummerFraPdl"].shouldNotBeNull()
         personaliaSeksjonsvar["fornavnFraPdl"].shouldBeNull()
+
+        val barneTilleggSeksjonsvar = hentSøknadsdataSomJson(søknadsdataJson, "barnetillegg")?.get("seksjonsvar")!!
+        barneTilleggSeksjonsvar["barnFraPdl"].shouldNotBeNull()
+        barneTilleggSeksjonsvar["barnFraPdl"][0]["forsørgerDuBarnet"].shouldNotBeNull()
+        barneTilleggSeksjonsvar["barnFraPdl"][0]["fødselsnummer"].shouldBeNull()
     }
 
     @Test

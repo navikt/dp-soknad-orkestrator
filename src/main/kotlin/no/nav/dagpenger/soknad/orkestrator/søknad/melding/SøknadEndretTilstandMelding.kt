@@ -101,6 +101,7 @@ class SøknadEndretTilstandMelding(
                 "folkeregistrertAdresseErNorgeStemmerDet" to
                     hentFeltFraSeksjon(seksjonsdataJson, "folkeregistrertAdresseErNorgeStemmerDet"),
                 "bostedsland" to hentFeltFraSeksjon(seksjonsdataJson, "bostedsland"),
+                "postnummerFraPdl" to hentFeltFraSeksjon(seksjonsdataJson, "postnummerFraPdl"),
             ).filterValues { it != "" }
         return objectMapper.writeValueAsString(
             mapOf(
@@ -140,7 +141,7 @@ class SøknadEndretTilstandMelding(
         }
 
     fun filtrerUaktuelleFelter(): List<SeksjonMedGyldigeFeltIder> {
-        val listOverGyldigeTyper =
+        val gyldigeTyper =
             listOf(
                 "envalg",
                 "flervalg",
@@ -159,7 +160,7 @@ class SøknadEndretTilstandMelding(
             fun traverse(node: JsonNode) {
                 when {
                     node.isObject && node.has("id") && node.has("type") -> {
-                        if (node["type"].asText() in listOverGyldigeTyper) {
+                        if (node["type"].asText() in gyldigeTyper && node["id"].asText() != "fødselsdato") {
                             seksjonMappet.add(
                                 node["id"].asText(),
                             )
