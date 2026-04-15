@@ -45,29 +45,34 @@ class SøknadEndretTilstandMelding(
         if (søknadsdata.isEmpty() || søknad == null) {
             null
         } else {
-            val aktuelleFelter = filtrerUaktuelleFelter()
+            try {
+                val aktuelleFelter = filtrerUaktuelleFelter()
 
-            mapOf(
-                "opprettet" to LocalDateTime.now(),
-                "innsendt" to (søknad.innsendtTidspunkt?.toString() ?: "null"),
-            ) +
-                søknadsdata.associate {
-                    if (it.data.isEmpty()) {
-                        return@associate it.seksjonId to
-                            mapOf("seksjonsdata" to null, "opprettet" to it.opprettet, "oppdatert" to it.oppdatert)
+                mapOf(
+                    "opprettet" to LocalDateTime.now(),
+                    "innsendt" to (søknad.innsendtTidspunkt?.toString() ?: "null"),
+                ) +
+                    søknadsdata.associate {
+                        if (it.data.isEmpty()) {
+                            return@associate it.seksjonId to
+                                mapOf("seksjonsdata" to null, "opprettet" to it.opprettet, "oppdatert" to it.oppdatert)
+                        }
+
+                        val aktuelleFelterForSeksjon =
+                            aktuelleFelter
+                                .find { pg ->
+                                    pg.seksjonId == it.seksjonId.toLowerCasePreservingASCIIRules()
+                                }?.spørsmål
+                                ?: emptyList()
+                        val seksjonsdataKlarTilStatistikk =
+                            filtrerSeksjonsdataForStatistikk(it.seksjonId, it.data, aktuelleFelterForSeksjon)
+
+                        it.seksjonId to
+                            mapOf("seksjonsdata" to seksjonsdataKlarTilStatistikk, "opprettet" to it.opprettet, "oppdatert" to it.oppdatert)
                     }
-
-                    val aktuelleFelterForSeksjon =
-                        aktuelleFelter
-                            .find { pg ->
-                                pg.seksjonId == it.seksjonId.toLowerCasePreservingASCIIRules()
-                            }?.spørsmål
-                            ?: emptyList()
-                    val seksjonsdataKlarTilStatistikk = filtrerSeksjonsdataForStatistikk(it.seksjonId, it.data, aktuelleFelterForSeksjon)
-
-                    it.seksjonId to
-                        mapOf("seksjonsdata" to seksjonsdataKlarTilStatistikk, "opprettet" to it.opprettet, "oppdatert" to it.oppdatert)
-                }
+            } catch (e: Exception) {
+                return null
+            }
         }
 
     fun filtrerSeksjonsdataForStatistikk(

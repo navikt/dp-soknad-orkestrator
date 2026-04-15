@@ -159,6 +159,52 @@ class SøknadEndretTilstandMeldingTest {
         søknadEndretTilstandMelding.toJson().shouldNotContainJsonKey("søknadsdata")
     }
 
+    @Test
+    fun `SøknadEndretTilstandMelding ikke legger til søknadsdata når pdfgrunnlag har ugyldig json`() {
+        var seksjonsdata = hentSeksjonData().get("arbeidsforhold")!!
+        val søknadEndretTilstandMelding =
+            SøknadEndretTilstandMelding(
+                søknadId = UUID.randomUUID(),
+                ident = "12345678910",
+                forrigeTilstand = "PÅBEGYNT",
+                nyTilstand = "INNSENDT",
+                søknadsdata =
+                    listOf(
+                        SeksjonMedTidstempler(
+                            seksjonId = "arbeidsforhold",
+                            data = seksjonsdata,
+                            opprettet = LocalDateTime.now(),
+                            oppdatert = LocalDateTime.now(),
+                        ),
+                    ),
+                pdfGrunnlag = hentPdfGrunnlagMedJsonSyntaksfeil(),
+            ).asMessage()
+        søknadEndretTilstandMelding.toJson().shouldNotContainJsonKey("søknadsdata")
+    }
+
+    @Test
+    fun `SøknadEndretTilstandMelding ikke legger til søknadsdata når seksjonssvar mangler`() {
+        var seksjonsdata = arbeidsforholdSvarUtenSeksjonsvar().get("arbeidsforhold")!!
+        val søknadEndretTilstandMelding =
+            SøknadEndretTilstandMelding(
+                søknadId = UUID.randomUUID(),
+                ident = "12345678910",
+                forrigeTilstand = "PÅBEGYNT",
+                nyTilstand = "INNSENDT",
+                søknadsdata =
+                    listOf(
+                        SeksjonMedTidstempler(
+                            seksjonId = "arbeidsforhold",
+                            data = seksjonsdata,
+                            opprettet = LocalDateTime.now(),
+                            oppdatert = LocalDateTime.now(),
+                        ),
+                    ),
+                pdfGrunnlag = hentPdfGrunnlag(),
+            ).asMessage()
+        søknadEndretTilstandMelding.toJson().shouldNotContainJsonKey("søknadsdata")
+    }
+
     private fun hentSøknadsdataSomJson(
         søknadsdataJson: JsonNode,
         seksjonId: String,
@@ -189,6 +235,18 @@ class SøknadEndretTilstandMeldingTest {
         )
     }
 
+    private fun arbeidsforholdSvarUtenSeksjonsvar(): Map<String, String> {
+        @Suppress("ktlint:standard:max-line-length")
+        var arbeidsforholdSeksjonsData =
+            """{"seksjonId":"arbeidsforhold","versjon":1}"""
+        var personaliaSeksjonsData =
+            """{"id": "personalia","seksjonsvar": {"fornavnFraPdl": "SOSIAL","mellomnavnFraPdl": "","etternavnFraPdl":"MOLDVARP","fødselsnummerFraPdl": "10928095547","alderFraPdl": "44","adresselinje1FraPdl": "Nygårdsveien 17B","adresselinje2FraPdl": "","adresselinje3FraPdl": "","postnummerFraPdl": "3214","poststedFraPdl": "Sandefjord","landkodeFraPdl": "NO","landFraPdl": "NORGE","kontonummerFraKontoregister": "","folkeregistrertAdresseErNorgeStemmerDet": "nei"},"versjon": 1}"""
+        return mapOf(
+            "personalia" to personaliaSeksjonsData,
+            "arbeidsforhold" to arbeidsforholdSeksjonsData,
+        )
+    }
+
     private fun hentPdfGrunnlag() =
         listOf(
             """{"navn":"Personalia","spørsmål":[{"id":"fornavnFraPdl","type":"registeropplysning","label":"Fornavn","svar":"AKTVERDIG"},{"id":"etternavnFraPdl","type":"registeropplysning","label":"Etternavn","svar":"PYRAMIDE"},{"id":"fødselsnummerFraPdl","type":"registeropplysning","label":"Fødselsnummer","svar":"15438643734"},{"id":"adresselinje1FraPdl","type":"registeropplysning","label":"Adresselinje 1","svar":"Gaddevegen 7"},{"id":"postnummerFraPdl","type":"registeropplysning","label":"Postnummer","svar":"6900"},{"id":"poststedFraPdl","type":"registeropplysning","label":"Poststed","svar":"Florø"},{"id":"landkodeFraPdl","type":"registeropplysning","label":"Landkode","svar":"NO"},{"id":"landFraPdl","type":"registeropplysning","label":"Land","svar":"NORGE"},{"id":"personaliaBostedslandForklarendeTekst","type":"forklarendeTekst","description":"<h3>Bostedsland</h3>"},{"id":"folkeregistrertAdresseErNorgeStemmerDet","type":"envalg","label":"Du er folkeregistrert i Norge. Er Norge bostedslandet ditt?","description":"Bostedslandet ditt er det landet du eier eller leier bolig i og tilbringer mesteparten av tiden din, også når du ikke jobber.","options":[{"value":"ja","label":"Ja, Norge er bostedslandet mitt"},{"value":"nei","label":"Nei, Norge er ikke bostedslandet mitt"}],"svar":"ja"}]}""",
@@ -202,6 +260,12 @@ class SøknadEndretTilstandMeldingTest {
     private fun hentPdfGrunnlagForArbeidsforholdOgPersonaliaBare() =
         listOf(
             """{"navn":"Arbeidsforhold","spørsmål":[{"id":"hvordanHarDuJobbet","type":"envalg","label":"Hvilke av de følgende alternativene passer best med hvordan du har jobbet?","options":[{"value":"fastArbeidstidIMindreEnn6Måneder","label":"Jeg har hatt fast arbeidstid i mindre enn seks måneder"},{"value":"fastArbeidstidI6MånederEllerMer","label":"Jeg har hatt fast arbeidstid i seks måneder eller mer"},{"value":"varierendeArbeidstidDeSiste12Månedene","label":"Jeg har hatt varierende arbeidstid de siste 12 månedene"},{"value":"jobbetMerIGjennomsnittDeSiste36MånedeneEnnDeSiste12Månedene","label":"Jeg har jobbet mer i gjennomsnitt de siste 36 månedene enn de siste 12 månedene"},{"value":"harIkkeJobbetDeSiste36Månedene","label":"Jeg har ikke vært i jobb de siste 36 månedene"}],"svar":"fastArbeidstidIMindreEnn6Måneder"},{"id":"lesMerOmArbeidstidLesMer","type":"lesMer","label":"Les mer om arbeidstid","description":"<p>Når vi vurderer om du har rett til dagpenger ser vi på hvor mye du har jobbet,og om .."},{"id":"harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene","type":"envalg","label":"Har du jobbet i et annet EØS-land,Sveits eller Storbritannia i løpet av de siste 36 månedene?","description":"Andre land i EØS:","options":[{"value":"ja","label":"Ja"},{"value":"nei","label":"Nei"}],"svar":"ja"},{"id":"harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36MånedeneLesMer","type":"lesMer","label":"Grunnen til at vi spør om dette og andre EØS land","description":"Hvis du har jobbet i et annet EØS-land,Sveits eller"},{"id":"harJobbetIEøsOgFastArbeidstidIMindreEnn6MånederForklarendeTekst","type":"forklarendeTekst","description":"<h3>Dine arbeidsforhold</h3>"},[{"id":"navnetPåBedriften","type":"kortTekst","label":"Navnet på bedriften","svar":"JOBB AS"},{"id":"hvilketLandJobbetDuI","type":"land","label":"Hvilket land jobbet du i?","options":[{"value":"NOR","label":"Norge"},{"value":"SWE","label":"Sverige"},{"value":"POL","label":"Polen"}],"svar":"SWE"},{"id":"oppgiPersonnummeretPinDuHaddeIDetteLandet","type":"kortTekst","label":"Oppgi personnummeret (PIN) som du hadde i dette landet","svar":"1234567890"},{"id":"hvordanHarDetteArbeidsforholdetEndretSeg","type":"envalg","label":"Hvordan har dette arbeidsforholdet endret seg?","options":[{"value":"arbeidsgiverenMinHarSagtMegOpp","label":"Arbeidsgiveren min har sagt meg opp"},{"value":"jegHarSagtOppSelv","label":"Jeg har sagt opp selv"},{"value":"jegHarFåttAvskjed","label":"Jeg har fått avskjed"},{"value":"kontraktenErUtgått","label":"Kontrakten er utgått"},{"value":"arbeidstidenErRedusert","label":"Arbeidstiden er redusert"},{"value":"arbeidsgiverErKonkurs","label":"Arbeidsgiver er konkurs"},{"value":"jegErPermittert","label":"Jeg er permittert"},{"value":"arbeidsforholdetErIkkeEndret","label":"Arbeidsforholdet er ikke endret"}],"svar":"jegErPermittert"},{"id":"permittertVarighetPåArbeidsforholdetFraOgMedDato","type":"dato","label":"Når startet du i dette arbeidsforholdet?","svar":"11. mars 2026"},{"id":"permittertNårErDuPermittertFraOgMedDato","type":"periodeFra","label":"Fra og med dato","description":"Hvis du har hatt flere permitteringsperioder skal du oppgi dato for den siste permitteringen.","svar":"11. mars 2026"},{"id":"permittertNårErDuPermittertTilOgMedDato","type":"periodeTil","label":"Til og med dato (valgfritt)","svar":"25. mars 2026"},{"id":"permittertInformasjonskort","type":"informasjonskort","label":"Informasjon","description":"For å ha rett til..."},{"id":"permittertArbeidsavtaleDokumentasjonskravindikator","type":"dokumentasjonskravindikator","label":"Arbeidsavtale"},{"id":"permittertPermiteringsvarselDokumentasjonskravindikator","type":"dokumentasjonskravindikator","label":"Permitteringsvarsel"},{"id":"permittertErDetteEtMidlertidigArbeidsforholdMedEnKontraktfestetSluttdato","type":"envalg","label":"Er du midlertidig ansatt,og har kontrakt med sluttdato?","options":[{"value":"ja","label":"Ja"},{"value":"nei","label":"Nei"},{"value":"vetIkke","label":"Jeg vet ikke"}],"svar":"nei"},{"id":"permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien","type":"envalg","label":"Er du permittert fra fiskeforedlings- eller fiskeoljeindustrien?","options":[{"value":"ja","label":"Ja"},{"value":"nei","label":"Nei"}],"svar":"nei"},{"id":"permittertHvorMangeProsentErDuPermittert","type":"tall","label":"Hvor mange prosent er du permittert?","svar":"100"},{"id":"permittertVetDuNårLønnspliktperiodenTilArbeidsgiverenDinEr","type":"envalg","label":"Vet du når lønnspliktperioden til arbeidsgiveren din er?","description":"Du finner informasjon om arbeidsgivers lønnspliktperiode i permitteringsvarselet.","options":[{"value":"ja","label":"Ja"},{"value":"nei","label":"Nei"}],"svar":"ja"},{"id":"permittertLønnsperiodeFraOgMedDato","type":"periodeFra","label":"Fra og med dato","svar":"17. mars 2026"},{"id":"permittertLønnsperiodeTilOgMedDato","type":"periodeTil","label":"Til og med dato (valgfritt)","svar":"25. mars 2026"},{"id":"harDuJobbetSkiftTurnusEllerRotasjon","type":"envalg","label":"Har du jobbet skift,turnus eller rotasjon?","description":"<p>Skift eller","options":[{"value":"skiftEllerTurns","label":"Ja,jeg har jobbet skift eller turnus"},{"value":"rotasjon","label":"Ja,jeg har jobbet rotasjon"},{"value":"hverkenSkiftTurnusEllerRotasjon","label":"Nei,ingen av delene"}],"svar":"rotasjon"},{"id":"harDuJobbetSkiftTurnusEllerRotasjonLesMer","type":"lesMer","label":"Grunnen til at vi spør om dette","description":"<p>Vi må vite hvilken arbeidstidsordning du har for å gi deg dagpenger fra riktig dato.</p>"},{"id":"jegHarJobbetRotasjonDokumentasjonskravindikator","type":"dokumentasjonskravindikator","label":"Dokumentasjon av rotasjonsordningen og den siste arbeidsperioden din"},{"id":"hvilkenTypeRotasjonsordningJobbetDu","type":"envalg","label":"Hvilke type rotasjonsordning jobbet du?","options":[{"value":"2-4-rotasjon","label":"2:4"},{"value":"2-3-rotasjon","label":"2:3"},{"value":"1-1-rotasjon","label":"1:1"},{"value":"annenRotasjon","label":"Annen rotasjon"}],"svar":"1-1-rotasjon"},{"id":"oppgiSisteArbeidsperiodeIDenSisteRotasjonenDinFraDato","type":"periodeFra","label":"Fra dato","svar":"25. mars 2026"},{"id":"oppgiSisteArbeidsperiodeIDenSisteRotasjonenDinTilDato","type":"periodeTil","label":"Til dato","svar":"27. mars 2026"}]]}""",
+            """{"navn":"Personalia","spørsmål":[{"id":"fornavnFraPdl","type":"registeropplysning","label":"Fornavn","svar":"AKTVERDIG"},{"id":"etternavnFraPdl","type":"registeropplysning","label":"Etternavn","svar":"PYRAMIDE"},{"id":"fødselsnummerFraPdl","type":"registeropplysning","label":"Fødselsnummer","svar":"15438643734"},{"id":"adresselinje1FraPdl","type":"registeropplysning","label":"Adresselinje 1","svar":"Gaddevegen 7"},{"id":"postnummerFraPdl","type":"registeropplysning","label":"Postnummer","svar":"6900"},{"id":"poststedFraPdl","type":"registeropplysning","label":"Poststed","svar":"Florø"},{"id":"landkodeFraPdl","type":"registeropplysning","label":"Landkode","svar":"NO"},{"id":"landFraPdl","type":"registeropplysning","label":"Land","svar":"NORGE"},{"id":"personaliaBostedslandForklarendeTekst","type":"forklarendeTekst","description":"<h3>Bostedsland</h3>"},{"id":"folkeregistrertAdresseErNorgeStemmerDet","type":"envalg","label":"Du er folkeregistrert i Norge. Er Norge bostedslandet ditt?","description":"Bostedslandet ditt er det landet du eier eller leier bolig i og tilbringer mesteparten av tiden din, også når du ikke jobber.","options":[{"value":"ja","label":"Ja, Norge er bostedslandet mitt"},{"value":"nei","label":"Nei, Norge er ikke bostedslandet mitt"}],"svar":"ja"}]}""",
+        )
+
+    private fun hentPdfGrunnlagMedJsonSyntaksfeil() =
+        listOf(
+            """{ikke gyldige json}""",
             """{"navn":"Personalia","spørsmål":[{"id":"fornavnFraPdl","type":"registeropplysning","label":"Fornavn","svar":"AKTVERDIG"},{"id":"etternavnFraPdl","type":"registeropplysning","label":"Etternavn","svar":"PYRAMIDE"},{"id":"fødselsnummerFraPdl","type":"registeropplysning","label":"Fødselsnummer","svar":"15438643734"},{"id":"adresselinje1FraPdl","type":"registeropplysning","label":"Adresselinje 1","svar":"Gaddevegen 7"},{"id":"postnummerFraPdl","type":"registeropplysning","label":"Postnummer","svar":"6900"},{"id":"poststedFraPdl","type":"registeropplysning","label":"Poststed","svar":"Florø"},{"id":"landkodeFraPdl","type":"registeropplysning","label":"Landkode","svar":"NO"},{"id":"landFraPdl","type":"registeropplysning","label":"Land","svar":"NORGE"},{"id":"personaliaBostedslandForklarendeTekst","type":"forklarendeTekst","description":"<h3>Bostedsland</h3>"},{"id":"folkeregistrertAdresseErNorgeStemmerDet","type":"envalg","label":"Du er folkeregistrert i Norge. Er Norge bostedslandet ditt?","description":"Bostedslandet ditt er det landet du eier eller leier bolig i og tilbringer mesteparten av tiden din, også når du ikke jobber.","options":[{"value":"ja","label":"Ja, Norge er bostedslandet mitt"},{"value":"nei","label":"Nei, Norge er ikke bostedslandet mitt"}],"svar":"ja"}]}""",
         )
 }
