@@ -5,18 +5,34 @@ import io.prometheus.metrics.core.metrics.Counter
 private const val NAMESPACE = "dp_soknad_orkestrator"
 
 object SøknadMetrikker {
+    val opprettet: Counter =
+        Counter
+            .builder()
+            .name("${NAMESPACE}_antall_soknader_opprettet")
+            .help("Indikerer antall nye søknader som er opprettet (ny søknad-flyt)")
+            .register()
+
     val mottatt: Counter =
         Counter
             .builder()
             .name("${NAMESPACE}_antall_soknader_mottatt")
-            .help("Indikerer antall søknader som er mottatt")
+            .help("Indikerer antall søknader som er mottatt/innsendt. Label 'kilde': 'ny' (orkestrator) eller 'quiz' (gammel flyt)")
+            .labelNames("kilde")
             .register()
 
     val slettet: Counter =
         Counter
             .builder()
             .name("${NAMESPACE}_antall_soknader_slettet")
-            .help("Indikerer antall søknader som er slettet")
+            .help("Indikerer antall søknader som er slettet. Label 'kilde': 'ny' (orkestrator) eller 'quiz' (gammel flyt)")
+            .labelNames("kilde")
+            .register()
+
+    val journalfort: Counter =
+        Counter
+            .builder()
+            .name("${NAMESPACE}_antall_soknader_journalfort")
+            .help("Indikerer antall søknader som er journalført (ny søknad-flyt)")
             .register()
 
     val varslet: Counter =

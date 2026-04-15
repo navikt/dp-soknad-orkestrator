@@ -113,7 +113,7 @@ class SøknadServiceTest {
             søknadRepository.hent(søknad.søknadId)
         } returns søknad
 
-        søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident)
+        søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident, "ny")
 
         verify { søknadRepository.slett(søknadId, ident) }
         with(testRapid.inspektør) {
@@ -136,7 +136,7 @@ class SøknadServiceTest {
             søknadRepository.hent(søknadId)
         } returns null
 
-        søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident)
+        søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident, "ny")
 
         verify(exactly = 0) { søknadRepository.slett(søknadId, ident) }
         with(testRapid.inspektør) {
