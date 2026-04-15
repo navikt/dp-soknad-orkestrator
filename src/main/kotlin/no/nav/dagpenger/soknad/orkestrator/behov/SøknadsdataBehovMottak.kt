@@ -87,8 +87,10 @@ class SøknadsdataBehovMottak(
             søknadsdataBehovløser.løs(SøknadBehovmelding(this))
         } catch (e: IllegalArgumentException) {
             logger.error(e) { "Kunne ikke løse behov Søknadsdata. Ett eller flere argumenter var feil." }
+            throw e
         } catch (e: IllegalStateException) {
             logger.error(e) { "Kunne ikke løse behov Søknadsdata. Opplysningen finnes ikke." }
+            throw e
         }
     }
 }
