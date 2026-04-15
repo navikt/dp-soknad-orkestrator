@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.saf
 
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
+import io.ktor.client.plugins.ClientRequestException
 import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -10,6 +11,7 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.oauth2.CachedOauth2Client
@@ -41,7 +43,7 @@ class SafKlient(
         azureAdClient.clientCredentials(safScope).access_token
             ?: throw RuntimeException("Klarte ikke hente SAF-token")
 
-    fun hentSøknadUuid(journalpostId: String): UUID =
+    fun hentSøknadUuid(journalpostId: String): UUID? =
         runBlocking {
             try {
                 logger.info { "Slår opp journalpost i SAF for journalpostId: $journalpostId" }
@@ -59,6 +61,14 @@ class SafKlient(
                         )
 
                 UUID.fromString(søknadUuid)
+            } catch (e: ClientRequestException) {
+                if (e.response.status == HttpStatusCode.NotFound) {
+                    logger.warn { "Fant ikke dokument i SAF for journalpostId: $journalpostId, svarer uten søknad_uuid" }
+                    null
+                } else {
+                    logger.error(e) { "SAF-oppslag feilet for journalpostId: $journalpostId" }
+                    throw e
+                }
             } catch (e: Exception) {
                 logger.error(e) { "SAF-oppslag feilet for journalpostId: $journalpostId" }
                 throw e

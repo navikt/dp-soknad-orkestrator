@@ -1254,6 +1254,34 @@ class SøknadsdataBehovløserTest {
             verdi["harAndreYtelser"].asBoolean() shouldBe false
             verdi["avsluttetArbeidsforhold"].isEmpty shouldBe true
             verdi["ønskerDagpengerFraDato"].isNull shouldBe true
+            verdi["reellArbeidssøker"]["helse"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["geografi"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["deltid"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["yrke"].asBoolean() shouldBe false
+        }
+    }
+
+    @Test
+    fun `svarer med tomme verdier når SAF ikke finner dokument`() {
+        every { søknadRepository.hentSøknadIdFraJournalPostId(any(), any()) } returns null
+        every { safKlient.hentSøknadUuid(any()) } returns null
+
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
+
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            val verdi = løsning["verdi"]
+            verdi["søknad_uuid"].isNull shouldBe true
+            verdi["eøsBostedsland"].asBoolean() shouldBe false
+            verdi["eøsArbeidsforhold"].asBoolean() shouldBe false
+            verdi["avtjentVerneplikt"].asBoolean() shouldBe false
+            verdi["harBarn"].asBoolean() shouldBe false
+            verdi["harAndreYtelser"].asBoolean() shouldBe false
+            verdi["avsluttetArbeidsforhold"].isEmpty shouldBe true
+            verdi["ønskerDagpengerFraDato"].isNull shouldBe true
+            verdi["reellArbeidssøker"]["helse"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["geografi"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["deltid"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["yrke"].asBoolean() shouldBe false
         }
     }
 }

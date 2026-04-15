@@ -53,6 +53,17 @@ class SøknadsdataBehovløser(
                     safKlient.hentSøknadUuid(journalpostId)
                 }
 
+        if (søknadId == null) {
+            logger.warn { "Fant ikke søknad_uuid i SAF for journalpostId: $journalpostId, svarer med tomme verdier" }
+            return publiserLøsning(
+                behovmelding,
+                objectMapper.convertValue(
+                    tomSøknadsdataResultat(),
+                    object : TypeReference<Map<String, Any?>>() {},
+                ),
+            )
+        }
+
         if (søknadRepository.hent(søknadId) == null) {
             logger.warn { "Fant ikke søknad for søknadId: $søknadId hentet fra SAF, svarer med tomme verdier" }
             val behovmeldingMedSøknadId =
@@ -425,7 +436,7 @@ class SøknadsdataBehovløser(
             "AUT",
         )
 
-    private fun tomSøknadsdataResultat(søknadId: UUID) =
+    private fun tomSøknadsdataResultat(søknadId: UUID? = null) =
         SøknadsdataResultType(
             eøsBostedsland = false,
             eøsArbeidsforhold = false,
@@ -434,7 +445,7 @@ class SøknadsdataBehovløser(
             harBarn = false,
             harAndreYtelser = false,
             ønskerDagpengerFraDato = null,
-            søknadUuid = søknadId.toString(),
+            søknadUuid = søknadId?.toString(),
             reellArbeidssøker = ReellArbeidssøker(helse = false, geografi = false, deltid = false, yrke = false),
         )
 }
@@ -448,7 +459,7 @@ data class SøknadsdataResultType(
     val harAndreYtelser: Boolean,
     val ønskerDagpengerFraDato: LocalDate?,
     @field:JsonProperty("søknad_uuid")
-    val søknadUuid: String,
+    val søknadUuid: String?,
     val reellArbeidssøker: ReellArbeidssøker,
 )
 

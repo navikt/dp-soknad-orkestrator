@@ -73,7 +73,27 @@ abstract class Behovløser(
         behovmelding: Behovmelding,
         svarPåBehov: Any,
     ) {
-        leggLøsningPåBehovmelding(behovmelding, svarPåBehov)
+        leggLøsningPåBehovmelding(
+            behovmelding.innkommendePacket,
+            svarPåBehov,
+            finnGjelderFraDato(behovmelding.søknadId, behovmelding.ident),
+        )
+        rapidsConnection.publish(behovmelding.ident, behovmelding.innkommendePacket.toJson())
+
+        BehovMetrikker.løst.labelValues(behov).inc()
+        logger.info { "Løste behov $behov" }
+        sikkerlogg.info { "Løste behov $behov med løsning: $svarPåBehov" }
+    }
+
+    internal fun publiserLøsning(
+        behovmelding: SøknadBehovmelding,
+        svarPåBehov: Any,
+    ) {
+        leggLøsningPåBehovmelding(
+            behovmelding.innkommendePacket,
+            svarPåBehov,
+            gjelderFra = null,
+        )
         rapidsConnection.publish(behovmelding.ident, behovmelding.innkommendePacket.toJson())
 
         BehovMetrikker.løst.labelValues(behov).inc()
@@ -82,12 +102,11 @@ abstract class Behovløser(
     }
 
     private fun leggLøsningPåBehovmelding(
-        behovmelding: Behovmelding,
+        innkommendePacket: JsonMessage,
         svarPåBehov: Any,
+        gjelderFra: LocalDate?,
     ) {
-        val gjelderFra: LocalDate? = finnGjelderFraDato(behovmelding.søknadId, behovmelding.ident)
-
-        behovmelding.innkommendePacket["@løsning"] =
+        innkommendePacket["@løsning"] =
             mapOf(
                 behov to
                     mapOf(
