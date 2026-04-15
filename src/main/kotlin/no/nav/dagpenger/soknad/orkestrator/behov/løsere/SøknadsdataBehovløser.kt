@@ -53,6 +53,23 @@ class SøknadsdataBehovløser(
                     safKlient.hentSøknadUuid(journalpostId)
                 }
 
+        if (søknadRepository.hent(søknadId) == null) {
+            logger.warn { "Fant ikke søknad for søknadId: $søknadId hentet fra SAF, svarer med tomme verdier" }
+            val behovmeldingMedSøknadId =
+                Behovmelding(
+                    behovmelding.innkommendePacket.apply {
+                        this["søknadId"] = søknadId.toString()
+                    },
+                )
+            return publiserLøsning(
+                behovmeldingMedSøknadId,
+                objectMapper.convertValue(
+                    tomSøknadsdataResultat(søknadId),
+                    object : TypeReference<Map<String, Any?>>() {},
+                ),
+            )
+        }
+
         val erOrkestratorSøknad = opplysningRepository.hentAlle(søknadId).isEmpty()
 
         val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
@@ -98,10 +115,10 @@ class SøknadsdataBehovløser(
                 reellArbeidssøker = reellArbeidssøker,
             )
 
-        val søknadsdataMap: Map<String, Any> =
+        val søknadsdataMap: Map<String, Any?> =
             objectMapper.convertValue(
                 søknadsdataResultat,
-                object : TypeReference<Map<String, Any>>() {},
+                object : TypeReference<Map<String, Any?>>() {},
             )
 
         val behovmeldingMedSøknadId: Behovmelding =
@@ -407,6 +424,19 @@ class SøknadsdataBehovløser(
             "HUN",
             "AUT",
         )
+
+    private fun tomSøknadsdataResultat(søknadId: UUID) =
+        SøknadsdataResultType(
+            eøsBostedsland = false,
+            eøsArbeidsforhold = false,
+            avtjentVerneplikt = false,
+            avsluttetArbeidsforhold = emptyList(),
+            harBarn = false,
+            harAndreYtelser = false,
+            ønskerDagpengerFraDato = null,
+            søknadUuid = søknadId.toString(),
+            reellArbeidssøker = ReellArbeidssøker(helse = false, geografi = false, deltid = false, yrke = false),
+        )
 }
 
 data class SøknadsdataResultType(
@@ -416,7 +446,7 @@ data class SøknadsdataResultType(
     val avsluttetArbeidsforhold: List<AvsluttedeArbeidsforhold>,
     val harBarn: Boolean,
     val harAndreYtelser: Boolean,
-    val ønskerDagpengerFraDato: LocalDate,
+    val ønskerDagpengerFraDato: LocalDate?,
     @field:JsonProperty("søknad_uuid")
     val søknadUuid: String,
     val reellArbeidssøker: ReellArbeidssøker,
