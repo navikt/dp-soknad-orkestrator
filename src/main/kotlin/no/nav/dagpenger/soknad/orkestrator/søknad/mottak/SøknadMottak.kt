@@ -51,7 +51,7 @@ class SøknadMottak(
                 return@withMDC
             }
             logger.info { "Mottok søknad innsendt hendelse for søknad ${packet["søknadId"]}" }
-            SøknadMetrikker.mottatt.inc()
+            SøknadMetrikker.mottatt.labelValues("quiz").inc()
             sikkerlogg.info { "Mottok søknad innsendt hendelse: ${packet.toJson()}" }
 
             val søknadmelding = objectMapper.readTree(packet.toJson())

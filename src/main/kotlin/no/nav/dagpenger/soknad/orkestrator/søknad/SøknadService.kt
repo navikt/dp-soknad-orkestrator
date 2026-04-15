@@ -68,6 +68,7 @@ class SøknadService(
     internal fun slettSøknadOgInkrementerMetrikk(
         søknadId: UUID,
         ident: String,
+        kilde: String,
     ) {
         val søknad =
             søknadRepository.hent(søknadId)
@@ -80,13 +81,14 @@ class SøknadService(
 
         sendEndretTilstandTilSlettetMelding(søknadId, ident, søknad)
 
-        SøknadMetrikker.slettet.inc()
+        SøknadMetrikker.slettet.labelValues(kilde).inc()
         logg.info { "Slettet søknad med søknadId: $søknadId" }
         sikkerlogg.info { "Slettet søknad med søknadId: $søknadId og ident: $ident" }
     }
 
     fun opprett(ident: String): UUID {
         val søknadId = søknadRepository.opprett(Søknad(ident = ident))
+        SøknadMetrikker.opprettet.inc()
         logg.info { "Opprettet søknad med søknadId $søknadId" }
         sikkerlogg.info { "Opprettet søknad med søknadId $søknadId for $ident" }
 
@@ -118,7 +120,7 @@ class SøknadService(
         val melding = MeldingOmSøknadKlarTilJournalføring(søknadId, ident)
 
         rapidsConnection.publish(ident, melding.asMessage().toJson())
-        SøknadMetrikker.mottatt.inc()
+        SøknadMetrikker.mottatt.labelValues("ny").inc()
 
         logg.info { "Publiserte melding om søknad klar til journalføring med søknadId: $søknadId" }
         sikkerlogg.info { "Publiserte melding om søknad klar til journalføring med søknadId: $søknadId og ident: $ident" }
@@ -138,6 +140,7 @@ class SøknadService(
 
             sendEndretTilstandTilSlettetMelding(søknad.søknadId, søknad.ident, søknad)
 
+            SøknadMetrikker.slettet.labelValues("ny").inc()
             sikkerlogg.info { "Automatisk jobb slettet søknad ${søknad.søknadId} og tilhørende seksjoner opprettet av ${søknad.ident}" }
         }
     }
