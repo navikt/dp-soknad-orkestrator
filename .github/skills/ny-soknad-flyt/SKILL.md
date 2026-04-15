@@ -32,10 +32,11 @@ av ny søknad. Begge flytene bruker samme `soknad`-tabell i databasen.
 dp-soknad (quiz-app)
   → Kafka: søknad_innsendt_varsel
     → SøknadMottak.onPacket()
-      → søknadRepository.lagreQuizSøknad()     (SøknadTabell + quiz_opplysning)
+      → søknadRepository.lagreQuizSøknad(søknadmelding.tilSøknad())
+        → SøknadMapper → dekomponerer søknadData
+        → skriver til SøknadTabell + quiz_opplysning
       → søknadService.publiserMeldingOmSøknadInnsendt()
       → søknadService.opprettOgLagreKomplettSøknaddata()
-      → SøknadMapper → dekomponerer søknadData
 ```
 
 Sletting av gammel søknad skjer via Kafka:
@@ -63,7 +64,7 @@ Frontend
     → SøknadService.opprett()                  → Tilstand: PÅBEGYNT
     → Kafka: søknad_endret_tilstand (PÅBEGYNT)
 
-  → PUT /soknad/{id}/seksjon/{seksjonId}       → SeksjonService lagrer svar
+  → PUT /seksjon/{søknadId}/{seksjonId}        → SeksjonService lagrer svar
   → POST /soknad/{id}                          → SøknadService.sendInn()
     → Kafka: søknad_klar_til_journalføring
       → MeldingOmSøknadKlarTilJournalføringMottak
@@ -81,9 +82,9 @@ Sletting av ny søknad:
 
 ### Nøkkelfiler
 
-- `søknad/SøknadApi.kt` — REST-endepunkter: `POST`, `DELETE /soknad`, `POST /soknad/{id}`
+- `søknad/SøknadApi.kt` — REST-endepunkter: `POST /soknad`, `DELETE /soknad/{id}`, `POST /soknad/{id}`
 - `søknad/SøknadService.kt` — Forretningslogikk for opprett, sendInn, slett
-- `søknad/seksjon/SeksjonApi.kt` — REST-endepunkter for seksjon-svar
+- `søknad/seksjon/SeksjonApi.kt` — REST-endepunkter for seksjon-svar under `/seksjon/{søknadId}/{seksjonId}`
 - `søknad/seksjon/SeksjonService.kt` — Lagring og henting av seksjoner
 - `søknad/seksjon/SeksjonRepository.kt` — DB-tilgang mot `seksjon_v2`-tabellen
 - `søknad/melding/MeldingOmSøknadKlarTilJournalføringMottak.kt` — Starter PDF-kjeden
@@ -104,7 +105,12 @@ enum class Tilstand {
 ```
 
 Gammel flyt starter direkte i `INNSENDT` (quiz-søknaden er allerede innsendt når den ankommer).
-Ny flyt starter i `PÅBEGYNT` og går gjennom alle tilstander.
+Ny flyt starter i `PÅBEGYNT`. Happy path er `PÅBEGYNT → INNSENDT → JOURNALFØRT`.
+
+Ny søknad kan også avsluttes uten å gå hele happy path:
+
+- **Bruker-initiert sletting:** hard delete + `søknad_endret_tilstand` med `nyTilstand = "Slettet"`
+- **Automatisk sletting:** `slettSøknadSomSystem()` setter tilstand til `SLETTET_AV_SYSTEM`
 
 ---
 
@@ -155,12 +161,15 @@ Begge flyter bruker `soknad`-tabellen (`SøknadTabell`). Skillet:
 - **Ny flyt:** Bruker `seksjon_v2`-tabellen. `søknad.opplysninger` er alltid tom.
 
 ```kotlin
-// Indikerer gammel quiz-søknad:
+// Praktisk heuristikk for gammel quiz-søknad:
 søknad.opplysninger.isNotEmpty()
 
-// Indikerer ny søknad:
+// Praktisk heuristikk for ny søknad:
 søknad.opplysninger.isEmpty()
 ```
+
+Dette er en nyttig heuristikk når du allerede har en `Søknad`-instans, men det er ikke et
+eksplisitt kildefelt i domenemodellen.
 
 ---
 
@@ -191,5 +200,6 @@ søknad.opplysninger.isEmpty()
   riktig `kilde` (`"ny"` eller `"quiz"`) siden dette driver metrikk-labelen.
 - Auto-sletting (7 dager) bruker `slettSøknadSomSystem()` + `SøknadMetrikker.slettet.labelValues("ny")` —
   disse søknadene er alltid ny flyt siden gammel flyt aldri er i PÅBEGYNT.
-- Ny flyt-søknader hentes i `hentSøknaderForIdent()` via inner join med `seksjon_v2` — gammel
-  flyt-søknader uten seksjoner vises ikke i oversikten.
+- `hentSøknaderForIdent()` bruker inner join med `seksjon_v2` — derfor vises ikke søknader uten
+  rader i `seksjon_v2` i oversikten. Det gjelder både gamle quiz-søknader og nye søknader som er
+  opprettet, men som ennå ikke har lagret noen seksjoner.
