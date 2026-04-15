@@ -99,30 +99,26 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                         sikkerLogg.info {
                             "Publiserte melding om behov for generering av søknad-PDF for søknad $søknadId innsendt av $ident "
                         }
-                        try {
-                            var seksjonsdata = seksjonRepository.hentSeksjonForStatistikk(søknadId, ident)
-                            var pdfGrunnlag = seksjonRepository.hentAllePdfGrunnlag(søknadId, ident)
+                        var seksjonsdata = seksjonRepository.hentSeksjonForStatistikk(søknadId, ident)
+                        var pdfGrunnlag = seksjonRepository.hentAllePdfGrunnlag(søknadId, ident)
 
-                            val søknadEndretTilstandMelding =
-                                SøknadEndretTilstandMelding(
-                                    søknadId = søknadId,
-                                    ident = ident,
-                                    forrigeTilstand = PÅBEGYNT.name,
-                                    nyTilstand = Tilstand.INNSENDT.name,
-                                    søknad = it,
-                                    søknadsdata = seksjonsdata,
-                                    pdfGrunnlag = pdfGrunnlag,
-                                )
-                            rapidsConnection.publish(
-                                ident,
-                                søknadEndretTilstandMelding.asMessage().toJson(),
+                        val søknadEndretTilstandMelding =
+                            SøknadEndretTilstandMelding(
+                                søknadId = søknadId,
+                                ident = ident,
+                                forrigeTilstand = PÅBEGYNT.name,
+                                nyTilstand = Tilstand.INNSENDT.name,
+                                søknad = it,
+                                søknadsdata = seksjonsdata,
+                                pdfGrunnlag = pdfGrunnlag,
                             )
-                            logg.info { "Publiserte endret tilstand til Innsendt melding for $søknadId" }
-                            sikkerLogg.info {
-                                "Publiserte endret tilstand til Innsendt melding for $søknadId innsendt av $ident. Melding: ${søknadEndretTilstandMelding.asMessage().toJson()}"
-                            }
-                        } catch (e: Exception) {
-                            logg.error { "Feil ved publisering av endret tilstand til Innsendt melding for $søknadId, Exception: $e" }
+                        rapidsConnection.publish(
+                            ident,
+                            søknadEndretTilstandMelding.asMessage().toJson(),
+                        )
+                        logg.info { "Publiserte endret tilstand til Innsendt melding for $søknadId" }
+                        sikkerLogg.info {
+                            "Publiserte endret tilstand til Innsendt melding for $søknadId innsendt av $ident. Melding: ${søknadEndretTilstandMelding.asMessage().toJson()}"
                         }
 
                         val dokumentasjonsKravLister = seksjonRepository.hentDokumentasjonskrav(søknadId, ident)
