@@ -81,6 +81,37 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         dokumenstasjonskrav[4]["valg"].asText() shouldBe "ETTERSENDT"
     }
 
+    @Suppress("ktlint:standard:max-line-length")
+    @Test
+    fun `onPacket leser melding, seksjoner har en seksjon uten seksjonsvar så søknad_endret_tilstand forventes å feile men flyten skal fortsette`() {
+        coEvery { søknadRepository.hent(any()) } returns Søknad(søknadId, ident) andThen (Søknad(søknadId, ident, INNSENDT))
+
+        coEvery { seksjonRepository.hentDokumentasjonskrav(any(), any()) } returns dokumentasjonskrav
+        coEvery { seksjonRepository.hentSeksjonForStatistikk(any(), any()) } returns seksjonerUtenSeksjonsvar
+        coEvery { seksjonRepository.hentAllePdfGrunnlag(any(), any()) } returns pdfGrunnlag
+
+        rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
+
+        verify { søknadRepository.markerSøknadSomInnsendt(søknadId, ident, innsendtTidspunkt) }
+        verify { pdfPayloadService.genererBruttoPdfPayload(søknadId, ident) }
+        verify { pdfPayloadService.genererNettoPdfPayload(søknadId, ident) }
+        rapidsConnection.inspektør.size shouldBe 2
+        rapidsConnection.inspektør.message(0)["@behov"][0].asText() shouldBe "generer_og_mellomlagre_søknad_pdf"
+
+        rapidsConnection.inspektør.message(1)["@event_name"].asText() shouldBe "dokumentkrav_innsendt"
+        rapidsConnection.inspektør.message(1)["innsendingsType"].asText() shouldBe "INNSENDT"
+        rapidsConnection.inspektør.message(1)["ferdigBesvart"].asText() shouldBe "true"
+        rapidsConnection.inspektør.message(1)["kilde"].asText() shouldBe "orkestrator"
+
+        val dokumenstasjonskrav = rapidsConnection.inspektør.message(1)["dokumentkrav"]
+        dokumenstasjonskrav.size() shouldBe 5
+        dokumenstasjonskrav[0]["valg"].asText() shouldBe "SEND_SENERE"
+        dokumenstasjonskrav[1]["valg"].asText() shouldBe "SEND_TIDLIGERE"
+        dokumenstasjonskrav[2]["valg"].asText() shouldBe "SENDER_IKKE"
+        dokumenstasjonskrav[3]["valg"].asText() shouldBe "SEND_NÅ"
+        dokumenstasjonskrav[4]["valg"].asText() shouldBe "ETTERSENDT"
+    }
+
     @Test
     fun `onPacket behandler ikke melding hvis søknad har tilstand ulik PÅBEGYNT`() {
         coEvery { søknadRepository.hent(any()) } returns Søknad(søknadId, ident, INNSENDT)
@@ -138,6 +169,18 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
                 seksjonId = "verneplikt",
                 data =
                     """{"seksjonId":"verneplikt","seksjonsvar":{"avtjentVerneplikt":"ja"},"versjon":1}""".trim(),
+                opprettet = LocalDateTime.now(),
+                oppdatert = LocalDateTime.now(),
+            ),
+        )
+
+    private val seksjonerUtenSeksjonsvar: List<SeksjonMedTidstempler> =
+        listOf(
+            SeksjonMedTidstempler(
+                seksjonId = "din-situasjon",
+                data =
+                    """{"seksjonId":"din-situasjon","versjon":1}"""
+                        .trim(),
                 opprettet = LocalDateTime.now(),
                 oppdatert = LocalDateTime.now(),
             ),
