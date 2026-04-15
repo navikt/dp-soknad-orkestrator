@@ -39,6 +39,13 @@ internal fun Application.søknadApi(
                         call.respond(OK, søknader)
                     }
                 }
+                route("/aktiv") {
+                    get {
+                        val ident = call.ident()
+                        val aktiveSøknader = søknadService.hentAktiveSøknaderForIdent(ident)
+                        call.respond(OK, aktiveSøknader)
+                    }
+                }
             }
             route("/soknad/{søknadId}") {
                 post {

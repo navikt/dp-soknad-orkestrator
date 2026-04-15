@@ -285,7 +285,7 @@ class SøknadRepository(
                 ?: throw IllegalStateException("Fant ikke søknad med journalpostId: $journalpostId")
         }
 
-    fun hentSoknaderForIdent(ident: String) =
+    fun hentOrkestratorSoknaderForIdent(ident: String) =
         transaction {
             SøknadTabell
                 .innerJoin(SeksjonV2Tabell)
@@ -299,6 +299,22 @@ class SøknadRepository(
                         innsendtTimestamp = it[SøknadTabell.innsendtTidspunkt],
                         oppdatertTidspunkt = it[SøknadTabell.oppdatertTidspunkt],
                         status = it[SøknadTabell.tilstand],
+                    )
+                }.toList()
+        }
+
+    fun hentAlleSoknaderForIdent(ident: String) =
+        transaction {
+            SøknadTabell
+                .select(SøknadTabell.søknadId, SøknadTabell.innsendtTidspunkt, tilstand, SøknadTabell.oppdatertTidspunkt)
+                .where { SøknadTabell.ident eq ident }
+                .distinctBy { it[SøknadTabell.søknadId] }
+                .map {
+                    SøknadForIdent(
+                        søknadId = it[SøknadTabell.søknadId],
+                        innsendtTimestamp = it[SøknadTabell.innsendtTidspunkt],
+                        oppdatertTidspunkt = it[SøknadTabell.oppdatertTidspunkt],
+                        status = it[tilstand],
                     )
                 }.toList()
         }

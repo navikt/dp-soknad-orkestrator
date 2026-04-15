@@ -308,7 +308,7 @@ class SøknadServiceTest {
                 status = "INNSENDT",
             )
 
-        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+        every { søknadRepository.hentOrkestratorSoknaderForIdent(ident) } returns listOf(søknadForIdent)
 
         val søknader =
             søknadService
@@ -330,7 +330,7 @@ class SøknadServiceTest {
                 status = "INNSENDT",
             )
 
-        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+        every { søknadRepository.hentOrkestratorSoknaderForIdent(ident) } returns listOf(søknadForIdent)
 
         val søknader =
             søknadService
@@ -352,7 +352,7 @@ class SøknadServiceTest {
                 status = "INNSENDT",
             )
 
-        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+        every { søknadRepository.hentOrkestratorSoknaderForIdent(ident) } returns listOf(søknadForIdent)
 
         val søknader =
             søknadService
@@ -374,7 +374,7 @@ class SøknadServiceTest {
                 status = "INNSENDT",
             )
 
-        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+        every { søknadRepository.hentOrkestratorSoknaderForIdent(ident) } returns listOf(søknadForIdent)
 
         val søknader =
             søknadService
@@ -387,7 +387,7 @@ class SøknadServiceTest {
 
     @Test
     fun `Returnerer tom liste hvis det ikke finnes søknad på søkeren`() {
-        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf()
+        every { søknadRepository.hentOrkestratorSoknaderForIdent(ident) } returns listOf()
 
         val søknader =
             søknadService
@@ -409,7 +409,7 @@ class SøknadServiceTest {
                 status = "INNSENDT",
             )
 
-        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+        every { søknadRepository.hentOrkestratorSoknaderForIdent(ident) } returns listOf(søknadForIdent)
 
         val søknader =
             søknadService
@@ -432,7 +432,7 @@ class SøknadServiceTest {
                 status = "INNSENDT",
             )
 
-        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+        every { søknadRepository.hentOrkestratorSoknaderForIdent(ident) } returns listOf(søknadForIdent)
 
         val søknader =
             søknadService

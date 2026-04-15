@@ -476,29 +476,29 @@ class SøknadRepositoryTest {
     }
 
     @Test
-    fun `hentSoknaderForIdent returnerer tom liste når det ikke finnes noen søknader med seksjoner for gitt ident`() {
-        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+    fun `hentOrkestratorSoknaderForIdent returnerer tom liste når det ikke finnes noen søknader med seksjoner for gitt ident`() {
+        val søknader = søknadRepository.hentOrkestratorSoknaderForIdent(ident)
 
         søknader shouldBe emptyList()
     }
 
     @Test
-    fun `hentSoknaderForIdent returnerer tom liste når søknad eksisterer men ikke har seksjoner`() {
+    fun `hentOrkestratorSoknaderForIdent returnerer tom liste når søknad eksisterer men ikke har seksjoner`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
 
-        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+        val søknader = søknadRepository.hentOrkestratorSoknaderForIdent(ident)
 
         søknader shouldBe emptyList()
     }
 
     @Test
-    fun `hentSoknaderForIdent returnerer søknader som har seksjoner for gitt ident`() {
+    fun `hentOrkestratorSoknaderForIdent returnerer søknader som har seksjoner for gitt ident`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, "seksjon-id", "{}", null, "{}")
 
-        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+        val søknader = søknadRepository.hentOrkestratorSoknaderForIdent(ident)
 
         søknader.size shouldBe 1
         søknader[0].søknadId shouldBe søknadId
@@ -506,14 +506,14 @@ class SøknadRepositoryTest {
     }
 
     @Test
-    fun `hentSoknaderForIdent returnerer riktig status og tidspunkter for innsendt søknad`() {
+    fun `hentOrkestratorSoknaderForIdent returnerer riktig status og tidspunkter for innsendt søknad`() {
         val søknadId = randomUUID()
         val innsendtTidspunkt = now().withNano(0)
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, "seksjon-id", "{}", null, "{}")
         søknadRepository.markerSøknadSomInnsendt(søknadId, ident, innsendtTidspunkt)
 
-        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+        val søknader = søknadRepository.hentOrkestratorSoknaderForIdent(ident)
 
         søknader.size shouldBe 1
         søknader[0].søknadId shouldBe søknadId
@@ -522,7 +522,7 @@ class SøknadRepositoryTest {
     }
 
     @Test
-    fun `hentSoknaderForIdent returnerer flere søknader for samme ident`() {
+    fun `hentOrkestratorSoknaderForIdent returnerer flere søknader for samme ident`() {
         val søknadId1 = randomUUID()
         val søknadId2 = randomUUID()
         søknadRepository.opprett(Søknad(søknadId1, ident))
@@ -530,14 +530,14 @@ class SøknadRepositoryTest {
         seksjonRepository.lagre(søknadId1, ident, "seksjon-id-1", "{}", null, "{}")
         seksjonRepository.lagre(søknadId2, ident, "seksjon-id-2", "{}", null, "{}")
 
-        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+        val søknader = søknadRepository.hentOrkestratorSoknaderForIdent(ident)
 
         søknader.size shouldBe 2
         søknader.map { it.søknadId }.shouldContainAll(søknadId1, søknadId2)
     }
 
     @Test
-    fun `hentSoknaderForIdent returnerer ikke søknader som tilhører andre identer`() {
+    fun `hentOrkestratorSoknaderForIdent returnerer ikke søknader som tilhører andre identer`() {
         val søknadIdForIdent = randomUUID()
         val søknadIdForAnnenIdent = randomUUID()
         val annenIdent = "9876543210"
@@ -546,21 +546,21 @@ class SøknadRepositoryTest {
         seksjonRepository.lagre(søknadIdForIdent, ident, "seksjon-id", "{}", null, "{}")
         seksjonRepository.lagre(søknadIdForAnnenIdent, annenIdent, "seksjon-id", "{}", null, "{}")
 
-        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+        val søknader = søknadRepository.hentOrkestratorSoknaderForIdent(ident)
 
         søknader.size shouldBe 1
         søknader[0].søknadId shouldBe søknadIdForIdent
     }
 
     @Test
-    fun `hentSoknaderForIdent returnerer kun en søknad selv om den har flere seksjoner`() {
+    fun `hentOrkestratorSoknaderForIdent returnerer kun en søknad selv om den har flere seksjoner`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, "seksjon-id-1", "{}", null, "{}")
         seksjonRepository.lagre(søknadId, ident, "seksjon-id-2", "{}", null, "{}")
         seksjonRepository.lagre(søknadId, ident, "seksjon-id-3", "{}", null, "{}")
 
-        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+        val søknader = søknadRepository.hentOrkestratorSoknaderForIdent(ident)
 
         søknader.size shouldBe 1
         søknader[0].søknadId shouldBe søknadId

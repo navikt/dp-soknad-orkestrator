@@ -209,7 +209,7 @@ class SøknadService(
     fun hentSistOppdatertTidspunkt(søknadId: UUID): LocalDateTime? = søknadRepository.hent(søknadId)?.oppdatertTidspunkt
 
     fun hentSøknaderForIdent(ident: String): List<SøknadForIdent> {
-        val alleSøknaderForSøkeren = søknadRepository.hentSoknaderForIdent(ident)
+        val alleSøknaderForSøkeren = søknadRepository.hentOrkestratorSoknaderForIdent(ident)
         alleSøknaderForSøkeren.forEach {
             val skjemakode = finnSkjemaKode(ident, it.søknadId, forventetFullførtSøknad = false)
             val tittel = hentTittelForSkjemaKode(skjemakode)
@@ -310,4 +310,49 @@ class SøknadService(
         }
         return false
     }
+
+    fun hentAktiveSøknaderForIdent(ident: String): SøknadOversiktForSøker {
+        val orkestratorSøknader = søknadRepository.hentOrkestratorSoknaderForIdent(ident)
+        val orkestratorSøknadsIder = orkestratorSøknader.map { it.søknadId }.toSet()
+        val quizSøknader = søknadRepository.hentAlleSoknaderForIdent(ident).filter { it.søknadId !in orkestratorSøknadsIder }
+
+        var aktivSøknader =
+            orkestratorSøknader.filter { it.status == Tilstand.PÅBEGYNT.name }
+
+        if (aktivSøknader.isNotEmpty()) {
+            return SøknadOversiktForSøker(
+                orkestratorSøknader = aktivSøknader,
+                quizSøknader = quizSøknader,
+                aktivSøknad =
+                    SøknadForIdentMedOrkestratorKildeSjekk(
+                        base = aktivSøknader.first(),
+                        erOrkestratorSøknad = true,
+                    ),
+            )
+        }
+
+        aktivSøknader = quizSøknader.filter { it.status == Tilstand.PÅBEGYNT.name }
+        if (aktivSøknader.isNotEmpty()) {
+            return SøknadOversiktForSøker(
+                orkestratorSøknader = orkestratorSøknader,
+                quizSøknader = quizSøknader,
+                aktivSøknad =
+                    SøknadForIdentMedOrkestratorKildeSjekk(
+                        base = aktivSøknader.sortedByDescending { it.oppdatertTidspunkt }.first(),
+                        erOrkestratorSøknad = false,
+                    ),
+            )
+        }
+
+        return SøknadOversiktForSøker(
+            orkestratorSøknader = orkestratorSøknader,
+            quizSøknader = quizSøknader,
+        )
+    }
 }
+
+data class SøknadOversiktForSøker(
+    val orkestratorSøknader: List<SøknadForIdent>,
+    val quizSøknader: List<SøknadForIdent>,
+    val aktivSøknad: SøknadForIdentMedOrkestratorKildeSjekk? = null,
+)
