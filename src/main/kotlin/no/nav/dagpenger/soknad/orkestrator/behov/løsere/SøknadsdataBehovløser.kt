@@ -1,10 +1,10 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import io.ktor.server.plugins.NotFoundException
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
@@ -17,6 +17,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforho
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.saf.SafKlient
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import java.time.LocalDate
@@ -28,6 +29,7 @@ class SøknadsdataBehovløser(
     søknadRepository: SøknadRepository,
     seksjonRepository: SeksjonRepository,
     fellesBehovløserLøsninger: FellesBehovløserLøsninger,
+    private val safKlient: SafKlient,
 ) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository, fellesBehovløserLøsninger) {
     override val behov = "Søknadsdata"
     override val beskrivendeId = "behov.søknadsdata"
@@ -46,6 +48,34 @@ class SøknadsdataBehovløser(
 
         val søknadId =
             søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
+                ?: run {
+                    logger.info { "Fant ikke søknadId for journalpostId: $journalpostId, slår opp i SAF" }
+                    safKlient.hentSøknadUuid(journalpostId)
+                }
+
+        if (søknadId == null) {
+            logger.warn { "Fant ikke søknad_uuid i SAF for journalpostId: $journalpostId, svarer med tomt objekt" }
+            return publiserLøsning(behovmelding, emptyMap<String, Any>())
+        }
+
+        if (søknadRepository.hent(søknadId) == null) {
+            logger.warn { "Fant ikke søknad for søknadId: $søknadId hentet fra SAF, svarer med tomme verdier" }
+            val behovmeldingMedSøknadId =
+                Behovmelding(
+                    behovmelding.innkommendePacket.apply {
+                        this["søknadId"] = søknadId.toString()
+                    },
+                )
+            return publiserLøsning(
+                behovmeldingMedSøknadId,
+                objectMapper.convertValue(
+                    tomSøknadsdataResultat(søknadId),
+                    object : TypeReference<Map<String, Any?>>() {},
+                ),
+            )
+        }
+
+        val erOrkestratorSøknad = opplysningRepository.hentAlle(søknadId).isEmpty()
 
         val eøsBostedsland = eøsBostedsland(behovmelding.ident, søknadId)
 
@@ -60,9 +90,9 @@ class SøknadsdataBehovløser(
 
         val avtjentVerneplikt = avtjentVerneplikt(behovmelding.ident, søknadId)
 
-        val harBarn = harSøkerBarn(behovmelding.ident, søknadId)
+        val harBarn = harSøkerBarn(behovmelding.ident, søknadId, erOrkestratorSøknad)
 
-        val harAndreYtelser = harAndreYtelser(behovmelding.ident, søknadId)
+        val harAndreYtelser = harAndreYtelser(behovmelding.ident, søknadId, erOrkestratorSøknad)
 
         val ønskerDagpengerFraDato =
             fellesBehovløserLøsninger.ønskerDagpengerFraDato(
@@ -86,15 +116,16 @@ class SøknadsdataBehovløser(
                 harBarn = harBarn,
                 harAndreYtelser = harAndreYtelser,
                 ønskerDagpengerFraDato = ønskerDagpengerFraDato,
-                søknadId = søknadId.toString(),
+                søknadUuid = søknadId.toString(),
                 reellArbeidssøker = reellArbeidssøker,
             )
 
-        val søknadsdataMap: Map<String, Any> =
+        val søknadsdataMap: Map<String, Any?> =
             objectMapper.convertValue(
                 søknadsdataResultat,
-                object : TypeReference<Map<String, Any>>() {},
+                object : TypeReference<Map<String, Any?>>() {},
             )
+
         val behovmeldingMedSøknadId: Behovmelding =
             Behovmelding(
                 behovmelding.innkommendePacket.apply {
@@ -174,6 +205,7 @@ class SøknadsdataBehovløser(
     private fun harAndreYtelser(
         ident: String,
         søknadId: UUID,
+        erOrkestratorSøknad: Boolean,
     ): Boolean {
         val tidligereArbeidsgiverYtelseFraQuiz =
             opplysningRepository.hent("faktum.utbetaling-eller-okonomisk-gode-tidligere-arbeidsgiver", ident, søknadId)?.svar
@@ -189,12 +221,14 @@ class SøknadsdataBehovløser(
             return andreYtelserFraQuiz || tidligereArbeidsgiver
         }
 
+        if (!erOrkestratorSøknad) return false
+
         val seksjonsvar =
-            seksjonRepository.hentSeksjonsvar(
-                søknadId,
+            seksjonRepository.hentSeksjonsvarEllerKastException(
                 ident,
+                søknadId,
                 "annen-pengestotte",
-            ) ?: throw NotFoundException("Finner ikke seksjon annen-pengestotte for søknad $søknadId")
+            )
 
         val annenPengestøtteSeksjon = objectMapper.readTree(seksjonsvar)
 
@@ -211,12 +245,15 @@ class SøknadsdataBehovløser(
     private fun harSøkerBarn(
         ident: String,
         søknadId: UUID,
+        erOrkestratorSøknad: Boolean,
     ): Boolean {
         val pdlBarnSvar = hentBarnSvar(BESKRIVENDE_ID_PDL_BARN, ident, søknadId)
         val egneBarnSvar = hentBarnSvar(BESKRIVENDE_ID_EGNE_BARN, ident, søknadId)
         if (pdlBarnSvar.isNotEmpty() || egneBarnSvar.isNotEmpty()) {
             return true
         }
+
+        if (!erOrkestratorSøknad) return false
 
         val seksjonsvar =
             seksjonRepository.hentSeksjonsvarEllerKastException(
@@ -392,6 +429,19 @@ class SøknadsdataBehovløser(
             "HUN",
             "AUT",
         )
+
+    private fun tomSøknadsdataResultat(søknadId: UUID) =
+        SøknadsdataResultType(
+            eøsBostedsland = false,
+            eøsArbeidsforhold = false,
+            avtjentVerneplikt = false,
+            avsluttetArbeidsforhold = emptyList(),
+            harBarn = false,
+            harAndreYtelser = false,
+            ønskerDagpengerFraDato = null,
+            søknadUuid = søknadId.toString(),
+            reellArbeidssøker = ReellArbeidssøker(helse = false, geografi = false, deltid = false, yrke = false),
+        )
 }
 
 data class SøknadsdataResultType(
@@ -401,8 +451,9 @@ data class SøknadsdataResultType(
     val avsluttetArbeidsforhold: List<AvsluttedeArbeidsforhold>,
     val harBarn: Boolean,
     val harAndreYtelser: Boolean,
-    val ønskerDagpengerFraDato: LocalDate,
-    val søknadId: String,
+    val ønskerDagpengerFraDato: LocalDate?,
+    @field:JsonProperty("søknad_uuid")
+    val søknadUuid: String,
     val reellArbeidssøker: ReellArbeidssøker,
 )
 

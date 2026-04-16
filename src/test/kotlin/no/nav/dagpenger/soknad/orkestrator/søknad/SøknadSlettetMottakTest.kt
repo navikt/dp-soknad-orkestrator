@@ -24,21 +24,21 @@ class SøknadSlettetMottakTest {
     fun `Skal slette søknad når søknad_slettet event mottas`() {
         testRapid.sendTestMessage(søknadSlettetEvent)
 
-        verify { søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident) }
+        verify { søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident, "quiz") }
     }
 
     @Test
     fun `Tar ikke i mot søknad_slettet event når påkrevd felt ident mangler`() {
         testRapid.sendTestMessage(søknadSlettetEventUtenIdent)
 
-        verify(exactly = 0) { søknadService.slettSøknadOgInkrementerMetrikk(any(), any()) }
+        verify(exactly = 0) { søknadService.slettSøknadOgInkrementerMetrikk(any(), any(), any()) }
     }
 
     @Test
     fun `Tar ikke i mot søknad_slettet event når påkrevd felt søknadId mangler`() {
         testRapid.sendTestMessage(søknadSlettetEventUtenSøknadId)
 
-        verify(exactly = 0) { søknadService.slettSøknadOgInkrementerMetrikk(any(), any()) }
+        verify(exactly = 0) { søknadService.slettSøknadOgInkrementerMetrikk(any(), any(), any()) }
     }
 
     private val søknadSlettetEvent =

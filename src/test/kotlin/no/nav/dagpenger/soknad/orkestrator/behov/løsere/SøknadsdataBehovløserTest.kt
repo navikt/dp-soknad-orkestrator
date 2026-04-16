@@ -5,6 +5,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.FellesBehovløserLøsninger
 import no.nav.dagpenger.soknad.orkestrator.behov.annenPengestøtteOrkestratorJson
 import no.nav.dagpenger.soknad.orkestrator.behov.arbeidsforholdMedRegistrerteAvsluttedeArbeidsforholdOrkestratorJson
@@ -33,6 +34,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Dato
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
+import no.nav.dagpenger.soknad.orkestrator.saf.SafKlient
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -49,6 +51,7 @@ class SøknadsdataBehovløserTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val testRapid = TestRapid()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    val safKlient = mockk<SafKlient>(relaxed = true)
     val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
     val fellesBehovløserLøsninger: FellesBehovløserLøsninger =
         FellesBehovløserLøsninger(
@@ -63,6 +66,7 @@ class SøknadsdataBehovløserTest {
             søknadRepository,
             seksjonRepository,
             fellesBehovløserLøsninger,
+            safKlient,
         )
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
@@ -124,9 +128,8 @@ class SøknadsdataBehovløserTest {
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 val verdi = løsning["verdi"]
                 verdi["eøsBostedsland"].asBoolean() shouldBe expectedEøsBostedsland
-                verdi["søknadId"].asUUID() shouldBe søknadId
+                verdi["søknad_uuid"].asUUID() shouldBe søknadId
                 verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-                løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
         }
@@ -172,9 +175,8 @@ class SøknadsdataBehovløserTest {
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 val verdi = løsning["verdi"]
                 verdi["eøsBostedsland"].asBoolean() shouldBe expectedEøsBostedsland
-                verdi["søknadId"].asUUID() shouldBe quizSøknadId
+                verdi["søknad_uuid"].asUUID() shouldBe quizSøknadId
                 verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-                løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
         }
@@ -212,9 +214,8 @@ class SøknadsdataBehovløserTest {
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 val verdi = løsning["verdi"]
                 verdi["eøsArbeidsforhold"].asBoolean() shouldBe expectedEøsArbeidsforhold
-                verdi["søknadId"].asUUID() shouldBe søknadId
+                verdi["søknad_uuid"].asUUID() shouldBe søknadId
                 verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-                løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
         }
@@ -259,9 +260,8 @@ class SøknadsdataBehovløserTest {
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 val verdi = løsning["verdi"]
                 verdi["eøsArbeidsforhold"].asBoolean() shouldBe expectedEøsArbeidsforhold
-                verdi["søknadId"].asUUID() shouldBe quizSøknadId
+                verdi["søknad_uuid"].asUUID() shouldBe quizSøknadId
                 verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-                løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
         }
@@ -298,9 +298,8 @@ class SøknadsdataBehovløserTest {
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 val verdi = løsning["verdi"]
                 verdi["avtjentVerneplikt"].asBoolean() shouldBe expectedAvtjentVerneplikt
-                verdi["søknadId"].asUUID() shouldBe søknadId
+                verdi["søknad_uuid"].asUUID() shouldBe søknadId
                 verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-                løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
         }
@@ -345,9 +344,8 @@ class SøknadsdataBehovløserTest {
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 val verdi = løsning["verdi"]
                 verdi["avtjentVerneplikt"].asBoolean() shouldBe expectedAvtjentVerneplikt
-                verdi["søknadId"].asUUID() shouldBe quizSøknadId
+                verdi["søknad_uuid"].asUUID() shouldBe quizSøknadId
                 verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-                løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
         }
@@ -370,9 +368,9 @@ class SøknadsdataBehovløserTest {
             ),
             ->
             every {
-                seksjonRepository.hentSeksjonsvar(
-                    søknadId,
+                seksjonRepository.hentSeksjonsvarEllerKastException(
                     ident,
+                    søknadId,
                     "annen-pengestotte",
                 )
             } returns
@@ -395,9 +393,8 @@ class SøknadsdataBehovløserTest {
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 val verdi = løsning["verdi"]
                 verdi["harAndreYtelser"].asBoolean() shouldBe forventetHarAndreYtelser
-                verdi["søknadId"].asUUID() shouldBe søknadId
+                verdi["søknad_uuid"].asUUID() shouldBe søknadId
                 verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-                løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
         }
@@ -461,9 +458,8 @@ class SøknadsdataBehovløserTest {
             testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
                 val verdi = løsning["verdi"]
                 verdi["harAndreYtelser"].asBoolean() shouldBe forventetHarAndreYtelser
-                verdi["søknadId"].asUUID() shouldBe quizSøknadId
+                verdi["søknad_uuid"].asUUID() shouldBe quizSøknadId
                 verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-                løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
             }
             testRapid.reset()
         }
@@ -501,9 +497,8 @@ class SøknadsdataBehovløserTest {
             avsluttetArbeidsforhold[1]["sluttårsak"].asText() shouldBe "PERMITTERT"
             avsluttetArbeidsforhold[1]["fiskeforedling"].asBoolean() shouldBe true
             avsluttetArbeidsforhold[1]["land"].asText() shouldBe "SWE"
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -539,9 +534,8 @@ class SøknadsdataBehovløserTest {
             avsluttetArbeidsforhold[1]["sluttårsak"].asText() shouldBe "PERMITTERT"
             avsluttetArbeidsforhold[1]["fiskeforedling"].asBoolean() shouldBe true
             avsluttetArbeidsforhold[1]["land"].asText() shouldBe "SWE"
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -591,9 +585,8 @@ class SøknadsdataBehovløserTest {
             avsluttetArbeidsforhold[1]["sluttårsak"].asText() shouldBe "PERMITTERT"
             avsluttetArbeidsforhold[1]["fiskeforedling"].asBoolean() shouldBe true
             avsluttetArbeidsforhold[1]["land"].asText() shouldBe "SWE"
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -603,7 +596,7 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["avsluttetArbeidsforhold"].size() shouldBe 0
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
         }
     }
@@ -633,9 +626,8 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["avsluttetArbeidsforhold"].size() shouldBe 0
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -664,9 +656,8 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["harBarn"].asBoolean() shouldBe true
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -695,9 +686,8 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["harBarn"].asBoolean() shouldBe true
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -726,9 +716,8 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["harBarn"].asBoolean() shouldBe true
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -756,9 +745,8 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["harBarn"].asBoolean() shouldBe false
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -797,9 +785,8 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["harBarn"].asBoolean() shouldBe true
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -829,9 +816,8 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["harBarn"].asBoolean() shouldBe true
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -861,9 +847,8 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["harBarn"].asBoolean() shouldBe true
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -885,9 +870,8 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["harBarn"].asBoolean() shouldBe false
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -926,9 +910,8 @@ class SøknadsdataBehovløserTest {
             reellArbeidssøker["geografi"].asBoolean() shouldBe false
             reellArbeidssøker["deltid"].asBoolean() shouldBe true
             reellArbeidssøker["yrke"].asBoolean() shouldBe false
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -967,9 +950,8 @@ class SøknadsdataBehovløserTest {
             reellArbeidssøker["geografi"].asBoolean() shouldBe true
             reellArbeidssøker["deltid"].asBoolean() shouldBe true
             reellArbeidssøker["yrke"].asBoolean() shouldBe true
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -1008,9 +990,8 @@ class SøknadsdataBehovløserTest {
             reellArbeidssøker["geografi"].asBoolean() shouldBe false
             reellArbeidssøker["deltid"].asBoolean() shouldBe false
             reellArbeidssøker["yrke"].asBoolean() shouldBe false
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -1056,9 +1037,8 @@ class SøknadsdataBehovløserTest {
             reellArbeidssøker["geografi"].asBoolean() shouldBe true
             reellArbeidssøker["deltid"].asBoolean() shouldBe true
             reellArbeidssøker["yrke"].asBoolean() shouldBe true
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -1104,9 +1084,8 @@ class SøknadsdataBehovløserTest {
             reellArbeidssøker["geografi"].asBoolean() shouldBe false
             reellArbeidssøker["deltid"].asBoolean() shouldBe true
             reellArbeidssøker["yrke"].asBoolean() shouldBe false
-            verdi["søknadId"].asUUID() shouldBe søknadId
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
     }
 
@@ -1137,8 +1116,7 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
-            verdi["søknadId"].asUUID() shouldBe søknadId
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
         }
     }
 
@@ -1169,8 +1147,7 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
-            verdi["søknadId"].asUUID() shouldBe søknadId
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
         }
     }
 
@@ -1200,8 +1177,7 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
-            verdi["søknadId"].asUUID() shouldBe søknadId
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
         }
     }
 
@@ -1230,8 +1206,71 @@ class SøknadsdataBehovløserTest {
         testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
             val verdi = løsning["verdi"]
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
-            verdi["søknadId"].asUUID() shouldBe søknadId
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+            verdi["søknad_uuid"].asUUID() shouldBe søknadId
+        }
+    }
+
+    @Test
+    fun `slår opp søknadId i SAF når journalpostId ikke finnes i databasen`() {
+        val safSøknadId = UUID.randomUUID()
+        every { søknadRepository.hentSøknadIdFraJournalPostId(any(), any()) } returns null
+        every { safKlient.hentSøknadUuid(any()) } returns safSøknadId
+        every { seksjonRepository.hentSeksjonsvar(safSøknadId, ident, "personalia") } returns
+            personaliaOrkestratorJson("ja", "NOR")
+        every { søknadRepository.hent(any()) } returns
+            Søknad(søknadId = safSøknadId, ident = ident, tilstand = Tilstand.INNSENDT, innsendtTidspunkt = null)
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(ident, safSøknadId, "din-situasjon")
+        } returns dinSituasjonMedGjenopptakelseOrkestratorJson(now)
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(any(), safSøknadId, "verneplikt")
+        } returns avtjentVernepliktOrkestratorJson("ja")
+
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
+
+        verify { safKlient.hentSøknadUuid("12345679") }
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            val verdi = løsning["verdi"]
+            verdi["søknad_uuid"].asUUID() shouldBe safSøknadId
+        }
+    }
+
+    @Test
+    fun `svarer med tomme verdier når søknad fra SAF ikke finnes i databasen`() {
+        val safSøknadId = UUID.randomUUID()
+        every { søknadRepository.hentSøknadIdFraJournalPostId(any(), any()) } returns null
+        every { safKlient.hentSøknadUuid(any()) } returns safSøknadId
+        every { søknadRepository.hent(safSøknadId) } returns null
+
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
+
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            val verdi = løsning["verdi"]
+            verdi["søknad_uuid"].asUUID() shouldBe safSøknadId
+            verdi["eøsBostedsland"].asBoolean() shouldBe false
+            verdi["eøsArbeidsforhold"].asBoolean() shouldBe false
+            verdi["avtjentVerneplikt"].asBoolean() shouldBe false
+            verdi["harBarn"].asBoolean() shouldBe false
+            verdi["harAndreYtelser"].asBoolean() shouldBe false
+            verdi["avsluttetArbeidsforhold"].isEmpty shouldBe true
+            verdi["ønskerDagpengerFraDato"].isNull shouldBe true
+            verdi["reellArbeidssøker"]["helse"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["geografi"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["deltid"].asBoolean() shouldBe false
+            verdi["reellArbeidssøker"]["yrke"].asBoolean() shouldBe false
+        }
+    }
+
+    @Test
+    fun `svarer med tomt objekt når SAF ikke finner dokument`() {
+        every { søknadRepository.hentSøknadIdFraJournalPostId(any(), any()) } returns null
+        every { safKlient.hentSøknadUuid(any()) } returns null
+
+        behovløser.løs(lagBehovmeldingUtenSøknadId(ident))
+
+        testRapid.inspektør.message(0)["@løsning"]["Søknadsdata"].also { løsning ->
+            val verdi = løsning["verdi"]
+            verdi.toString() shouldBe "{}"
         }
     }
 }

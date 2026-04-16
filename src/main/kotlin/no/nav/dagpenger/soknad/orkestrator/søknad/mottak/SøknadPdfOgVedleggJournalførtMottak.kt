@@ -9,6 +9,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 
@@ -64,6 +65,7 @@ internal class SøknadPdfOgVedleggJournalførtMottak(
             søknadRepository.hent(søknadId)?.let {
                 if (it.ident == ident) {
                     søknadRepository.markerSøknadSomJournalført(søknadId, ident, journalpostId, journalførtTidspunkt)
+                    SøknadMetrikker.journalfort.inc()
                     logg.info { "Søknad $søknadId markert som journalført" }
                     sikkerLogg.info { "Søknad $søknadId innsendt av $ident markert som journaført med journalpostId $journalpostId" }
                 } else {

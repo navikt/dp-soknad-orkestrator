@@ -33,6 +33,7 @@ import no.nav.dagpenger.soknad.orkestrator.personalia.PersonService
 import no.nav.dagpenger.soknad.orkestrator.personalia.PersonaliaService
 import no.nav.dagpenger.soknad.orkestrator.personalia.personaliaApi
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
+import no.nav.dagpenger.soknad.orkestrator.saf.SafKlient
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -176,6 +177,11 @@ internal class ApplicationBuilder(
                     QuizOpplysningRepositoryPostgres(dataSource),
                     seksjonRepository,
                     søknadRepository,
+                    SafKlient(
+                        azureAdClient = azureAdClient,
+                        safUrl = Configuration.safUrl,
+                        safScope = Configuration.safScope,
+                    ),
                 )
                 SøknadSlettetMottak(rapidsConnection, søknadService)
                 MeldingOmEttersendingMottak(rapidsConnection, søknadRepository, seksjonRepository)

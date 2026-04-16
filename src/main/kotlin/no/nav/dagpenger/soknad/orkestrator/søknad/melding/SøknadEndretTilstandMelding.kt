@@ -45,29 +45,34 @@ class SøknadEndretTilstandMelding(
         if (søknadsdata.isEmpty() || søknad == null) {
             null
         } else {
-            val aktuelleFelter = filtrerUaktuelleFelter()
+            try {
+                val aktuelleFelter = filtrerUaktuelleFelter()
 
-            mapOf(
-                "opprettet" to LocalDateTime.now(),
-                "innsendt" to (søknad.innsendtTidspunkt?.toString() ?: "null"),
-            ) +
-                søknadsdata.associate {
-                    if (it.data.isEmpty()) {
-                        return@associate it.seksjonId to
-                            mapOf("seksjonsdata" to null, "opprettet" to it.opprettet, "oppdatert" to it.oppdatert)
+                mapOf(
+                    "opprettet" to LocalDateTime.now(),
+                    "innsendt" to (søknad.innsendtTidspunkt?.toString() ?: "null"),
+                ) +
+                    søknadsdata.associate {
+                        if (it.data.isEmpty()) {
+                            return@associate it.seksjonId to
+                                mapOf("seksjonsdata" to null, "opprettet" to it.opprettet, "oppdatert" to it.oppdatert)
+                        }
+
+                        val aktuelleFelterForSeksjon =
+                            aktuelleFelter
+                                .find { pg ->
+                                    pg.seksjonId == it.seksjonId.toLowerCasePreservingASCIIRules()
+                                }?.spørsmål
+                                ?: emptyList()
+                        val seksjonsdataKlarTilStatistikk =
+                            filtrerSeksjonsdataForStatistikk(it.seksjonId, it.data, aktuelleFelterForSeksjon)
+
+                        it.seksjonId to
+                            mapOf("seksjonsdata" to seksjonsdataKlarTilStatistikk, "opprettet" to it.opprettet, "oppdatert" to it.oppdatert)
                     }
-
-                    val aktuelleFelterForSeksjon =
-                        aktuelleFelter
-                            .find { pg ->
-                                pg.seksjonId == it.seksjonId.toLowerCasePreservingASCIIRules()
-                            }?.spørsmål
-                            ?: emptyList()
-                    val seksjonsdataKlarTilStatistikk = filtrerSeksjonsdataForStatistikk(it.seksjonId, it.data, aktuelleFelterForSeksjon)
-
-                    it.seksjonId to
-                        mapOf("seksjonsdata" to seksjonsdataKlarTilStatistikk, "opprettet" to it.opprettet, "oppdatert" to it.oppdatert)
-                }
+            } catch (e: Exception) {
+                return null
+            }
         }
 
     fun filtrerSeksjonsdataForStatistikk(
@@ -101,6 +106,9 @@ class SøknadEndretTilstandMelding(
                 "folkeregistrertAdresseErNorgeStemmerDet" to
                     hentFeltFraSeksjon(seksjonsdataJson, "folkeregistrertAdresseErNorgeStemmerDet"),
                 "bostedsland" to hentFeltFraSeksjon(seksjonsdataJson, "bostedsland"),
+                "postnummerFraPdl" to hentFeltFraSeksjon(seksjonsdataJson, "postnummerFraPdl"),
+                "landFraPdl" to hentFeltFraSeksjon(seksjonsdataJson, "landFraPdl"),
+                "landkodeFraPdl" to hentFeltFraSeksjon(seksjonsdataJson, "landkodeFraPdl"),
             ).filterValues { it != "" }
         return objectMapper.writeValueAsString(
             mapOf(
@@ -140,7 +148,7 @@ class SøknadEndretTilstandMelding(
         }
 
     fun filtrerUaktuelleFelter(): List<SeksjonMedGyldigeFeltIder> {
-        val listOverGyldigeTyper =
+        val gyldigeTyper =
             listOf(
                 "envalg",
                 "flervalg",
@@ -159,7 +167,7 @@ class SøknadEndretTilstandMelding(
             fun traverse(node: JsonNode) {
                 when {
                     node.isObject && node.has("id") && node.has("type") -> {
-                        if (node["type"].asText() in listOverGyldigeTyper) {
+                        if (node["type"].asText() in gyldigeTyper && node["id"].asText() != "fødselsdato") {
                             seksjonMappet.add(
                                 node["id"].asText(),
                             )

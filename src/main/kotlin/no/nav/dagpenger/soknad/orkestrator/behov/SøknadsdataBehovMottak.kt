@@ -10,6 +10,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdataBehovløser
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
+import no.nav.dagpenger.soknad.orkestrator.saf.SafKlient
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 
@@ -18,6 +19,7 @@ class SøknadsdataBehovMottak(
     opplysningRepository: QuizOpplysningRepositoryPostgres,
     seksjonRepository: SeksjonRepository,
     søknadRepository: SøknadRepository,
+    safKlient: SafKlient,
 ) : River.PacketListener {
     val søknadsdataBehovløser =
         SøknadsdataBehovløser(
@@ -30,6 +32,7 @@ class SøknadsdataBehovMottak(
                 søknadRepository,
                 seksjonRepository,
             ),
+            safKlient,
         )
 
     private companion object {
@@ -84,8 +87,10 @@ class SøknadsdataBehovMottak(
             søknadsdataBehovløser.løs(SøknadBehovmelding(this))
         } catch (e: IllegalArgumentException) {
             logger.error(e) { "Kunne ikke løse behov Søknadsdata. Ett eller flere argumenter var feil." }
+            throw e
         } catch (e: IllegalStateException) {
             logger.error(e) { "Kunne ikke løse behov Søknadsdata. Opplysningen finnes ikke." }
+            throw e
         }
     }
 }
