@@ -37,6 +37,7 @@ import no.nav.dagpenger.soknad.orkestrator.saf.SafKlient
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.jobb.RekjørJournalføringForSøknaderJobb
 import no.nav.dagpenger.soknad.orkestrator.søknad.jobb.SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføringMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.MeldingOmEttersendingMottak
@@ -204,5 +205,6 @@ internal class ApplicationBuilder(
                 runMigration()
             }
         SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb.startFixedRateTimer(søknadService)
+        RekjørJournalføringForSøknaderJobb.startEngangsJobb(rapidsConnection, søknadRepository)
     }
 }
