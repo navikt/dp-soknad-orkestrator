@@ -54,14 +54,8 @@ class SøknadsdataBehovløser(
                 }
 
         if (søknadId == null) {
-            logger.warn { "Fant ikke søknad_uuid i SAF for journalpostId: $journalpostId, svarer med tomme verdier" }
-            return publiserLøsning(
-                behovmelding,
-                objectMapper.convertValue(
-                    tomSøknadsdataResultat(),
-                    object : TypeReference<Map<String, Any?>>() {},
-                ),
-            )
+            logger.warn { "Fant ikke søknad_uuid i SAF for journalpostId: $journalpostId, svarer med tomt objekt" }
+            return publiserLøsning(behovmelding, emptyMap<String, Any>())
         }
 
         if (søknadRepository.hent(søknadId) == null) {
