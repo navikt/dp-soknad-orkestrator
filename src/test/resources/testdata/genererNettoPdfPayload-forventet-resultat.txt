@@ -7,18 +7,23 @@
             font-family: 'Source Sans Pro';
             font-style: normal;
             width: 600px;
-            padding: 0 40px 40px 40px;
+            padding: 2rem;
             color: rgb(38, 38, 38);
         }
 
-        h2 {
+        h1, h2 {
             margin-top: 2rem;
+        }
+
+        h3 {
+            margin-top: 1.5rem;
         }
 
         .modalSpørsmål {
             background: #eee;
-            padding: 1rem;
+            padding: 0.5rem 1rem;
             margin-bottom: 1rem;
+            border-radius: 10px;
         }
 
         .pageHeaderRight {
