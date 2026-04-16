@@ -78,7 +78,7 @@
     </p>
     <p>
             <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
-            <div><i>For å vurdere om du har rett til dagpenger, må vi vite din nåværende ukentlige arbeidstid. Hvis du jobber mer enn 50 prosent av den totale arbeidstiden du hadde før, har du ikke rett til dagpenger.<br/><br/>Hvis arbeidstiden din i egen næring ikke er redusert, kan du skrive inn samme antall timer som i spørsmålet over.</i></div>
+            <div><i>For å vurdere om du har rett til dagpenger, må vi vite din nåværende ukentlige arbeidstid. Hvis du jobber mer enn 50 prosent av den totale arbeidstiden du hadde før, har du ikke rett til dagpenger.&lt;br/&gt;&lt;br/&gt;Hvis arbeidstiden din i egen næring ikke er redusert, kan du skrive inn samme antall timer som i spørsmålet over.</i></div>
             <br/>
     Svar:
         1
@@ -230,7 +230,7 @@
     </p>
     <p>
             <strong>Skriv inn hvor mange timer du jobber per uke i egen næring nå</strong>
-            <div><i>For å vurdere om du har rett til dagpenger, må vi vite din nåværende ukentlige arbeidstid. Hvis du jobber mer enn 50 prosent av den totale arbeidstiden du hadde før, har du ikke rett til dagpenger.<br/><br/>Hvis arbeidstiden din i egen næring ikke er redusert, kan du skrive inn samme antall timer som i spørsmålet over.</i></div>
+            <div><i>For å vurdere om du har rett til dagpenger, må vi vite din nåværende ukentlige arbeidstid. Hvis du jobber mer enn 50 prosent av den totale arbeidstiden du hadde før, har du ikke rett til dagpenger.&lt;br/&gt;&lt;br/&gt;Hvis arbeidstiden din i egen næring ikke er redusert, kan du skrive inn samme antall timer som i spørsmålet over.</i></div>
             <br/>
     Svar:
         1
@@ -356,7 +356,7 @@
     <h2>Annen pengestøtte</h2>
     <p>
             <strong>Har du de siste 36 måneder motatt pengestøtte fra EØS-land, Sveits eller Storbritania som ligner på</strong>
-            <div><i><ul><li>Sykepenger</li><li>Foreldrepenger eller svangerskapspenger</li><li>Dagpenger / arbeidsledighetstrygd</li><li>Pleiepenger, omsorgspenger eller opplæringspenger</li></ul></i></div>
+            <div><i>&lt;ul&gt;&lt;li&gt;Sykepenger&lt;/li&gt;&lt;li&gt;Foreldrepenger eller svangerskapspenger&lt;/li&gt;&lt;li&gt;Dagpenger / arbeidsledighetstrygd&lt;/li&gt;&lt;li&gt;Pleiepenger, omsorgspenger eller opplæringspenger&lt;/li&gt;&lt;/ul&gt;</i></div>
             <br/>
     Svar:
 
@@ -369,7 +369,7 @@
             <div><i>Med utgangspunkt i en vedvarende agenda dokumenteres oppfølgingen som en følge av resultatoppnåelsen.</i></div>
     </p>
     <p>
-            <div><i><strong>Dine pengestøtter fra EØS land</strong><br/>Du må legge til alle trygdeytelser fra EØS-land, Sveits eller Storbritannia du har mottatt eller søkt på de siste 36 måneder</i></div>
+            <div><i>&lt;strong&gt;Dine pengestøtter fra EØS land&lt;/strong&gt;&lt;br/&gt;Du må legge til alle trygdeytelser fra EØS-land, Sveits eller Storbritannia du har mottatt eller søkt på de siste 36 måneder</i></div>
     </p>
             <div class="modalSpørsmål">
     <p>
@@ -455,7 +455,7 @@
             </div>
     <p>
             <strong>Mottar du eller har du søkt om pengestøtte fra andre enn Nav?</strong>
-            <div><i><ul><li>Pensjon fra andre enn NAV</li><li>Etterlønn</li><li>Pengestøtte under arbeidsløshet eller garantilott fra Garantikassen for fiskere (GFF)</li></ul></i></div>
+            <div><i>&lt;ul&gt;&lt;li&gt;Pensjon fra andre enn NAV&lt;/li&gt;&lt;li&gt;Etterlønn&lt;/li&gt;&lt;li&gt;Pengestøtte under arbeidsløshet eller garantilott fra Garantikassen for fiskere (GFF)&lt;/li&gt;&lt;/ul&gt;</i></div>
             <br/>
     Svar:
 
@@ -468,7 +468,7 @@
             <div><i>På grunnlag av en sømløs tidshorisont tas det høyde for relasjonene i tillegg til forholdene.</i></div>
     </p>
     <p>
-            <div><i><strong>Dine pengestøtter fra Norge</strong><br />Du må legge til alle pengestøtter du mottar eller har søkt om som ikke er fra Nav.</i></div>
+            <div><i>&lt;strong&gt;Dine pengestøtter fra Norge&lt;/strong&gt;&lt;br /&gt;Du må legge til alle pengestøtter du mottar eller har søkt om som ikke er fra Nav.</i></div>
     </p>
             <div class="modalSpørsmål">
     <p>
