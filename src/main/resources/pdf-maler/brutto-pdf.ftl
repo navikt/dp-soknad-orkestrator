@@ -3,6 +3,8 @@
     <#switch svar>
         <#case "dokumentkravSvarSendNå">
             <#return "Jeg vil laste opp nå">
+        <#case "dokumentkravEttersendt">
+            <#return "Jeg har ettersendt">
         <#case "dokumentkravSvarSenderIkke">
             <#return "Jeg sender det ikke">
         <#case "dokumentkravSvarSenderSenere">
