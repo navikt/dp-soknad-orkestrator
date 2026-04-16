@@ -47,8 +47,14 @@ class BostedslandErNorgeBehovløser(
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("folkeregistrertAdresseErNorgeStemmerDet")?.let {
-                if (!it.isMissingOrNull()) {
-                    return it.erBoolean()
+                if (!it.isMissingOrNull() && it.erBoolean() == true) {
+                    return true
+                }
+
+                seksjonsJson.findPath("bostedsland")?.let {
+                    if (!it.isMissingOrNull()) {
+                        return it.asText() == "NOR"
+                    }
                 }
             }
         }
