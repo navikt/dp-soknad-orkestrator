@@ -66,9 +66,49 @@ class BostedslandErNorgeBehovløserTest {
         }
     }
 
+    @Test
+    fun `Behovløser publiserer løsning på behov BostedslandErNorge med folkeregistrertAdresseErNorgeStemmerDet felt`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+              "seksjonId":"personalia",
+              "seksjonsvar": {
+                "folkeregistrertAdresseErNorgeStemmerDet": "ja"
+              },
+              "versjon": 1
+            }
+            """.trimIndent()
+
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.BostedslandErNorge))
+
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "personalia") }
+        verify { søknadRepository.hent(søknadId) }
+        testRapid.inspektør.message(0)["@løsning"]["BostedslandErNorge"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe true
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
     @ParameterizedTest
-    @CsvSource(value = ["ja, true", "nei, false"])
-    fun `Behovløser publiserer løsning på behov BostedslandErNorge med verdi og gjelderFra med seksjonsdata`(
+    @CsvSource(value = ["NOR, true", "SWE, false"])
+    fun `Behovløser publiserer løsning på behov BostedslandErNorge  for søkere som bor i utlandet`(
         svar: String,
         returverdi: Boolean,
     ) {
@@ -83,7 +123,52 @@ class BostedslandErNorgeBehovløserTest {
             {
               "seksjonId":"personalia",
               "seksjonsvar": {
-                "folkeregistrertAdresseErNorgeStemmerDet": "$svar"
+                "bostedsland": "$svar"
+              },
+              "versjon": 1
+            }
+            """.trimIndent()
+
+        val søknadstidspunkt = ZonedDateTime.now()
+        every {
+            søknadRepository.hent(any())
+        } returns
+            Søknad(
+                søknadId = søknadId,
+                ident = ident,
+                tilstand = Tilstand.INNSENDT,
+                innsendtTidspunkt = søknadstidspunkt.toLocalDateTime(),
+            )
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.BostedslandErNorge))
+
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "personalia") }
+        verify { søknadRepository.hent(søknadId) }
+        testRapid.inspektør.message(0)["@løsning"]["BostedslandErNorge"].also { løsning ->
+            løsning["verdi"].asBoolean() shouldBe returverdi
+            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = ["NOR, true", "SWE, false"])
+    fun `Behovløser publiserer løsning på behov BostedslandErNorge for søkere svar nei på svar fra PDL men som velger Norge`(
+        svar: String,
+        returverdi: Boolean,
+    ) {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                any(),
+                any(),
+                any(),
+            )
+        } returns
+            """
+            {
+              "seksjonId":"personalia",
+              "seksjonsvar": {
+                "folkeregistrertAdresseErNorgeStemmerDet": "nei",
+                "bostedsland": "$svar"
               },
               "versjon": 1
             }
