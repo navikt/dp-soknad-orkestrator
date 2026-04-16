@@ -430,7 +430,7 @@ class SøknadsdataBehovløser(
             "AUT",
         )
 
-    private fun tomSøknadsdataResultat(søknadId: UUID? = null) =
+    private fun tomSøknadsdataResultat(søknadId: UUID) =
         SøknadsdataResultType(
             eøsBostedsland = false,
             eøsArbeidsforhold = false,
@@ -439,7 +439,7 @@ class SøknadsdataBehovløser(
             harBarn = false,
             harAndreYtelser = false,
             ønskerDagpengerFraDato = null,
-            søknadUuid = søknadId?.toString(),
+            søknadUuid = søknadId.toString(),
             reellArbeidssøker = ReellArbeidssøker(helse = false, geografi = false, deltid = false, yrke = false),
         )
 }
@@ -453,7 +453,7 @@ data class SøknadsdataResultType(
     val harAndreYtelser: Boolean,
     val ønskerDagpengerFraDato: LocalDate?,
     @field:JsonProperty("søknad_uuid")
-    val søknadUuid: String?,
+    val søknadUuid: String,
     val reellArbeidssøker: ReellArbeidssøker,
 )
 
