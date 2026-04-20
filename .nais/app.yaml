@@ -14,8 +14,8 @@ spec:
     min: {{ replicas.min }}
   resources:
     requests:
-      cpu: 50m
-      memory: 384Mi
+      cpu: 262m
+      memory: 512Mi
   leaderElection: true
   kafka:
     pool: {{ kafka.pool }}
