@@ -1,4 +1,4 @@
-<#import "include/macros.ftl" as macros/>
+<#import "include/macros.ftlh" as macros/>
 <#function mapDokumentasjonskravSvar svar>
     <#switch svar>
         <#case "dokumentkravSvarSendNå">
@@ -27,7 +27,7 @@
 <#assign root = json?eval_json>
 
 <html lang="no">
-<#include "include/html-head-element.ftl"/>
+<#include "include/html-head-element.ftlh"/>
 <body>
 <#include "include/page-header-right.ftl"/>
 <h1>Søknad om dagpenger</h1>

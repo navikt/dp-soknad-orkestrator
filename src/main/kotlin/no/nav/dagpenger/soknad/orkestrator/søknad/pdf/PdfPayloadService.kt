@@ -31,12 +31,12 @@ class PdfPayloadService(
     fun genererBruttoPdfPayload(
         søknadId: UUID,
         ident: String,
-    ): String = genererPdfPayload(søknadId, ident, "brutto-pdf.ftl")
+    ): String = genererPdfPayload(søknadId, ident, "brutto-pdf.ftlh")
 
     fun genererNettoPdfPayload(
         søknadId: UUID,
         ident: String,
-    ): String = genererPdfPayload(søknadId, ident, "netto-pdf.ftl")
+    ): String = genererPdfPayload(søknadId, ident, "netto-pdf.ftlh")
 
     private fun genererPdfPayload(
         søknadId: UUID,
