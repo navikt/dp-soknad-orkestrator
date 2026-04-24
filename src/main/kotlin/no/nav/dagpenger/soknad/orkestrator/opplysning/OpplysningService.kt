@@ -247,6 +247,7 @@ class OpplysningService(
             NyOpplysningDTO(
                 verdi = objectMapper.writeValueAsString(BarnetilleggV2Løsning(søknadbarnId, løsningsbarn)),
                 begrunnelse = slettRequest.begrunnelse,
+                gyldigFraOgMed = tidligsteBarnetilleggFom(alleBarnEtterSletting),
             )
 
         try {

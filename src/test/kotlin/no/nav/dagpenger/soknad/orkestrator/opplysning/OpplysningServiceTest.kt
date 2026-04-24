@@ -869,9 +869,9 @@ class OpplysningServiceTest {
                 etternavn = "Etternavn",
                 fødselsdato = LocalDate.of(2015, 1, 1),
                 statsborgerskap = "NOR",
-                forsørgerBarnet = true,
+                forsørgerBarnet = false,
                 fraRegister = false,
-                kvalifisererTilBarnetillegg = true,
+                kvalifisererTilBarnetillegg = false,
                 barnetilleggFom = null,
                 barnetilleggTom = null,
                 begrunnelse = null,
@@ -884,11 +884,11 @@ class OpplysningServiceTest {
                 etternavn = "Etternavn",
                 fødselsdato = LocalDate.of(2018, 1, 1),
                 statsborgerskap = "NOR",
-                forsørgerBarnet = false,
+                forsørgerBarnet = true,
                 fraRegister = true,
-                kvalifisererTilBarnetillegg = false,
-                barnetilleggFom = null,
-                barnetilleggTom = null,
+                kvalifisererTilBarnetillegg = true,
+                barnetilleggFom = LocalDate.of(2018, 1, 1),
+                barnetilleggTom = LocalDate.of(2036, 1, 1),
                 begrunnelse = null,
                 endretAv = null,
             )
@@ -915,7 +915,7 @@ class OpplysningServiceTest {
         løsning.barn.size shouldBe 1
         løsning.barn[0].fornavnOgMellomnavn shouldBe "Barn 2"
         fangetOpplysning.begrunnelse shouldBe "Feil barn"
-        fangetOpplysning.gyldigFraOgMed shouldBe null
+        fangetOpplysning.gyldigFraOgMed shouldBe LocalDate.of(2018, 1, 1)
         fangetOpplysning.gyldigTilOgMed shouldBe null
 
         verify(exactly = 1) {
