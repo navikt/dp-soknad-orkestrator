@@ -260,8 +260,7 @@ class OpplysningService(
             NyOpplysningDTO(
                 verdi = objectMapper.writeValueAsString(BarnetilleggV2Løsning(søknadbarnId, løsningsbarn)),
                 begrunnelse = barn.begrunnelse,
-                gyldigFraOgMed = nyttBarnSvar.barnetilleggFom,
-                gyldigTilOgMed = nyttBarnSvar.barnetilleggTom,
+                gyldigFraOgMed = tidligsteBarnetilleggFom(alleBarnEtterEndring),
             )
 
         val behandlingId = barnRequest.behandlingId
@@ -311,8 +310,7 @@ class OpplysningService(
             NyOpplysningDTO(
                 verdi = objectMapper.writeValueAsString(BarnetilleggV2Løsning(søknadbarnId, løsningsbarn)),
                 begrunnelse = barn.begrunnelse,
-                gyldigFraOgMed = barn.barnetilleggFom,
-                gyldigTilOgMed = barn.barnetilleggTom,
+                gyldigFraOgMed = tidligsteBarnetilleggFom(alleBarn),
             )
 
         val behandlingId =
@@ -332,5 +330,8 @@ class OpplysningService(
 
     private companion object {
         private val logger = KotlinLogging.logger {}
+
+        fun tidligsteBarnetilleggFom(barn: List<BarnSvar>) =
+            barn.filter { it.kvalifisererTilBarnetillegg }.mapNotNull { it.barnetilleggFom }.minOrNull()
     }
 }
