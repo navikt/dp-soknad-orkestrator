@@ -14,6 +14,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import no.nav.dagpenger.soknad.orkestrator.api.auth.saksbehandlerId
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnRequestDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SlettBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.metrikker.OpplysningMetrikker
 import java.util.UUID
 
@@ -68,6 +69,15 @@ internal fun Application.opplysningApi(opplysningService: OpplysningService) {
 
                             sikkerlogg.info { "PUT /barn/$søknadbarnId/$barnId: søknadId=$søknadId" }
                             oppdaterBarn(opplysningService, søknadId, barnId)
+                        }
+
+                        post("/slett") {
+                            val søknadbarnId = validerOgFormaterUuidParameter(parameternavn) ?: return@post
+                            val barnId = validerOgFormaterUuidParameter("barnId") ?: return@post
+                            val søknadId = opplysningService.mapTilSøknadId(søknadbarnId)
+
+                            sikkerlogg.info { "POST /barn/$søknadbarnId/$barnId/slett: søknadId=$søknadId" }
+                            slettBarn(opplysningService, søknadId, barnId)
                         }
                     }
                 }
@@ -163,6 +173,39 @@ private suspend fun RoutingContext.oppdaterBarn(
         )
         return
     }
+}
+
+private suspend fun RoutingContext.slettBarn(
+    opplysningService: OpplysningService,
+    søknadId: UUID,
+    barnId: UUID,
+) {
+    val token =
+        call.request.headers["Authorization"]?.removePrefix("Bearer ")
+            ?: throw IllegalArgumentException("Fant ikke token i request header")
+
+    val slettRequest: SlettBarnRequestDTO
+    try {
+        slettRequest = call.receive<SlettBarnRequestDTO>()
+    } catch (e: Exception) {
+        call.respond(
+            HttpStatusCode.BadRequest,
+            "Kunne ikke parse request body til SlettBarnRequestDTO. Feilmelding: $e",
+        )
+        return
+    }
+
+    if (opplysningService.hentBarn(søknadId).none { it.barnId == barnId }) {
+        call.respond(HttpStatusCode.NotFound, "Fant ikke barn med id $barnId for søknad $søknadId")
+        return
+    }
+
+    val saksbehandlerId = call.saksbehandlerId()
+    sikkerlogg.info { "POST /barn slettBarn: saksbehandlerId=$saksbehandlerId, barnId=$barnId" }
+
+    opplysningService.slettBarn(slettRequest, barnId, søknadId, saksbehandlerId, token)
+    OpplysningMetrikker.endringBarn.inc()
+    call.respond(HttpStatusCode.OK)
 }
 
 private suspend fun RoutingContext.oppdaterBarnDeprecated(

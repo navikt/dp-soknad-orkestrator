@@ -60,6 +60,35 @@ paths:
                   $ref: '#/components/schemas/BarnResponse'
         '400':
           description: Ugyldig request body
+  /opplysninger/barn/{soknadbarnId}/{barnId}/slett:
+    post:
+      summary: Slett barn fra søknad
+      parameters:
+        - in: path
+          name: soknadbarnId
+          required: true
+          description: id for hele listen med barn på en gitt søknad, tilsvarende inntektId
+          schema:
+            type: string
+            format: uuid
+        - in: path
+          name: barnId
+          required: true
+          description: id for det spesifikke barnet som skal slettes
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlettBarnRequest'
+      responses:
+        '200':
+          description: Barn slettet
+        '404':
+          description: Fant ikke barnet som skal slettes
   /opplysninger/barn/{soknadbarnId}/{barnId}:
     put:
       summary: Oppdater opplysning om barn
@@ -215,6 +244,17 @@ components:
           $ref: '#/components/schemas/BarnData'
       required:
         - barn
+    SlettBarnRequest:
+      type: object
+      properties:
+        behandlingId:
+          type: string
+          format: uuid
+        begrunnelse:
+          type: string
+      required:
+        - behandlingId
+        - begrunnelse
     BarnData:
       type: object
       properties:

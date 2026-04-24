@@ -853,4 +853,136 @@ class OpplysningServiceTest {
 
         verify(exactly = 0) { dpBehandlingKlient.oppdaterBarnOpplysning(any(), any(), any()) }
     }
+
+    @Test
+    fun `slettBarn sender oppdatert barnliste til dp-behandling uten det slettede barnet`() {
+        val søknadId = UUID.randomUUID()
+        val søknadbarnId = UUID.randomUUID()
+        val behandlingId = UUID.randomUUID()
+        val barnSomSkalSlettes = UUID.randomUUID()
+        val dpBehandlingOpplysningSlot = slot<NyOpplysningDTO>()
+
+        val barn1 =
+            BarnSvar(
+                barnSvarId = barnSomSkalSlettes,
+                fornavnOgMellomnavn = "Barn 1",
+                etternavn = "Etternavn",
+                fødselsdato = LocalDate.of(2015, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = true,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = true,
+                barnetilleggFom = null,
+                barnetilleggTom = null,
+                begrunnelse = null,
+                endretAv = null,
+            )
+        val barn2 =
+            BarnSvar(
+                barnSvarId = UUID.randomUUID(),
+                fornavnOgMellomnavn = "Barn 2",
+                etternavn = "Etternavn",
+                fødselsdato = LocalDate.of(2018, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = true,
+                kvalifisererTilBarnetillegg = false,
+                barnetilleggFom = null,
+                barnetilleggTom = null,
+                begrunnelse = null,
+                endretAv = null,
+            )
+
+        every { saksbehandlerBarnRepository.hentBarn(søknadId) } returns listOf(barn1, barn2)
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
+        every { dpBehandlingKlient.oppdaterBarnOpplysning(any(), capture(dpBehandlingOpplysningSlot), any()) } returns Unit
+
+        opplysningService.slettBarn(
+            slettRequest =
+                no.nav.dagpenger.soknad.orkestrator.api.models.SlettBarnRequestDTO(
+                    behandlingId = behandlingId,
+                    begrunnelse = "Feil barn",
+                ),
+            barnId = barnSomSkalSlettes,
+            søknadId = søknadId,
+            saksbehandlerId = "saksbehandlerId",
+            token = "token",
+        )
+
+        val fangetOpplysning = dpBehandlingOpplysningSlot.captured
+        val løsning = objectMapper.readValue<BarnetilleggV2Løsning>(fangetOpplysning.verdi)
+
+        løsning.barn.size shouldBe 1
+        løsning.barn[0].fornavnOgMellomnavn shouldBe "Barn 2"
+        fangetOpplysning.begrunnelse shouldBe "Feil barn"
+        fangetOpplysning.gyldigFraOgMed shouldBe null
+        fangetOpplysning.gyldigTilOgMed shouldBe null
+
+        verify(exactly = 1) {
+            dpBehandlingKlient.oppdaterBarnOpplysning(behandlingId, fangetOpplysning, "token")
+        }
+    }
+
+    @Test
+    fun `slettBarn lagrer snapshot uten det slettede barnet`() {
+        val søknadId = UUID.randomUUID()
+        val søknadbarnId = UUID.randomUUID()
+        val barnSomSkalSlettes = UUID.randomUUID()
+        val lagredeSlot = slot<List<BarnSvar>>()
+
+        val barn =
+            BarnSvar(
+                barnSvarId = barnSomSkalSlettes,
+                fornavnOgMellomnavn = "Barn",
+                etternavn = "Etternavn",
+                fødselsdato = LocalDate.of(2015, 1, 1),
+                statsborgerskap = "NOR",
+                forsørgerBarnet = false,
+                fraRegister = false,
+                kvalifisererTilBarnetillegg = false,
+                barnetilleggFom = null,
+                barnetilleggTom = null,
+                begrunnelse = null,
+                endretAv = null,
+            )
+
+        every { saksbehandlerBarnRepository.hentBarn(søknadId) } returns listOf(barn)
+        every { opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId) } returns søknadbarnId
+        every { saksbehandlerBarnRepository.lagreBarn(søknadId, capture(lagredeSlot), any()) } returns Unit
+
+        opplysningService.slettBarn(
+            slettRequest =
+                no.nav.dagpenger.soknad.orkestrator.api.models.SlettBarnRequestDTO(
+                    behandlingId = UUID.randomUUID(),
+                    begrunnelse = "Begrunnelse",
+                ),
+            barnId = barnSomSkalSlettes,
+            søknadId = søknadId,
+            saksbehandlerId = "saksbehandlerId",
+            token = "token",
+        )
+
+        lagredeSlot.captured shouldBe emptyList()
+    }
+
+    @Test
+    fun `slettBarn kaster exception hvis barn ikke finnes`() {
+        val søknadId = UUID.randomUUID()
+
+        every { saksbehandlerBarnRepository.hentBarn(søknadId) } returns emptyList()
+
+        shouldThrow<IllegalArgumentException> {
+            opplysningService.slettBarn(
+                slettRequest =
+                    no.nav.dagpenger.soknad.orkestrator.api.models.SlettBarnRequestDTO(
+                        behandlingId = UUID.randomUUID(),
+                        begrunnelse = "Begrunnelse",
+                    ),
+                barnId = UUID.randomUUID(),
+                søknadId = søknadId,
+                saksbehandlerId = "saksbehandlerId",
+                token = "token",
+            )
+        }
+    }
 }
