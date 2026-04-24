@@ -623,6 +623,8 @@ class OpplysningServiceTest {
             )
         }
         løsning.søknadbarnId shouldBe søknadbarnId
+        fangetDpBehandlingOpplysning.gyldigFraOgMed shouldBe LocalDate.of(2020, 1, 1)
+        fangetDpBehandlingOpplysning.gyldigTilOgMed shouldBe null
     }
 
     @Test
@@ -819,8 +821,8 @@ class OpplysningServiceTest {
         løsning.barn.size shouldBe 1
         løsning.barn[0].fornavnOgMellomnavn shouldBe "Nytt"
         fangetOpplysning.begrunnelse shouldBe "Begrunnelse"
-        fangetOpplysning.gyldigFraOgMed shouldBe Barn.barnetilleggperiode(LocalDate.of(2020, 1, 1)).first
-        fangetOpplysning.gyldigTilOgMed shouldBe Barn.barnetilleggperiode(LocalDate.of(2020, 1, 1)).second
+        fangetOpplysning.gyldigFraOgMed shouldBe LocalDate.of(2020, 1, 1)
+        fangetOpplysning.gyldigTilOgMed shouldBe null
     }
 
     @Test
