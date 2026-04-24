@@ -17,7 +17,7 @@
     <#if spørsmål.svar??>
         <p>
             <#if spørsmål.label??>
-                <strong>${spørsmål.label?html}</strong>
+                <strong>${spørsmål.label}</strong>
             </#if>
             <br/>
             <@macros.finnSvar spørsmål=spørsmål/>
@@ -51,7 +51,7 @@
         <#list dokumentkrav as krav>
             <p>
                 <#if krav.tittel??>
-                    <strong>${krav.tittel?html}</strong>
+                    <strong>${krav.tittel}</strong>
                 </#if>
                 <br/>
                 <#if krav.svar??>
@@ -59,7 +59,7 @@
                 </#if>
                 <#if krav.begrunnelse??>
                     <br/>
-                    Begrunnelse: ${krav.begrunnelse?html}
+                    Begrunnelse: ${krav.begrunnelse}
                 </#if>
             </p>
         </#list>

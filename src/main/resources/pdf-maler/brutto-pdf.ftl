@@ -16,17 +16,17 @@
 <#macro håndterSpørsmål spørsmål>
     <p>
         <#if spørsmål.label??>
-            <strong>${spørsmål.label?html}</strong>
+            <strong>${spørsmål.label}</strong>
         </#if>
         <#if spørsmål.description??>
-            <div><i>${spørsmål.description?html}</i></div>
+            <div><i>${spørsmål.description}</i></div>
         </#if>
         <#if spørsmål.svar??>
             <br/>
             <@macros.finnSvar spørsmål=spørsmål/>
             <#if spørsmål.options??>
                 <div>Svaralternativene
-                    var: <#list spørsmål.options as option>${option.label?html}<#sep>, </#sep></#list></div>
+                    var: <#list spørsmål.options as option>${option.label}<#sep>, </#sep></#list></div>
             </#if>
         </#if>
     </p>
@@ -58,7 +58,7 @@
         <#list dokumentkrav as krav>
             <p>
                 <#if krav.tittel??>
-                    <strong>${krav.tittel?html}</strong>
+                    <strong>${krav.tittel}</strong>
                 </#if>
                 <br/>
                 <#if krav.svar??>
@@ -66,7 +66,7 @@
                 </#if>
                 <#if krav.begrunnelse??>
                     <br/>
-                    Begrunnelse: ${krav.begrunnelse?html}
+                    Begrunnelse: ${krav.begrunnelse}
                 </#if>
             </p>
         </#list>
