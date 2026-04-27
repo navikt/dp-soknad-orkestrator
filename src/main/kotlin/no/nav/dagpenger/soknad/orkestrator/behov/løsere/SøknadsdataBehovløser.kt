@@ -46,12 +46,16 @@ class SøknadsdataBehovløser(
                 "Mangler journalpostId i behov for søknadsdata for søknaden",
             )
 
+        logger.info { "Løser Søknadsdata-behov for journalpostId=$journalpostId" }
+
         val søknadId =
             søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
                 ?: run {
                     logger.info { "Fant ikke søknadId for journalpostId: $journalpostId, slår opp i SAF" }
                     safKlient.hentSøknadUuid(journalpostId)
                 }
+
+        logger.info { "Fant søknadId=$søknadId for journalpostId=$journalpostId" }
 
         if (søknadId == null) {
             logger.warn { "Fant ikke søknad_uuid i SAF for journalpostId: $journalpostId, svarer med tomt objekt" }
