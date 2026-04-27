@@ -70,7 +70,13 @@ internal class ApplicationBuilder(
     private val søknadPersonaliaRepository = SøknadPersonaliaRepository(dataSource)
 
     private val seksjonRepository = SeksjonRepository(dataSource, søknadRepository)
-    private val seksjonService = SeksjonService(seksjonRepository, søknadRepository)
+    private val søknadService: SøknadService =
+        SøknadService(
+            søknadRepository = søknadRepository,
+            søknadPersonaliaRepository = søknadPersonaliaRepository,
+            seksjonRepository = seksjonRepository,
+        )
+    private val seksjonService = SeksjonService(seksjonRepository, søknadRepository, søknadService)
     private val personaliaService =
         PersonaliaService(
             personService =
@@ -93,13 +99,6 @@ internal class ApplicationBuilder(
                         scope = Configuration.pdlApiSystemScope,
                     ).access_token ?: throw RuntimeException("Kunne ikke hente token")
             },
-        )
-
-    private val søknadService: SøknadService =
-        SøknadService(
-            søknadRepository = søknadRepository,
-            søknadPersonaliaRepository = søknadPersonaliaRepository,
-            seksjonRepository = seksjonRepository,
         )
 
     private val journalføringService = JournalføringService()

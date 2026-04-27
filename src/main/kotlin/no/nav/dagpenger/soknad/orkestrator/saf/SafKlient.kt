@@ -48,6 +48,15 @@ class SafKlient(
             try {
                 logger.info { "Slår opp journalpost i SAF for journalpostId: $journalpostId" }
                 val journalpost = hentJournalpost(journalpostId)
+
+                val brevkode = journalpost.hovedDokument.brevkode
+                if (brevkode != null && brevkode.startsWith("NAVe")) {
+                    logger.warn {
+                        "Journalpost $journalpostId er en ettersending (brevkode=$brevkode) — returnerer null uten å hente dokumentinnhold"
+                    }
+                    return@runBlocking null
+                }
+
                 val dokumentInfoId = journalpost.hovedDokument.dokumentInfoId
 
                 sikkerlogg.info { "Henter søknadsdata fra SAF for journalpostId: $journalpostId, dokumentInfoId: $dokumentInfoId" }

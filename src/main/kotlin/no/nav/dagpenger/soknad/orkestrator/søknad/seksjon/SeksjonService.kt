@@ -5,6 +5,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.søknad.Dokument
 import no.nav.dagpenger.soknad.orkestrator.søknad.Dokumentvariant
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmEttersending
@@ -14,6 +15,7 @@ import java.util.UUID
 class SeksjonService(
     val seksjonRepository: SeksjonRepository,
     val søknadRepository: SøknadRepository,
+    val søknadService: SøknadService,
 ) {
     private companion object {
         private val logg = KotlinLogging.logger {}
@@ -89,13 +91,16 @@ class SeksjonService(
         seksjonId: String,
         dokumentasjonskrav: String,
     ) {
+        val hoveddokumentSkjemakode = søknadService.finnSkjemaKode(ident, søknadId, forventetFullførtSøknad = false)
+        logg.info { "Sender ettersending for søknadId=$søknadId, hoveddokumentSkjemakode=$hoveddokumentSkjemakode" }
         val event =
             MeldingOmEttersending(
                 søknadId = søknadId,
                 ident = ident,
                 dokumentKravene =
                     opprettDokumenterFraDokumentasjonskravEttersending(
-                        dokumentasjonskrav,
+                        dokumentasjonskrav = dokumentasjonskrav,
+                        hoveddokumentSkjemakode = hoveddokumentSkjemakode,
                     ),
                 dokumentasjonskravJson = dokumentasjonskrav,
                 seksjonId = seksjonId,
@@ -106,32 +111,41 @@ class SeksjonService(
         )
     }
 
-    fun opprettDokumenterFraDokumentasjonskravEttersending(dokumentasjonskrav: String): List<Dokument> =
-        jsonMapper
-            .readTree(dokumentasjonskrav)
-            .toList()
-            .mapNotNull { rootNode ->
-                rootNode
-                    .findValue("bundle")
-                    ?.let { bundleNode ->
-                        if (!bundleNode.isEmpty) {
-                            Dokument(
-                                skjemakode = rootNode.at("/skjemakode").textValue(),
-                                varianter =
-                                    listOf(
-                                        Dokumentvariant(
-                                            filnavn = bundleNode.at("/filnavn").textValue(),
-                                            urn = bundleNode.at("/urn").textValue(),
-                                            variant = "ARKIV",
-                                            type = "PDF",
+    fun opprettDokumenterFraDokumentasjonskravEttersending(
+        dokumentasjonskrav: String,
+        hoveddokumentSkjemakode: String? = null,
+    ): List<Dokument> {
+        val dokumenter =
+            jsonMapper
+                .readTree(dokumentasjonskrav)
+                .toList()
+                .mapNotNull { rootNode ->
+                    rootNode
+                        .findValue("bundle")
+                        ?.let { bundleNode ->
+                            if (!bundleNode.isEmpty) {
+                                Dokument(
+                                    skjemakode = rootNode.at("/skjemakode").textValue(),
+                                    varianter =
+                                        listOf(
+                                            Dokumentvariant(
+                                                filnavn = bundleNode.at("/filnavn").textValue(),
+                                                urn = bundleNode.at("/urn").textValue(),
+                                                variant = "ARKIV",
+                                                type = "PDF",
+                                            ),
                                         ),
-                                    ),
-                            )
-                        } else {
-                            null
+                                )
+                            } else {
+                                null
+                            }
                         }
-                    }
-            }
+                }
+        if (hoveddokumentSkjemakode != null && dokumenter.isNotEmpty()) {
+            return listOf(dokumenter.first().copy(skjemakode = hoveddokumentSkjemakode)) + dokumenter.drop(1)
+        }
+        return dokumenter
+    }
 }
 
 data class Seksjon(
