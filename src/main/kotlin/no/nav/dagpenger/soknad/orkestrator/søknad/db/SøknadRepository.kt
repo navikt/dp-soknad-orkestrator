@@ -26,6 +26,7 @@ import org.jetbrains.exposed.sql.javatime.dateTimeLiteral
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.json.jsonb
 import org.jetbrains.exposed.sql.or
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -284,6 +285,32 @@ class SøknadRepository(
                 .firstOrNull()
         }
 
+    fun lagreEttersendingJournalpostId(
+        søknadId: UUID,
+        journalpostId: String,
+    ) {
+        transaction {
+            EttersendingJournalpostTabell.insert {
+                it[EttersendingJournalpostTabell.søknadId] = søknadId
+                it[EttersendingJournalpostTabell.journalpostId] = journalpostId
+            }
+        }
+    }
+
+    fun hentSøknadIdFraEttersendingJournalpostId(
+        journalpostId: String,
+        ident: String,
+    ): UUID? =
+        transaction {
+            EttersendingJournalpostTabell
+                .innerJoin(SøknadTabell)
+                .select(EttersendingJournalpostTabell.søknadId)
+                .where { EttersendingJournalpostTabell.journalpostId eq journalpostId }
+                .andWhere { SøknadTabell.ident eq ident }
+                .map { it[EttersendingJournalpostTabell.søknadId] }
+                .firstOrNull()
+        }
+
     fun hentSoknaderForIdent(ident: String) =
         transaction {
             SøknadTabell
@@ -325,3 +352,9 @@ object SøknadDataTabell : IntIdTable("soknad_data") {
 private fun serializeSøknadData(søknadData: JsonNode): String = objectMapper.writeValueAsString(søknadData)
 
 private fun deserializeSøknadData(søknadData: String): JsonNode = objectMapper.readTree(søknadData)
+
+object EttersendingJournalpostTabell : IntIdTable("ettersending_journalpost") {
+    val opprettet: Column<LocalDateTime> = datetime("opprettet").default(now())
+    val søknadId: Column<UUID> = uuid("soknad_id").references(SøknadTabell.søknadId)
+    val journalpostId: Column<String> = varchar("journalpost_id", 32)
+}

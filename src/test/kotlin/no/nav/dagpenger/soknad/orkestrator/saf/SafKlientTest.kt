@@ -32,26 +32,7 @@ class SafKlientTest {
         )
 
     @Test
-    fun `hentSøknadUuid returnerer null for NAVe-brevkode uten å hente dokumentinnhold`() {
-        var antallRequests = 0
-        val mockEngine =
-            MockEngine { _ ->
-                antallRequests++
-                respond(
-                    content = ettersendingGraphQlRespons,
-                    status = HttpStatusCode.OK,
-                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
-                )
-            }
-
-        val resultat = lagSafKlient(mockEngine).hentSøknadUuid("123456789")
-
-        resultat shouldBe null
-        antallRequests shouldBe 1
-    }
-
-    @Test
-    fun `hentSøknadUuid henter dokumentinnhold for ikke-NAVe-brevkode`() {
+    fun `hentSøknadUuid henter journalpost og deretter dokumentinnhold`() {
         var antallRequests = 0
         val mockEngine =
             MockEngine { _ ->
@@ -77,24 +58,6 @@ class SafKlientTest {
         antallRequests shouldBe 2
     }
 }
-
-private val ettersendingGraphQlRespons =
-    """
-    {
-      "data": {
-        "journalpost": {
-          "journalpostId": "123456789",
-          "dokumenter": [
-            {
-              "dokumentInfoId": "dok-1",
-              "brevkode": "NAVe 04-01.03",
-              "tittel": "Ettersending til søknad om dagpenger"
-            }
-          ]
-        }
-      }
-    }
-    """.trimIndent()
 
 private val vanligSøknadGraphQlRespons =
     """
