@@ -52,25 +52,5 @@
         </#if>
     </#list>
 </#list>
-<#if root.dokumentasjonskrav?? && root.dokumentasjonskrav?size gt 0>
-    <h2>Dokumentasjonskrav</h2>
-    <#list root.dokumentasjonskrav as dokumentkrav>
-        <#list dokumentkrav as krav>
-            <p>
-                <#if krav.tittel??>
-                    <strong>${krav.tittel?html}</strong>
-                </#if>
-                <br/>
-                <#if krav.svar??>
-                    Svar: ${mapDokumentasjonskravSvar(krav.svar)}
-                </#if>
-                <#if krav.begrunnelse??>
-                    <br/>
-                    Begrunnelse: ${krav.begrunnelse?html}
-                </#if>
-            </p>
-        </#list>
-    </#list>
-</#if>
 </body>
 </html>
