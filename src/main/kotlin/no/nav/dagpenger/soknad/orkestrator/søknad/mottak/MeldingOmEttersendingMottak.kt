@@ -60,6 +60,7 @@ internal class MeldingOmEttersendingMottak(
         val dokumentasjonskravJson =
             packet["@løsning"][BEHOV]["dokumentasjonskravJson"].asText()
         val seksjonId = packet["@løsning"][BEHOV]["seksjonId"].asText()
+        val journalpostId = packet["@løsning"][BEHOV]["journalpostId"].asText()
 
         withLoggingContext(
             "søknadId" to søknadId.toString(),
@@ -81,6 +82,7 @@ internal class MeldingOmEttersendingMottak(
                     dokumentasjonskrav = dokumentasjonskravJson,
                     oppdatertTidspunkt = oppdatertTidspunkt,
                 )
+                søknadRepository.lagreEttersendingJournalpostId(søknadId, journalpostId)
                 val dokumentKravInnsendtMelding =
                     DokumentKravInnsendtMelding(
                         søknadId = søknadId,

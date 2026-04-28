@@ -51,7 +51,11 @@ class SøknadsdataBehovløser(
         val søknadId =
             søknadRepository.hentSøknadIdFraJournalPostId(journalpostId, behovmelding.ident)
                 ?: run {
-                    logger.info { "Fant ikke søknadId for journalpostId: $journalpostId, slår opp i SAF" }
+                    logger.info { "Fant ikke søknadId for journalpostId: $journalpostId, slår opp i ettersending-mapping" }
+                    søknadRepository.hentSøknadIdFraEttersendingJournalpostId(journalpostId, behovmelding.ident)
+                }
+                ?: run {
+                    logger.info { "Fant ikke søknadId i ettersending-mapping for journalpostId: $journalpostId, slår opp i SAF" }
                     safKlient.hentSøknadUuid(journalpostId)
                 }
 
