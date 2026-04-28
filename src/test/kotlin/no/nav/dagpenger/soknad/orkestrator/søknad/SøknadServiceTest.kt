@@ -145,6 +145,32 @@ class SøknadServiceTest {
     }
 
     @Test
+    @Suppress("ktlint:standard:max-line-length")
+    fun `slettSøknadOgInkrementerMetrikk returnerer uten å gjøre noe for alle tilstander som ikke er PÅBEGYNT`() {
+        val tilstanderSomIkkeSkalSlettes =
+            listOf(
+                Tilstand.INNSENDT,
+                Tilstand.JOURNALFØRT,
+                Tilstand.SLETTET_AV_SYSTEM,
+            )
+
+        tilstanderSomIkkeSkalSlettes.forEach { tilstand ->
+            testRapid.reset() // Nullstill testrapid mellom iterasjoner
+            val søknadId = randomUUID()
+            val søknad = Søknad(ident = ident, søknadId = søknadId, tilstand = tilstand)
+
+            every {
+                søknadRepository.hent(søknadId)
+            } returns søknad
+
+            søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident, "ny")
+
+            verify(exactly = 0) { søknadRepository.slett(søknadId, ident) }
+            testRapid.inspektør.size shouldBe 0
+        }
+    }
+
+    @Test
     fun `opprett returnerer UUID fra repository`() {
         val søknadId = randomUUID()
         coEvery { søknadRepository.opprett(any()) } returns søknadId
