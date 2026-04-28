@@ -23,6 +23,7 @@ class PdfPayloadService(
         init {
             freemarkerConfiguration.setClassForTemplateLoading(this::class.java, "/pdf-maler")
             freemarkerConfiguration.defaultEncoding = "UTF-8"
+            freemarkerConfiguration.outputFormat = freemarker.core.HTMLOutputFormat.INSTANCE
         }
     }
 
