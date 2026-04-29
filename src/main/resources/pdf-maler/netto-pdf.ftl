@@ -30,7 +30,7 @@
 <#include "include/html-head-element.ftl"/>
 <body>
 <#include "include/page-header-right.ftl"/>
-<#include "include/søknad-om-dagpenger-header.ftl"/>
+<h1>Søknad om dagpenger</h1>
 <#list root.seksjoner as seksjon>
     <h2>${seksjon.navn}</h2>
     <#list seksjon.spørsmål as spørsmål>
