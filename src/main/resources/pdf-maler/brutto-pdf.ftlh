@@ -16,10 +16,10 @@
 <#macro håndterSpørsmål spørsmål>
     <p>
         <#if spørsmål.label??>
-            <strong>${spørsmål.label}</strong>
+            <strong>${spørsmål.label?no_esc}</strong>
         </#if>
         <#if spørsmål.description??>
-            <div><i>${spørsmål.description}</i></div>
+            <div><i>${spørsmål.description?no_esc}</i></div>
         </#if>
         <#if spørsmål.svar??>
             <br/>
@@ -36,7 +36,7 @@
 <html lang="no">
 <#include "include/html-head-element.ftlh"/>
 <body>
-<#include "include/page-header-right.ftl"/>
+<#include "include/page-header-right.ftlh"/>
 <h1>Søknad om dagpenger</h1>
 <#list root.seksjoner as seksjon>
     <h2>${seksjon.navn}</h2>

@@ -29,7 +29,7 @@
 <html lang="no">
 <#include "include/html-head-element.ftlh"/>
 <body>
-<#include "include/page-header-right.ftl"/>
+<#include "include/page-header-right.ftlh"/>
 <h1>Søknad om dagpenger</h1>
 <#list root.seksjoner as seksjon>
     <h2>${seksjon.navn}</h2>
