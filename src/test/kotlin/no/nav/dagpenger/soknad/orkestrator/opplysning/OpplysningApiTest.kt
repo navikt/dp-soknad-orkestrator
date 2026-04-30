@@ -21,6 +21,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnDataDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SlettBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
@@ -153,7 +154,23 @@ class OpplysningApiTest {
                 .put("/opplysninger/ugyldigSøknadId/barn/oppdater") {
                     header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
                     header(HttpHeaders.ContentType, "application/json")
-                    setBody(oppdatertBarnRequestDTO)
+                    setBody(
+                        BarnRequestDTO(
+                            behandlingId = UUID.randomUUID(),
+                            barn =
+                                BarnDataDTO(
+                                    fornavnOgMellomnavn = "Ola",
+                                    etternavn = "Nordmann",
+                                    fodselsdato = LocalDate.of(2020, 1, 1),
+                                    oppholdssted = "Norge",
+                                    forsorgerBarnet = true,
+                                    kvalifisererTilBarnetillegg = true,
+                                    barnetilleggFom = LocalDate.of(2020, 1, 1),
+                                    barnetilleggTom = LocalDate.of(2038, 1, 1),
+                                    begrunnelse = "Begrunnelse",
+                                ),
+                        ),
+                    )
                 }.let { response ->
                     response.status shouldBe HttpStatusCode.BadRequest
                 }
@@ -424,21 +441,76 @@ class OpplysningApiTest {
                 }
         }
     }
-}
 
-val oppdatertBarnRequestDTO =
-    BarnRequestDTO(
-        behandlingId = UUID.randomUUID(),
-        barn =
-            BarnDataDTO(
-                fornavnOgMellomnavn = "Ola",
-                etternavn = "Nordmann",
-                fodselsdato = LocalDate.of(2020, 1, 1),
-                oppholdssted = "Norge",
-                forsorgerBarnet = true,
-                kvalifisererTilBarnetillegg = true,
-                barnetilleggFom = LocalDate.of(2020, 1, 1),
-                barnetilleggTom = LocalDate.of(2038, 1, 1),
-                begrunnelse = "Begrunnelse",
+    @Test
+    fun `Slett barn returnerer 404 Not Found hvis barn ikke finnes`() {
+        val actualSøknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client
+                .post("/opplysninger/barn/$actualSøknadbarnId/${UUID.randomUUID()}/slett") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                    header(HttpHeaders.ContentType, "application/json")
+                    setBody(
+                        SlettBarnRequestDTO(
+                            behandlingId = UUID.randomUUID(),
+                            begrunnelse = "Begrunnelse",
+                        ),
+                    )
+                }.status shouldBe HttpStatusCode.NotFound
+        }
+    }
+
+    @Test
+    fun `Slett barn returnerer 400 Bad Request ved ugyldig body`() {
+        val actualSøknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client
+                .post("/opplysninger/barn/$actualSøknadbarnId/${UUID.randomUUID()}/slett") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                    header(HttpHeaders.ContentType, "application/json")
+                    setBody("ikke gyldig json")
+                }.status shouldBe HttpStatusCode.BadRequest
+        }
+    }
+
+    @Test
+    fun `Slett barn returnerer 200 OK`() {
+        val barnId = UUID.randomUUID()
+        val actualSøknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
+
+        saksbehandlerBarnRepository.lagreBarn(
+            søknadId,
+            listOf(
+                BarnSvar(
+                    barnSvarId = barnId,
+                    fornavnOgMellomnavn = "Barn",
+                    etternavn = "Barnesen",
+                    fødselsdato = LocalDate.of(2015, 1, 1),
+                    statsborgerskap = "NOR",
+                    forsørgerBarnet = false,
+                    fraRegister = false,
+                    kvalifisererTilBarnetillegg = false,
+                    begrunnelse = null,
+                    endretAv = null,
+                ),
             ),
-    )
+            "saksbehandlerId",
+        )
+
+        withMockAuthServerAndTestApplication(moduleFunction = testModuleFunction) {
+            client
+                .post("/opplysninger/barn/$actualSøknadbarnId/$barnId/slett") {
+                    header(HttpHeaders.Authorization, "Bearer $testAzureADToken")
+                    header(HttpHeaders.ContentType, "application/json")
+                    setBody(
+                        SlettBarnRequestDTO(
+                            behandlingId = UUID.randomUUID(),
+                            begrunnelse = "Begrunnelse",
+                        ),
+                    )
+                }.status shouldBe HttpStatusCode.OK
+        }
+    }
+}

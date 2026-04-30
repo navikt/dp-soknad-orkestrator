@@ -589,6 +589,33 @@ class SøknadRepositoryTest {
         }
         return søknadId
     }
+
+    @Test
+    fun `lagreEttersendingJournalpostId lagrer kobling mellom søknadId og journalpostId`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+
+        søknadRepository.lagreEttersendingJournalpostId(søknadId, "987654321")
+
+        val funnetSøknadId = søknadRepository.hentSøknadIdFraEttersendingJournalpostId("987654321", ident)
+        funnetSøknadId shouldBe søknadId
+    }
+
+    @Test
+    fun `hentSøknadIdFraEttersendingJournalpostId returnerer null når journalpostId ikke finnes`() {
+        val funnetSøknadId = søknadRepository.hentSøknadIdFraEttersendingJournalpostId("ukjent-id", ident)
+        funnetSøknadId shouldBe null
+    }
+
+    @Test
+    fun `hentSøknadIdFraEttersendingJournalpostId returnerer null når ident ikke matcher`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        søknadRepository.lagreEttersendingJournalpostId(søknadId, "111222333")
+
+        val funnetSøknadId = søknadRepository.hentSøknadIdFraEttersendingJournalpostId("111222333", "annen-ident")
+        funnetSøknadId shouldBe null
+    }
 }
 
 fun hentSøknadbarnIdUtenÅOppretteNy(søknadId: UUID): UUID? =

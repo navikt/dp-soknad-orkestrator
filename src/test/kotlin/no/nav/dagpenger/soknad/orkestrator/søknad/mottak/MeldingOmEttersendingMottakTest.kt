@@ -51,6 +51,7 @@ class MeldingOmEttersendingMottakTest {
                 any(LocalDateTime::class),
             )
         }
+        verify { søknadRepository.lagreEttersendingJournalpostId(søknadId, journalpostId) }
 
         rapidsConnection.inspektør.size shouldBe 1
         val dokumentKravInnsendtMelding = rapidsConnection.inspektør.message(0)

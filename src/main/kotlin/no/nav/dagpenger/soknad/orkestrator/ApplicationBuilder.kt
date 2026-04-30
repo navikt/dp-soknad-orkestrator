@@ -37,6 +37,7 @@ import no.nav.dagpenger.soknad.orkestrator.saf.SafKlient
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.jobb.RekjørJournalføringForSøknaderJobb
 import no.nav.dagpenger.soknad.orkestrator.søknad.jobb.SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføringMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.MeldingOmEttersendingMottak
@@ -69,7 +70,13 @@ internal class ApplicationBuilder(
     private val søknadPersonaliaRepository = SøknadPersonaliaRepository(dataSource)
 
     private val seksjonRepository = SeksjonRepository(dataSource, søknadRepository)
-    private val seksjonService = SeksjonService(seksjonRepository, søknadRepository)
+    private val søknadService: SøknadService =
+        SøknadService(
+            søknadRepository = søknadRepository,
+            søknadPersonaliaRepository = søknadPersonaliaRepository,
+            seksjonRepository = seksjonRepository,
+        )
+    private val seksjonService = SeksjonService(seksjonRepository, søknadRepository, søknadService)
     private val personaliaService =
         PersonaliaService(
             personService =
@@ -92,13 +99,6 @@ internal class ApplicationBuilder(
                         scope = Configuration.pdlApiSystemScope,
                     ).access_token ?: throw RuntimeException("Kunne ikke hente token")
             },
-        )
-
-    private val søknadService: SøknadService =
-        SøknadService(
-            søknadRepository = søknadRepository,
-            søknadPersonaliaRepository = søknadPersonaliaRepository,
-            seksjonRepository = seksjonRepository,
         )
 
     private val journalføringService = JournalføringService()
@@ -204,5 +204,6 @@ internal class ApplicationBuilder(
                 runMigration()
             }
         SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb.startFixedRateTimer(søknadService)
+        RekjørJournalføringForSøknaderJobb.startEngangsJobb(rapidsConnection, søknadRepository)
     }
 }

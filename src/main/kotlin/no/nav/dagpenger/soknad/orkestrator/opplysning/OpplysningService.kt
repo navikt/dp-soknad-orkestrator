@@ -9,6 +9,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.DataType
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO.Kilde
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
+import no.nav.dagpenger.soknad.orkestrator.api.models.SlettBarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_EGNE_BARN
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser.Companion.BESKRIVENDE_ID_PDL_BARN
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggV2BehovLøser.BarnetilleggV2Løsning
@@ -211,6 +212,58 @@ class OpplysningService(
         saksbehandlerBarnRepository.lagreBarn(søknadId, alleBarnEtterEndring, saksbehandlerId)
     }
 
+    fun slettBarn(
+        slettRequest: SlettBarnRequestDTO,
+        barnId: UUID,
+        søknadId: UUID,
+        saksbehandlerId: String,
+        token: String,
+    ) {
+        val alleBarnSvar = hentAlleBarnSvar(søknadId)
+
+        require(alleBarnSvar.any { it.barnSvarId == barnId }) {
+            "Fant ikke barn med id $barnId"
+        }
+
+        val alleBarnEtterSletting = alleBarnSvar.filter { it.barnSvarId != barnId }
+
+        val søknadbarnId = opplysningRepository.hentEllerOpprettSøknadbarnId(søknadId)
+        val løsningsbarn =
+            alleBarnEtterSletting.map {
+                LøsningsbarnV2(
+                    fornavnOgMellomnavn = it.fornavnOgMellomnavn,
+                    etternavn = it.etternavn,
+                    fødselsdato = it.fødselsdato,
+                    statsborgerskap = it.statsborgerskap,
+                    kvalifiserer = it.kvalifisererTilBarnetillegg,
+                    barnetilleggFom = it.barnetilleggFom,
+                    barnetilleggTom = it.barnetilleggTom,
+                    endretAv = it.endretAv,
+                    begrunnelse = it.begrunnelse,
+                )
+            }
+
+        val dpBehandlingOpplysning =
+            NyOpplysningDTO(
+                verdi = objectMapper.writeValueAsString(BarnetilleggV2Løsning(søknadbarnId, løsningsbarn)),
+                begrunnelse = slettRequest.begrunnelse,
+                gyldigFraOgMed = tidligsteBarnetilleggFom(alleBarnEtterSletting),
+            )
+
+        try {
+            dpBehandlingKlient.oppdaterBarnOpplysning(
+                behandlingId = slettRequest.behandlingId,
+                dpBehandlingOpplysning = dpBehandlingOpplysning,
+                token = token,
+            )
+        } catch (e: Exception) {
+            logger.error { e.message }
+            throw IllegalStateException("Feil ved sletting av barn mot dp-behandling", e)
+        }
+
+        saksbehandlerBarnRepository.lagreBarn(søknadId, alleBarnEtterSletting, saksbehandlerId)
+    }
+
     fun leggTilBarn(
         barnRequest: BarnRequestDTO,
         søknadId: UUID,
@@ -260,8 +313,7 @@ class OpplysningService(
             NyOpplysningDTO(
                 verdi = objectMapper.writeValueAsString(BarnetilleggV2Løsning(søknadbarnId, løsningsbarn)),
                 begrunnelse = barn.begrunnelse,
-                gyldigFraOgMed = nyttBarnSvar.barnetilleggFom,
-                gyldigTilOgMed = nyttBarnSvar.barnetilleggTom,
+                gyldigFraOgMed = tidligsteBarnetilleggFom(alleBarnEtterEndring),
             )
 
         val behandlingId = barnRequest.behandlingId
@@ -311,8 +363,7 @@ class OpplysningService(
             NyOpplysningDTO(
                 verdi = objectMapper.writeValueAsString(BarnetilleggV2Løsning(søknadbarnId, løsningsbarn)),
                 begrunnelse = barn.begrunnelse,
-                gyldigFraOgMed = barn.barnetilleggFom,
-                gyldigTilOgMed = barn.barnetilleggTom,
+                gyldigFraOgMed = tidligsteBarnetilleggFom(alleBarn),
             )
 
         val behandlingId =
@@ -332,5 +383,8 @@ class OpplysningService(
 
     private companion object {
         private val logger = KotlinLogging.logger {}
+
+        fun tidligsteBarnetilleggFom(barn: List<BarnSvar>) =
+            barn.filter { it.kvalifisererTilBarnetillegg }.mapNotNull { it.barnetilleggFom }.minOrNull()
     }
 }

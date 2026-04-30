@@ -77,6 +77,12 @@ class SøknadService(
             logg.warn { "Kunne ikke finne søknad med søknadId: $søknadId for sletting" }
             return
         }
+
+        if (søknad.tilstand != Tilstand.PÅBEGYNT) {
+            logg.warn { "Søknad med søknadId: $søknadId er i tilstand ${søknad.tilstand}, og skal ikke slettes" }
+            return
+        }
+
         søknadRepository.slett(søknadId, ident)
 
         sendEndretTilstandTilSlettetMelding(søknadId, ident, søknad)

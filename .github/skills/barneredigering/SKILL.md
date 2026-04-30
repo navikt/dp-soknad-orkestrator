@@ -2,7 +2,7 @@
 name: barneredigering
 description: |
   Barn (child) editing for saksbehandlere in dp-soknad-orkestrator.
-  Use this skill when working on barn-related features: editing, adding, or fetching
+  Use this skill when working on barn-related features: editing, adding, deleting, or fetching
   children in søknader, the saksbehandler_barn table, barn behovløsere, or the
   dp-behandling integration for barn opplysninger.
 ---
@@ -11,7 +11,7 @@ description: |
 
 ## Architecture overview
 
-Saksbehandlere can view, edit, and add barn (children) for a søknad. The system supports
+Saksbehandlere can view, edit, add, and delete barn (children) for a søknad. The system supports
 both the old quiz-søknad and the new seksjon_v2 søknad format through a unified read/write
 layer.
 
@@ -31,9 +31,9 @@ that søknad.
 
 ### Write flow
 
-Both `oppdaterBarn` and `leggTilBarn`:
+`oppdaterBarn`, `leggTilBarn`, and `slettBarn` all follow this pattern:
 1. Read current barn from the priority chain above
-2. Apply the edit (update or append)
+2. Apply the edit (update, append, or remove)
 3. INSERT a full snapshot (all barn) into `saksbehandler_barn`
 4. Send to dp-behandling via POST
 
@@ -61,8 +61,8 @@ Uses `JSON` (not `JSONB`) for consistency with `seksjon_v2` and to preserve key 
 ### Service layer
 - `src/main/kotlin/.../opplysning/OpplysningService.kt` — Core barn CRUD. Contains
   `hentBarn`, `hentAlleBarnSvar` (priority chain), `oppdaterBarn`, `leggTilBarn`,
-  `erEndret`, `sendbarnTilDpBehandling`, `hentBarnFraQuizOpplysninger`,
-  `hentBarnFraSeksjon`.
+  `slettBarn`, `sendbarnTilDpBehandling`, `tidligsteBarnetilleggFom`,
+  `hentBarnFraQuizOpplysninger`, `hentBarnFraSeksjon`.
 
 ### Repositories
 - `src/main/kotlin/.../opplysning/SaksbehandlerBarnRepository.kt` — Interface:
@@ -81,6 +81,8 @@ Uses `JSON` (not `JSONB`) for consistency with `seksjon_v2` and to preserve key 
     and optional `behandlingId: UUID?`.
   - **`BarnData`** — The barn fields (fornavnOgMellomnavn, etternavn, fodselsdato, etc.).
     No `barnId` — that's in the path for PUT.
+  - **`SlettBarnRequest`** — Request body for DELETE. Contains `behandlingId: UUID` (required)
+    and `begrunnelse: String` (required).
 
 ### API
 - `src/main/kotlin/.../opplysning/OpplysningApi.kt` — Route handlers. Endpoints:
@@ -89,6 +91,7 @@ Uses `JSON` (not `JSONB`) for consistency with `seksjon_v2` and to preserve key 
   - `GET /opplysninger/barn/{soknadbarnId}` — Fetch barn by søknadbarnId
   - `PUT /opplysninger/barn/{soknadbarnId}/{barnId}` — Update specific barn
   - `POST /opplysninger/barn/{soknadbarnId}` — Add new barn
+  - `POST /opplysninger/barn/{soknadbarnId}/{barnId}/slett` — Delete specific barn
 - Authentication: Azure AD (`saksbehandler` group required)
 
 ### dp-behandling integration
@@ -98,6 +101,10 @@ Uses `JSON` (not `JSONB`) for consistency with `seksjon_v2` and to preserve key 
   - Body: `NyOpplysningDTO(opplysningstype: UUID, verdi: String, begrunnelse: String,
     gyldigFraOgMed: LocalDate?, gyldigTilOgMed: LocalDate?)`
   - `verdi` is a JSON-serialized `BarnetilleggV2Løsning`
+  - `gyldigFraOgMed` is set to `tidligsteBarnetilleggFom(alleBarn)` — the minimum
+    `barnetilleggFom` among barn where `kvalifisererTilBarnetillegg == true`. `null` if
+    no barn qualify.
+  - `gyldigTilOgMed` is always `null` (not sent)
   - Hardcoded barn opplysningstype: `0194881f-9428-74d5-b160-f63a4c61a23b`
   - Uses OBO token flow via Azure AD
 
@@ -218,9 +225,13 @@ Requires `System.setProperty("Grupper.saksbehandler", "saksbehandler")` in setup
 ## Important conventions
 
 - `behandlingId` can be null in `BarnRequestDTO`. When null, skip the dp-behandling call.
-- `barnId` is a path parameter for PUT, not in the request body.
+- `behandlingId` is required in `SlettBarnRequestDTO` — sletting without syncing to
+  dp-behandling is not supported.
+- `barnId` is a path parameter for PUT and slett, not in the request body.
 - `barnetilleggFom`/`Tom` are set from `Barn.barnetilleggperiode(fødselsdato)` only when
   `kvalifisererTilBarnetillegg == true`. Otherwise null.
 - Begrunnelse is per-barn (inside JSON), not per-snapshot.
 - The `barn_soknad_mapping` table maps `søknadbarnId ↔ søknadId` for dp-behandling.
 - objectMapper config: `FAIL_ON_UNKNOWN_PROPERTIES = false`, dates as ISO strings.
+- `gyldigFraOgMed` sent to dp-behandling is always the **minimum** `barnetilleggFom` among
+  qualifying barn, not the individual barn's fom. `gyldigTilOgMed` is never sent.

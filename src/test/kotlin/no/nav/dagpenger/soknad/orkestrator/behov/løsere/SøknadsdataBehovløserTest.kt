@@ -1214,6 +1214,7 @@ class SøknadsdataBehovløserTest {
     fun `slår opp søknadId i SAF når journalpostId ikke finnes i databasen`() {
         val safSøknadId = UUID.randomUUID()
         every { søknadRepository.hentSøknadIdFraJournalPostId(any(), any()) } returns null
+        every { søknadRepository.hentSøknadIdFraEttersendingJournalpostId(any(), any()) } returns null
         every { safKlient.hentSøknadUuid(any()) } returns safSøknadId
         every { seksjonRepository.hentSeksjonsvar(safSøknadId, ident, "personalia") } returns
             personaliaOrkestratorJson("ja", "NOR")
@@ -1239,6 +1240,7 @@ class SøknadsdataBehovløserTest {
     fun `svarer med tomme verdier når søknad fra SAF ikke finnes i databasen`() {
         val safSøknadId = UUID.randomUUID()
         every { søknadRepository.hentSøknadIdFraJournalPostId(any(), any()) } returns null
+        every { søknadRepository.hentSøknadIdFraEttersendingJournalpostId(any(), any()) } returns null
         every { safKlient.hentSøknadUuid(any()) } returns safSøknadId
         every { søknadRepository.hent(safSøknadId) } returns null
 
@@ -1264,6 +1266,7 @@ class SøknadsdataBehovløserTest {
     @Test
     fun `svarer med tomt objekt når SAF ikke finner dokument`() {
         every { søknadRepository.hentSøknadIdFraJournalPostId(any(), any()) } returns null
+        every { søknadRepository.hentSøknadIdFraEttersendingJournalpostId(any(), any()) } returns null
         every { safKlient.hentSøknadUuid(any()) } returns null
 
         behovløser.løs(lagBehovmeldingUtenSøknadId(ident))

@@ -48,6 +48,7 @@ class SafKlient(
             try {
                 logger.info { "Slår opp journalpost i SAF for journalpostId: $journalpostId" }
                 val journalpost = hentJournalpost(journalpostId)
+
                 val dokumentInfoId = journalpost.hovedDokument.dokumentInfoId
 
                 sikkerlogg.info { "Henter søknadsdata fra SAF for journalpostId: $journalpostId, dokumentInfoId: $dokumentInfoId" }

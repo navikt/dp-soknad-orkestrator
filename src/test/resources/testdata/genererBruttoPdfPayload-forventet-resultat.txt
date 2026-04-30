@@ -49,8 +49,7 @@
     Innsendt elektronisk 31.12.2020 23:59<br/>
     Fødselsnummer: 987654321
 </div><h1>Søknad om dagpenger</h1>
-<p>fornavn mellomnavn etternavn<br/>987654321<br/>adresselinje1, adresselinje2, adresselinje3, 1234 poststed, land<br/>Kontonummer: 97143830733</p>
-<hr/>    <h2>Egen næring</h2>
+    <h2>Egen næring</h2>
     <p>
             <strong>Driver du egen næringsvirksomhet?</strong>
             <br/>
