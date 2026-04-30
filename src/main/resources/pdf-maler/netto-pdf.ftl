@@ -30,7 +30,7 @@
 
 <html lang="no">
 <#include "include/html-head-element.ftl"/>
-<body>src/main/resources/pdf-maler/include/html-head-element.ftl
+<body>
 <#include "include/page-header-right.ftl"/>
 <#include "include/søknad-om-dagpenger-header.ftl"/>
 <#list root.seksjoner as seksjon>
