@@ -17,8 +17,9 @@
 
         .modalSpørsmål {
             background: #eee;
-            padding: 1rem;
+            padding: 0.5rem 1rem;
             margin-bottom: 1rem;
+            border-radius: 12px;
         }
 
         .pageHeaderRight {

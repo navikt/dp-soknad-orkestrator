@@ -1,14 +1,29 @@
 package no.nav.dagpenger.soknad.orkestrator.utils
 
+import com.openhtmltopdf.outputdevice.helper.BaseRendererBuilder
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder
 import java.io.ByteArrayOutputStream
 
 fun genererPdfFraHtml(html: String): ByteArray {
     val vasketHtml = vaskHtml(html)
+    val vanligFont = { PdfRendererBuilder::class.java.getResourceAsStream("/fonts/SourceSans3-Regular.ttf") }
+    val boldFont = { PdfRendererBuilder::class.java.getResourceAsStream("/fonts/SourceSans3-Bold.ttf") }
 
     val outputStream = ByteArrayOutputStream()
     PdfRendererBuilder()
-        .withHtmlContent(vasketHtml, null)
+        .useFont(
+            vanligFont,
+            "Source Sans Pro",
+            400,
+            BaseRendererBuilder.FontStyle.NORMAL,
+            true,
+        ).useFont(
+            boldFont,
+            "Source Sans Pro",
+            700,
+            BaseRendererBuilder.FontStyle.NORMAL,
+            true,
+        ).withHtmlContent(vasketHtml, null)
         .toStream(outputStream)
         .run()
 

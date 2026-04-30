@@ -15,8 +15,14 @@
 
         .modalSpørsmål {
             background: #eee;
-            padding: 1rem;
+<<<<<<< Updated upstream
+            padding: 0.5rem 1rem;
             margin-bottom: 1rem;
+=======
+            padding: 1rem;
+            margin-bottom: 0.5rem 1rem;
+>>>>>>> Stashed changes
+            border-radius: 12px;
         }
 
         .pageHeaderRight {

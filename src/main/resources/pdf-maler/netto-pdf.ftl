@@ -9,6 +9,8 @@
             <#return "Jeg sender det senere">
         <#case "dokumentkravSvarSendtTidligere">
             <#return "Jeg har sendt det i en tidligere søknad om dagpenger">
+        <#case "dokumentkravEttersendt">
+            <#return "Jeg har ettersendt">
         <#default>
             <#return svar>
     </#switch>

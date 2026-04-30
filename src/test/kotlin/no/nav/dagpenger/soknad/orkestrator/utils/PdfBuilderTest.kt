@@ -78,7 +78,7 @@ val inntektSkjemaHtml =
 
         .readmore--pdf > div {
             padding-left: 1rem;
-            border-left: 2px solid #071a3636;
+            border-left: 2px solid #071a363;
             margin-bottom: 1rem
 
         }
