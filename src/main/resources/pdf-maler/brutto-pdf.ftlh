@@ -16,10 +16,10 @@
 <#macro håndterSpørsmål spørsmål>
     <p>
         <#if spørsmål.label??>
-            <strong>${spørsmål.label?no_esc}</strong>
+            <strong>${spørsmål.label}</strong>
         </#if>
         <#if spørsmål.description??>
-            <div><i>${spørsmål.description?no_esc}</i></div>
+            <div><i>${spørsmål.description}</i></div>
         </#if>
         <#if spørsmål.svar??>
             <br/>
