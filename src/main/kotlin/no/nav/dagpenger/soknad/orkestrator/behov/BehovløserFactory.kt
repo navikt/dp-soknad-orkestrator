@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.AndreØkonomiskeYtelser
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BarnOver16
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Barnetillegg
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BarnetilleggV2
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.BostedslandErNorge
@@ -19,6 +20,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Ordin�
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Permittert
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertFiskeforedling
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertGrensearbeider
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Sanksjon
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdato
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.TarUtdanningEllerOpplæring
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Verneplikt
@@ -26,6 +28,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Villig
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnskerDagpengerFraDato
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.ØnsketArbeidstid
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.AndreØkonomiskeYtelserBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnOver16Behovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggBehovLøser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BarnetilleggV2BehovLøser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BostedslandErNorgeBehovløser
@@ -43,6 +46,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.OrdinærBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertGrensearbeiderBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SanksjonBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.UtdanningEllerOpplæringBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.VernepliktBehovløser
@@ -209,6 +213,10 @@ class BehovløserFactory(
                 ),
             EgenNæringsvirksomhet to
                 EgenNæringsvirksomhetBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            BarnOver16 to
+                BarnOver16Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            Sanksjon to
+                SanksjonBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
         )
 
     fun behovløserFor(behov: Behov): Behovløser =
@@ -241,5 +249,7 @@ class BehovløserFactory(
         PermittertGrensearbeider,
         EgetGårdsbruk,
         EgenNæringsvirksomhet,
+        BarnOver16,
+        Sanksjon,
     }
 }

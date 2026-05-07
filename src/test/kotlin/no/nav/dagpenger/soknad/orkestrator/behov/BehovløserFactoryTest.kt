@@ -80,6 +80,8 @@ class BehovløserFactoryTest {
             "PermittertGrensearbeider",
             "EgetGårdsbruk",
             "EgenNæringsvirksomhet",
+            "BarnOver16",
+            "Sanksjon",
         )
     }
 }
