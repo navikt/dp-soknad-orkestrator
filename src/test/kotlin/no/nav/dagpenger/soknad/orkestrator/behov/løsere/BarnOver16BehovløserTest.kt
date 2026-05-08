@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -79,15 +80,19 @@ class BarnOver16BehovløserTest {
     }
 
     @Test
-    fun `skal returnere false når ingen barn finnes i quiz-opplysninger og seksjon returnerer null`() {
-        every { seksjonRepository.hentSeksjonsvar(any(), any(), any()) } returns null
+    fun `skal kaste exception når ingen barn finnes i quiz-opplysninger og seksjon ikke finnes`() {
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any())
+        } throws IllegalStateException("Fant ikke seksjon")
 
-        behovløser.harBarnOver16(ident, søknadId) shouldBe false
+        shouldThrow<IllegalStateException> {
+            behovløser.harBarnOver16(ident, søknadId)
+        }
     }
 
     @Test
     fun `skal returnere false når barnFraPdl og barnLagtManuelt er null i seksjonsdata`() {
-        every { seksjonRepository.hentSeksjonsvar(søknadId, ident, "barnetillegg") } returns
+        every { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "barnetillegg") } returns
             """
             {
               "seksjonId": "barnetillegg",
@@ -105,7 +110,7 @@ class BarnOver16BehovløserTest {
     @Test
     fun `skal returnere true når barn i seksjonsdata er over 16 år`() {
         val fødselsdato = LocalDate.now().minusYears(17).toString()
-        every { seksjonRepository.hentSeksjonsvar(søknadId, ident, "barnetillegg") } returns
+        every { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "barnetillegg") } returns
             """
             {
               "seksjonId": "barnetillegg",
@@ -125,7 +130,7 @@ class BarnOver16BehovløserTest {
     @Test
     fun `skal returnere false når barn i seksjonsdata er under 16 år`() {
         val fødselsdato = LocalDate.now().minusYears(5).toString()
-        every { seksjonRepository.hentSeksjonsvar(søknadId, ident, "barnetillegg") } returns
+        every { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "barnetillegg") } returns
             """
             {
               "seksjonId": "barnetillegg",
@@ -183,7 +188,7 @@ class BarnOver16BehovløserTest {
                 innsendtTidspunkt = innsendtTidspunkt.toLocalDateTime(),
             )
         val fødselsdato = LocalDate.now().minusYears(17).toString()
-        every { seksjonRepository.hentSeksjonsvar(søknadId, ident, "barnetillegg") } returns
+        every { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "barnetillegg") } returns
             """
             {
               "seksjonId": "barnetillegg",

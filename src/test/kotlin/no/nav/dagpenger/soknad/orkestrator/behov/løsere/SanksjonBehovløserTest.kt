@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -80,12 +81,14 @@ class SanksjonBehovløserTest {
     }
 
     @Test
-    fun `skal returnere false når seksjon ikke finnes`() {
+    fun `skal kaste exception når seksjon ikke finnes`() {
         every {
             seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any())
         } throws IllegalStateException("Fant ikke seksjon")
 
-        behovløser.harSanksjon(ident, søknadId) shouldBe false
+        shouldThrow<IllegalStateException> {
+            behovløser.harSanksjon(ident, søknadId)
+        }
     }
 
     @Test

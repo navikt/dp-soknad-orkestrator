@@ -50,8 +50,11 @@ class BarnOver16Behovløser(
 
         // 2. Seksjon (ny søknad)
         val seksjonsvar =
-            seksjonRepository.hentSeksjonsvar(søknadId, ident, "barnetillegg")
-                ?: return false
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident = ident,
+                søknadId = søknadId,
+                seksjonId = "barnetillegg",
+            )
 
         val alleBarn =
             objectMapper.readTree(seksjonsvar).let { seksjonJson ->

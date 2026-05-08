@@ -23,20 +23,6 @@ class SanksjonBehovløser(
     override val behov = Sanksjon.name
     override val beskrivendeId = "faktum.arbeidsforhold"
 
-    private val sanksjonSluttårsaker =
-        setOf(
-            Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
-            Sluttårsak.SAGT_OPP_SELV,
-            Sluttårsak.AVSKJEDIGET,
-        )
-
-    private val sanksjonVerdierISeksjon =
-        setOf(
-            "arbeidsgiverenMinHarSagtMegOpp",
-            "jegHarSagtOppSelv",
-            "jegHarFåttAvskjed",
-        )
-
     override fun løs(behovmelding: Behovmelding) {
         val svarPåBehov = harSanksjon(behovmelding.ident, behovmelding.søknadId)
         publiserLøsning(behovmelding, svarPåBehov)
@@ -46,28 +32,35 @@ class SanksjonBehovløser(
         ident: String,
         søknadId: UUID,
     ): Boolean {
-        // 1. Quiz-opplysninger (gammel søknad)
         val arbeidsforholdOpplysning = opplysningRepository.hent(beskrivendeId, ident, søknadId)
+
+        val sanksjonSluttårsakerIQuiz =
+            setOf(
+                Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
+                Sluttårsak.SAGT_OPP_SELV,
+                Sluttårsak.AVSKJEDIGET,
+            )
 
         if (arbeidsforholdOpplysning != null) {
             return arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>().any { arbeidsforhold ->
-                arbeidsforhold.sluttårsak in sanksjonSluttårsaker
+                arbeidsforhold.sluttårsak in sanksjonSluttårsakerIQuiz
             }
         }
 
-        // 2. Seksjon (ny søknad)
-        val seksjonsSvar =
-            try {
-                seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold")
-            } catch (e: IllegalStateException) {
-                return false
-            }
+        val seksjonsSvar = seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold")
+
+        val sanksjonSluttårsakerIOrkestrator =
+            setOf(
+                "arbeidsgiverenMinHarSagtMegOpp",
+                "jegHarSagtOppSelv",
+                "jegHarFåttAvskjed",
+            )
 
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() in sanksjonVerdierISeksjon
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() in sanksjonSluttårsakerIOrkestrator
                     }
                 }
             }
