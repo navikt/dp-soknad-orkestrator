@@ -20,6 +20,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Ordin�
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Permittert
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertFiskeforedling
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertGrensearbeider
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PlanleggerUtdanning
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Sanksjon
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Søknadsdato
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.TarUtdanningEllerOpplæring
@@ -46,6 +47,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.OrdinærBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertFiskeforedlingBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PermittertGrensearbeiderBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.PlanleggerUtdanningBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SanksjonBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.SøknadsdatoBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.UtdanningEllerOpplæringBehovløser
@@ -217,6 +219,8 @@ class BehovløserFactory(
                 BarnOver16Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             Sanksjon to
                 SanksjonBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            PlanleggerUtdanning to
+                PlanleggerUtdanningBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
         )
 
     fun behovløserFor(behov: Behov): Behovløser =
@@ -251,5 +255,6 @@ class BehovløserFactory(
         EgenNæringsvirksomhet,
         BarnOver16,
         Sanksjon,
+        PlanleggerUtdanning,
     }
 }
