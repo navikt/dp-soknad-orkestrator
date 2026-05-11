@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.pdf
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
@@ -195,5 +196,42 @@ class PdfPayloadServiceTest {
             }
 
         exception.message shouldBe "Fant ikke PDF-grunnlag for søknad $søknadId"
+    }
+
+    @Test
+    fun `genererBruttoPdfPayload escaper ampersand i rich text for alle seksjoner`() {
+        every { seksjonRepository.hentPdfGrunnlag(any(), any()) } returns
+            listOf(
+                """
+                {
+                  "navn": "Seksjon 1",
+                  "spørsmål": [
+                    {
+                      "label": "<strong>Gekki & Gekko</strong>",
+                      "description": "<i>Hei & hå</i>",
+                      "svar": "ja & nei"
+                    }
+                  ]
+                }
+                """.trimIndent(),
+                """
+                {
+                  "navn": "Seksjon 2",
+                  "spørsmål": [
+                    {
+                      "label": "<strong>Andre & tredje</strong>",
+                      "svar": "ja"
+                    }
+                  ]
+                }
+                """.trimIndent(),
+            )
+
+        val bruttoPdfPayload = pdfPayloadService.genererBruttoPdfPayload(randomUUID(), ident)
+
+        bruttoPdfPayload shouldContain "Gekki &amp;amp; Gekko" // label still uses default FreeMarker escaping
+        bruttoPdfPayload shouldContain "Hei &amp; hå" // description uses ?no_esc, so only one level of escaping
+        bruttoPdfPayload shouldContain "Andre &amp;amp; tredje"
+        bruttoPdfPayload shouldContain "ja &amp; nei" // svar should not be normalized
     }
 }

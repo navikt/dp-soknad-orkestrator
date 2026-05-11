@@ -1,7 +1,11 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.pdf
 
+import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.databind.node.ArrayNode
+import com.fasterxml.jackson.databind.node.ObjectNode
 import freemarker.template.Configuration
 import freemarker.template.Configuration.VERSION_2_3_34
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadPersonalia
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
@@ -19,6 +23,8 @@ class PdfPayloadService(
 ) {
     companion object {
         private var freemarkerConfiguration: Configuration = Configuration(VERSION_2_3_34)
+        private val felterMedMarkup = setOf("label", "description")
+        private val ikkeEscapetAmpersand = Regex("&(?!#\\d+;|#x[0-9a-fA-F]+;|[a-zA-Z][a-zA-Z0-9]+;)")
 
         init {
             freemarkerConfiguration.setClassForTemplateLoading(this::class.java, "/pdf-maler")
@@ -32,17 +38,18 @@ class PdfPayloadService(
     fun genererBruttoPdfPayload(
         søknadId: UUID,
         ident: String,
-    ): String = genererPdfPayload(søknadId, ident, "brutto-pdf.ftlh")
+    ): String = genererPdfPayload(søknadId, ident, "brutto-pdf.ftlh", normaliserMarkupFelter = true)
 
     fun genererNettoPdfPayload(
         søknadId: UUID,
         ident: String,
-    ): String = genererPdfPayload(søknadId, ident, "netto-pdf.ftlh")
+    ): String = genererPdfPayload(søknadId, ident, "netto-pdf.ftlh", normaliserMarkupFelter = false)
 
     private fun genererPdfPayload(
         søknadId: UUID,
         ident: String,
         mal: String,
+        normaliserMarkupFelter: Boolean,
     ): String {
         val søknad = søknadRepository.hent(søknadId) ?: throw IllegalStateException("Fant ikke søknad $søknadId")
         val søknadPersonalia =
@@ -52,6 +59,7 @@ class PdfPayloadService(
             seksjonRepository
                 .hentPdfGrunnlag(søknadId, ident)
                 .also { if (it.isEmpty()) throw IllegalStateException("Fant ikke PDF-grunnlag for søknad $søknadId") }
+                .map { if (normaliserMarkupFelter) normaliserHtmlFelterISeksjon(it) else it }
                 .joinToString(",")
 
         val dokumentasjonskrav =
@@ -93,4 +101,32 @@ class PdfPayloadService(
             "${søknadPersonalia.postnummer} ${søknadPersonalia.poststed}",
             søknadPersonalia.land,
         ).filter { verdi -> verdi.isNotBlank() }.joinToString(", ")
+
+    private fun normaliserHtmlFelterISeksjon(seksjonSomJson: String): String {
+        val seksjonNode = objectMapper.readTree(seksjonSomJson)
+        normaliserHtmlFelter(seksjonNode)
+        return objectMapper.writeValueAsString(seksjonNode)
+    }
+
+    private fun normaliserHtmlFelter(node: JsonNode) {
+        when (node) {
+            is ObjectNode -> {
+                val felter = node.properties().iterator()
+                while (felter.hasNext()) {
+                    val (feltNavn, feltVerdi) = felter.next()
+                    if (feltNavn in felterMedMarkup && feltVerdi.isTextual) {
+                        node.put(feltNavn, normaliserRichText(feltVerdi.asText()))
+                    } else {
+                        normaliserHtmlFelter(feltVerdi)
+                    }
+                }
+            }
+
+            is ArrayNode -> {
+                node.forEach { normaliserHtmlFelter(it) }
+            }
+        }
+    }
+
+    private fun normaliserRichText(tekst: String): String = tekst.replace(ikkeEscapetAmpersand, "&amp;")
 }

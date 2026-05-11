@@ -19,7 +19,7 @@
             <strong>${spørsmål.label}</strong>
         </#if>
         <#if spørsmål.description??>
-            <div><i>${spørsmål.description}</i></div>
+            <div>${spørsmål.description?no_esc}</div>
         </#if>
         <#if spørsmål.svar??>
             <br/>
