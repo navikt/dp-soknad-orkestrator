@@ -96,7 +96,7 @@ class EØSPengestøtteBehovløserTest {
         every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns
             """
             {
-              "seksjonId": "annen-pengestøtte",
+              "seksjonId": "annen-pengestotte",
               "seksjonsvar": {
                 "harMottattEllerSøktOmPengestøtteFraAndreEøsLand": "ja"
               },
@@ -113,7 +113,7 @@ class EØSPengestøtteBehovløserTest {
 
         behovløser.løs(lagBehovmelding(ident, søknadId, EØSPengestøtte))
 
-        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "annen-pengestøtte") }
+        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "annen-pengestotte") }
         testRapid.inspektør.message(0)["@løsning"][EØSPengestøtte.name].also { løsning ->
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
@@ -140,7 +140,7 @@ class EØSPengestøtteBehovløserTest {
         every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns
             """
             {
-              "seksjonId": "annen-pengestøtte",
+              "seksjonId": "annen-pengestotte",
               "seksjonsvar": {
                 "harMottattEllerSøktOmPengestøtteFraAndreEøsLand": "nei"
               },
@@ -156,7 +156,7 @@ class EØSPengestøtteBehovløserTest {
         every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns
             """
             {
-              "seksjonId": "annen-pengestøtte",
+              "seksjonId": "annen-pengestotte",
               "seksjonsvar": {},
               "versjon": 1
             }
@@ -169,7 +169,7 @@ class EØSPengestøtteBehovløserTest {
     fun `skal kaste feil dersom seksjon mangler`() {
         every {
             seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any())
-        } throws IllegalStateException("Fant ingen seksjonsvar på annen-pengestøtte for søknad=$søknadId")
+        } throws IllegalStateException("Fant ingen seksjonsvar på annen-pengestotte for søknad=$søknadId")
 
         shouldThrow<IllegalStateException> {
             behovløser.løs(lagBehovmelding(ident, søknadId, EØSPengestøtte))
