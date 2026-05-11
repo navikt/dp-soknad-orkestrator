@@ -341,6 +341,20 @@ Test-hjelpere tilgjengelig:
 - **Logger:** bruk `logger` for normal logging, `sikkerlogg` hvis du logger persondata (ident, svar).
 - **Navngivning:** klassen heter `<BehovNavn>Behovløser`, filen tilsvarende. Unntak: `BarnetilleggBehovLøser` / `BarnetilleggV2BehovLøser` bruker `BehovLøser` (historisk inkonsistens — følg `Behovløser`-mønsteret for nye).
 
+## Åpne spørsmål
+
+### Håndtering av manglende seksjoner
+
+Det er ikke en enhetlig strategi i kodebasen for hva som skal skje når en seksjon mangler:
+
+- Noen behovløsere kaster exception (`hentSeksjonsvarEllerKastException`) — appen feiler og det blir synlig
+- Noen returnerer en fallback-verdi (f.eks. `false`) — stille og usynlig
+- Noen har domenespesifikke defaults (f.eks. tom liste)
+
+**Spørsmål som bør avklares:** Når er det riktig å feile hardt vs. falle tilbake til en default?
+Avhenger trolig av om behovet er et filter (der `false` er en meningsfull verdi) eller et faktum
+(der manglende data er et tegn på noe galt). Bør diskuteres og standardiseres.
+
 ## Feil å unngå
 
 - Glem ikke å legge til i **`BehovløserFactoryTest`** — testen feiler ellers.
