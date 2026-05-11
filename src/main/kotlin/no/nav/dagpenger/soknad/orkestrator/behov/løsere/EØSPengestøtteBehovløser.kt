@@ -43,7 +43,7 @@ class EØSPengestøtteBehovløser(
         }
 
         // 2. Seksjon (ny søknad)
-        val seksjonsSvar = seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "annen-pengestøtte")
+        val seksjonsSvar = seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "annen-pengestotte")
 
         return objectMapper
             .readTree(seksjonsSvar)
