@@ -83,6 +83,7 @@ class BehovløserFactoryTest {
             "BarnOver16",
             "Sanksjon",
             "PlanleggerUtdanning",
+            "EØSPengestøtte",
         )
     }
 }
