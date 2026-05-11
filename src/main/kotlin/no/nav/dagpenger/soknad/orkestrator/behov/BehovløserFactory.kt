@@ -9,6 +9,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Bosted
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EgenNæringsvirksomhet
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EgetGårdsbruk
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EØSArbeid
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.EØSPengestøtte
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.HarTilleggsopplysninger
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.HelseTilAlleTyperJobb
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.JobbetUtenforNorge
@@ -36,6 +37,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.løsere.BostedslandErNorgeBehov
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EgenNæringsvirksomhetBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EgetGårdsbrukBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EØSArbeidBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.løsere.EØSPengestøtteBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HarTilleggsopplysningerBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.HelseTilAlleTyperJobbBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.løsere.JobbetUtenforNorgeBehovløser
@@ -221,6 +223,8 @@ class BehovløserFactory(
                 SanksjonBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
             PlanleggerUtdanning to
                 PlanleggerUtdanningBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
+            EØSPengestøtte to
+                EØSPengestøtteBehovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository),
         )
 
     fun behovløserFor(behov: Behov): Behovløser =
@@ -256,5 +260,6 @@ class BehovløserFactory(
         BarnOver16,
         Sanksjon,
         PlanleggerUtdanning,
+        EØSPengestøtte,
     }
 }
