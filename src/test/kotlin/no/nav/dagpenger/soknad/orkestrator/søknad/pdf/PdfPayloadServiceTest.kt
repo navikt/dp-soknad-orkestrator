@@ -225,6 +225,30 @@ class PdfPayloadServiceTest {
                   ]
                 }
                 """.trimIndent(),
+                """
+                {
+                  "navn": "Seksjon 3",
+                  "spørsmål": [
+                    {
+                        "id": "reistTilbakeTilBostedslandet",
+                        "type": "envalg",
+                        "label": "Har du reist tilbake til & bostedslandet ditt etter at du ble arbeidsledig eller permittert?",
+                        "description": "Hvis du bor i et EØS-land & jobber i et annet, er du en EØS-pendler. Det er egne regler for hvor du skal søke om penger hvis du blir arbeidsledig eller permittert og du har tilknytning til flere EØS-land.<br/><br/>Hvilket land du skal søke om penger fra avhenger av<ul><li>hvilket land du sist jobbet i</li><li>hvilket land du bor i</li><li>om du er permittert eller delvis arbeidsledig, eller om du er helt arbeidsledig</li></ul>Er du usikker på hva du skal svare, kan du lese <a href='https://nav.no/dagpenger#eos'>mer om hvor du skal søke penger fra</a>.",
+                        "options": [
+                            {
+                                "value": "ja &",
+                                "label": "Ja &"
+                            },
+                            {
+                                "value": "nei &",
+                                "label": "Nei &"
+                            }
+                        ],
+                        "svar": "nei &"
+                    }
+                  ]
+                }
+                """.trimIndent(),
             )
 
         val bruttoPdfPayload = pdfPayloadService.genererBruttoPdfPayload(randomUUID(), ident)
