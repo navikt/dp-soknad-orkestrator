@@ -16,7 +16,7 @@
 <#macro håndterSpørsmål spørsmål>
     <p>
         <#if spørsmål.label??>
-            <strong>${spørsmål.label}</strong>
+            <strong>${spørsmål.label?no_esc}</strong>
         </#if>
         <#if spørsmål.description??>
             <div>${spørsmål.description?no_esc}</div>

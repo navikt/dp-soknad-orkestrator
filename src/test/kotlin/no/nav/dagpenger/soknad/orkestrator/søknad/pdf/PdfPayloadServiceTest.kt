@@ -229,9 +229,9 @@ class PdfPayloadServiceTest {
 
         val bruttoPdfPayload = pdfPayloadService.genererBruttoPdfPayload(randomUUID(), ident)
 
-        bruttoPdfPayload shouldContain "Gekki &amp;amp; Gekko" // label still uses default FreeMarker escaping
+        bruttoPdfPayload shouldContain "Gekki &amp; Gekko" // label still uses default FreeMarker escaping
         bruttoPdfPayload shouldContain "Hei &amp; hå" // description uses ?no_esc, so only one level of escaping
-        bruttoPdfPayload shouldContain "Andre &amp;amp; tredje"
+        bruttoPdfPayload shouldContain "Andre &amp; tredje"
         bruttoPdfPayload shouldContain "ja &amp; nei" // svar should not be normalized
     }
 }
