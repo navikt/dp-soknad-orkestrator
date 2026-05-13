@@ -60,13 +60,14 @@ class PlanleggerUtdanningBehovløserTest {
     }
 
     @Test
-    fun `skal publisere løsning fra seksjonsdata`() {
+    fun `skal publisere løsning fra seksjonsdata når bruker planlegger utdanning`() {
         val søknadstidspunkt = ZonedDateTime.now()
         every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns
             """
             {
               "seksjonId": "utdanning",
               "seksjonsvar": {
+                "tarUtdanningEllerOpplæring": "nei",
                 "planleggerÅStarteEllerFullføreStudierSamtidig": "ja"
               },
               "versjon": 1
@@ -87,6 +88,39 @@ class PlanleggerUtdanningBehovløserTest {
             løsning["verdi"].asBoolean() shouldBe true
             løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
         }
+    }
+
+    @Test
+    fun `skal returnere false når bruker tar utdanning allerede`() {
+        every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns
+            """
+            {
+              "seksjonId": "utdanning",
+              "seksjonsvar": {
+                "tarUtdanningEllerOpplæring": "ja"
+              },
+              "versjon": 1
+            }
+            """.trimIndent()
+
+        behovløser.planleggerUtdanning(ident, søknadId) shouldBe false
+    }
+
+    @Test
+    fun `skal returnere false når bruker ikke planlegger utdanning`() {
+        every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns
+            """
+            {
+              "seksjonId": "utdanning",
+              "seksjonsvar": {
+                "tarUtdanningEllerOpplæring": "nei",
+                "planleggerÅStarteEllerFullføreStudierSamtidig": "nei"
+              },
+              "versjon": 1
+            }
+            """.trimIndent()
+
+        behovløser.planleggerUtdanning(ident, søknadId) shouldBe false
     }
 
     @Test
