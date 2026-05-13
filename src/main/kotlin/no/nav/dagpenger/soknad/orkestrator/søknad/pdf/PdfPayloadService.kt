@@ -26,6 +26,29 @@ class PdfPayloadService(
         private val felterMedMarkup = setOf("label", "description")
         private val ikkeEscapetAmpersand = Regex("&(?!#\\d+;|#x[0-9a-fA-F]+;|[a-zA-Z][a-zA-Z0-9]+;)")
 
+        // Tags that are safe for OpenHtmlToPDF rendering
+        private val tillatteTagger =
+            setOf(
+                "p",
+                "br",
+                "ul",
+                "ol",
+                "li",
+                "strong",
+                "em",
+                "b",
+                "i",
+                "a",
+                "h3",
+                "h4",
+            )
+
+        // Regex to match any HTML tag (opening, closing, or self-closing)
+        private val htmlTagRegex = Regex("<\\s*(/?)\\s*([a-zA-Z][a-zA-Z0-9]*)\\b([^>]*)(/?)\\s*>")
+
+        // Regex to extract href attribute value
+        private val hrefRegex = Regex("""href\s*=\s*(['"])(https?://[^'"]*)\1""", RegexOption.IGNORE_CASE)
+
         init {
             freemarkerConfiguration.setClassForTemplateLoading(this::class.java, "/pdf-maler")
             freemarkerConfiguration.defaultEncoding = "UTF-8"
@@ -128,5 +151,30 @@ class PdfPayloadService(
         }
     }
 
-    private fun normaliserRichText(tekst: String): String = tekst.replace(ikkeEscapetAmpersand, "&amp;")
+    private fun normaliserRichText(tekst: String): String {
+        // 1. Strip or keep HTML tags based on allowlist
+        val sanitisert =
+            htmlTagRegex.replace(tekst) { match ->
+                val slash = match.groupValues[1]
+                val tagNavn = match.groupValues[2].lowercase()
+                val attributter = match.groupValues[3]
+                val selvlukkende = match.groupValues[4]
+
+                if (tagNavn !in tillatteTagger) return@replace ""
+
+                when {
+                    slash.isNotEmpty() -> "</$tagNavn>"
+                    tagNavn == "a" -> {
+                        val href = hrefRegex.find(attributter)?.groupValues?.get(2)
+                        if (href != null) "<a href=\"$href\">" else "<a>"
+                    }
+                    tagNavn == "br" -> "<br/>"
+                    selvlukkende == "/" -> "<$tagNavn/>"
+                    else -> "<$tagNavn>"
+                }
+            }
+
+        // 2. Escape unescaped ampersands in remaining text
+        return sanitisert.replace(ikkeEscapetAmpersand, "&amp;")
+    }
 }

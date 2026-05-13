@@ -14,23 +14,25 @@
     </#switch>
 </#function>
 <#macro håndterSpørsmål spørsmål>
-    <p>
+    <div class="sporsmal">
         <#if spørsmål.label??>
-            <strong>${spørsmål.label?no_esc}</strong>
+            <p><strong>${spørsmål.label?no_esc}</strong></p>
         </#if>
         <#if spørsmål.description??>
             <div>${spørsmål.description?no_esc}</div>
         </#if>
         <#if spørsmål.svar??>
-            <br/>
+            <p>
             <@macros.finnSvar spørsmål=spørsmål/>
             <#if spørsmål.options??>
-                <div>Svaralternativene
-                    var: <#list spørsmål.options as option>${option.label}<#sep>, </#sep></#list></div>
+                <br/>Svaralternativene
+                    var: <#list spørsmål.options as option>${option.label}<#sep>, </#sep></#list>
             </#if>
+            </p>
         </#if>
-    </p>
+    </div>
 </#macro>
+
 <#assign root = json?eval_json>
 
 <html lang="no">
