@@ -21,6 +21,7 @@ import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andWhere
 import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.exposedLogger
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.dateTimeLiteral
 import org.jetbrains.exposed.sql.javatime.datetime
@@ -290,7 +291,12 @@ class SøknadRepository(
         journalpostId: String,
     ) {
         transaction {
-            EttersendingJournalpostTabell.insert {
+            EttersendingJournalpostTabell.upsert(
+                EttersendingJournalpostTabell.journalpostId,
+                onUpdate = {
+                    exposedLogger.info("Konflikt på journalpostId $journalpostId for søknadId $søknadId.")
+                },
+            ) {
                 it[EttersendingJournalpostTabell.søknadId] = søknadId
                 it[EttersendingJournalpostTabell.journalpostId] = journalpostId
             }

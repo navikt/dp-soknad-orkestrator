@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
 import BarnSøknadMappingTabell
 import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.collections.shouldNotContainAnyOf
@@ -615,6 +616,18 @@ class SøknadRepositoryTest {
 
         val funnetSøknadId = søknadRepository.hentSøknadIdFraEttersendingJournalpostId("111222333", "annen-ident")
         funnetSøknadId shouldBe null
+    }
+
+    @Test
+    fun `håndterer lagre ettersending flere ganger `() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        søknadRepository.lagreEttersendingJournalpostId(søknadId, "111222333")
+
+        shouldNotThrowAny { søknadRepository.lagreEttersendingJournalpostId(søknadId, "111222333") }
+
+        val funnetSøknadId = søknadRepository.hentSøknadIdFraEttersendingJournalpostId("111222333", ident)
+        funnetSøknadId shouldBe søknadId
     }
 }
 
