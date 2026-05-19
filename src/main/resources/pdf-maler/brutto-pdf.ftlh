@@ -1,4 +1,4 @@
-<#import "include/macros.ftl" as macros/>
+<#import "include/macros.ftlh" as macros/>
 <#function mapDokumentasjonskravSvar svar>
     <#switch svar>
         <#case "dokumentkravSvarSendNå">
@@ -14,29 +14,31 @@
     </#switch>
 </#function>
 <#macro håndterSpørsmål spørsmål>
-    <p>
+    <div class="sporsmal">
         <#if spørsmål.label??>
-            <strong>${spørsmål.label?html}</strong>
+            <p><strong>${spørsmål.label?no_esc}</strong></p>
         </#if>
         <#if spørsmål.description??>
-            <div><i>${spørsmål.description?html}</i></div>
+            <div>${spørsmål.description?no_esc}</div>
         </#if>
         <#if spørsmål.svar??>
-            <br/>
+            <p>
             <@macros.finnSvar spørsmål=spørsmål/>
             <#if spørsmål.options??>
-                <div>Svaralternativene
-                    var: <#list spørsmål.options as option>${option.label?html}<#sep>, </#sep></#list></div>
+                <br/>Svaralternativene
+                    var: <#list spørsmål.options as option>${option.label}<#sep>, </#sep></#list>
             </#if>
+            </p>
         </#if>
-    </p>
+    </div>
 </#macro>
+
 <#assign root = json?eval_json>
 
 <html lang="no">
-<#include "include/html-head-element.ftl"/>
+<#include "include/html-head-element.ftlh"/>
 <body>
-<#include "include/page-header-right.ftl"/>
+<#include "include/page-header-right.ftlh"/>
 <h1>Søknad om dagpenger</h1>
 <#list root.seksjoner as seksjon>
     <h2>${seksjon.navn}</h2>
@@ -58,7 +60,7 @@
         <#list dokumentkrav as krav>
             <p>
                 <#if krav.tittel??>
-                    <strong>${krav.tittel?html}</strong>
+                    <strong>${krav.tittel}</strong>
                 </#if>
                 <br/>
                 <#if krav.svar??>
@@ -66,7 +68,7 @@
                 </#if>
                 <#if krav.begrunnelse??>
                     <br/>
-                    Begrunnelse: ${krav.begrunnelse?html}
+                    Begrunnelse: ${krav.begrunnelse}
                 </#if>
             </p>
         </#list>
