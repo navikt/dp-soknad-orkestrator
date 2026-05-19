@@ -1,4 +1,4 @@
-<#import "include/macros.ftlh" as macros/>
+<#import "include/macros.ftl" as macros/>
 <#function mapDokumentasjonskravSvar svar>
     <#switch svar>
         <#case "dokumentkravSvarSendNå">
@@ -17,7 +17,7 @@
     <#if spørsmål.svar??>
         <p>
             <#if spørsmål.label??>
-                <strong>${spørsmål.label}</strong>
+                <strong>${spørsmål.label?html}</strong>
             </#if>
             <br/>
             <@macros.finnSvar spørsmål=spørsmål/>
@@ -27,9 +27,9 @@
 <#assign root = json?eval_json>
 
 <html lang="no">
-<#include "include/html-head-element.ftlh"/>
+<#include "include/html-head-element.ftl"/>
 <body>
-<#include "include/page-header-right.ftlh"/>
+<#include "include/page-header-right.ftl"/>
 <h1>Søknad om dagpenger</h1>
 <#list root.seksjoner as seksjon>
     <h2>${seksjon.navn}</h2>
@@ -51,7 +51,7 @@
         <#list dokumentkrav as krav>
             <p>
                 <#if krav.tittel??>
-                    <strong>${krav.tittel}</strong>
+                    <strong>${krav.tittel?html}</strong>
                 </#if>
                 <br/>
                 <#if krav.svar??>
@@ -59,7 +59,7 @@
                 </#if>
                 <#if krav.begrunnelse??>
                     <br/>
-                    Begrunnelse: ${krav.begrunnelse}
+                    Begrunnelse: ${krav.begrunnelse?html}
                 </#if>
             </p>
         </#list>
