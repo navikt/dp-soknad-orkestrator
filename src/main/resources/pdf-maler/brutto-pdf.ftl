@@ -1,4 +1,4 @@
-<#import "include/macros.ftlh" as macros/>
+<#import "include/macros.ftl" as macros/>
 <#function mapDokumentasjonskravSvar svar>
     <#switch svar>
         <#case "dokumentkravSvarSendNå">
@@ -14,31 +14,29 @@
     </#switch>
 </#function>
 <#macro håndterSpørsmål spørsmål>
-    <div class="sporsmal">
+    <p>
         <#if spørsmål.label??>
-            <p><strong>${spørsmål.label?no_esc}</strong></p>
+            <strong>${spørsmål.label?html}</strong>
         </#if>
         <#if spørsmål.description??>
-            <div>${spørsmål.description?no_esc}</div>
+            <div><i>${spørsmål.description?html}</i></div>
         </#if>
         <#if spørsmål.svar??>
-            <p>
+            <br/>
             <@macros.finnSvar spørsmål=spørsmål/>
             <#if spørsmål.options??>
-                <br/>Svaralternativene
-                    var: <#list spørsmål.options as option>${option.label}<#sep>, </#sep></#list>
+                <div>Svaralternativene
+                    var: <#list spørsmål.options as option>${option.label?html}<#sep>, </#sep></#list></div>
             </#if>
-            </p>
         </#if>
-    </div>
+    </p>
 </#macro>
-
 <#assign root = json?eval_json>
 
 <html lang="no">
-<#include "include/html-head-element.ftlh"/>
+<#include "include/html-head-element.ftl"/>
 <body>
-<#include "include/page-header-right.ftlh"/>
+<#include "include/page-header-right.ftl"/>
 <h1>Søknad om dagpenger</h1>
 <#list root.seksjoner as seksjon>
     <h2>${seksjon.navn}</h2>
@@ -60,7 +58,7 @@
         <#list dokumentkrav as krav>
             <p>
                 <#if krav.tittel??>
-                    <strong>${krav.tittel}</strong>
+                    <strong>${krav.tittel?html}</strong>
                 </#if>
                 <br/>
                 <#if krav.svar??>
@@ -68,7 +66,7 @@
                 </#if>
                 <#if krav.begrunnelse??>
                     <br/>
-                    Begrunnelse: ${krav.begrunnelse}
+                    Begrunnelse: ${krav.begrunnelse?html}
                 </#if>
             </p>
         </#list>
