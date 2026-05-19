@@ -10,11 +10,11 @@
         <#list alleSvar as svar>
             <#list spørsmål.options as option>
                 <#if svar == option.value>
-                    ${option.label}<#if (alleSvar?size > 1)><#sep>,</#sep></#if>
+                    ${option.label?html}<#if (alleSvar?size > 1)><#sep>,</#sep></#if>
                 </#if>
             </#list>
         </#list>
     <#else>
-        ${spørsmål.svar}
+        ${spørsmål.svar?html}
     </#if>
 </#macro>
