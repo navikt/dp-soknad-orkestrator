@@ -62,7 +62,7 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                 val innsendtTidspunkt = jsonNode.get("innsendtTidspunkt").asLocalDateTime()
                 val søknadIderForMislykkedeSøknader: List<UUID> =
                     listOf(
-                        UUID.fromString("fb774432-3801-4737-8914-fd8af550ff3e"), // dev
+                        UUID.fromString("8feb4a0a-2346-44b9-a3e2-e438d05598b8"), // dev
                         UUID.fromString("1eb49db5-8387-4946-9b32-9f9d24caa944"),
                         UUID.fromString("34a2c4aa-4b2e-49d0-98a7-09dffb806291"),
                         UUID.fromString("5a2ada17-e1c0-473a-880d-ccaafc637a6f"),
