@@ -134,6 +134,31 @@ class SeksjonRepository(
                 }.toList()
         }
 
+    fun hentSeksjonMetadata(
+        søknadId: UUID,
+        ident: String,
+        seksjonId: String,
+    ): SeksjonMedTidstempler =
+        transaction {
+            SeksjonV2Tabell
+                .innerJoin(SøknadTabell)
+                .select(
+                    SeksjonV2Tabell.seksjonsvar,
+                    SeksjonV2Tabell.seksjonId,
+                    SeksjonV2Tabell.opprettet,
+                    SeksjonV2Tabell.oppdatert,
+                ).where {
+                    SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) and (SeksjonV2Tabell.seksjonId eq seksjonId)
+                }.map {
+                    SeksjonMedTidstempler(
+                        seksjonId = it[SeksjonV2Tabell.seksjonId],
+                        data = "",
+                        opprettet = it[SeksjonV2Tabell.opprettet],
+                        oppdatert = it[SeksjonV2Tabell.oppdatert],
+                    )
+                }.firstOrNull() ?: throw IllegalStateException("Fant ingen seksjon for søknad $søknadId")
+        }
+
     fun hentSeksjonIdForAlleLagredeSeksjoner(
         søknadId: UUID,
         ident: String,

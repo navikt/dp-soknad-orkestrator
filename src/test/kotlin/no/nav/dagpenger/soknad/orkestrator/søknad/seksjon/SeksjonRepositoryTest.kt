@@ -288,6 +288,19 @@ class SeksjonRepositoryTest {
     }
 
     @Test
+    fun `hentSeksjonForStatistikk returnerer lagret seksjon`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        val seksjon = seksjonRepository.hentSeksjonMetadata(søknadId, ident, seksjonId)
+
+        seksjon.seksjonId shouldBe seksjonId
+        seksjon.data shouldBe ""
+        seksjon.opprettet shouldNotBe null
+    }
+
+    @Test
     @Suppress("ktlint:standard:max-line-length")
     fun `hentSeksjonIdForAlleLagredeSeksjoner returnerer forventede seksjoner hvis søknaden eksisterer og tilhører bruker som gjør kallet`() {
         val søknadId = randomUUID()

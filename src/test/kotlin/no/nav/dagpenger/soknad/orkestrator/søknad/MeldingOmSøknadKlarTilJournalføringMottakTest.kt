@@ -59,7 +59,6 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
 
         val søknadsdata = rapidsConnection.inspektør.message(1)["søknadsdata"]
         søknadsdata shouldNotBe null
-        søknadsdata["opprettet"] shouldNotBe null
         søknadsdata["innsendt"] shouldNotBe null
         søknadsdata["verneplikt"] shouldNotBe null
         søknadsdata["verneplikt"]["seksjonsdata"].asText() shouldBe seksjoner.find { it.seksjonId == "verneplikt" }?.data

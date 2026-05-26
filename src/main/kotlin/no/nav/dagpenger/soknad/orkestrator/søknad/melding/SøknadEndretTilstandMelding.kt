@@ -6,7 +6,6 @@ import io.ktor.util.toLowerCasePreservingASCIIRules
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonMedTidstempler
-import java.time.LocalDateTime
 import java.util.UUID
 
 class SøknadEndretTilstandMelding(
@@ -49,7 +48,6 @@ class SøknadEndretTilstandMelding(
                 val aktuelleFelter = filtrerUaktuelleFelter()
 
                 mapOf(
-                    "opprettet" to LocalDateTime.now(),
                     "innsendt" to (søknad.innsendtTidspunkt?.toString() ?: "null"),
                 ) +
                     søknadsdata.associate {
