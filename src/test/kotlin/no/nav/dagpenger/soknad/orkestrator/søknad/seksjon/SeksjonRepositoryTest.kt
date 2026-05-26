@@ -288,7 +288,7 @@ class SeksjonRepositoryTest {
     }
 
     @Test
-    fun `hentSeksjonForStatistikk returnerer lagret seksjon`() {
+    fun `hentSeksjonMetadata returnerer lagret seksjon`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
@@ -298,6 +298,80 @@ class SeksjonRepositoryTest {
         seksjon.seksjonId shouldBe seksjonId
         seksjon.data shouldBe ""
         seksjon.opprettet shouldNotBe null
+        seksjon.oppdatert shouldBe null
+    }
+
+    @Test
+    fun `hentSeksjonMetadata returnerer riktig seksjon når flere seksjoner finnes`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+        seksjonRepository.lagre(søknadId, ident, seksjonId2, seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
+
+        val seksjon = seksjonRepository.hentSeksjonMetadata(søknadId, ident, seksjonId2)
+
+        seksjon.seksjonId shouldBe seksjonId2
+        seksjon.data shouldBe ""
+        seksjon.opprettet shouldNotBe null
+    }
+
+    @Test
+    fun `hentSeksjonMetadata returnerer oppdatert tidsstempel etter oppdatering av seksjon`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        val metadataFørOppdatering = seksjonRepository.hentSeksjonMetadata(søknadId, ident, seksjonId)
+
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar2, dokumentasjonskrav2, pdfGrunnlag2)
+
+        val metadataEtterOppdatering = seksjonRepository.hentSeksjonMetadata(søknadId, ident, seksjonId)
+
+        metadataEtterOppdatering.opprettet shouldBe metadataFørOppdatering.opprettet
+        metadataEtterOppdatering.oppdatert shouldNotBe null
+    }
+
+    @Test
+    fun `hentSeksjonMetadata kaster exception hvis ident er feil`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        val exception =
+            shouldThrow<IllegalStateException> {
+                seksjonRepository.hentSeksjonMetadata(søknadId, "en-annen-ident", seksjonId)
+            }
+
+        exception.message shouldBe "Fant ingen seksjon for søknad $søknadId"
+    }
+
+    @Test
+    fun `hentSeksjonMetadata kaster exception hvis søknaden ikke eksisterer`() {
+        val søknadId = randomUUID()
+        val annenSøknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        val exception =
+            shouldThrow<IllegalStateException> {
+                seksjonRepository.hentSeksjonMetadata(annenSøknadId, ident, seksjonId)
+            }
+
+        exception.message shouldBe "Fant ingen seksjon for søknad $annenSøknadId"
+    }
+
+    @Test
+    fun `hentSeksjonMetadata kaster exception hvis seksjonen ikke eksisterer`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        val exception =
+            shouldThrow<IllegalStateException> {
+                seksjonRepository.hentSeksjonMetadata(søknadId, ident, "mangler-seksjon")
+            }
+
+        exception.message shouldBe "Fant ingen seksjon for søknad $søknadId"
     }
 
     @Test
