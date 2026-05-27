@@ -14,7 +14,7 @@ val junitJupiterVersion: String by project
 val naisfulTestAppVersion: String by project
 
 plugins {
-    kotlin("jvm") version "2.3.20"
+    kotlin("jvm") version "2.3.21"
     id("io.ktor.plugin") version "3.4.2"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
 }
