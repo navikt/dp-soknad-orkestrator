@@ -127,7 +127,7 @@
                 <strong>Forklar kort hvordan du har beregnet antall arbeidstimer totalt</strong>
             <br/>
     Svar:
-        1
+        1 &amp; 2
         </p>
             </div>
             <div class="modalSpørsmål">
