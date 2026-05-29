@@ -176,3 +176,9 @@ data class SeksjonMedTidstempler(
     val opprettet: LocalDateTime,
     val oppdatert: LocalDateTime?,
 )
+
+data class SeksjonMetadata(
+    val seksjonId: String,
+    val opprettet: LocalDateTime,
+    val oppdatert: LocalDateTime?,
+)

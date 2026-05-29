@@ -296,7 +296,6 @@ class SeksjonRepositoryTest {
         val seksjon = seksjonRepository.hentSeksjonMetadata(søknadId, ident, seksjonId)
 
         seksjon.seksjonId shouldBe seksjonId
-        seksjon.data shouldBe ""
         seksjon.opprettet shouldNotBe null
         seksjon.oppdatert shouldBe null
     }
@@ -311,7 +310,6 @@ class SeksjonRepositoryTest {
         val seksjon = seksjonRepository.hentSeksjonMetadata(søknadId, ident, seksjonId2)
 
         seksjon.seksjonId shouldBe seksjonId2
-        seksjon.data shouldBe ""
         seksjon.opprettet shouldNotBe null
     }
 

@@ -65,9 +65,8 @@ class SeksjonServiceTest {
         every {
             seksjonRepository.hentSeksjonMetadata(søknadId, ident, seksjonId)
         } returns
-            SeksjonMedTidstempler(
+            SeksjonMetadata(
                 seksjonId = seksjonId,
-                data = seksjonsvar,
                 opprettet = nå,
                 oppdatert = null,
             )
@@ -100,9 +99,8 @@ class SeksjonServiceTest {
         every {
             seksjonRepository.hentSeksjonMetadata(søknadId, ident, seksjonId)
         } returns
-            SeksjonMedTidstempler(
+            SeksjonMetadata(
                 seksjonId = seksjonId,
-                data = "",
                 opprettet = opprettet,
                 oppdatert = oppdatert,
             )
@@ -132,9 +130,8 @@ class SeksjonServiceTest {
         every {
             seksjonRepository.hentSeksjonMetadata(søknadId, ident, seksjonId)
         } returns
-            SeksjonMedTidstempler(
+            SeksjonMetadata(
                 seksjonId = seksjonId,
-                data = "",
                 opprettet = nå,
                 oppdatert = null,
             )

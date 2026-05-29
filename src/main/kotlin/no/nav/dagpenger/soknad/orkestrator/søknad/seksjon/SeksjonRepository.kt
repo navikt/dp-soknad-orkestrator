@@ -138,7 +138,7 @@ class SeksjonRepository(
         søknadId: UUID,
         ident: String,
         seksjonId: String,
-    ): SeksjonMedTidstempler =
+    ): SeksjonMetadata =
         transaction {
             SeksjonV2Tabell
                 .innerJoin(SøknadTabell)
@@ -150,9 +150,8 @@ class SeksjonRepository(
                 ).where {
                     SeksjonV2Tabell.søknadId eq søknadId and (SøknadTabell.ident eq ident) and (SeksjonV2Tabell.seksjonId eq seksjonId)
                 }.map {
-                    SeksjonMedTidstempler(
+                    SeksjonMetadata(
                         seksjonId = it[SeksjonV2Tabell.seksjonId],
-                        data = "",
                         opprettet = it[SeksjonV2Tabell.opprettet],
                         oppdatert = it[SeksjonV2Tabell.oppdatert],
                     )
