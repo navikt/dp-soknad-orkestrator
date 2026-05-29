@@ -9,6 +9,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmEttersending
+import no.nav.dagpenger.soknad.orkestrator.søknad.melding.SeksjonDataTilStatistikk
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -40,6 +41,22 @@ class SeksjonService(
         logg.info { "Lagrer seksjon $seksjonId" }
         sikkerlogg.info { "Lagrer seksjon $seksjonId, for ident: $ident, med svar: $seksjonsvar, dokumentasjonskrav: $dokumentasjonskrav" }
         seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, dokumentasjonskrav, pdfGrunnlag)
+
+        val seksjon = seksjonRepository.hentSeksjonMetadata(søknadId, ident, seksjonId)
+
+        val sendPåbegyntSøknadTilStatistikk =
+            SeksjonDataTilStatistikk(
+                søknadId = søknadId,
+                ident = ident,
+                seksjonId = seksjonId,
+                opprettet = seksjon.opprettet,
+                oppdatert = seksjon.oppdatert ?: seksjon.opprettet,
+            )
+
+        rapidsConnection.publish(
+            ident,
+            sendPåbegyntSøknadTilStatistikk.asMessage().toJson(),
+        )
     }
 
     fun hentSeksjonsvar(
@@ -156,6 +173,12 @@ data class Seksjon(
 data class SeksjonMedTidstempler(
     val seksjonId: String,
     val data: String,
+    val opprettet: LocalDateTime,
+    val oppdatert: LocalDateTime?,
+)
+
+data class SeksjonMetadata(
+    val seksjonId: String,
     val opprettet: LocalDateTime,
     val oppdatert: LocalDateTime?,
 )
