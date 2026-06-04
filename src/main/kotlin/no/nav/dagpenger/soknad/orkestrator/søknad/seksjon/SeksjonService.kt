@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.seksjon
 
-import com.fasterxml.jackson.databind.json.JsonMapper
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.søknad.Dokument
@@ -10,6 +9,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmEttersending
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.SeksjonDataTilStatistikk
+import tools.jackson.databind.json.JsonMapper
 import java.time.LocalDateTime
 import java.util.UUID
 

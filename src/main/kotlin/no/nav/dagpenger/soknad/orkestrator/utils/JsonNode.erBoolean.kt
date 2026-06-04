@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.utils
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 
 fun JsonNode.erBoolean(): Boolean =
     when {

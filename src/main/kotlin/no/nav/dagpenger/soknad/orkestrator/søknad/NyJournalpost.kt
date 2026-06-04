@@ -1,7 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import com.fasterxml.jackson.databind.JsonNode
 import de.slub.urn.URN
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 data class NyJournalpost(

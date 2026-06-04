@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
 import io.ktor.client.request.header
@@ -34,6 +33,7 @@ import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.testAzureADToke
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.withMockAuthServerAndTestApplication
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.Test

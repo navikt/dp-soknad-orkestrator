@@ -1,11 +1,11 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.melding
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import io.ktor.util.toLowerCasePreservingASCIIRules
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonMedTidstempler
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 class SøknadEndretTilstandMelding(
@@ -133,7 +133,7 @@ class SøknadEndretTilstandMelding(
             }
 
             seksjonssvarJson.isArray -> {
-                seksjonssvarJson.map { element -> filtrerUgyldigeSpørsmålBasertPåType(element, tillatteFelter) }
+                seksjonssvarJson.values().map { element -> filtrerUgyldigeSpørsmålBasertPåType(element, tillatteFelter) }
             }
 
             seksjonssvarJson.isNull -> {
@@ -173,7 +173,7 @@ class SøknadEndretTilstandMelding(
                     }
 
                     node.isArray -> {
-                        node.forEach { traverse(it) }
+                        node.values().forEach { traverse(it) }
                     }
 
                     node.isObject -> {

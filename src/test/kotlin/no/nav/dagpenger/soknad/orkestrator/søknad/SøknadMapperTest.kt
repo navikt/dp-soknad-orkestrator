@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.matchers.collections.shouldContainAll
 import io.kotest.matchers.shouldBe
@@ -19,6 +18,7 @@ import no.nav.dagpenger.soknad.orkestrator.utils.februar
 import no.nav.dagpenger.soknad.orkestrator.utils.januar
 import no.nav.dagpenger.soknad.orkestrator.utils.mars
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.ObjectMapper
 import java.time.ZonedDateTime
 import java.util.UUID
 

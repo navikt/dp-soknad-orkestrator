@@ -1,8 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.core.type.TypeReference
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
@@ -20,6 +18,8 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import no.nav.dagpenger.soknad.orkestrator.saf.SafKlient
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
+import tools.jackson.core.type.TypeReference
+import tools.jackson.databind.JsonNode
 import java.time.LocalDate
 import java.util.UUID
 
@@ -271,14 +271,14 @@ class SøknadsdataBehovløser(
             )
 
         val pdlBarn =
-            objectMapper.readTree(seksjonsvar).let { seksjonJson ->
-                seksjonJson.findPath("barnFraPdl")?.toList() ?: emptyList()
-            }
+            objectMapper.readTree(seksjonsvar)?.let { seksjonJson ->
+                seksjonJson.findPath("barnFraPdl").takeUnless { it.isMissingNode }?.toList() ?: emptyList()
+            } ?: emptyList()
 
         val egneBarn =
-            objectMapper.readTree(seksjonsvar).let { seksjonJson ->
-                seksjonJson.findPath("barnLagtManuelt")?.toList() ?: emptyList()
-            }
+            objectMapper.readTree(seksjonsvar)?.let { seksjonJson ->
+                seksjonJson.findPath("barnLagtManuelt").takeUnless { it.isMissingNode }?.toList() ?: emptyList()
+            } ?: emptyList()
 
         return !(pdlBarn.isEmpty() && egneBarn.isEmpty())
     }
@@ -329,16 +329,14 @@ class SøknadsdataBehovløser(
                 return emptyList()
             }
 
-        objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
-            seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
-                if (!it.isMissingOrNull()) {
-                    return it.map {
-                        AvsluttedeArbeidsforhold(
-                            sluttårsak = it.sluttårsak(),
-                            fiskeforedling = it.fiskForedling(),
-                            land = it.findPath("hvilketLandJobbetDuI").asText(),
-                        )
-                    }
+        objectMapper.readTree(seksjonsSvar)?.let { seksjonsJson ->
+            seksjonsJson.findPath("registrerteArbeidsforhold").takeUnless { it.isMissingOrNull() }?.let { arbeidsforholdNode ->
+                return arbeidsforholdNode.values().map { arbeidsforhold ->
+                    AvsluttedeArbeidsforhold(
+                        sluttårsak = arbeidsforhold.sluttårsak(),
+                        fiskeforedling = arbeidsforhold.fiskForedling(),
+                        land = arbeidsforhold.findPath("hvilketLandJobbetDuI").asText(),
+                    )
                 }
             }
         }
@@ -347,7 +345,8 @@ class SøknadsdataBehovløser(
     }
 
     private fun JsonNode.finnOpplysning(navn: String): JsonNode =
-        this.findPath(navn) ?: throw NoSuchElementException("Finner ikke opplysning med navn: $navn")
+        this.findPath(navn).takeUnless { it.isMissingNode }
+            ?: throw NoSuchElementException("Finner ikke opplysning med navn: $navn")
 
     private fun JsonNode.sluttårsak(): Sluttårsak =
         this.findPath("hvordanHarDetteArbeidsforholdetEndretSeg").asText().let {
@@ -367,8 +366,10 @@ class SøknadsdataBehovløser(
             else -> throw IllegalArgumentException("Ukjent sluttårsak: $string")
         }
 
-    private fun JsonNode.fiskForedling(): Boolean =
-        this.finnOpplysning("permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien").asText() == "ja"
+    private fun JsonNode.fiskForedling(): Boolean {
+        val node = this.findPath("permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien")
+        return !node.isMissingNode && !node.isNull && node.asText() == "ja"
+    }
 
     private fun finnSluttÅrsakForQuiz(sluttårsak: Sluttårsak): Sluttårsak {
         if (sluttårsak == Sluttårsak.PERMITTERT_FISKEFOREDLING) {
@@ -397,7 +398,9 @@ class SøknadsdataBehovløser(
             )
 
         val personaliaSeksjonsData = objectMapper.readTree(seksjonsSvar)
-        val borINorge = personaliaSeksjonsData.finnOpplysning("folkeregistrertAdresseErNorgeStemmerDet").asText()
+        // Feltet finnes bare hvis bruker er folkeregistrert i Norge (landFraPdl === "NORGE").
+        // Brukere uten norsk folkeregistrert adresse får aldri spørsmålet, så manglende felt er forventet.
+        val borINorge = personaliaSeksjonsData.findPath("folkeregistrertAdresseErNorgeStemmerDet").asText()
         if (borINorge == "ja") return false
 
         val bostedsland = personaliaSeksjonsData.finnOpplysning("bostedsland").asText()

@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import org.jetbrains.exposed.sql.Database
@@ -8,6 +7,7 @@ import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import tools.jackson.module.kotlin.readValue
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID

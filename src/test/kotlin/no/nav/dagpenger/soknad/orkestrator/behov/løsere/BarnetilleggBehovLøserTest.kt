@@ -176,10 +176,10 @@ class BarnetilleggBehovLøserTest {
             it["fødselsdato"].asText() shouldBe "2013-05-26"
             it["statsborgerskap"].asText() shouldBe "NOR"
             it["kvalifiserer"].asBoolean() shouldBe false
-            it["barnetilleggFom"].asText().shouldBe("null")
-            it["barnetilleggTom"].asText().shouldBe("null")
-            it["endretAv"].asText().shouldBe("null")
-            it["begrunnelse"].asText().shouldBe("null")
+            it["barnetilleggFom"].isNull shouldBe true
+            it["barnetilleggTom"].isNull shouldBe true
+            it["endretAv"].isNull shouldBe true
+            it["begrunnelse"].isNull shouldBe true
         }
         løsteBarn[1].also {
             it["kvalifiserer"].asBoolean() shouldBe true
@@ -188,8 +188,8 @@ class BarnetilleggBehovLøserTest {
         }
         løsteBarn[2].also {
             it["kvalifiserer"].asBoolean() shouldBe false
-            it["barnetilleggFom"].asText() shouldBe "null"
-            it["barnetilleggTom"].asText() shouldBe "null"
+            it["barnetilleggFom"].isNull shouldBe true
+            it["barnetilleggTom"].isNull shouldBe true
         }
     }
 

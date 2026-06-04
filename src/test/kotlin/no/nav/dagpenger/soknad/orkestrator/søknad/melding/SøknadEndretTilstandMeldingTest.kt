@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.melding
 
-import com.fasterxml.jackson.databind.JsonNode
 import io.kotest.assertions.json.shouldContainJsonKey
 import io.kotest.assertions.json.shouldNotContainJsonKey
 import io.kotest.matchers.nulls.shouldBeNull
@@ -11,6 +10,7 @@ import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonMedTidstempler
 import org.junit.jupiter.api.Test
+import tools.jackson.databind.JsonNode
 import java.time.LocalDateTime
 import java.util.UUID
 

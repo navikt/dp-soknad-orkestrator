@@ -32,6 +32,10 @@ class DokumentKravInnsendtMelding(
     val erFerdigBesvart = erDokumentasjonskravFerdigBesvart()
 
     private fun erDokumentasjonskravFerdigBesvart(): Boolean {
+        // TODO: Returverdien av all {} brukes ikke — funksjonen returnerer alltid true.
+        //  For at logikken skal fungere må dette fikses. I tillegg er filer alltid en tom liste
+        //  fordi elementene i JSON-arrayen er objekter, ikke tekststrenger — urn må trolig
+        //  ekstraheres eksplisitt fra hvert filobjekt for at isNotEmpty()-sjekken skal gi mening.
         alleDokumentasjonskrav.all {
             when (it.valg) {
                 "SEND_NÅ", "ETTERSENDT" -> it.filer.isNotEmpty() && it.bundle != null
@@ -87,8 +91,11 @@ class DokumentKravInnsendtMelding(
                                 skjemakode = it.get("skjemakode").asText(),
                                 valg = mapSvaret(it.get("svar").asText()),
                                 begrunnelse = it.get("begrunnelse")?.asText(),
-                                filer = it.get("filer")?.map { fil -> fil.asText() }?.toList() ?: emptyList(),
-                                bundle = it.get("bundle")?.asText(),
+                                filer =
+                                    it.get("filer")?.values()?.mapNotNull { fil ->
+                                        if (fil.isTextual) fil.textValue() else null
+                                    } ?: emptyList(),
+                                bundle = it.get("bundle")?.toString(),
                             )
                         }
                     }

@@ -6,20 +6,20 @@ import kotlin.test.Test
 
 class ErBooleanTest {
     val jaNode =
-        com.fasterxml.jackson.databind
-            .ObjectMapper()
+        tools.jackson.databind.json
+            .JsonMapper()
             .readTree("\"ja\"")
     val neiNode =
-        com.fasterxml.jackson.databind
-            .ObjectMapper()
+        tools.jackson.databind.json
+            .JsonMapper()
             .readTree("\"nei\"")
     val trueNode =
-        com.fasterxml.jackson.databind
-            .ObjectMapper()
+        tools.jackson.databind.json
+            .JsonMapper()
             .readTree("true")
     val falseNode =
-        com.fasterxml.jackson.databind
-            .ObjectMapper()
+        tools.jackson.databind.json
+            .JsonMapper()
             .readTree("false")
 
     @Test

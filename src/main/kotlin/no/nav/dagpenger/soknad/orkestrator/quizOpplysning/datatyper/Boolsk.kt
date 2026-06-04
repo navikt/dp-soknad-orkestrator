@@ -1,7 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
-import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 data object Boolsk : Datatype<Boolean>(Boolean::class.java) {

@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.mottak
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import com.github.navikt.tbd_libs.rapids_and_rivers.River
 import com.github.navikt.tbd_libs.rapids_and_rivers.withMDC
@@ -15,6 +14,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
+import tools.jackson.databind.JsonNode
 
 class SøknadMottak(
     rapidsConnection: RapidsConnection,

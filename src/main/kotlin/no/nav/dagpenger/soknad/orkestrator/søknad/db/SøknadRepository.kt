@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
-import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
@@ -33,6 +32,7 @@ import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsert
+import tools.jackson.databind.JsonNode
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
 import java.util.UUID

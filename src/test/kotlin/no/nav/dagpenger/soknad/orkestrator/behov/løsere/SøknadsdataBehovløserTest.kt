@@ -87,6 +87,52 @@ class SøknadsdataBehovløserTest {
         } returns dinSituasjonMedGjenopptakelseOrkestratorJson(now)
 
         every {
+            seksjonRepository.hentSeksjonsvar(
+                any(),
+                ident,
+                "personalia",
+            )
+        } returns personaliaOrkestratorJson("ja", "NOR")
+
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident,
+                any(),
+                "annen-pengestotte",
+            )
+        } returns annenPengestøtteOrkestratorJson("nei", "nei")
+
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident,
+                any(),
+                "barnetillegg",
+            )
+        } returns barnetilleggUtenBarn()
+
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident,
+                any(),
+                "arbeidsforhold",
+            )
+        } returns arbeidsforholdUtenRegistrerteAvsluttedeArbeidsforholdOrkestratorJson()
+
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident,
+                any(),
+                "reell-arbeidssoker",
+            )
+        } returns
+            reellArbeidssøkerOrkestratorJson(
+                kanDuTaAlleTyperArbeid = "nei",
+                kanDuJobbeIHeleNorge = "nei",
+                kanDuJobbeBådeHeltidOgDeltid = "nei",
+                erDuVilligTilÅBytteYrkeEllerGåNedILønn = "nei",
+            )
+
+        every {
             seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),

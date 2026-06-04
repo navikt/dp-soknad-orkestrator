@@ -2,7 +2,6 @@ package no.nav.dagpenger.soknad.orkestrator.api.auth
 
 import com.auth0.jwk.JwkProviderBuilder
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.DeserializationFeature
 import com.natpryce.konfig.PropertyGroup
 import com.natpryce.konfig.getValue
 import com.natpryce.konfig.stringType
@@ -11,12 +10,13 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
-import io.ktor.serialization.jackson.jackson
+import io.ktor.serialization.jackson3.jackson
 import io.ktor.server.auth.jwt.JWTAuthenticationProvider
 import io.ktor.server.auth.jwt.JWTCredential
 import io.ktor.server.auth.jwt.JWTPrincipal
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.soknad.orkestrator.Configuration
+import tools.jackson.databind.DeserializationFeature
 import java.net.URI
 import java.net.URL
 import java.util.concurrent.TimeUnit

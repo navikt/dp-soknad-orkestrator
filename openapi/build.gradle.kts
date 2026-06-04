@@ -24,12 +24,16 @@ sourceSets {
     }
 }
 
+kotlin {
+    jvmToolchain(21)
+}
+
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation(libs.jackson.annotation)
+    implementation(libs.jackson.databind)
 }
 
 configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {

@@ -93,6 +93,6 @@ class BehovMottak(
 }
 
 internal fun JsonMessage.mottatteBehov() =
-    get("@behov").map { it.asText() }.filter { behov ->
+    get("@behov").values().map { it.asText() }.filter { behov ->
         BehovløserFactory.Behov.entries.any { it.name == behov }
     }

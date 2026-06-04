@@ -1,8 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.pdf
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.node.ArrayNode
-import com.fasterxml.jackson.databind.node.ObjectNode
 import freemarker.template.Configuration
 import freemarker.template.Configuration.VERSION_2_3_34
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
@@ -10,6 +7,9 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadPersonalia
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.node.ArrayNode
+import tools.jackson.databind.node.ObjectNode
 import java.io.ByteArrayOutputStream
 import java.io.OutputStreamWriter
 import java.time.format.DateTimeFormatter

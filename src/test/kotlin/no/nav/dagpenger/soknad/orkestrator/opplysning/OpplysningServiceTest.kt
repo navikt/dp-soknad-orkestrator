@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import com.fasterxml.jackson.module.kotlin.readValue
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
@@ -20,6 +19,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 import java.util.UUID
 import kotlin.test.Test

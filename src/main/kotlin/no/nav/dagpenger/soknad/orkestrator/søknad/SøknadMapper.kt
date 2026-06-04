@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
@@ -17,6 +16,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Heltall
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Periode
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 class SøknadMapper(

@@ -1,8 +1,8 @@
 package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 @Suppress("UNCHECKED_CAST")
@@ -16,27 +16,31 @@ data object EøsArbeidsforhold : Datatype<List<EøsArbeidsforholdSvar>>(
         søknadId: UUID,
     ): QuizOpplysning<*> {
         val eøsArbeidsforholdSvar: List<EøsArbeidsforholdSvar> =
-            faktum.get("svar").map { eøsArbeidsforhold ->
+            faktum.get("svar").values().map { eøsArbeidsforhold ->
                 val arbeidsgivernavnSvar =
                     eøsArbeidsforhold
+                        .values()
                         .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.arbeidsgivernavn" }
                         ?.get("svar")
                         ?.asText() ?: ""
 
                 val landSvar =
                     eøsArbeidsforhold
+                        .values()
                         .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.land" }
                         ?.get("svar")
                         ?.asText() ?: ""
 
                 val personnummerSvar =
                     eøsArbeidsforhold
+                        .values()
                         .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.personnummer" }
                         ?.get("svar")
                         ?.asText() ?: ""
 
                 val varighet =
                     eøsArbeidsforhold
+                        .values()
                         .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.varighet" }
                         ?.get("svar")
 
