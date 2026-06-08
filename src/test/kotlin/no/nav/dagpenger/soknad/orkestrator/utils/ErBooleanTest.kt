@@ -22,11 +22,17 @@ class ErBooleanTest {
             .JsonMapper()
             .readTree("false")
 
+    val vetIkkeNode =
+        tools.jackson.databind.json
+            .JsonMapper()
+            .readTree("\"vetikke\"")
+
     @Test
     fun testErBoolean() {
         assertTrue(jaNode.erBoolean())
         assertFalse(neiNode.erBoolean())
         assertTrue(trueNode.erBoolean())
         assertFalse(falseNode.erBoolean())
+        assertFalse(vetIkkeNode.erBoolean())
     }
 }

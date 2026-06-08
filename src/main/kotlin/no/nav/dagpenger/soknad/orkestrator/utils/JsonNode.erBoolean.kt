@@ -12,7 +12,13 @@ fun JsonNode.erBoolean(): Boolean =
             false
         }
 
+        this.isBoolean -> {
+            this.booleanValue()
+        }
+
         else -> {
-            this.asBoolean()
+            // Jackson 3 kaster for strenger som ikke er "true"/"false".
+            // Matcher Jackson 2-atferd: kun eksakt "true" gir true.
+            this.asText().lowercase() == "true"
         }
     }
