@@ -1,8 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.json.JsonMapper
-import com.fasterxml.jackson.databind.node.ObjectNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.isMissingOrNull
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
@@ -16,6 +13,9 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadSlett
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.SøknadEndretTilstandMelding
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.erBoolean
+import tools.jackson.databind.JsonNode
+import tools.jackson.databind.json.JsonMapper
+import tools.jackson.databind.node.ObjectNode
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -47,7 +47,7 @@ class SøknadService(
             objectMapper.createObjectNode().apply {
                 put("ident", ident)
                 put("søknadId", søknadId.toString())
-                set<JsonNode>("seksjoner", seksjoner)
+                set("seksjoner", seksjoner)
             }
 
         søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
@@ -279,7 +279,7 @@ class SøknadService(
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() == "jegErPermittert"
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asString() == "jegErPermittert"
                     }
                 }
             }

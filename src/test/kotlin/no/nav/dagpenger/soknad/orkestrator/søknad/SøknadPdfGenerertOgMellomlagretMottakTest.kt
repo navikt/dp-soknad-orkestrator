@@ -36,8 +36,8 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
         rapidsConnection.inspektør.size shouldBe 1
         with(rapidsConnection.inspektør) {
             message(0)["søknadId"].asUUID() shouldBe søknadId
-            message(0)["ident"].asText() shouldBe ident
-            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
+            message(0)["ident"].asString() shouldBe ident
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV] shouldNotBe null
         }
     }
 
@@ -49,9 +49,9 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
         with(rapidsConnection.inspektør) {
             message(0)["søknadId"].asUUID() shouldBe søknadId
-            message(0)["ident"].asText() shouldBe ident
-            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
-            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asText() shouldBe "04-16.04"
+            message(0)["ident"].asString() shouldBe ident
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV] shouldNotBe null
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asString() shouldBe "04-16.04"
         }
     }
 
@@ -63,9 +63,9 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
         with(rapidsConnection.inspektør) {
             message(0)["søknadId"].asUUID() shouldBe søknadId
-            message(0)["ident"].asText() shouldBe ident
-            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
-            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asText() shouldBe "04-01.04"
+            message(0)["ident"].asString() shouldBe ident
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV] shouldNotBe null
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asString() shouldBe "04-01.04"
         }
     }
 
@@ -77,9 +77,9 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
 
         with(rapidsConnection.inspektør) {
             message(0)["søknadId"].asUUID() shouldBe søknadId
-            message(0)["ident"].asText() shouldBe ident
-            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
-            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asText() shouldBe "04-16.03"
+            message(0)["ident"].asString() shouldBe ident
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV] shouldNotBe null
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asString() shouldBe "04-16.03"
         }
     }
 
@@ -90,9 +90,9 @@ class SøknadPdfGenerertOgMellomlagretMottakTest {
         rapidsConnection.sendTestMessage(genererOgMellomlagreSøknadPdfLøsning)
         with(rapidsConnection.inspektør) {
             message(0)["søknadId"].asUUID() shouldBe søknadId
-            message(0)["ident"].asText() shouldBe ident
-            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV].asText() shouldNotBe null
-            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asText() shouldBe "04-01.03"
+            message(0)["ident"].asString() shouldBe ident
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV] shouldNotBe null
+            message(0)[BehovForJournalføringAvSøknadPdfOgVedlegg.BEHOV]["hovedDokument"]["skjemakode"].asString() shouldBe "04-01.03"
         }
     }
 

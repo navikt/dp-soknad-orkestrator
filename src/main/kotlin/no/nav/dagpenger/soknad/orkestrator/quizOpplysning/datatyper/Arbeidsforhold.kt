@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
-import com.fasterxml.jackson.databind.JsonNode
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.ARBEIDSGIVER_KONKURS
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.AVSKJEDIGET
@@ -9,6 +8,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.REDUSERT_ARBEIDSTID
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak.SAGT_OPP_SELV
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 @Suppress("UNCHECKED_CAST")
@@ -21,7 +21,7 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
         ident: String,
         søknadId: UUID,
     ): QuizOpplysning<*>? {
-        val kompletteArbeidsforhold = faktum["svar"].filter { harAllePåkrevdeFelt(it) }
+        val kompletteArbeidsforhold = faktum["svar"].values().filter { harAllePåkrevdeFelt(it) }
 
         if (kompletteArbeidsforhold.isEmpty()) return null
 
@@ -46,23 +46,29 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
     }
 
     private fun erPermittering(arbeidsforhold: JsonNode) =
-        arbeidsforhold.any { it["svar"].asText() == "faktum.arbeidsforhold.endret.svar.permittert" }
+        arbeidsforhold.values().any {
+            it["svar"]?.takeIf { node -> node.isTextual }?.textValue() ==
+                "faktum.arbeidsforhold.endret.svar.permittert"
+        }
 
-    private fun JsonNode.harPåkrevdFelt(påkrevdFelt: String): Boolean = this.any { it["beskrivendeId"].asText() == påkrevdFelt }
+    private fun JsonNode.harPåkrevdFelt(påkrevdFelt: String): Boolean =
+        this.values().any { it["beskrivendeId"]?.takeIf { node -> node.isTextual }?.textValue() == påkrevdFelt }
 
     private fun hentArbeidsforholdSvar(kompletteArbeidsforhold: List<JsonNode>) =
         kompletteArbeidsforhold.map { arbeidsforhold ->
             val navnSvar =
                 arbeidsforhold
-                    .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.navn-bedrift" }
+                    .values()
+                    .single { it.get("beskrivendeId")?.textValue() == "faktum.arbeidsforhold.navn-bedrift" }
                     .get("svar")
-                    .asText()
+                    .asString()
 
             val landFaktum =
                 arbeidsforhold
-                    .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.land" }
+                    .values()
+                    .single { it.get("beskrivendeId")?.textValue() == "faktum.arbeidsforhold.land" }
                     .get("svar")
-                    .asText()
+                    .asString()
 
             val sluttårsak = finnSluttårsak(arbeidsforhold)
 
@@ -75,9 +81,10 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
 
     internal fun finnSluttårsak(arbeidsforhold: JsonNode): Sluttårsak =
         arbeidsforhold
-            .single { it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.endret" }
+            .values()
+            .single { it.get("beskrivendeId")?.textValue() == "faktum.arbeidsforhold.endret" }
             .get("svar")
-            .asText()
+            .asString()
             .let {
                 when (it) {
                     "faktum.arbeidsforhold.endret.svar.arbeidsgiver-konkurs" -> ARBEIDSGIVER_KONKURS
@@ -94,8 +101,8 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
 
     private fun finnSluttårsakVedPermittering(arbeidsforhold: JsonNode): Sluttårsak {
         val permittertFraFiskeriFaktum =
-            arbeidsforhold.single {
-                it.get("beskrivendeId").asText() == "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering"
+            arbeidsforhold.values().single {
+                it.get("beskrivendeId")?.textValue() == "faktum.arbeidsforhold.permittertert-fra-fiskeri-naering"
             }
 
         return when (permittertFraFiskeriFaktum.get("svar").asBoolean()) {

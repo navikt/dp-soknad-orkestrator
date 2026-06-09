@@ -1,7 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import com.fasterxml.jackson.databind.JsonNode
 import de.slub.urn.URN
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 data class NyJournalpost(
@@ -40,7 +40,7 @@ data class Dokumentvariant(
 fun JsonNode.dokumentVarianter(): List<Dokumentvariant> =
     this.toList().map { node ->
         val format =
-            when (node["metainfo"]["variant"].asText()) {
+            when (node["metainfo"]["variant"].asString()) {
                 "NETTO" -> {
                     "ARKIV"
                 }
@@ -56,9 +56,9 @@ fun JsonNode.dokumentVarianter(): List<Dokumentvariant> =
                 }
             }
         Dokumentvariant(
-            filnavn = node["metainfo"]["innhold"].asText(),
-            urn = node["urn"].asText(),
+            filnavn = node["metainfo"]["innhold"].asString(),
+            urn = node["urn"].asString(),
             variant = format,
-            type = node["metainfo"]["filtype"].asText(),
+            type = node["metainfo"]["filtype"].asString(),
         )
     }

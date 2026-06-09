@@ -32,6 +32,10 @@ class DokumentKravInnsendtMelding(
     val erFerdigBesvart = erDokumentasjonskravFerdigBesvart()
 
     private fun erDokumentasjonskravFerdigBesvart(): Boolean {
+        // TODO: Returverdien av all {} brukes ikke — funksjonen returnerer alltid true.
+        //  For at logikken skal fungere må dette fikses. I tillegg er filer alltid en tom liste
+        //  fordi elementene i JSON-arrayen er objekter, ikke tekststrenger — urn må trolig
+        //  ekstraheres eksplisitt fra hvert filobjekt for at isNotEmpty()-sjekken skal gi mening.
         alleDokumentasjonskrav.all {
             when (it.valg) {
                 "SEND_NÅ", "ETTERSENDT" -> it.filer.isNotEmpty() && it.bundle != null
@@ -83,12 +87,15 @@ class DokumentKravInnsendtMelding(
                         val dokumentkravForSeksjon = objectMapper.readTree(dokument).toList()
                         dokumentkravForSeksjon.map {
                             Dokumentasjonskrav(
-                                dokumentnavn = it.get("type").asText(),
-                                skjemakode = it.get("skjemakode").asText(),
-                                valg = mapSvaret(it.get("svar").asText()),
-                                begrunnelse = it.get("begrunnelse")?.asText(),
-                                filer = it.get("filer")?.map { fil -> fil.asText() }?.toList() ?: emptyList(),
-                                bundle = it.get("bundle")?.asText(),
+                                dokumentnavn = it.get("type").asString(),
+                                skjemakode = it.get("skjemakode").asString(),
+                                valg = mapSvaret(it.get("svar").asString()),
+                                begrunnelse = it.get("begrunnelse")?.asString(),
+                                filer =
+                                    it.get("filer")?.values()?.mapNotNull { fil ->
+                                        if (fil.isTextual) fil.textValue() else null
+                                    } ?: emptyList(),
+                                bundle = it.get("bundle")?.toString(),
                             )
                         }
                     }

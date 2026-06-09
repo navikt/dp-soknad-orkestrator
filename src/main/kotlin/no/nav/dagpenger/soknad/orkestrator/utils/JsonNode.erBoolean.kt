@@ -1,18 +1,24 @@
 package no.nav.dagpenger.soknad.orkestrator.utils
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
 
 fun JsonNode.erBoolean(): Boolean =
     when {
-        this.asText().lowercase() == "ja" -> {
+        this.asString().lowercase() == "ja" -> {
             true
         }
 
-        this.asText().lowercase() == "nei" -> {
+        this.asString().lowercase() == "nei" -> {
             false
         }
 
+        this.isBoolean -> {
+            this.booleanValue()
+        }
+
         else -> {
-            this.asBoolean()
+            // Jackson 3 kaster for strenger som ikke er "true"/"false".
+            // Matcher Jackson 2-atferd: kun eksakt "true" gir true.
+            this.asString().lowercase() == "true"
         }
     }

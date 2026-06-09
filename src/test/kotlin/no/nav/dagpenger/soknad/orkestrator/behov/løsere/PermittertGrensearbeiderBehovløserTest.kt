@@ -90,16 +90,16 @@ class PermittertGrensearbeiderBehovløserTest {
                     any(),
                 )
             } returns
-                """
-                {
-                  "seksjonId":"personalia",
-                  "seksjonsvar": {
-                    "reisteDuHjemTilLandetDuBorI": "${testData.first}",
-                    "reisteDuITaktMedRotasjon": "${testData.second}"
-                  },
-                  "versjon": 1
+                buildString {
+                    append("""{"seksjonId":"personalia","seksjonsvar":{""")
+                    val felter =
+                        listOfNotNull(
+                            testData.first?.let { """"reisteDuHjemTilLandetDuBorI":"$it"""" },
+                            testData.second?.let { """"reisteDuITaktMedRotasjon":"$it"""" },
+                        )
+                    append(felter.joinToString(","))
+                    append("""},"versjon":1}""")
                 }
-                """.trimIndent()
         }
 
         // Må også lagre søknadstidspunkt fordi det er denne som brukes for å sette gjelderFra i første omgang

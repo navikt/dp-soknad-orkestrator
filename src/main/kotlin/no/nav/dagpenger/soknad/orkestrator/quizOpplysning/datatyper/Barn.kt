@@ -1,8 +1,8 @@
 package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
+import tools.jackson.databind.JsonNode
 import java.time.LocalDate
 import java.util.UUID
 
@@ -17,30 +17,35 @@ data object Barn : Datatype<List<BarnSvar>>(List::class.java as Class<List<BarnS
         val fraRegister = beskrivendeId == "faktum.register.barn-liste"
 
         val barnSvar: List<BarnSvar> =
-            faktum.get("svar").map { it ->
+            faktum.get("svar").values().map { it ->
                 val fornavnOgMellomnavn =
                     it
-                        .single { it.get("beskrivendeId").asText() == "faktum.barn-fornavn-mellomnavn" }
+                        .values()
+                        .single { it.get("beskrivendeId").asString() == "faktum.barn-fornavn-mellomnavn" }
                         .get("svar")
-                        .asText()
+                        .asString()
                 val etternavn =
                     it
-                        .single { it.get("beskrivendeId").asText() == "faktum.barn-etternavn" }
+                        .values()
+                        .single { it.get("beskrivendeId").asString() == "faktum.barn-etternavn" }
                         .get("svar")
-                        .asText()
+                        .asString()
                 val fødselsdato =
                     it
-                        .single { it.get("beskrivendeId").asText() == "faktum.barn-foedselsdato" }
+                        .values()
+                        .single { it.get("beskrivendeId").asString() == "faktum.barn-foedselsdato" }
                         .get("svar")
                         .asLocalDate()
                 val statsborgerskap =
                     it
-                        .single { it.get("beskrivendeId").asText() == "faktum.barn-statsborgerskap" }
+                        .values()
+                        .single { it.get("beskrivendeId").asString() == "faktum.barn-statsborgerskap" }
                         .get("svar")
-                        .asText()
+                        .asString()
                 val forsørgerBarnet =
                     it
-                        .single { it.get("beskrivendeId").asText() == "faktum.forsoerger-du-barnet" }
+                        .values()
+                        .single { it.get("beskrivendeId").asString() == "faktum.forsoerger-du-barnet" }
                         .get("svar")
                         .asBoolean()
 

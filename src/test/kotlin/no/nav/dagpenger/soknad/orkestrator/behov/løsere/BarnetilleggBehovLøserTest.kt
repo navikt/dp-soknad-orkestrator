@@ -121,30 +121,30 @@ class BarnetilleggBehovLøserTest {
         løsteBarn.size() shouldBe 3
         løsteBarn[0].also {
             it["søknadbarnId"].asUUID() shouldBe lagretSøknadbarnId
-            it["fornavnOgMellomnavn"].asText() shouldBe "Ola"
-            it["etternavn"].asText() shouldBe "Nordmann"
-            it["fødselsdato"].asText() shouldBe "2000-01-01"
-            it["statsborgerskap"].asText() shouldBe "NOR"
+            it["fornavnOgMellomnavn"].asString() shouldBe "Ola"
+            it["etternavn"].asString() shouldBe "Nordmann"
+            it["fødselsdato"].asString() shouldBe "2000-01-01"
+            it["statsborgerskap"].asString() shouldBe "NOR"
             it["kvalifiserer"].asBoolean() shouldBe true
             it["barnetilleggFom"].asLocalDate() shouldBe 1.januar(2000)
             it["barnetilleggTom"].asLocalDate() shouldBe 1.januar(2018)
-            it["endretAv"].asText() shouldBe "123"
-            it["begrunnelse"].asText() shouldBe "Begrunnelse for endring"
+            it["endretAv"].asString() shouldBe "123"
+            it["begrunnelse"].asString() shouldBe "Begrunnelse for endring"
         }
         løsteBarn[1].also {
             it["søknadbarnId"].asUUID() shouldBe lagretSøknadbarnId
-            it["fornavnOgMellomnavn"].asText() shouldBe "Per"
-            it["etternavn"].asText() shouldBe "Nordmann"
-            it["fødselsdato"].asText() shouldBe "2000-01-01"
-            it["statsborgerskap"].asText() shouldBe "NOR"
+            it["fornavnOgMellomnavn"].asString() shouldBe "Per"
+            it["etternavn"].asString() shouldBe "Nordmann"
+            it["fødselsdato"].asString() shouldBe "2000-01-01"
+            it["statsborgerskap"].asString() shouldBe "NOR"
             it["kvalifiserer"].asBoolean() shouldBe false
         }
         løsteBarn[2].also {
             it["søknadbarnId"].asUUID() shouldBe lagretSøknadbarnId
-            it["fornavnOgMellomnavn"].asText() shouldBe "Per"
-            it["etternavn"].asText() shouldBe "Utland"
-            it["fødselsdato"].asText() shouldBe "2000-01-01"
-            it["statsborgerskap"].asText() shouldBe "UTL"
+            it["fornavnOgMellomnavn"].asString() shouldBe "Per"
+            it["etternavn"].asString() shouldBe "Utland"
+            it["fødselsdato"].asString() shouldBe "2000-01-01"
+            it["statsborgerskap"].asString() shouldBe "UTL"
             it["kvalifiserer"].asBoolean() shouldBe true
         }
     }
@@ -171,25 +171,25 @@ class BarnetilleggBehovLøserTest {
         løsteBarn.size() shouldBe 3
         løsteBarn[0].also {
             it["søknadbarnId"].asUUID().shouldNotBeNull()
-            it["fornavnOgMellomnavn"].asText() shouldBe "SMISKENDE"
-            it["etternavn"].asText() shouldBe "KJENNING"
-            it["fødselsdato"].asText() shouldBe "2013-05-26"
-            it["statsborgerskap"].asText() shouldBe "NOR"
+            it["fornavnOgMellomnavn"].asString() shouldBe "SMISKENDE"
+            it["etternavn"].asString() shouldBe "KJENNING"
+            it["fødselsdato"].asString() shouldBe "2013-05-26"
+            it["statsborgerskap"].asString() shouldBe "NOR"
             it["kvalifiserer"].asBoolean() shouldBe false
-            it["barnetilleggFom"].asText().shouldBe("null")
-            it["barnetilleggTom"].asText().shouldBe("null")
-            it["endretAv"].asText().shouldBe("null")
-            it["begrunnelse"].asText().shouldBe("null")
+            it["barnetilleggFom"].isNull shouldBe true
+            it["barnetilleggTom"].isNull shouldBe true
+            it["endretAv"].isNull shouldBe true
+            it["begrunnelse"].isNull shouldBe true
         }
         løsteBarn[1].also {
             it["kvalifiserer"].asBoolean() shouldBe true
-            it["barnetilleggFom"].asText() shouldBe "2009-11-12"
-            it["barnetilleggTom"].asText() shouldBe "2027-11-12"
+            it["barnetilleggFom"].asString() shouldBe "2009-11-12"
+            it["barnetilleggTom"].asString() shouldBe "2027-11-12"
         }
         løsteBarn[2].also {
             it["kvalifiserer"].asBoolean() shouldBe false
-            it["barnetilleggFom"].asText() shouldBe "null"
-            it["barnetilleggTom"].asText() shouldBe "null"
+            it["barnetilleggFom"].isNull shouldBe true
+            it["barnetilleggTom"].isNull shouldBe true
         }
     }
 

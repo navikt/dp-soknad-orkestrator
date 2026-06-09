@@ -1,12 +1,17 @@
 package no.nav.dagpenger.soknad.orkestrator.utils
 
-import com.github.navikt.tbd_libs.naisful.test.TestContext
-import com.github.navikt.tbd_libs.naisful.test.naisfulTestApp
+import io.ktor.client.HttpClient
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.serialization.jackson3.jackson
 import io.ktor.server.application.Application
-import io.micrometer.prometheusmetrics.PrometheusConfig
-import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
-import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
+import io.ktor.server.application.install
+import io.ktor.server.testing.testApplication
+import no.nav.dagpenger.soknad.orkestrator.config.configure
 import no.nav.security.mock.oauth2.MockOAuth2Server
+
+class TestContext(
+    val client: HttpClient,
+)
 
 object TestApplication {
     private const val TOKENX_ISSUER_ID = "tokenx"
@@ -51,12 +56,21 @@ object TestApplication {
         System.setProperty("azure-app.client-id", CLIENT_ID)
         System.setProperty("azure-app.well-known-url", "${mockOAuth2Server.wellKnownUrl(AZUREAD_ISSUER_ID)}")
 
-        return naisfulTestApp(
-            testApplicationModule = moduleFunction,
-            meterRegistry = PrometheusMeterRegistry(PrometheusConfig.DEFAULT),
-            objectMapper = objectMapper,
-        ) {
-            test()
+        testApplication {
+            application {
+                install(io.ktor.server.plugins.contentnegotiation.ContentNegotiation) {
+                    jackson { configure() }
+                }
+
+                moduleFunction()
+            }
+            val client =
+                createClient {
+                    install(ContentNegotiation) {
+                        jackson { configure() }
+                    }
+                }
+            TestContext(client).test()
         }
     }
 }

@@ -54,7 +54,7 @@ class LønnsgarantiBehovløser(
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() == "arbeidsgiverErKonkurs"
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asString() == "arbeidsgiverErKonkurs"
                     }
                 }
             }

@@ -6,8 +6,8 @@ import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
 open class Behovmelding(
     packet: JsonMessage,
 ) {
-    val behov = packet["@behov"].map { it.asText() }
-    val ident = packet["ident"].asText()
+    val behov = packet["@behov"].values().map { it.asString() }
+    val ident = packet["ident"].asString()
     val søknadId = packet["søknadId"].asUUID()
     val innkommendePacket: JsonMessage = packet
 }
@@ -15,7 +15,7 @@ open class Behovmelding(
 class SøknadBehovmelding(
     packet: JsonMessage,
 ) {
-    val behov = packet["@behov"].map { it.asText() }
-    val ident = packet["ident"].asText()
+    val behov = packet["@behov"].values().map { it.asString() }
+    val ident = packet["ident"].asString()
     val innkommendePacket: JsonMessage = packet
 }

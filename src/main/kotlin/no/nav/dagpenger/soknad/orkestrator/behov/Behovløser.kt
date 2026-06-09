@@ -121,9 +121,9 @@ abstract class Behovløser(
         val sikkerlogg = KotlinLogging.logger("tjenestekall.Behovløser")
     }
 
-    fun JsonMessage.søknadId(): UUID = UUID.fromString(get("søknadId").asText())
+    fun JsonMessage.søknadId(): UUID = UUID.fromString(get("søknadId").asString())
 
-    fun JsonMessage.ident(): String = get("ident").asText()
+    fun JsonMessage.ident(): String = get("ident").asString()
 
     // I første omgang er gjelderFra lik søknadstidspunkt
     private fun finnGjelderFraDato(

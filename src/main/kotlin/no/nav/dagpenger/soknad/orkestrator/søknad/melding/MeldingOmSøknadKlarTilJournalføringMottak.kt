@@ -50,14 +50,14 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
         meterRegistry: MeterRegistry,
     ) {
         withMDC(
-            mapOf("søknadId" to packet["søknadId"].asText()),
+            mapOf("søknadId" to packet["søknadId"].asString()),
         ) {
             logg.info { "Mottok $EVENT_NAME hendelse for søknad ${packet["søknadId"]}" }
             sikkerLogg.info { "Mottok $EVENT_NAME hendelse for søknad ${packet["søknadId"]} og ident ${packet["ident"]}" }
 
             try {
                 val jsonNode = objectMapper.readTree(packet.toJson())
-                val ident = jsonNode.get("ident").asText()
+                val ident = jsonNode.get("ident").asString()
                 val søknadId = jsonNode.get("søknadId").asUUID()
                 val innsendtTidspunkt = jsonNode.get("innsendtTidspunkt").asLocalDateTime()
                 val søknadIderForMislykkedeSøknader: List<UUID> =

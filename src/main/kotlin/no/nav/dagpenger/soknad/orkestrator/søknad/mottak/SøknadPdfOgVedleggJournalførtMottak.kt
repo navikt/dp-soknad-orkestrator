@@ -52,8 +52,8 @@ internal class SøknadPdfOgVedleggJournalførtMottak(
         meterRegistry: MeterRegistry,
     ) {
         val søknadId = packet["søknadId"].asUUID()
-        val ident = packet["ident"].asText()
-        val journalpostId = packet["@løsning"][BEHOV]["journalpostId"].asText()
+        val ident = packet["ident"].asString()
+        val journalpostId = packet["@løsning"][BEHOV]["journalpostId"].asString()
         val journalførtTidspunkt = packet["@løsning"][BEHOV]["journalførtTidspunkt"].asLocalDateTime()
 
         withLoggingContext(

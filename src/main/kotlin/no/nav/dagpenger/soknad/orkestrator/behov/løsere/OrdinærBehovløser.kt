@@ -65,7 +65,7 @@ class OrdinærBehovløser(
                     return it.any { arbeidsforhold ->
                         val hvordanHarDetteArbeidsforholdetEndretSeg = arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]
                         if (hvordanHarDetteArbeidsforholdetEndretSeg != null) {
-                            return hvordanHarDetteArbeidsforholdetEndretSeg.asText() !in ikkeOrdinæreRettighetstyper
+                            return hvordanHarDetteArbeidsforholdetEndretSeg.asString() !in ikkeOrdinæreRettighetstyper
                         }
                         return false
                     }

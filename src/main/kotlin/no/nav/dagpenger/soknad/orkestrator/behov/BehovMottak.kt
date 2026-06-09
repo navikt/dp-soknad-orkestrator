@@ -45,19 +45,19 @@ class BehovMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val behovId = packet["@behovId"].asText()
+        val behovId = packet["@behovId"].asString()
         val søknadId =
             try {
                 packet["søknadId"].asUUID()
             } catch (e: IllegalArgumentException) {
-                logger.error(e) { "SøknadId i behovet er ikke en gyldig UUID: ${packet["søknadId"].asText()}" }
+                logger.error(e) { "SøknadId i behovet er ikke en gyldig UUID: ${packet["søknadId"].asString()}" }
                 return
             }
 
         withMDC(
             mapOf(
                 "søknadId" to søknadId.toString(),
-                "behandlingId" to packet["behandlingId"].asText(),
+                "behandlingId" to packet["behandlingId"].asString(),
                 "behovId" to behovId,
             ),
         ) {
@@ -93,6 +93,6 @@ class BehovMottak(
 }
 
 internal fun JsonMessage.mottatteBehov() =
-    get("@behov").map { it.asText() }.filter { behov ->
+    get("@behov").values().map { it.asString() }.filter { behov ->
         BehovløserFactory.Behov.entries.any { it.name == behov }
     }

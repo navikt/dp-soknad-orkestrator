@@ -50,9 +50,9 @@ internal class MinidialogJournalførtMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val behovId = packet["@behovId"].asText()
-        val søknadId = packet["søknad_uuid"].asText()
-        val dialogId = packet[behov]["dialog_uuid"].asText()
+        val behovId = packet["@behovId"].asString()
+        val søknadId = packet["søknad_uuid"].asString()
+        val dialogId = packet[behov]["dialog_uuid"].asString()
         val journalpostId = packet["@løsning"][behov].asLong()
 
         withLoggingContext(
@@ -60,7 +60,7 @@ internal class MinidialogJournalførtMottak(
             "søknadId" to søknadId,
             "dialogId" to dialogId,
         ) {
-            if (packet["@id"].asText() in emptyList<String>()) {
+            if (packet["@id"].asString() in emptyList<String>()) {
                 logger.warn {
                     "Ignorerer melding fordi den inneholder en duplikat journalføring journalpostId=$journalpostId"
                 }

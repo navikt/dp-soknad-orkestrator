@@ -39,13 +39,13 @@ class RekjørJournalføringForSøknaderJobbTest {
 
         testRapid.inspektør.size shouldBe 2
 
-        testRapid.inspektør.message(0)["@event_name"].asText() shouldBe "søknad_klar_til_journalføring"
-        testRapid.inspektør.message(0)["søknadId"].asText() shouldBe søknadId1.toString()
-        testRapid.inspektør.message(0)["ident"].asText() shouldBe ident1
+        testRapid.inspektør.message(0)["@event_name"].asString() shouldBe "søknad_klar_til_journalføring"
+        testRapid.inspektør.message(0)["søknadId"].asString() shouldBe søknadId1.toString()
+        testRapid.inspektør.message(0)["ident"].asString() shouldBe ident1
 
-        testRapid.inspektør.message(1)["@event_name"].asText() shouldBe "søknad_klar_til_journalføring"
-        testRapid.inspektør.message(1)["søknadId"].asText() shouldBe søknadId2.toString()
-        testRapid.inspektør.message(1)["ident"].asText() shouldBe ident2
+        testRapid.inspektør.message(1)["@event_name"].asString() shouldBe "søknad_klar_til_journalføring"
+        testRapid.inspektør.message(1)["søknadId"].asString() shouldBe søknadId2.toString()
+        testRapid.inspektør.message(1)["ident"].asString() shouldBe ident2
     }
 
     @Test
@@ -58,7 +58,7 @@ class RekjørJournalføringForSøknaderJobbTest {
         RekjørJournalføringForSøknaderJobb.kjørJobb(testRapid, søknadRepository, søknadIder)
 
         testRapid.inspektør.size shouldBe 1
-        testRapid.inspektør.message(0)["søknadId"].asText() shouldBe søknadId2.toString()
+        testRapid.inspektør.message(0)["søknadId"].asString() shouldBe søknadId2.toString()
     }
 
     @Test
@@ -72,7 +72,7 @@ class RekjørJournalføringForSøknaderJobbTest {
         RekjørJournalføringForSøknaderJobb.kjørJobb(testRapid, søknadRepository, søknadIder)
 
         testRapid.inspektør.size shouldBe 1
-        testRapid.inspektør.message(0)["søknadId"].asText() shouldBe søknadId2.toString()
+        testRapid.inspektør.message(0)["søknadId"].asString() shouldBe søknadId2.toString()
     }
 
     @Test
@@ -96,8 +96,8 @@ class RekjørJournalføringForSøknaderJobbTest {
         RekjørJournalføringForSøknaderJobb.kjørJobb(testRapid, søknadRepository, søknadIder)
 
         testRapid.inspektør.size shouldBe 2
-        testRapid.inspektør.message(0)["søknadId"].asText() shouldBe søknadId1.toString()
-        testRapid.inspektør.message(1)["søknadId"].asText() shouldBe søknadId3.toString()
+        testRapid.inspektør.message(0)["søknadId"].asString() shouldBe søknadId1.toString()
+        testRapid.inspektør.message(1)["søknadId"].asString() shouldBe søknadId3.toString()
     }
 
     @Test

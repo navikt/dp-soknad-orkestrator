@@ -51,7 +51,7 @@ internal class SøknadPdfGenerertOgMellomlagretMottak(
     ) {
         val søknadId = packet["søknadId"].asUUID()
         if (søknadId.toString() == "ad6e29ea-7eaa-42ae-9e4c-dcb3e8f2e7ae") return
-        val ident = packet["ident"].asText()
+        val ident = packet["ident"].asString()
         withLoggingContext(
             "søknadId" to søknadId.toString(),
         ) {

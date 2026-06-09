@@ -87,6 +87,52 @@ class SøknadsdataBehovløserTest {
         } returns dinSituasjonMedGjenopptakelseOrkestratorJson(now)
 
         every {
+            seksjonRepository.hentSeksjonsvar(
+                any(),
+                ident,
+                "personalia",
+            )
+        } returns personaliaOrkestratorJson("ja", "NOR")
+
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident,
+                any(),
+                "annen-pengestotte",
+            )
+        } returns annenPengestøtteOrkestratorJson("nei", "nei")
+
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident,
+                any(),
+                "barnetillegg",
+            )
+        } returns barnetilleggUtenBarn()
+
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident,
+                any(),
+                "arbeidsforhold",
+            )
+        } returns arbeidsforholdUtenRegistrerteAvsluttedeArbeidsforholdOrkestratorJson()
+
+        every {
+            seksjonRepository.hentSeksjonsvarEllerKastException(
+                ident,
+                any(),
+                "reell-arbeidssoker",
+            )
+        } returns
+            reellArbeidssøkerOrkestratorJson(
+                kanDuTaAlleTyperArbeid = "nei",
+                kanDuJobbeIHeleNorge = "nei",
+                kanDuJobbeBådeHeltidOgDeltid = "nei",
+                erDuVilligTilÅBytteYrkeEllerGåNedILønn = "nei",
+            )
+
+        every {
             seksjonRepository.hentSeksjonsvarEllerKastException(
                 any(),
                 any(),
@@ -491,12 +537,12 @@ class SøknadsdataBehovløserTest {
             val verdi = løsning["verdi"]
             val avsluttetArbeidsforhold = verdi["avsluttetArbeidsforhold"]
             avsluttetArbeidsforhold.size() shouldBe 2
-            avsluttetArbeidsforhold[0]["sluttårsak"].asText() shouldBe "SAGT_OPP_AV_ARBEIDSGIVER"
+            avsluttetArbeidsforhold[0]["sluttårsak"].asString() shouldBe "SAGT_OPP_AV_ARBEIDSGIVER"
             avsluttetArbeidsforhold[0]["fiskeforedling"].asBoolean() shouldBe false
-            avsluttetArbeidsforhold[0]["land"].asText() shouldBe "NOR"
-            avsluttetArbeidsforhold[1]["sluttårsak"].asText() shouldBe "PERMITTERT"
+            avsluttetArbeidsforhold[0]["land"].asString() shouldBe "NOR"
+            avsluttetArbeidsforhold[1]["sluttårsak"].asString() shouldBe "PERMITTERT"
             avsluttetArbeidsforhold[1]["fiskeforedling"].asBoolean() shouldBe true
-            avsluttetArbeidsforhold[1]["land"].asText() shouldBe "SWE"
+            avsluttetArbeidsforhold[1]["land"].asString() shouldBe "SWE"
             verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
         }
@@ -528,12 +574,12 @@ class SøknadsdataBehovløserTest {
             val verdi = løsning["verdi"]
             val avsluttetArbeidsforhold = verdi["avsluttetArbeidsforhold"]
             avsluttetArbeidsforhold.size() shouldBe 2
-            avsluttetArbeidsforhold[0]["sluttårsak"].asText() shouldBe "SAGT_OPP_AV_ARBEIDSGIVER"
+            avsluttetArbeidsforhold[0]["sluttårsak"].asString() shouldBe "SAGT_OPP_AV_ARBEIDSGIVER"
             avsluttetArbeidsforhold[0]["fiskeforedling"].asBoolean() shouldBe false
-            avsluttetArbeidsforhold[0]["land"].asText() shouldBe "NOR"
-            avsluttetArbeidsforhold[1]["sluttårsak"].asText() shouldBe "PERMITTERT"
+            avsluttetArbeidsforhold[0]["land"].asString() shouldBe "NOR"
+            avsluttetArbeidsforhold[1]["sluttårsak"].asString() shouldBe "PERMITTERT"
             avsluttetArbeidsforhold[1]["fiskeforedling"].asBoolean() shouldBe true
-            avsluttetArbeidsforhold[1]["land"].asText() shouldBe "SWE"
+            avsluttetArbeidsforhold[1]["land"].asString() shouldBe "SWE"
             verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
         }
@@ -579,12 +625,12 @@ class SøknadsdataBehovløserTest {
             val verdi = løsning["verdi"]
             val avsluttetArbeidsforhold = verdi["avsluttetArbeidsforhold"]
             avsluttetArbeidsforhold.size() shouldBe 2
-            avsluttetArbeidsforhold[0]["sluttårsak"].asText() shouldBe "SAGT_OPP_AV_ARBEIDSGIVER"
+            avsluttetArbeidsforhold[0]["sluttårsak"].asString() shouldBe "SAGT_OPP_AV_ARBEIDSGIVER"
             avsluttetArbeidsforhold[0]["fiskeforedling"].asBoolean() shouldBe false
-            avsluttetArbeidsforhold[0]["land"].asText() shouldBe "NOR"
-            avsluttetArbeidsforhold[1]["sluttårsak"].asText() shouldBe "PERMITTERT"
+            avsluttetArbeidsforhold[0]["land"].asString() shouldBe "NOR"
+            avsluttetArbeidsforhold[1]["sluttårsak"].asString() shouldBe "PERMITTERT"
             avsluttetArbeidsforhold[1]["fiskeforedling"].asBoolean() shouldBe true
-            avsluttetArbeidsforhold[1]["land"].asText() shouldBe "SWE"
+            avsluttetArbeidsforhold[1]["land"].asString() shouldBe "SWE"
             verdi["søknad_uuid"].asUUID() shouldBe søknadId
             verdi["ønskerDagpengerFraDato"].asLocalDate() shouldBe now
         }

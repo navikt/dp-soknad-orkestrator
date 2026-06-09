@@ -1,11 +1,11 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.melding
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.JsonMessage
 import io.ktor.util.toLowerCasePreservingASCIIRules
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonMedTidstempler
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 class SøknadEndretTilstandMelding(
@@ -91,7 +91,7 @@ class SøknadEndretTilstandMelding(
             )
         val seksjon =
             mapOf(
-                "seksjonId" to seksjonsdataJson["seksjonId"].asText(),
+                "seksjonId" to seksjonsdataJson["seksjonId"].asString(),
                 "seksjonsvar" to filtrertSeksjonsdata,
                 "versjon" to seksjonsdataJson["versjon"].asInt(),
             )
@@ -133,7 +133,7 @@ class SøknadEndretTilstandMelding(
             }
 
             seksjonssvarJson.isArray -> {
-                seksjonssvarJson.map { element -> filtrerUgyldigeSpørsmålBasertPåType(element, tillatteFelter) }
+                seksjonssvarJson.values().map { element -> filtrerUgyldigeSpørsmålBasertPåType(element, tillatteFelter) }
             }
 
             seksjonssvarJson.isNull -> {
@@ -141,7 +141,7 @@ class SøknadEndretTilstandMelding(
             }
 
             else -> {
-                seksjonssvarJson.asText()
+                seksjonssvarJson.asString()
             }
         }
 
@@ -165,15 +165,15 @@ class SøknadEndretTilstandMelding(
             fun traverse(node: JsonNode) {
                 when {
                     node.isObject && node.has("id") && node.has("type") -> {
-                        if (node["type"].asText() in gyldigeTyper && node["id"].asText() != "fødselsdato") {
+                        if (node["type"].asString() in gyldigeTyper && node["id"].asString() != "fødselsdato") {
                             seksjonMappet.add(
-                                node["id"].asText(),
+                                node["id"].asString(),
                             )
                         }
                     }
 
                     node.isArray -> {
-                        node.forEach { traverse(it) }
+                        node.values().forEach { traverse(it) }
                     }
 
                     node.isObject -> {
@@ -184,7 +184,7 @@ class SøknadEndretTilstandMelding(
 
             traverse(seksjon)
             SeksjonMedGyldigeFeltIder(
-                seksjonId = hentSeksjonIdFraNavn(seksjon["navn"].asText()),
+                seksjonId = hentSeksjonIdFraNavn(seksjon["navn"].asString()),
                 spørsmål = seksjonMappet,
             )
         }
@@ -202,7 +202,7 @@ class SøknadEndretTilstandMelding(
     private fun hentFeltFraSeksjon(
         jsonNode: JsonNode,
         nøkkel: String,
-    ): String = jsonNode["seksjonsvar"][nøkkel]?.asText() ?: ""
+    ): String = jsonNode["seksjonsvar"][nøkkel]?.asString() ?: ""
 
     data class SeksjonMedGyldigeFeltIder(
         val seksjonId: String,

@@ -1,9 +1,9 @@
 package no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatype
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import io.kotest.matchers.shouldBe
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
+import tools.jackson.databind.json.JsonMapper
 import kotlin.test.Test
 
 class ArbeidsforholdTest {
@@ -22,7 +22,7 @@ class ArbeidsforholdTest {
 
 //language=JSON
 val arbeidsforholdPermittertFraFiskeri =
-    ObjectMapper().readTree(
+    JsonMapper().readTree(
         """
         [
           {
@@ -51,7 +51,7 @@ val arbeidsforholdPermittertFraFiskeri =
 
 //language=JSON
 val arbeidsforholdPermittert =
-    ObjectMapper().readTree(
+    JsonMapper().readTree(
         """
         [
           {
@@ -80,7 +80,7 @@ val arbeidsforholdPermittert =
 
 //language=JSON
 val arbeidsforholdAvskjediget =
-    ObjectMapper().readTree(
+    JsonMapper().readTree(
         """
         [
           {
@@ -104,7 +104,7 @@ val arbeidsforholdAvskjediget =
 
 //language=JSON
 val arbeidsforholdKontraktUtgått =
-    ObjectMapper().readTree(
+    JsonMapper().readTree(
         """
         [
           {
@@ -128,7 +128,7 @@ val arbeidsforholdKontraktUtgått =
 
 //language=JSON
 val arbeidsforholdRedusertArbeidstid =
-    ObjectMapper().readTree(
+    JsonMapper().readTree(
         """
         [
           {
@@ -152,7 +152,7 @@ val arbeidsforholdRedusertArbeidstid =
 
 //language=JSON
 val arbeidsforholdSagtOppAvArbeidsgiver =
-    ObjectMapper().readTree(
+    JsonMapper().readTree(
         """
         [
           {
@@ -181,7 +181,7 @@ val arbeidsforholdSagtOppAvArbeidsgiver =
 
 //language=JSON
 val arbeidsforholdSagtOppSelv =
-    ObjectMapper().readTree(
+    JsonMapper().readTree(
         """
         [
           {
@@ -210,7 +210,7 @@ val arbeidsforholdSagtOppSelv =
 
 //language=JSON
 val arbeidsforholdIkkeEndret =
-    ObjectMapper().readTree(
+    JsonMapper().readTree(
         """
         [
           {

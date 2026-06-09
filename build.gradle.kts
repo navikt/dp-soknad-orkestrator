@@ -11,7 +11,6 @@ val dagpengerOauth2KlientVersion: String by project
 val freemarkerVersion: String by project
 
 val junitJupiterVersion: String by project
-val naisfulTestAppVersion: String by project
 
 plugins {
     kotlin("jvm") version "2.3.21"
@@ -72,6 +71,7 @@ dependencies {
 
     implementation("io.ktor:ktor-server-netty:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-server-config-yaml:${libs.versions.ktor.get()}")
+    implementation("io.ktor:ktor-server-content-negotiation:3.4.3")
 
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.client.mock)
@@ -82,5 +82,4 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitJupiterVersion")
     testImplementation("io.ktor:ktor-server-test-host-jvm:${libs.versions.ktor.get()}")
     testImplementation(libs.rapids.and.rivers.test)
-    testImplementation("com.github.navikt.tbd-libs:naisful-test-app:$naisfulTestAppVersion")
 }

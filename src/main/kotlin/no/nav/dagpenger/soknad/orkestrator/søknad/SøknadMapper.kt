@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad
 
-import com.fasterxml.jackson.databind.JsonNode
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.metrikker.SøknadMetrikker
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
@@ -17,16 +16,17 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Heltall
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Periode
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 class SøknadMapper(
     private val jsonNode: JsonNode,
 ) {
     val søknad by lazy {
-        val ident = jsonNode.get("ident").asText()
+        val ident = jsonNode.get("ident").asString()
         val søknadId = jsonNode.get("søknadId").asUUID()
         val søknadData = jsonNode.get("søknadData")
-        val søknadstidspunkt = jsonNode.get("søknadstidspunkt").asText()
+        val søknadstidspunkt = jsonNode.get("søknadstidspunkt").asString()
 
         Søknad(
             søknadId = søknadId,
@@ -80,8 +80,8 @@ class SøknadMapper(
         ident: String,
         søknadId: UUID,
     ): QuizOpplysning<*>? {
-        val beskrivendeId = faktum.get("beskrivendeId").asText()
-        val faktumtype = faktum.get("type").asText()
+        val beskrivendeId = faktum.get("beskrivendeId").asString()
+        val faktumtype = faktum.get("type").asString()
 
         if (faktumtype == "dokument") {
             return null

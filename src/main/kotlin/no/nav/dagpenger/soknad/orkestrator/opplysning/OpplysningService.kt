@@ -1,6 +1,5 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import com.fasterxml.jackson.databind.JsonNode
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnDataDTO
@@ -21,6 +20,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.BarnSvar
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 class OpplysningService(
@@ -72,16 +72,16 @@ class OpplysningService(
         val egneBarn = seksjonJson.findPath("barnLagtManuelt")?.toList() ?: emptyList()
 
         fun JsonNode.tilBarnSvar(fraRegister: Boolean): BarnSvar {
-            val kvalifiserer = this["forsørgerDuBarnet"]?.asText() == "ja"
+            val kvalifiserer = this["forsørgerDuBarnet"]?.asString() == "ja"
             val fødselsdato = this["fødselsdato"].asLocalDate()
             val barnetilleggperiode = if (kvalifiserer) barnetilleggperiode(fødselsdato) else null
 
             return BarnSvar(
-                barnSvarId = this["id"]?.asText()?.let { UUID.fromString(it) } ?: UUID.randomUUID(),
-                fornavnOgMellomnavn = this["fornavnOgMellomnavn"].asText(),
-                etternavn = this["etternavn"].asText(),
+                barnSvarId = this["id"]?.asString()?.let { UUID.fromString(it) } ?: UUID.randomUUID(),
+                fornavnOgMellomnavn = this["fornavnOgMellomnavn"].asString(),
+                etternavn = this["etternavn"].asString(),
                 fødselsdato = fødselsdato,
-                statsborgerskap = this["bostedsland"].asText(),
+                statsborgerskap = this["bostedsland"].asString(),
                 forsørgerBarnet = kvalifiserer,
                 fraRegister = fraRegister,
                 kvalifisererTilBarnetillegg = kvalifiserer,
