@@ -279,7 +279,7 @@ class SøknadService(
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() == "jegErPermittert"
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asString() == "jegErPermittert"
                     }
                 }
             }

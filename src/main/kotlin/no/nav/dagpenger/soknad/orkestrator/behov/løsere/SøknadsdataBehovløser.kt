@@ -42,7 +42,7 @@ class SøknadsdataBehovløser(
         }
 
         val journalpostId =
-            behovmelding.innkommendePacket.get("journalpostId").asText() ?: throw IllegalStateException(
+            behovmelding.innkommendePacket.get("journalpostId").asString() ?: throw IllegalStateException(
                 "Mangler journalpostId i behov for søknadsdata for søknaden",
             )
 
@@ -191,16 +191,16 @@ class SøknadsdataBehovløser(
         val reellArbeidssøkerSeksjon = objectMapper.readTree(seksjonsvar)
 
         val kanDuTaAlleTyperArbeid =
-            reellArbeidssøkerSeksjon.finnOpplysning("kanDuTaAlleTyperArbeid").asText() == "ja"
+            reellArbeidssøkerSeksjon.finnOpplysning("kanDuTaAlleTyperArbeid").asString() == "ja"
 
         val kanDuJobbeIHeleNorge =
-            reellArbeidssøkerSeksjon.finnOpplysning("kanDuJobbeIHeleNorge").asText() == "ja"
+            reellArbeidssøkerSeksjon.finnOpplysning("kanDuJobbeIHeleNorge").asString() == "ja"
 
         val kanDuJobbeBådeHeltidOgDeltid =
-            reellArbeidssøkerSeksjon.finnOpplysning("kanDuJobbeBådeHeltidOgDeltid").asText() == "ja"
+            reellArbeidssøkerSeksjon.finnOpplysning("kanDuJobbeBådeHeltidOgDeltid").asString() == "ja"
 
         val erDuVilligTilÅBytteYrkeEllerGåNedILønn =
-            reellArbeidssøkerSeksjon.finnOpplysning("erDuVilligTilÅBytteYrkeEllerGåNedILønn").asText() == "ja"
+            reellArbeidssøkerSeksjon.finnOpplysning("erDuVilligTilÅBytteYrkeEllerGåNedILønn").asString() == "ja"
 
         return ReellArbeidssøker(
             helse = kanDuTaAlleTyperArbeid,
@@ -241,10 +241,12 @@ class SøknadsdataBehovløser(
         val annenPengestøtteSeksjon = objectMapper.readTree(seksjonsvar)
 
         val mottarDuPengestøtteFraAndreEnnNav: Boolean =
-            annenPengestøtteSeksjon.finnOpplysning("mottarDuPengestøtteFraAndreEnnNav").asText() == "ja"
+            annenPengestøtteSeksjon.finnOpplysning("mottarDuPengestøtteFraAndreEnnNav").asString() == "ja"
 
         val mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver =
-            annenPengestøtteSeksjon.finnOpplysning("mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver").asText() == "ja"
+            annenPengestøtteSeksjon
+                .finnOpplysning("mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver")
+                .asString() == "ja"
 
         return mottarDuPengestøtteFraAndreEnnNav ||
             mottarDuAndreUtbetalingerEllerØkonomiskeGoderFraTidligereArbeidsgiver
@@ -335,7 +337,7 @@ class SøknadsdataBehovløser(
                     AvsluttedeArbeidsforhold(
                         sluttårsak = arbeidsforhold.sluttårsak(),
                         fiskeforedling = arbeidsforhold.fiskForedling(),
-                        land = arbeidsforhold.findPath("hvilketLandJobbetDuI").asText(),
+                        land = arbeidsforhold.findPath("hvilketLandJobbetDuI").asString(),
                     )
                 }
             }
@@ -349,7 +351,7 @@ class SøknadsdataBehovløser(
             ?: throw NoSuchElementException("Finner ikke opplysning med navn: $navn")
 
     private fun JsonNode.sluttårsak(): Sluttårsak =
-        this.findPath("hvordanHarDetteArbeidsforholdetEndretSeg").asText().let {
+        this.findPath("hvordanHarDetteArbeidsforholdetEndretSeg").asString().let {
             mapSluttÅrsak(it)
         }
 
@@ -368,7 +370,7 @@ class SøknadsdataBehovløser(
 
     private fun JsonNode.fiskForedling(): Boolean {
         val node = this.findPath("permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien")
-        return !node.isMissingNode && !node.isNull && node.asText() == "ja"
+        return !node.isMissingNode && !node.isNull && node.asString() == "ja"
     }
 
     private fun finnSluttÅrsakForQuiz(sluttårsak: Sluttårsak): Sluttårsak {
@@ -400,10 +402,10 @@ class SøknadsdataBehovløser(
         val personaliaSeksjonsData = objectMapper.readTree(seksjonsSvar)
         // Feltet finnes bare hvis bruker er folkeregistrert i Norge (landFraPdl === "NORGE").
         // Brukere uten norsk folkeregistrert adresse får aldri spørsmålet, så manglende felt er forventet.
-        val borINorge = personaliaSeksjonsData.findPath("folkeregistrertAdresseErNorgeStemmerDet").asText()
+        val borINorge = personaliaSeksjonsData.findPath("folkeregistrertAdresseErNorgeStemmerDet").asString()
         if (borINorge == "ja") return false
 
-        val bostedsland = personaliaSeksjonsData.finnOpplysning("bostedsland").asText()
+        val bostedsland = personaliaSeksjonsData.finnOpplysning("bostedsland").asString()
         return eøsLandOgSveits.contains(bostedsland)
     }
 

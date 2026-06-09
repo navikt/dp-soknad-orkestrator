@@ -12,7 +12,7 @@ data object Flervalg : Datatype<List<String>>(String::class.java as Class<List<S
         ident: String,
         søknadId: UUID,
     ): QuizOpplysning<*> {
-        val svar = faktum.get("svar").values().map { it.asText() }
+        val svar = faktum.get("svar").values().map { it.asString() }
         return QuizOpplysning(beskrivendeId, Flervalg, svar, ident, søknadId)
     }
 }

@@ -60,7 +60,7 @@ class SanksjonBehovløser(
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asText() in sanksjonSluttårsakerIOrkestrator
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asString() in sanksjonSluttårsakerIOrkestrator
                     }
                 }
             }

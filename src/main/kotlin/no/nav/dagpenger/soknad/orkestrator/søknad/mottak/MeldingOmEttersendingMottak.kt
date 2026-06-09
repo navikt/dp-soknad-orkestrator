@@ -56,11 +56,11 @@ internal class MeldingOmEttersendingMottak(
         meterRegistry: MeterRegistry,
     ) {
         val søknadId = packet["søknadId"].asUUID()
-        val ident = packet["ident"].asText()
+        val ident = packet["ident"].asString()
         val dokumentasjonskravJson =
-            packet["@løsning"][BEHOV]["dokumentasjonskravJson"].asText()
-        val seksjonId = packet["@løsning"][BEHOV]["seksjonId"].asText()
-        val journalpostId = packet["@løsning"][BEHOV]["journalpostId"].asText()
+            packet["@løsning"][BEHOV]["dokumentasjonskravJson"].asString()
+        val seksjonId = packet["@løsning"][BEHOV]["seksjonId"].asString()
+        val journalpostId = packet["@løsning"][BEHOV]["journalpostId"].asString()
 
         withLoggingContext(
             "søknadId" to søknadId.toString(),

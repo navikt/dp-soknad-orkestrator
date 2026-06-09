@@ -64,7 +64,7 @@ class SøknadsdataBehovMottak(
         metadata: MessageMetadata,
         meterRegistry: MeterRegistry,
     ) {
-        val behovId = packet["@behovId"].asText()
+        val behovId = packet["@behovId"].asString()
 
         withMDC(
             mapOf(

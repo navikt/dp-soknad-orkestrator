@@ -35,13 +35,13 @@ class SøknadSlettetMottak(
         meterRegistry: MeterRegistry,
     ) {
         withMDC(
-            mapOf("søknadId" to packet["søknad_uuid"].asText()),
+            mapOf("søknadId" to packet["søknad_uuid"].asString()),
         ) {
             logger.info { "Mottok søknad slettet hendelse for søknad ${packet["søknad_uuid"]}" }
             sikkerlogg.info { "Mottok søknad slettet hendelse: ${packet.toJson()}" }
 
             val søknadId = packet["søknad_uuid"].asUUID()
-            val ident = packet["ident"].asText()
+            val ident = packet["ident"].asString()
 
             søknadService.slettSøknadOgInkrementerMetrikk(søknadId, ident, "quiz")
         }

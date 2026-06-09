@@ -87,10 +87,10 @@ class DokumentKravInnsendtMelding(
                         val dokumentkravForSeksjon = objectMapper.readTree(dokument).toList()
                         dokumentkravForSeksjon.map {
                             Dokumentasjonskrav(
-                                dokumentnavn = it.get("type").asText(),
-                                skjemakode = it.get("skjemakode").asText(),
-                                valg = mapSvaret(it.get("svar").asText()),
-                                begrunnelse = it.get("begrunnelse")?.asText(),
+                                dokumentnavn = it.get("type").asString(),
+                                skjemakode = it.get("skjemakode").asString(),
+                                valg = mapSvaret(it.get("svar").asString()),
+                                begrunnelse = it.get("begrunnelse")?.asString(),
                                 filer =
                                     it.get("filer")?.values()?.mapNotNull { fil ->
                                         if (fil.isTextual) fil.textValue() else null

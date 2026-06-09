@@ -20,28 +20,28 @@ data object EøsArbeidsforhold : Datatype<List<EøsArbeidsforholdSvar>>(
                 val arbeidsgivernavnSvar =
                     eøsArbeidsforhold
                         .values()
-                        .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.arbeidsgivernavn" }
+                        .find { it.get("beskrivendeId").asString() == "faktum.eos-arbeidsforhold.arbeidsgivernavn" }
                         ?.get("svar")
-                        ?.asText() ?: ""
+                        ?.asString() ?: ""
 
                 val landSvar =
                     eøsArbeidsforhold
                         .values()
-                        .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.land" }
+                        .find { it.get("beskrivendeId").asString() == "faktum.eos-arbeidsforhold.land" }
                         ?.get("svar")
-                        ?.asText() ?: ""
+                        ?.asString() ?: ""
 
                 val personnummerSvar =
                     eøsArbeidsforhold
                         .values()
-                        .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.personnummer" }
+                        .find { it.get("beskrivendeId").asString() == "faktum.eos-arbeidsforhold.personnummer" }
                         ?.get("svar")
-                        ?.asText() ?: ""
+                        ?.asString() ?: ""
 
                 val varighet =
                     eøsArbeidsforhold
                         .values()
-                        .find { it.get("beskrivendeId").asText() == "faktum.eos-arbeidsforhold.varighet" }
+                        .find { it.get("beskrivendeId").asString() == "faktum.eos-arbeidsforhold.varighet" }
                         ?.get("svar")
 
                 val fom = varighet?.get("fom")?.asLocalDate() ?: throw IllegalArgumentException("Fom dato mangler")

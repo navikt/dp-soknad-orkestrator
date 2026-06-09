@@ -21,31 +21,31 @@ data object Barn : Datatype<List<BarnSvar>>(List::class.java as Class<List<BarnS
                 val fornavnOgMellomnavn =
                     it
                         .values()
-                        .single { it.get("beskrivendeId").asText() == "faktum.barn-fornavn-mellomnavn" }
+                        .single { it.get("beskrivendeId").asString() == "faktum.barn-fornavn-mellomnavn" }
                         .get("svar")
-                        .asText()
+                        .asString()
                 val etternavn =
                     it
                         .values()
-                        .single { it.get("beskrivendeId").asText() == "faktum.barn-etternavn" }
+                        .single { it.get("beskrivendeId").asString() == "faktum.barn-etternavn" }
                         .get("svar")
-                        .asText()
+                        .asString()
                 val fødselsdato =
                     it
                         .values()
-                        .single { it.get("beskrivendeId").asText() == "faktum.barn-foedselsdato" }
+                        .single { it.get("beskrivendeId").asString() == "faktum.barn-foedselsdato" }
                         .get("svar")
                         .asLocalDate()
                 val statsborgerskap =
                     it
                         .values()
-                        .single { it.get("beskrivendeId").asText() == "faktum.barn-statsborgerskap" }
+                        .single { it.get("beskrivendeId").asString() == "faktum.barn-statsborgerskap" }
                         .get("svar")
-                        .asText()
+                        .asString()
                 val forsørgerBarnet =
                     it
                         .values()
-                        .single { it.get("beskrivendeId").asText() == "faktum.forsoerger-du-barnet" }
+                        .single { it.get("beskrivendeId").asString() == "faktum.forsoerger-du-barnet" }
                         .get("svar")
                         .asBoolean()
 

@@ -138,7 +138,7 @@ class PdfPayloadService(
                 while (felter.hasNext()) {
                     val (feltNavn, feltVerdi) = felter.next()
                     if (feltNavn in felterMedMarkup && feltVerdi.isTextual) {
-                        node.put(feltNavn, normaliserRichText(feltVerdi.asText()))
+                        node.put(feltNavn, normaliserRichText(feltVerdi.asString()))
                     } else {
                         normaliserHtmlFelter(feltVerdi)
                     }

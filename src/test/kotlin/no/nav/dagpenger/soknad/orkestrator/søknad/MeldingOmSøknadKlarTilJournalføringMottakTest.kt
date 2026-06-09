@@ -54,30 +54,30 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         verify { pdfPayloadService.genererBruttoPdfPayload(søknadId, ident) }
         verify { pdfPayloadService.genererNettoPdfPayload(søknadId, ident) }
         rapidsConnection.inspektør.size shouldBe 3
-        rapidsConnection.inspektør.message(0)["@behov"][0].asText() shouldBe "generer_og_mellomlagre_søknad_pdf"
-        rapidsConnection.inspektør.message(1)["@event_name"].asText() shouldBe "søknad_endret_tilstand"
+        rapidsConnection.inspektør.message(0)["@behov"][0].asString() shouldBe "generer_og_mellomlagre_søknad_pdf"
+        rapidsConnection.inspektør.message(1)["@event_name"].asString() shouldBe "søknad_endret_tilstand"
 
         val søknadsdata = rapidsConnection.inspektør.message(1)["søknadsdata"]
         søknadsdata shouldNotBe null
         søknadsdata["innsendt"] shouldNotBe null
         søknadsdata["verneplikt"] shouldNotBe null
-        søknadsdata["verneplikt"]["seksjonsdata"].asText() shouldBe seksjoner.find { it.seksjonId == "verneplikt" }?.data
+        søknadsdata["verneplikt"]["seksjonsdata"].asString() shouldBe seksjoner.find { it.seksjonId == "verneplikt" }?.data
         søknadsdata["din-situasjon"] shouldNotBe null
-        søknadsdata["din-situasjon"]["seksjonsdata"].asText().trim() shouldBe
+        søknadsdata["din-situasjon"]["seksjonsdata"].asString().trim() shouldBe
             """{"seksjonId":"din-situasjon","seksjonsvar":{"harDuMottattDagpengerFraNavILøpetAvDeSiste52Ukene":"ja","hvilkenDatoSøkerDuGjenopptakFra":"2024-02-21"},"versjon":1}"""
 
-        rapidsConnection.inspektør.message(2)["@event_name"].asText() shouldBe "dokumentkrav_innsendt"
-        rapidsConnection.inspektør.message(2)["innsendingsType"].asText() shouldBe "INNSENDT"
+        rapidsConnection.inspektør.message(2)["@event_name"].asString() shouldBe "dokumentkrav_innsendt"
+        rapidsConnection.inspektør.message(2)["innsendingsType"].asString() shouldBe "INNSENDT"
         rapidsConnection.inspektør.message(2)["ferdigBesvart"].asBoolean() shouldBe true
-        rapidsConnection.inspektør.message(2)["kilde"].asText() shouldBe "orkestrator"
+        rapidsConnection.inspektør.message(2)["kilde"].asString() shouldBe "orkestrator"
 
         val dokumenstasjonskrav = rapidsConnection.inspektør.message(2)["dokumentkrav"]
         dokumenstasjonskrav.size() shouldBe 5
-        dokumenstasjonskrav[0]["valg"].asText() shouldBe "SEND_SENERE"
-        dokumenstasjonskrav[1]["valg"].asText() shouldBe "SEND_TIDLIGERE"
-        dokumenstasjonskrav[2]["valg"].asText() shouldBe "SENDER_IKKE"
-        dokumenstasjonskrav[3]["valg"].asText() shouldBe "SEND_NÅ"
-        dokumenstasjonskrav[4]["valg"].asText() shouldBe "ETTERSENDT"
+        dokumenstasjonskrav[0]["valg"].asString() shouldBe "SEND_SENERE"
+        dokumenstasjonskrav[1]["valg"].asString() shouldBe "SEND_TIDLIGERE"
+        dokumenstasjonskrav[2]["valg"].asString() shouldBe "SENDER_IKKE"
+        dokumenstasjonskrav[3]["valg"].asString() shouldBe "SEND_NÅ"
+        dokumenstasjonskrav[4]["valg"].asString() shouldBe "ETTERSENDT"
     }
 
     @Test

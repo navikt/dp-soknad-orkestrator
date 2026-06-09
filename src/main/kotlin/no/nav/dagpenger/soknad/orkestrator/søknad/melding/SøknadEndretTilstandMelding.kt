@@ -91,7 +91,7 @@ class SøknadEndretTilstandMelding(
             )
         val seksjon =
             mapOf(
-                "seksjonId" to seksjonsdataJson["seksjonId"].asText(),
+                "seksjonId" to seksjonsdataJson["seksjonId"].asString(),
                 "seksjonsvar" to filtrertSeksjonsdata,
                 "versjon" to seksjonsdataJson["versjon"].asInt(),
             )
@@ -141,7 +141,7 @@ class SøknadEndretTilstandMelding(
             }
 
             else -> {
-                seksjonssvarJson.asText()
+                seksjonssvarJson.asString()
             }
         }
 
@@ -165,9 +165,9 @@ class SøknadEndretTilstandMelding(
             fun traverse(node: JsonNode) {
                 when {
                     node.isObject && node.has("id") && node.has("type") -> {
-                        if (node["type"].asText() in gyldigeTyper && node["id"].asText() != "fødselsdato") {
+                        if (node["type"].asString() in gyldigeTyper && node["id"].asString() != "fødselsdato") {
                             seksjonMappet.add(
-                                node["id"].asText(),
+                                node["id"].asString(),
                             )
                         }
                     }
@@ -184,7 +184,7 @@ class SøknadEndretTilstandMelding(
 
             traverse(seksjon)
             SeksjonMedGyldigeFeltIder(
-                seksjonId = hentSeksjonIdFraNavn(seksjon["navn"].asText()),
+                seksjonId = hentSeksjonIdFraNavn(seksjon["navn"].asString()),
                 spørsmål = seksjonMappet,
             )
         }
@@ -202,7 +202,7 @@ class SøknadEndretTilstandMelding(
     private fun hentFeltFraSeksjon(
         jsonNode: JsonNode,
         nøkkel: String,
-    ): String = jsonNode["seksjonsvar"][nøkkel]?.asText() ?: ""
+    ): String = jsonNode["seksjonsvar"][nøkkel]?.asString() ?: ""
 
     data class SeksjonMedGyldigeFeltIder(
         val seksjonId: String,

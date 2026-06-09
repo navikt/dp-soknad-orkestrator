@@ -19,12 +19,12 @@ internal object Landoppslag {
 
     val land =
         world.let { mapper.readTree(it) }.values().map {
-            val alpha3Code = it["alpha3"].asText()
+            val alpha3Code = it["alpha3"].asString()
             require(alpha3Code.length == 3) {
                 "ISO 3166-1-alpha3 må være 3 bokstaver lang. Fikk: $alpha3Code"
             }
             val landkode = alpha3Code.uppercase()
-            val landnavn = it["no"].asText()
+            val landnavn = it["no"].asString()
 
             LandDTO(
                 alpha3kode = landkode,

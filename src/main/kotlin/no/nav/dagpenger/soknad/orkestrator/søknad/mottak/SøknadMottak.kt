@@ -41,9 +41,9 @@ class SøknadMottak(
         meterRegistry: MeterRegistry,
     ) {
         withMDC(
-            mapOf("søknadId" to packet["søknadId"].asText()),
+            mapOf("søknadId" to packet["søknadId"].asString()),
         ) {
-            val søknadId = packet["søknadId"].asText()
+            val søknadId = packet["søknadId"].asString()
             if (søknadId == "85882e9f-0bf7-478b-9d94-55cfb3fa8a53" || søknadId == "eb081524-2e25-42e2-963f-aac8f90c5b14") {
                 logger.warn {
                     "Mottok søknad_innsendt_varsel med $søknadId som vi hopper over fordi den kommer med ugyldig data som ikke kan mappes riktig og vil feile"
@@ -77,14 +77,14 @@ class SøknadMottak(
     private fun JsonNode.tilSøknad() = SøknadMapper(this).søknad
 
     private fun JsonNode.publiserMeldingOmSøknadInnsendt() {
-        val ident = this.get("ident").asText()
+        val ident = this.get("ident").asString()
         val søknadId = this.get("søknadId").asUUID()
 
         søknadService.publiserMeldingOmSøknadInnsendt(søknadId, ident)
     }
 
     private fun opprettOgLagreKomplettSøknaddata(søknadMelding: JsonNode): JsonNode {
-        val ident = søknadMelding.get("ident").asText()
+        val ident = søknadMelding.get("ident").asString()
         val søknadId = søknadMelding.get("søknadId").asUUID()
         val seksjoner = søknadMelding["søknadData"]["seksjoner"]
 

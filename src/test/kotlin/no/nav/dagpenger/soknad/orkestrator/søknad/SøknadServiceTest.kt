@@ -83,8 +83,8 @@ class SøknadServiceTest {
             søknadService.opprettOgLagreKomplettSøknaddata(ident = ident, søknadId = søknadId, seksjoner = seksjoner)
 
         verify(exactly = 1) { søknadRepository.lagreKomplettSøknadData(søknadId, any()) }
-        søknadData["ident"].asText() shouldBe ident
-        søknadData["søknadId"].asText() shouldBe søknadId.toString()
+        søknadData["ident"].asString() shouldBe ident
+        søknadData["søknadId"].asString() shouldBe søknadId.toString()
         søknadData["seksjoner"] shouldBe seksjoner
     }
 
@@ -96,9 +96,9 @@ class SøknadServiceTest {
 
         with(testRapid.inspektør) {
             size shouldBe 1
-            field(0, "@event_name").asText() shouldBe "søknad_innsendt"
-            field(0, "søknadId").asText() shouldBe søknadId.toString()
-            field(0, "ident").asText() shouldBe ident
+            field(0, "@event_name").asString() shouldBe "søknad_innsendt"
+            field(0, "søknadId").asString() shouldBe søknadId.toString()
+            field(0, "ident").asString() shouldBe ident
         }
     }
 
@@ -119,10 +119,10 @@ class SøknadServiceTest {
         with(testRapid.inspektør) {
             size shouldBe 1
 
-            field(0, "@event_name").asText() shouldBe "søknad_endret_tilstand"
-            field(0, "gjeldendeTilstand").asText() shouldBe "Slettet"
-            field(0, "søknad_uuid").asText() shouldBe søknadId.toString()
-            field(0, "ident").asText() shouldBe ident
+            field(0, "@event_name").asString() shouldBe "søknad_endret_tilstand"
+            field(0, "gjeldendeTilstand").asString() shouldBe "Slettet"
+            field(0, "søknad_uuid").asString() shouldBe søknadId.toString()
+            field(0, "ident").asString() shouldBe ident
             testRapid.inspektør.message(0).has("søknadsdata") shouldBe false
         }
     }
@@ -183,7 +183,7 @@ class SøknadServiceTest {
         søknadService.sendInn(randomUUID(), ident)
 
         testRapid.inspektør.size shouldBe 1
-        testRapid.inspektør.message(0)["@event_name"].asText() shouldBe "søknad_klar_til_journalføring"
+        testRapid.inspektør.message(0)["@event_name"].asString() shouldBe "søknad_klar_til_journalføring"
     }
 
     @Test
@@ -206,21 +206,21 @@ class SøknadServiceTest {
         verify { søknadRepository.slettSøknadSomSystem(søknadId2, ident2, any()) }
         with(testRapid.inspektør) {
             size shouldBe 4
-            field(0, "@event_name").asText() shouldBe "søknad_slettet"
-            field(0, "søknad_uuid").asText() shouldBe søknadId1.toString()
-            field(0, "ident").asText() shouldBe ident1
+            field(0, "@event_name").asString() shouldBe "søknad_slettet"
+            field(0, "søknad_uuid").asString() shouldBe søknadId1.toString()
+            field(0, "ident").asString() shouldBe ident1
 
-            field(1, "@event_name").asText() shouldBe "søknad_endret_tilstand"
-            field(1, "søknad_uuid").asText() shouldBe søknadId1.toString()
-            field(1, "ident").asText() shouldBe ident1
+            field(1, "@event_name").asString() shouldBe "søknad_endret_tilstand"
+            field(1, "søknad_uuid").asString() shouldBe søknadId1.toString()
+            field(1, "ident").asString() shouldBe ident1
 
-            field(2, "@event_name").asText() shouldBe "søknad_slettet"
-            field(2, "søknad_uuid").asText() shouldBe søknadId2.toString()
-            field(2, "ident").asText() shouldBe ident2
+            field(2, "@event_name").asString() shouldBe "søknad_slettet"
+            field(2, "søknad_uuid").asString() shouldBe søknadId2.toString()
+            field(2, "ident").asString() shouldBe ident2
 
-            field(3, "@event_name").asText() shouldBe "søknad_endret_tilstand"
-            field(3, "søknad_uuid").asText() shouldBe søknadId2.toString()
-            field(3, "ident").asText() shouldBe ident2
+            field(3, "@event_name").asString() shouldBe "søknad_endret_tilstand"
+            field(3, "søknad_uuid").asString() shouldBe søknadId2.toString()
+            field(3, "ident").asString() shouldBe ident2
         }
     }
 

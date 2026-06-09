@@ -11,7 +11,7 @@ data object Tekst : Datatype<String>(String::class.java) {
         ident: String,
         søknadId: UUID,
     ): QuizOpplysning<*> {
-        val svar = faktum.get("svar").asText()
+        val svar = faktum.get("svar").asString()
         return QuizOpplysning(beskrivendeId, Tekst, svar, ident, søknadId)
     }
 }

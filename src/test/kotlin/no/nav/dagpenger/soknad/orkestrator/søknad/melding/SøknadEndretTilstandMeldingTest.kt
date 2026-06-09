@@ -51,8 +51,8 @@ class SøknadEndretTilstandMeldingTest {
         val seksjonsvarJson = objectMapper.readTree(filtrertArbeidsforhold)
         val seksjonsvarResponse = seksjonsvarJson["seksjonsvar"]
 
-        seksjonsvarResponse["hvordanHarDuJobbet"].asText() shouldBe "fastArbeidstidIMindreEnn6Måneder"
-        seksjonsvarResponse["harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene"].asText() shouldBe "ja"
+        seksjonsvarResponse["hvordanHarDuJobbet"].asString() shouldBe "fastArbeidstidIMindreEnn6Måneder"
+        seksjonsvarResponse["harDuJobbetIEtAnnetEøsLandSveitsEllerStorbritanniaILøpetAvDeSiste36Månedene"].asString() shouldBe "ja"
     }
 
     @Test
@@ -208,7 +208,7 @@ class SøknadEndretTilstandMeldingTest {
     private fun hentSøknadsdataSomJson(
         søknadsdataJson: JsonNode,
         seksjonId: String,
-    ): JsonNode? = objectMapper.readTree(søknadsdataJson["søknadsdata"][seksjonId]["seksjonsdata"].asText())
+    ): JsonNode? = objectMapper.readTree(søknadsdataJson["søknadsdata"][seksjonId]["seksjonsdata"].asString())
 
     private fun hentSeksjonData(): Map<String, String> {
         @Suppress("ktlint:standard:max-line-length")

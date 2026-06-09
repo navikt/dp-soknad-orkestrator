@@ -56,16 +56,16 @@ class MeldingOmEttersendingMottakTest {
         rapidsConnection.inspektør.size shouldBe 1
         val dokumentKravInnsendtMelding = rapidsConnection.inspektør.message(0)
 
-        dokumentKravInnsendtMelding["@event_name"].asText() shouldBe "dokumentkrav_innsendt"
-        dokumentKravInnsendtMelding["ident"].asText() shouldBe ident
-        dokumentKravInnsendtMelding["søknad_uuid"].asText() shouldBe søknadId.toString()
-        dokumentKravInnsendtMelding["innsendingsType"].asText() shouldBe "ETTERSENDT"
-        dokumentKravInnsendtMelding["ferdigBesvart"].asText() shouldBe "true"
-        dokumentKravInnsendtMelding["kilde"].asText() shouldBe "orkestrator"
+        dokumentKravInnsendtMelding["@event_name"].asString() shouldBe "dokumentkrav_innsendt"
+        dokumentKravInnsendtMelding["ident"].asString() shouldBe ident
+        dokumentKravInnsendtMelding["søknad_uuid"].asString() shouldBe søknadId.toString()
+        dokumentKravInnsendtMelding["innsendingsType"].asString() shouldBe "ETTERSENDT"
+        dokumentKravInnsendtMelding["ferdigBesvart"].asString() shouldBe "true"
+        dokumentKravInnsendtMelding["kilde"].asString() shouldBe "orkestrator"
         dokumentKravInnsendtMelding["dokumentkrav"].size() shouldBe 1
-        dokumentKravInnsendtMelding["dokumentkrav"][0]["dokumentnavn"].asText() shouldBe "ArbeidsforholdArbeidsavtale"
-        dokumentKravInnsendtMelding["dokumentkrav"][0]["skjemakode"].asText() shouldBe "O2"
-        dokumentKravInnsendtMelding["dokumentkrav"][0]["valg"].asText() shouldBe "ETTERSENDT"
+        dokumentKravInnsendtMelding["dokumentkrav"][0]["dokumentnavn"].asString() shouldBe "ArbeidsforholdArbeidsavtale"
+        dokumentKravInnsendtMelding["dokumentkrav"][0]["skjemakode"].asString() shouldBe "O2"
+        dokumentKravInnsendtMelding["dokumentkrav"][0]["valg"].asString() shouldBe "ETTERSENDT"
     }
 
     @Test

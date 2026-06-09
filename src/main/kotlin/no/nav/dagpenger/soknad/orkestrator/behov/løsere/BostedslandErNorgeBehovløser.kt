@@ -53,7 +53,7 @@ class BostedslandErNorgeBehovløser(
 
                 seksjonsJson.findPath("bostedsland")?.let {
                     if (!it.isMissingOrNull()) {
-                        return it.asText() == "NOR"
+                        return it.asString() == "NOR"
                     }
                 }
             }

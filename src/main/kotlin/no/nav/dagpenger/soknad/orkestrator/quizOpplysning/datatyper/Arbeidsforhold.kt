@@ -61,14 +61,14 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
                     .values()
                     .single { it.get("beskrivendeId")?.textValue() == "faktum.arbeidsforhold.navn-bedrift" }
                     .get("svar")
-                    .asText()
+                    .asString()
 
             val landFaktum =
                 arbeidsforhold
                     .values()
                     .single { it.get("beskrivendeId")?.textValue() == "faktum.arbeidsforhold.land" }
                     .get("svar")
-                    .asText()
+                    .asString()
 
             val sluttårsak = finnSluttårsak(arbeidsforhold)
 
@@ -84,7 +84,7 @@ data object Arbeidsforhold : Datatype<List<ArbeidsforholdSvar>>(
             .values()
             .single { it.get("beskrivendeId")?.textValue() == "faktum.arbeidsforhold.endret" }
             .get("svar")
-            .asText()
+            .asString()
             .let {
                 when (it) {
                     "faktum.arbeidsforhold.endret.svar.arbeidsgiver-konkurs" -> ARBEIDSGIVER_KONKURS

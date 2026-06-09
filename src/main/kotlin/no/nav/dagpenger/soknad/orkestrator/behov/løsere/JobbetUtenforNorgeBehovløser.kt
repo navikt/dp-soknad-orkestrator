@@ -52,7 +52,7 @@ class JobbetUtenforNorgeBehovløser(
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvilketLandJobbetDuI"].asText() != landkodeNorge
+                        arbeidsforhold["hvilketLandJobbetDuI"].asString() != landkodeNorge
                     }
                 }
             }
