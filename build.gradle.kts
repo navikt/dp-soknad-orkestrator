@@ -71,7 +71,7 @@ dependencies {
 
     implementation("io.ktor:ktor-server-netty:${libs.versions.ktor.get()}")
     implementation("io.ktor:ktor-server-config-yaml:${libs.versions.ktor.get()}")
-    implementation("io.ktor:ktor-server-content-negotiation:3.4.3")
+    implementation("io.ktor:ktor-server-content-negotiation:3.5.0")
 
     testImplementation(kotlin("test"))
     testImplementation(libs.ktor.client.mock)
