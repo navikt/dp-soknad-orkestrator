@@ -35,7 +35,7 @@ class SanksjonBehovløserTest {
         opplysningRepository.lagre(
             arbeidsforholdOpplysning(
                 listOf(
-                    ArbeidsforholdSvar(navn = "Arbeidsgiver AS", land = "NOR", sluttårsak = Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER),
+                    ArbeidsforholdSvar(navn = "Arbeidsgiver AS", land = "NOR", sluttårsak = Sluttårsak.SAGT_OPP_SELV),
                     ArbeidsforholdSvar(navn = "Annen AS", land = "NOR", sluttårsak = Sluttårsak.PERMITTERT),
                 ),
             ),
@@ -101,7 +101,7 @@ class SanksjonBehovløserTest {
               "seksjonId": "arbeidsforhold",
               "seksjonsvar": {
                 "registrerteArbeidsforhold": [
-                  { "hvordanHarDetteArbeidsforholdetEndretSeg": "arbeidsgiverenMinHarSagtMegOpp" }
+                  { "hvordanHarDetteArbeidsforholdetEndretSeg": "jegHarSagtOppSelv" }
                 ]
               },
               "versjon": 1
