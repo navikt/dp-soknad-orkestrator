@@ -36,7 +36,6 @@ class SanksjonBehovløser(
 
         val sanksjonSluttårsakerIQuiz =
             setOf(
-                Sluttårsak.SAGT_OPP_AV_ARBEIDSGIVER,
                 Sluttårsak.SAGT_OPP_SELV,
                 Sluttårsak.AVSKJEDIGET,
             )
@@ -51,7 +50,6 @@ class SanksjonBehovløser(
 
         val sanksjonSluttårsakerIOrkestrator =
             setOf(
-                "arbeidsgiverenMinHarSagtMegOpp",
                 "jegHarSagtOppSelv",
                 "jegHarFåttAvskjed",
             )
