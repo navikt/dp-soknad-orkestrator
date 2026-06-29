@@ -13,9 +13,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadSlett
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.SøknadEndretTilstandMelding
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.erBoolean
-import tools.jackson.databind.JsonNode
 import tools.jackson.databind.json.JsonMapper
-import tools.jackson.databind.node.ObjectNode
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -37,22 +35,6 @@ class SøknadService(
     }
 
     fun søknadFinnes(søknadId: UUID) = søknadRepository.hent(søknadId) != null
-
-    fun opprettOgLagreKomplettSøknaddata(
-        ident: String,
-        søknadId: UUID,
-        seksjoner: JsonNode,
-    ): ObjectNode {
-        val komplettSøknaddata =
-            objectMapper.createObjectNode().apply {
-                put("ident", ident)
-                put("søknadId", søknadId.toString())
-                set("seksjoner", seksjoner)
-            }
-
-        søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
-        return komplettSøknaddata
-    }
 
     fun publiserMeldingOmSøknadInnsendt(
         søknadId: UUID,
