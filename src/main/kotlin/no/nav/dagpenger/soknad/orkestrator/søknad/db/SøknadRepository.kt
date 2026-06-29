@@ -95,27 +95,6 @@ class SøknadRepository(
                 }.firstOrNull()
         }
 
-    fun lagreKomplettSøknadData(
-        søknadId: UUID,
-        komplettSøknadData: JsonNode,
-    ) {
-        transaction {
-            SøknadDataTabell.insert {
-                it[SøknadDataTabell.søknadId] = søknadId
-                it[soknadData] = komplettSøknadData
-            }
-        }
-    }
-
-    fun hentKomplettSøknadData(søknadId: UUID): JsonNode? =
-        transaction {
-            SøknadDataTabell
-                .select(SøknadDataTabell.soknadData)
-                .where { SøknadDataTabell.søknadId eq søknadId }
-                .singleOrNull()
-                ?.get(SøknadDataTabell.soknadData)
-        }
-
     fun slett(
         søknadId: UUID,
         ident: String,
