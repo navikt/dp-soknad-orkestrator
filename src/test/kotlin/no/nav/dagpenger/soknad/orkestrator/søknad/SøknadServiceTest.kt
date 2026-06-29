@@ -12,7 +12,6 @@ import io.mockk.mockk
 import io.mockk.mockkStatic
 import io.mockk.unmockkStatic
 import io.mockk.verify
-import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjon
 import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.Seksjonsnavn
 import no.nav.dagpenger.soknad.orkestrator.opplysning.seksjoner.getSeksjon
@@ -71,21 +70,6 @@ class SøknadServiceTest {
         } returns null
 
         søknadService.søknadFinnes(randomUUID()) shouldBe false
-    }
-
-    @Test
-    fun `Kan opprette komplett søknadData med quiz-seksjoner`() {
-        val ident = "12345678901"
-        val søknadId = randomUUID()
-        val seksjoner = objectMapper.readTree(quizSeksjoner)
-
-        val søknadData =
-            søknadService.opprettOgLagreKomplettSøknaddata(ident = ident, søknadId = søknadId, seksjoner = seksjoner)
-
-        verify(exactly = 1) { søknadRepository.lagreKomplettSøknadData(søknadId, any()) }
-        søknadData["ident"].asString() shouldBe ident
-        søknadData["søknadId"].asString() shouldBe søknadId.toString()
-        søknadData["seksjoner"] shouldBe seksjoner
     }
 
     @Test

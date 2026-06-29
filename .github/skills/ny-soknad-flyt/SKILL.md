@@ -122,7 +122,7 @@ Alle metrikker er under namespace `dp_soknad_orkestrator`.
 
 | Metrikk | `kilde="ny"` | `kilde="quiz"` |
 |---|---|---|
-| `antall_soknader_mottatt{kilde}` | `SøknadService.sendInn()` | `SøknadMottak.onPacket()` |
+| `antall_soknader_mottatt{kilde}` | `SøknadService.sendInn()` |
 | `antall_soknader_slettet{kilde}` | REST DELETE + auto-slett | `SøknadSlettetMottak` |
 
 ### Ny flyt-spesifikke metrikker
@@ -179,7 +179,7 @@ eksplisitt kildefelt i domenemodellen.
 
 | Event | Kilde | Håndteres av |
 |---|---|---|
-| `søknad_innsendt_varsel` | dp-soknad | `SøknadMottak` |
+| `søknad_innsendt_varsel` | dp-soknad |
 | `søknad_slettet` | dp-soknad | `SøknadSlettetMottak` |
 
 ### Ny flyt — ut

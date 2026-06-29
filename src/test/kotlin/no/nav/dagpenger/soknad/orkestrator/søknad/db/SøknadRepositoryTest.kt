@@ -23,7 +23,6 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.JOURNALFØRT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.SLETTET_AV_SYSTEM
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
-import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
@@ -117,29 +116,6 @@ class SøknadRepositoryTest {
         val hentetSøknad = søknadRepository.hentPåbegynt(ident)
 
         hentetSøknad shouldBe null
-    }
-
-    @Test
-    fun `Kan opprette og hente komplett søknaddata`() {
-        val søknadId = randomUUID()
-        søknadRepository.opprett(Søknad(søknadId = søknadId, ident = "1234567891"))
-
-        søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
-        val hentetSøknaddata = søknadRepository.hentKomplettSøknadData(søknadId)
-
-        hentetSøknaddata shouldBe komplettSøknaddata
-    }
-
-    @Test
-    fun `Kan ikke lagre komplett søknaddata for én søknad flere ganger`() {
-        val søknadId = randomUUID()
-        søknadRepository.opprett(Søknad(søknadId = søknadId, ident = "1234567891"))
-
-        søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
-
-        shouldThrow<ExposedSQLException> {
-            søknadRepository.lagreKomplettSøknadData(søknadId, komplettSøknaddata)
-        }
     }
 
     @Test
