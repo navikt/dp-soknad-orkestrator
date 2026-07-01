@@ -464,6 +464,15 @@ class SøknadServiceTest {
                       "svar": "dokumentkravSvarSenderSenere",
                       "begrunnelse": "ccc"
                     },
+                    {
+                      "id": "5fd32960-4b66-455f-a5e0-df49d8cde9e1",
+                      "seksjonId": "arbeidsforhold",
+                      "spørsmålId": "hvordanHarDetteArbeidsforholdetEndretSeg",
+                      "skjemakode": "T6",
+                      "tittel": "Permitteringsvarsel - Bedrift 2 DA",
+                      "type": "ArbeidsforholdPermitteringsvarsel",
+                      "begrunnelse": "ccc"
+                    },
                   {
                     "id": "a67bce29-eb2a-4c1d-8433-69ac9fd63a33",
                     "seksjonId": "arbeidsforhold",

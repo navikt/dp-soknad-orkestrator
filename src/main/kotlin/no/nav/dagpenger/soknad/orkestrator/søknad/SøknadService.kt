@@ -193,7 +193,7 @@ class SøknadService(
                     .readTree(dokumentasjonskrav)
                     .toList()
                     .filter { rootNode ->
-                        rootNode.findValue("svar").stringValue() == "dokumentkravSvarSenderSenere"
+                        rootNode.findValue("svar")?.asString() == "dokumentkravSvarSenderSenere"
                     }
             }.map { it.toString() }
 
