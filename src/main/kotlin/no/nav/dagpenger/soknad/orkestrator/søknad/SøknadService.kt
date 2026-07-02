@@ -182,6 +182,21 @@ class SøknadService(
         ident: String,
     ) = seksjonRepository.hentDokumentasjonskrav(søknadId, ident)
 
+    fun finnSendSenereDokumentasjonskraveneForEnSøknad(
+        søknadId: UUID,
+        ident: String,
+    ): List<String> =
+        seksjonRepository
+            .hentDokumentasjonskrav(søknadId, ident)
+            .flatMap { dokumentasjonskrav ->
+                jsonMapper
+                    .readTree(dokumentasjonskrav)
+                    .toList()
+                    .filter { rootNode ->
+                        rootNode.findValue("svar")?.asString() == "dokumentkravSvarSenderSenere"
+                    }
+            }.map { it.toString() }
+
     fun opprettDokumenterFraDokumentasjonskrav(
         søknadId: UUID,
         ident: String,
@@ -223,6 +238,7 @@ class SøknadService(
             val skjemakode = finnSkjemaKode(ident, it.søknadId, forventetFullførtSøknad = false)
             val tittel = hentTittelForSkjemaKode(skjemakode)
             it.tittel = tittel
+            it.manglendeDokumentasjonskrav = finnSendSenereDokumentasjonskraveneForEnSøknad(it.søknadId, ident)
         }
         return alleSøknaderForSøkeren
     }
