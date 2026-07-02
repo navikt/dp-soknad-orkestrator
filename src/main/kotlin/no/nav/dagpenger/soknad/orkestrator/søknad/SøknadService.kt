@@ -238,7 +238,7 @@ class SøknadService(
             val skjemakode = finnSkjemaKode(ident, it.søknadId, forventetFullførtSøknad = false)
             val tittel = hentTittelForSkjemaKode(skjemakode)
             it.tittel = tittel
-            it.dokumentKravSendSendereList = finnSendSenereDokumentasjonskraveneForEnSøknad(it.søknadId, ident)
+            it.manglendeDokumentasjonskrav = finnSendSenereDokumentasjonskraveneForEnSøknad(it.søknadId, ident)
         }
         return alleSøknaderForSøkeren
     }

@@ -9,5 +9,5 @@ data class SøknadForIdent(
     val oppdatertTidspunkt: LocalDateTime? = null,
     val status: String,
     var tittel: String = "Søknad om dagpenger",
-    var dokumentKravSendSendereList: List<String>? = emptyList(),
+    var manglendeDokumentasjonskrav: List<String>? = emptyList(),
 )
