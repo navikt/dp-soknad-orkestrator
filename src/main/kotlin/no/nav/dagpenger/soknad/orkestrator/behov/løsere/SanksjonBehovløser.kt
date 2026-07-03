@@ -12,6 +12,7 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
+import tools.jackson.databind.JsonNode
 import java.util.UUID
 
 class SanksjonBehovløser(
@@ -58,11 +59,25 @@ class SanksjonBehovløser(
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
                     return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asString() in sanksjonSluttårsakerIOrkestrator
+                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asString() in sanksjonSluttårsakerIOrkestrator ||
+                            harSøkerenTakketNeiTilTilbud(arbeidsforhold)
                     }
                 }
             }
         }
         return false
+    }
+
+    private fun harSøkerenTakketNeiTilTilbud(arbeidsforhold: JsonNode): Boolean {
+        val svartNeiPåTilbudSvaralternativer =
+            setOf(
+                "jegErOppsagtHvaHarDuSvartPåTilbudet",
+                "kontraktenErUtgåttHvaHarDuSvartPåTilbudet",
+                "arbeidstidenErRedusertHvaHarDuSvartPåTilbudet",
+            )
+
+        return svartNeiPåTilbudSvaralternativer.any {
+            arbeidsforhold[it]?.asString() == "nei"
+        }
     }
 }
