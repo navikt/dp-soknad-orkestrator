@@ -2,7 +2,6 @@ package no.nav.dagpenger.soknad.orkestrator.behov.løsere
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
-import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -81,20 +80,18 @@ class SanksjonBehovløserTest {
     }
 
     @Test
-    fun `skal kaste exception når seksjon ikke finnes`() {
+    fun `skal returnere false når verken quiz-opplysning eller arbeidsforhold-seksjon finnes`() {
         every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any())
-        } throws IllegalStateException("Fant ikke seksjon")
+            seksjonRepository.hentSeksjonsvar(any(), any(), any())
+        } returns null
 
-        shouldThrow<IllegalStateException> {
-            behovløser.harSanksjon(ident, søknadId)
-        }
+        behovløser.harSanksjon(ident, søknadId) shouldBe false
     }
 
     @Test
     fun `skal returnere true ved sanksjonsluttårsak i seksjonsdata`() {
         every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold")
+            seksjonRepository.hentSeksjonsvar(søknadId, ident, "arbeidsforhold")
         } returns
             """
             {
@@ -114,7 +111,7 @@ class SanksjonBehovløserTest {
     @Test
     fun `skal returnere false når ingen arbeidsforhold har sanksjonsluttårsak i seksjonsdata`() {
         every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold")
+            seksjonRepository.hentSeksjonsvar(søknadId, ident, "arbeidsforhold")
         } returns
             """
             {
@@ -168,7 +165,7 @@ class SanksjonBehovløserTest {
                 innsendtTidspunkt = innsendtTidspunkt.toLocalDateTime(),
             )
         every {
-            seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold")
+            seksjonRepository.hentSeksjonsvar(søknadId, ident, "arbeidsforhold")
         } returns
             """
             {
