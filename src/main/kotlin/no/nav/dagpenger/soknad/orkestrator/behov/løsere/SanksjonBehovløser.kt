@@ -46,7 +46,7 @@ class SanksjonBehovløser(
             }
         }
 
-        val seksjonsSvar = seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold")
+        val seksjonsSvar = seksjonRepository.hentSeksjonsvar(søknadId, ident, "arbeidsforhold") ?: return false
 
         val sanksjonSluttårsakerIOrkestrator =
             setOf(
