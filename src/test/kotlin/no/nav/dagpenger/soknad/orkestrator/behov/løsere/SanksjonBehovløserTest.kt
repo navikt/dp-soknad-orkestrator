@@ -109,6 +109,26 @@ class SanksjonBehovløserTest {
     }
 
     @Test
+    fun `skal returnere true hvis søkeren har takket nei til tilbud om fortsettelse`() {
+        every {
+            seksjonRepository.hentSeksjonsvar(søknadId, ident, "arbeidsforhold")
+        } returns
+            """
+            {
+              "seksjonId": "arbeidsforhold",
+              "seksjonsvar": {
+                "registrerteArbeidsforhold": [
+                  { "hvordanHarDetteArbeidsforholdetEndretSeg": "jegErOppsagt", "jegErOppsagtHvaHarDuSvartPåTilbudet": "nei" }
+                ]
+              },
+              "versjon": 1
+            }
+            """.trimIndent()
+
+        behovløser.harSanksjon(ident, søknadId) shouldBe true
+    }
+
+    @Test
     fun `skal returnere false når ingen arbeidsforhold har sanksjonsluttårsak i seksjonsdata`() {
         every {
             seksjonRepository.hentSeksjonsvar(søknadId, ident, "arbeidsforhold")
