@@ -74,21 +74,6 @@ class SøknadServiceTest {
     }
 
     @Test
-    fun `Kan opprette komplett søknadData med quiz-seksjoner`() {
-        val ident = "12345678901"
-        val søknadId = randomUUID()
-        val seksjoner = objectMapper.readTree(quizSeksjoner)
-
-        val søknadData =
-            søknadService.opprettOgLagreKomplettSøknaddata(ident = ident, søknadId = søknadId, seksjoner = seksjoner)
-
-        verify(exactly = 1) { søknadRepository.lagreKomplettSøknadData(søknadId, any()) }
-        søknadData["ident"].asString() shouldBe ident
-        søknadData["søknadId"].asString() shouldBe søknadId.toString()
-        søknadData["seksjoner"] shouldBe seksjoner
-    }
-
-    @Test
     fun `vi kan sende ut melding om ny søknad på rapiden`() {
         val søknadId = randomUUID()
 

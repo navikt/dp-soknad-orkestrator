@@ -49,6 +49,6 @@ class SøknadSlettetMottak(
 
     private companion object {
         private val logger = KotlinLogging.logger {}
-        private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadMottak")
+        private val sikkerlogg = KotlinLogging.logger("tjenestekall.SøknadSlettetMottak")
     }
 }

@@ -13,31 +13,20 @@ description: |
 Det finnes to søknad-flyter i dp-soknad-orkestrator som eksisterer parallelt under utrullingen
 av ny søknad. Begge flytene bruker samme `soknad`-tabell i databasen.
 
-| | Gammel flyt (quiz) | Ny flyt (orkestrator) |
-|---|---|---|
-| **Opprinnelse** | Kafka-event fra dp-soknad | REST API fra frontend |
-| **Trigger** | `søknad_innsendt_varsel` | `POST /soknad` |
-| **Mottak** | `SøknadMottak` | `SøknadApi` + `SøknadService.opprett()` |
+| | Gammel flyt (quiz)         | Ny flyt (orkestrator) |
+|---|----------------------------|---|
+| **Opprinnelse** | -                          | REST API fra frontend |
+| **Trigger** | -                          | `POST /soknad` |
+| **Mottak** | -                          | `SøknadApi` + `SøknadService.opprett()` |
 | **Opplysninger** | `quiz_opplysning`-tabeller | `seksjon_v2`-tabell |
-| **Innsending** | Allerede innsendt ved mottak | `POST /soknad/{id}` → `sendInn()` |
-| **Journalføring** | Separat journalføring-flyt | Via PDF-behov-kjede |
+| **Innsending** | -                          | `POST /soknad/{id}` → `sendInn()` |
+| **Journalføring** | -                          | Via PDF-behov-kjede |
 
 ---
 
 ## Gammel quiz-flyt
 
 ### Livssyklus
-
-```
-dp-soknad (quiz-app)
-  → Kafka: søknad_innsendt_varsel
-    → SøknadMottak.onPacket()
-      → søknadRepository.lagreQuizSøknad(søknadmelding.tilSøknad())
-        → SøknadMapper → dekomponerer søknadData
-        → skriver til SøknadTabell + quiz_opplysning
-      → søknadService.publiserMeldingOmSøknadInnsendt()
-      → søknadService.opprettOgLagreKomplettSøknaddata()
-```
 
 Sletting av gammel søknad skjer via Kafka:
 ```
@@ -46,9 +35,6 @@ dp-soknad → Kafka: søknad_slettet
 ```
 
 ### Nøkkelfiler
-
-- `søknad/mottak/SøknadMottak.kt` — Kafka-lytter for `søknad_innsendt_varsel`
-- `søknad/SøknadMapper.kt` — Mapper quiz-data til `Søknad` + opplysninger
 - `søknad/mottak/SøknadSlettetMottak.kt` — Kafka-lytter for `søknad_slettet`
 - `quizOpplysning/` — Alle datatyper og repository for quiz-opplysninger
 
@@ -122,7 +108,7 @@ Alle metrikker er under namespace `dp_soknad_orkestrator`.
 
 | Metrikk | `kilde="ny"` | `kilde="quiz"` |
 |---|---|---|
-| `antall_soknader_mottatt{kilde}` | `SøknadService.sendInn()` | `SøknadMottak.onPacket()` |
+| `antall_soknader_mottatt{kilde}` | `SøknadService.sendInn()` |
 | `antall_soknader_slettet{kilde}` | REST DELETE + auto-slett | `SøknadSlettetMottak` |
 
 ### Ny flyt-spesifikke metrikker
@@ -179,7 +165,6 @@ eksplisitt kildefelt i domenemodellen.
 
 | Event | Kilde | Håndteres av |
 |---|---|---|
-| `søknad_innsendt_varsel` | dp-soknad | `SøknadMottak` |
 | `søknad_slettet` | dp-soknad | `SøknadSlettetMottak` |
 
 ### Ny flyt — ut

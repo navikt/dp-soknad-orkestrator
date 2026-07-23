@@ -41,7 +41,6 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.jobb.RekjørJournalføringFor
 import no.nav.dagpenger.soknad.orkestrator.søknad.jobb.SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføringMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.MeldingOmEttersendingMottak
-import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfGenerertOgMellomlagretMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfOgVedleggJournalførtMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadSlettetMottak
@@ -150,7 +149,6 @@ internal class ApplicationBuilder(
                 søknadService.setRapidsConnection(rapidsConnection)
                 seksjonService.setRapidsConnection(rapidsConnection)
                 journalføringService.setRapidsConnection(rapidsConnection)
-                SøknadMottak(rapidsConnection, søknadService, søknadRepository)
                 MeldingOmSøknadKlarTilJournalføringMottak(
                     rapidsConnection,
                     søknadRepository,
