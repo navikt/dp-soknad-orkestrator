@@ -7,8 +7,8 @@ allow_docker = true
 allow_jvm_attach = true
 
 [propose.allow]
-ports = [2181, 5432, 9092]
-localhost = [8080]
+ports = [2181, 5432, 9092, 64342]
+localhost = [8080, 64342]
 
 # The following are machine-specific — add to ~/.config/cplt/config.toml:
 # allow.read += ["~/.gradle/gradle.properties"]  # in personal config
