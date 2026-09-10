@@ -12,6 +12,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadStatus
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadStatusRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.asUUID
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 
 class SøknadsbehandlingFerdigMottak(
     val rapidsConnection: RapidsConnection,
@@ -53,22 +54,37 @@ class SøknadsbehandlingFerdigMottak(
 
         søknadRepository.hent(søknadId)?.let {
             if (it.ident != ident) {
+                logg.error { "Søknad $søknadId tilhører ikke identen i meldingen, hopper over oppdatering av status" }
                 sikkerLogg.error { "Søknad $søknadId tilhører ikke ident: $ident for oppdatering av status" }
-                throw IllegalArgumentException("Søknad $søknadId tilhører ikke identen for oppdatering av status")
+                return@onPacket
             }
-            søknadStatusRepository.lagre(
-                søknadStatus =
-                    SøknadStatus(
-                        søknadId = søknadId,
-                        behandlingId = behandlingId,
-                        ident = ident,
-                        førteTil = Status.valueOf(førteTil),
-                        rettighetsperioder = rettighetsperioder,
-                    ),
-            )
+            try {
+                søknadStatusRepository.lagre(
+                    søknadStatus =
+                        SøknadStatus(
+                            søknadId = søknadId,
+                            behandlingId = behandlingId,
+                            ident = ident,
+                            førteTil = tilStatus(førteTil, søknadId.toString()),
+                            rettighetsperioder = rettighetsperioder,
+                        ),
+                )
+            } catch (e: ExposedSQLException) {
+                logg.error(e) { "Feil ved lagring av status for søknad $søknadId" }
+                sikkerLogg.error(e) { "Feil ved lagring av status for søknad $søknadId innsendt av $ident" }
+            }
         } ?: also {
             logg.warn { "Fant ikke søknad $søknadId for oppdatering status" }
             sikkerLogg.warn { "Fant ikke søknad $søknadId innsendt av $ident for oppdatering av status" }
         }
     }
+
+    private fun tilStatus(
+        førteTil: String,
+        søknadId: String,
+    ): Status =
+        Status.entries.find { it.name == førteTil }
+            ?: Status.Ukjent.also {
+                logg.error { "Ukjent verdi for $søknadId i førteTil: $førteTil, lagrer status som ${Status.Ukjent}" }
+            }
 }

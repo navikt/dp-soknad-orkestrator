@@ -1,6 +1,7 @@
 package no.nav.dagpenger.soknad.orkestrator.søknad.mottak
 
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.matchers.shouldBe
 import io.mockk.clearMocks
 import io.mockk.every
@@ -17,7 +18,6 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadsbehandlingFerd
 import java.util.UUID
 import kotlin.test.BeforeTest
 import kotlin.test.Test
-import kotlin.test.assertFailsWith
 
 class SøknadsbehandlingFerdigMottakTest {
     private val søknadId = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6")
@@ -67,11 +67,11 @@ class SøknadsbehandlingFerdigMottakTest {
     }
 
     @Test
-    fun `onPacket med ident som ikke tilhører søknaden skal feile`() {
+    fun `onPacket med ident som ikke tilhører søknaden lagrer ikke status`() {
         every { søknadRepository.hent(søknadId) } returns
             Søknad(søknadId = søknadId, ident = "12345678901", tilstand = Tilstand.INNSENDT)
 
-        assertFailsWith<IllegalArgumentException> {
+        shouldNotThrowAny {
             rapidsConnection.sendTestMessage(søknadsbehandlingFerdigMelding())
         }
 
@@ -79,15 +79,17 @@ class SøknadsbehandlingFerdigMottakTest {
     }
 
     @Test
-    fun `onPacket med ukjent verdi i førteTil skal feile`() {
+    fun `onPacket med ukjent verdi i førteTil lagrer status som Ukjent`() {
         every { søknadRepository.hent(søknadId) } returns
             Søknad(søknadId = søknadId, ident = ident, tilstand = Tilstand.INNSENDT)
 
-        assertFailsWith<IllegalArgumentException> {
+        shouldNotThrowAny {
             rapidsConnection.sendTestMessage(søknadsbehandlingFerdigMelding(førteTil = "Tullestatus"))
         }
 
-        verify(exactly = 0) { søknadStatusRepository.lagre(any()) }
+        val lagretStatus = slot<SøknadStatus>()
+        verify { søknadStatusRepository.lagre(capture(lagretStatus)) }
+        lagretStatus.captured.førteTil shouldBe Status.Ukjent
     }
 
     @Test

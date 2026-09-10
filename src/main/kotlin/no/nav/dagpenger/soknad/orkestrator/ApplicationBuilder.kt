@@ -37,6 +37,7 @@ import no.nav.dagpenger.soknad.orkestrator.saf.SafKlient
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadPersonaliaRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadStatusRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.jobb.RekjørJournalføringForSøknaderJobb
 import no.nav.dagpenger.soknad.orkestrator.søknad.jobb.SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.MeldingOmSøknadKlarTilJournalføringMottak
@@ -44,6 +45,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.MeldingOmEttersendingM
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfGenerertOgMellomlagretMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadPdfOgVedleggJournalførtMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadSlettetMottak
+import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.SøknadsbehandlingFerdigMottak
 import no.nav.dagpenger.soknad.orkestrator.søknad.pdf.PdfPayloadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonService
@@ -66,6 +68,7 @@ internal class ApplicationBuilder(
             dataSource = dataSource,
             quizOpplysningRepository = quizOpplysningRepositoryPostgres,
         )
+    private val søknadStatusRepository = SøknadStatusRepository(dataSource)
     private val søknadPersonaliaRepository = SøknadPersonaliaRepository(dataSource)
 
     private val seksjonRepository = SeksjonRepository(dataSource, søknadRepository)
@@ -183,6 +186,11 @@ internal class ApplicationBuilder(
                 )
                 SøknadSlettetMottak(rapidsConnection, søknadService)
                 MeldingOmEttersendingMottak(rapidsConnection, søknadRepository, seksjonRepository)
+                SøknadsbehandlingFerdigMottak(
+                    rapidsConnection,
+                    søknadRepository,
+                    søknadStatusRepository,
+                )
             }
 
     init {
