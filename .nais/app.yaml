@@ -65,6 +65,10 @@ spec:
       value: "https://{{SAF_INGRESS}}"
     - name: SAF_SCOPE
       value: "{{SAF_SCOPE}}"
+    - name: AAREG_URL
+      value: {{AAREG_URL}}
+    - name: AAREG_AUDIENCE
+      value: {{AAREG_AUDIENCE}}
   azure:
     application:
       enabled: true

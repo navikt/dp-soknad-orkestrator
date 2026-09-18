@@ -23,6 +23,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.SøknadsdataBehovMottak
 import no.nav.dagpenger.soknad.orkestrator.config.configure
 import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
+import no.nav.dagpenger.soknad.orkestrator.opplysning.AaregClient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.DpBehandlingKlient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
 import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepositoryPostgres
@@ -110,6 +111,12 @@ internal class ApplicationBuilder(
             azureAdKlient = azureAdClient,
             dpBehandlingBaseUrl = Configuration.miljøVariabler.dpBehandlingBaseUrl,
             dpBehandlingScope = Configuration.miljøVariabler.dpBehandlingScope,
+        )
+
+    private val aaregClient: AaregClient =
+        AaregClient(
+            aaregUrl = Configuration.aaregUrl,
+            tokenProvider = tokenXClient(audience = Configuration.aaregAudience),
         )
 
     private val saksbehandlerBarnRepository = SaksbehandlerBarnRepositoryPostgres(dataSource)

@@ -38,6 +38,9 @@ internal object Configuration {
     val safUrl by lazy { properties[Key("SAF_URL", stringType)] }
     val safScope by lazy { properties[Key("SAF_SCOPE", stringType)] }
 
+    val aaregUrl by lazy { properties[Key("AAREG_URL", stringType)] }
+    val aaregAudience by lazy { properties[Key("AAREG_AUDIENCE", stringType)] }
+
     val miljøVariabler =
         Variabler(
             dpBehandlingBaseUrl = properties[Key("DP_BEHANDLING_BASE_URL", stringType)],
