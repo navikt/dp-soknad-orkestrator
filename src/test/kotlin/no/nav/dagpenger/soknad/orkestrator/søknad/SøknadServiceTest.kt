@@ -486,6 +486,117 @@ class SøknadServiceTest {
         søknader!!.tittel shouldBe "Søknad om dagpenger (ikke permittert)"
     }
 
+    @Test
+    fun `hentSøknaderForIdent sorterer rettighetsperioder med nyeste fraOgMed først`() {
+        val eldstePeriode =
+            Rettighetsperiode(
+                fraOgMed = "2026-09-21",
+                tilOgMed = "2026-09-21",
+                harRett = true,
+                opprinnelse = "Ny",
+            )
+        val midterstePeriode =
+            Rettighetsperiode(
+                fraOgMed = "2026-09-22",
+                tilOgMed = "2026-10-01",
+                harRett = false,
+                opprinnelse = "Stans",
+            )
+        val nyestePeriode =
+            Rettighetsperiode(
+                fraOgMed = "2026-10-02",
+                tilOgMed = "2026-12-31",
+                harRett = true,
+                opprinnelse = "Gjenopptak",
+            )
+        val søknadForIdent =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+                rettighetsperioder = listOf(midterstePeriode, nyestePeriode, eldstePeriode),
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+
+        val søknad = søknadService.hentSøknaderForIdent(ident).single()
+
+        søknad.rettighetsperioder shouldBe listOf(nyestePeriode, midterstePeriode, eldstePeriode)
+    }
+
+    @Test
+    fun `hentSøknaderForIdent beholder tom liste med rettighetsperioder`() {
+        val søknadForIdent =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+                rettighetsperioder = emptyList(),
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+
+        val søknad = søknadService.hentSøknaderForIdent(ident).single()
+
+        søknad.rettighetsperioder shouldBe emptyList()
+    }
+
+    @Test
+    fun `hentSøknaderForIdent håndterer at rettighetsperioder er null`() {
+        val søknadForIdent =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+                rettighetsperioder = null,
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
+
+        val søknad = søknadService.hentSøknaderForIdent(ident).single()
+
+        søknad.rettighetsperioder shouldBe emptyList()
+    }
+
+    @Test
+    fun `hentSøknaderForIdent sorterer rettighetsperioder for hver søknad separat`() {
+        val periode1 =
+            Rettighetsperiode(
+                fraOgMed = "2026-09-21",
+                tilOgMed = "2026-09-21",
+                harRett = true,
+                opprinnelse = "Ny",
+            )
+        val periode2 =
+            Rettighetsperiode(
+                fraOgMed = "2026-09-22",
+                tilOgMed = "2026-10-01",
+                harRett = false,
+                opprinnelse = "Stans",
+            )
+        val førsteSøknad =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+                rettighetsperioder = listOf(periode1, periode2),
+            )
+        val andreSøknad =
+            SøknadForIdent(
+                søknadId = randomUUID(),
+                innsendtTimestamp = LocalDateTime.now(),
+                status = "INNSENDT",
+                rettighetsperioder = listOf(periode2),
+            )
+
+        every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(førsteSøknad, andreSøknad)
+
+        val søknader = søknadService.hentSøknaderForIdent(ident)
+
+        søknader.single { it.søknadId == førsteSøknad.søknadId }.rettighetsperioder shouldBe listOf(periode2, periode1)
+        søknader.single { it.søknadId == andreSøknad.søknadId }.rettighetsperioder shouldBe listOf(periode2)
+    }
+
     private val quizSeksjoner =
         //language=json
         """

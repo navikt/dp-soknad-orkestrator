@@ -14,6 +14,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.melding.SøknadEndretTilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import no.nav.dagpenger.soknad.orkestrator.utils.erBoolean
 import tools.jackson.databind.json.JsonMapper
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -221,6 +222,18 @@ class SøknadService(
             val tittel = hentTittelForSkjemaKode(skjemakode)
             it.tittel = tittel
             it.manglendeDokumentasjonskrav = finnSendSenereDokumentasjonskraveneForEnSøknad(it.søknadId, ident)
+            it.rettighetsperioder =
+                it.rettighetsperioder
+                    ?.map {
+                        Rettighetsperiode(
+                            it.fraOgMed,
+                            it.tilOgMed,
+                            it.harRett,
+                            it.opprinnelse,
+                        )
+                    }?.sortedByDescending {
+                        LocalDate.parse(it.fraOgMed)
+                    } ?: emptyList()
         }
         return alleSøknaderForSøkeren
     }

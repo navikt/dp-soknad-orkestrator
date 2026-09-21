@@ -2,6 +2,7 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.db
 
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.søknad.Rettighetsperiode
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadForIdent
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
@@ -32,6 +33,7 @@ import org.jetbrains.exposed.sql.stringLiteral
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import org.jetbrains.exposed.sql.upsert
+import tools.jackson.core.type.TypeReference
 import tools.jackson.databind.JsonNode
 import java.time.LocalDateTime
 import java.time.LocalDateTime.now
@@ -307,17 +309,29 @@ class SøknadRepository(
                     tilstand,
                     SøknadTabell.oppdatertTidspunkt,
                     SøknadStatusTabell.førteTil,
+                    SøknadStatusTabell.rettighetsperioder,
                 ).where { SøknadTabell.ident eq ident }
                 .andWhere { SøknadTabell.søknadId eq SeksjonV2Tabell.søknadId }
                 .orderBy(SøknadStatusTabell.id, SortOrder.DESC)
                 .distinctBy { it[SøknadTabell.søknadId] }
                 .map {
+                    val rettighetsperioderJson = it.getOrNull(SøknadStatusTabell.rettighetsperioder)
+                    val rettighetsperioder =
+                        if (rettighetsperioderJson.isNullOrBlank() || rettighetsperioderJson == "[]") {
+                            emptyList()
+                        } else {
+                            objectMapper.readValue(
+                                rettighetsperioderJson,
+                                object : TypeReference<List<Rettighetsperiode>>() {},
+                            )
+                        }
                     SøknadForIdent(
                         søknadId = it[SøknadTabell.søknadId],
                         innsendtTimestamp = it[SøknadTabell.innsendtTidspunkt],
                         oppdatertTidspunkt = it[SøknadTabell.oppdatertTidspunkt],
-                        status = it[SøknadTabell.tilstand],
+                        status = it[tilstand],
                         søknadVedtak = it.getOrNull(SøknadStatusTabell.førteTil) ?: "",
+                        rettighetsperioder = rettighetsperioder,
                     )
                 }.toList()
         }

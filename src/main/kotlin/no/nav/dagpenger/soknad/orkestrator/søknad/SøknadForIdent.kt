@@ -9,6 +9,7 @@ data class SøknadForIdent(
     val oppdatertTidspunkt: LocalDateTime? = null,
     val status: String,
     val søknadVedtak: String? = "",
+    var rettighetsperioder: List<Rettighetsperiode>? = null,
     var tittel: String = "Søknad om dagpenger",
     var manglendeDokumentasjonskrav: List<String>? = emptyList(),
 )
