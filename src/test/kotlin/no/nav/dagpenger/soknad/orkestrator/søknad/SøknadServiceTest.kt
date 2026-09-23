@@ -349,6 +349,7 @@ class SøknadServiceTest {
                 søknadId = randomUUID(),
                 innsendtTimestamp = LocalDateTime.now(),
                 status = "INNSENDT",
+                søknadVedtak = null,
             )
 
         every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
@@ -371,6 +372,7 @@ class SøknadServiceTest {
                 søknadId = randomUUID(),
                 innsendtTimestamp = LocalDateTime.now(),
                 status = "INNSENDT",
+                søknadVedtak = null,
             )
 
         every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
@@ -393,6 +395,7 @@ class SøknadServiceTest {
                 søknadId = randomUUID(),
                 innsendtTimestamp = LocalDateTime.now(),
                 status = "INNSENDT",
+                søknadVedtak = null,
             )
 
         every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
@@ -415,6 +418,7 @@ class SøknadServiceTest {
                 søknadId = randomUUID(),
                 innsendtTimestamp = LocalDateTime.now(),
                 status = "INNSENDT",
+                søknadVedtak = null,
             )
 
         every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
@@ -450,6 +454,7 @@ class SøknadServiceTest {
                 søknadId = randomUUID(),
                 innsendtTimestamp = LocalDateTime.now(),
                 status = "INNSENDT",
+                søknadVedtak = null,
             )
 
         every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)
@@ -473,6 +478,7 @@ class SøknadServiceTest {
                 søknadId = randomUUID(),
                 innsendtTimestamp = LocalDateTime.now(),
                 status = "INNSENDT",
+                søknadVedtak = null,
             )
 
         every { søknadRepository.hentSoknaderForIdent(ident) } returns listOf(søknadForIdent)

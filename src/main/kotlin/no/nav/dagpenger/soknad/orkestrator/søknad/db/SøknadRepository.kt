@@ -16,6 +16,7 @@ import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
+import org.jetbrains.exposed.sql.SortOrder
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.andWhere
@@ -299,9 +300,16 @@ class SøknadRepository(
         transaction {
             SøknadTabell
                 .innerJoin(SeksjonV2Tabell)
-                .select(SøknadTabell.søknadId, SøknadTabell.innsendtTidspunkt, tilstand, SøknadTabell.oppdatertTidspunkt)
-                .where { SøknadTabell.ident eq ident }
+                .leftJoin(SøknadStatusTabell)
+                .select(
+                    SøknadTabell.søknadId,
+                    SøknadTabell.innsendtTidspunkt,
+                    tilstand,
+                    SøknadTabell.oppdatertTidspunkt,
+                    SøknadStatusTabell.førteTil,
+                ).where { SøknadTabell.ident eq ident }
                 .andWhere { SøknadTabell.søknadId eq SeksjonV2Tabell.søknadId }
+                .orderBy(SøknadStatusTabell.id, SortOrder.DESC)
                 .distinctBy { it[SøknadTabell.søknadId] }
                 .map {
                     SøknadForIdent(
@@ -309,6 +317,7 @@ class SøknadRepository(
                         innsendtTimestamp = it[SøknadTabell.innsendtTidspunkt],
                         oppdatertTidspunkt = it[SøknadTabell.oppdatertTidspunkt],
                         status = it[SøknadTabell.tilstand],
+                        søknadVedtak = it.getOrNull(SøknadStatusTabell.førteTil),
                     )
                 }.toList()
         }

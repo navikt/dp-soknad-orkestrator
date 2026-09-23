@@ -16,7 +16,9 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
+import no.nav.dagpenger.soknad.orkestrator.søknad.Status
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadStatus
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.INNSENDT
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.JOURNALFØRT
@@ -541,6 +543,62 @@ class SøknadRepositoryTest {
 
         søknader.size shouldBe 1
         søknader[0].søknadId shouldBe søknadId
+    }
+
+    @Test
+    fun `hentSoknaderForIdent returnerer null som søknadVedtak når søknaden ikke har status`() {
+        val søknadUtenStatus = randomUUID()
+        val søknadMedStatus = randomUUID()
+        søknadRepository.opprett(Søknad(søknadUtenStatus, ident))
+        søknadRepository.opprett(Søknad(søknadMedStatus, ident))
+        seksjonRepository.lagre(søknadUtenStatus, ident, "seksjon-id-1", "{}", null, "{}")
+        seksjonRepository.lagre(søknadMedStatus, ident, "seksjon-id-2", "{}", null, "{}")
+        SøknadStatusRepository(dataSource).lagre(
+            SøknadStatus(
+                søknadId = søknadMedStatus,
+                ident = ident,
+                behandlingId = randomUUID().toString(),
+                førteTil = Status.Innvilgelse,
+                rettighetsperioder = "[]",
+            ),
+        )
+
+        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+
+        søknader.size shouldBe 2
+        søknader.single { it.søknadId == søknadUtenStatus }.søknadVedtak shouldBe null
+        søknader.single { it.søknadId == søknadMedStatus }.søknadVedtak shouldBe Status.Innvilgelse.name
+    }
+
+    @Test
+    fun `hentSoknaderForIdent returnerer nyeste søknadVedtak når søknaden har flere statuser`() {
+        val søknadId = randomUUID()
+        søknadRepository.opprett(Søknad(søknadId, ident))
+        seksjonRepository.lagre(søknadId, ident, "seksjon-id", "{}", null, "{}")
+        val søknadStatusRepository = SøknadStatusRepository(dataSource)
+        søknadStatusRepository.lagre(
+            SøknadStatus(
+                søknadId = søknadId,
+                ident = ident,
+                behandlingId = randomUUID().toString(),
+                førteTil = Status.Innvilgelse,
+                rettighetsperioder = "[]",
+            ),
+        )
+        søknadStatusRepository.lagre(
+            SøknadStatus(
+                søknadId = søknadId,
+                ident = ident,
+                behandlingId = randomUUID().toString(),
+                førteTil = Status.Stans,
+                rettighetsperioder = "[]",
+            ),
+        )
+
+        val søknader = søknadRepository.hentSoknaderForIdent(ident)
+
+        søknader.size shouldBe 1
+        søknader.single { it.søknadId == søknadId }.søknadVedtak shouldBe Status.Stans.name
     }
 
     private fun opprettSøknad(
