@@ -16,7 +16,6 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepositoryPostgres
-import no.nav.dagpenger.soknad.orkestrator.søknad.Rettighetsperiode
 import no.nav.dagpenger.soknad.orkestrator.søknad.Status
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadStatus
@@ -547,7 +546,7 @@ class SøknadRepositoryTest {
     }
 
     @Test
-    fun `hentSoknaderForIdent returnerer tom søknadVedtak og tomme rettighetsperioder når søknaden ikke har status`() {
+    fun `hentSoknaderForIdent returnerer tom søknadVedtak når søknaden ikke har status`() {
         val søknadUtenStatus = randomUUID()
         val søknadMedStatus = randomUUID()
         søknadRepository.opprett(Søknad(søknadUtenStatus, ident))
@@ -560,65 +559,19 @@ class SøknadRepositoryTest {
                 ident = ident,
                 behandlingId = randomUUID().toString(),
                 førteTil = Status.Innvilgelse,
-                rettighetsperioder = rettighetsperioderJson(innvilgetPeriode),
-            ),
-        )
-
-        val søknader = søknadRepository.hentSoknaderForIdent(ident)
-
-        søknader.size shouldBe 2
-        with(søknader.single { it.søknadId == søknadUtenStatus }) {
-            søknadVedtak shouldBe ""
-            rettighetsperioder shouldBe emptyList()
-        }
-        with(søknader.single { it.søknadId == søknadMedStatus }) {
-            søknadVedtak shouldBe Status.Innvilgelse.name
-            rettighetsperioder shouldBe listOf(innvilgetPeriode)
-        }
-    }
-
-    @Test
-    fun `hentSoknaderForIdent returnerer tomme rettighetsperioder når status har tom liste`() {
-        val søknadId = randomUUID()
-        søknadRepository.opprett(Søknad(søknadId, ident))
-        seksjonRepository.lagre(søknadId, ident, "seksjon-id", "{}", null, "{}")
-        SøknadStatusRepository(dataSource).lagre(
-            SøknadStatus(
-                søknadId = søknadId,
-                ident = ident,
-                behandlingId = randomUUID().toString(),
-                førteTil = Status.Avslag,
                 rettighetsperioder = "[]",
             ),
         )
 
         val søknader = søknadRepository.hentSoknaderForIdent(ident)
 
-        søknader.single().rettighetsperioder shouldBe emptyList()
+        søknader.size shouldBe 2
+        søknader.single { it.søknadId == søknadUtenStatus }.søknadVedtak shouldBe ""
+        søknader.single { it.søknadId == søknadMedStatus }.søknadVedtak shouldBe Status.Innvilgelse.name
     }
 
     @Test
-    fun `hentSoknaderForIdent returnerer flere rettighetsperioder for samme søknad`() {
-        val søknadId = randomUUID()
-        søknadRepository.opprett(Søknad(søknadId, ident))
-        seksjonRepository.lagre(søknadId, ident, "seksjon-id", "{}", null, "{}")
-        SøknadStatusRepository(dataSource).lagre(
-            SøknadStatus(
-                søknadId = søknadId,
-                ident = ident,
-                behandlingId = randomUUID().toString(),
-                førteTil = Status.Endring,
-                rettighetsperioder = rettighetsperioderJson(innvilgetPeriode, stansetPeriode),
-            ),
-        )
-
-        val søknader = søknadRepository.hentSoknaderForIdent(ident)
-
-        søknader.single().rettighetsperioder shouldBe listOf(innvilgetPeriode, stansetPeriode)
-    }
-
-    @Test
-    fun `hentSoknaderForIdent returnerer nyeste søknadVedtak og rettighetsperioder når søknaden har flere statuser`() {
+    fun `hentSoknaderForIdent returnerer nyeste søknadVedtak når søknaden har flere statuser`() {
         val søknadId = randomUUID()
         søknadRepository.opprett(Søknad(søknadId, ident))
         seksjonRepository.lagre(søknadId, ident, "seksjon-id", "{}", null, "{}")
@@ -629,7 +582,7 @@ class SøknadRepositoryTest {
                 ident = ident,
                 behandlingId = randomUUID().toString(),
                 førteTil = Status.Innvilgelse,
-                rettighetsperioder = rettighetsperioderJson(innvilgetPeriode),
+                rettighetsperioder = "[]",
             ),
         )
         søknadStatusRepository.lagre(
@@ -638,36 +591,15 @@ class SøknadRepositoryTest {
                 ident = ident,
                 behandlingId = randomUUID().toString(),
                 førteTil = Status.Stans,
-                rettighetsperioder = rettighetsperioderJson(stansetPeriode),
+                rettighetsperioder = "[]",
             ),
         )
 
         val søknader = søknadRepository.hentSoknaderForIdent(ident)
 
         søknader.size shouldBe 1
-        with(søknader.single { it.søknadId == søknadId }) {
-            søknadVedtak shouldBe Status.Stans.name
-            rettighetsperioder shouldBe listOf(stansetPeriode)
-        }
+        søknader.single { it.søknadId == søknadId }.søknadVedtak shouldBe Status.Stans.name
     }
-
-    private val innvilgetPeriode =
-        Rettighetsperiode(
-            fraOgMed = "2026-09-21",
-            tilOgMed = "2026-09-21",
-            harRett = true,
-            opprinnelse = "Ny",
-        )
-
-    private val stansetPeriode =
-        Rettighetsperiode(
-            fraOgMed = "2026-09-22",
-            tilOgMed = "2026-10-01",
-            harRett = false,
-            opprinnelse = "Stans",
-        )
-
-    private fun rettighetsperioderJson(vararg perioder: Rettighetsperiode): String = objectMapper.writeValueAsString(perioder.toList())
 
     private fun opprettSøknad(
         søknadId: UUID,

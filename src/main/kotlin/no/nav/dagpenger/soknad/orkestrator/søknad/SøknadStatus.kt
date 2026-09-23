@@ -10,13 +10,6 @@ data class SøknadStatus(
     val rettighetsperioder: String,
 )
 
-data class Rettighetsperiode(
-    val fraOgMed: String,
-    val tilOgMed: String,
-    val harRett: Boolean,
-    val opprinnelse: String,
-)
-
 enum class Status {
     Innvilgelse,
     Avslag,
