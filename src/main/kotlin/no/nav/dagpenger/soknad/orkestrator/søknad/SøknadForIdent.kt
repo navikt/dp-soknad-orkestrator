@@ -8,7 +8,7 @@ data class SøknadForIdent(
     val innsendtTimestamp: LocalDateTime? = null,
     val oppdatertTidspunkt: LocalDateTime? = null,
     val status: String,
-    val søknadVedtak: String? = "",
+    val søknadVedtak: String?,
     var tittel: String = "Søknad om dagpenger",
     var manglendeDokumentasjonskrav: List<String>? = emptyList(),
 )

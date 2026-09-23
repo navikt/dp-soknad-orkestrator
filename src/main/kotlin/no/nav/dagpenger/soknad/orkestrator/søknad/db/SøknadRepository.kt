@@ -317,7 +317,7 @@ class SøknadRepository(
                         innsendtTimestamp = it[SøknadTabell.innsendtTidspunkt],
                         oppdatertTidspunkt = it[SøknadTabell.oppdatertTidspunkt],
                         status = it[SøknadTabell.tilstand],
-                        søknadVedtak = it.getOrNull(SøknadStatusTabell.førteTil) ?: "",
+                        søknadVedtak = it.getOrNull(SøknadStatusTabell.førteTil),
                     )
                 }.toList()
         }

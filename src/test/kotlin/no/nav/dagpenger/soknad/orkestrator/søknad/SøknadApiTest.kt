@@ -149,6 +149,7 @@ class SøknadApiTest {
                     søknadId = søknadId,
                     innsendtTimestamp = innsendtTimestamp,
                     status = "Innsendt",
+                    søknadVedtak = null,
                     tittel = "Søknad om dagpenger",
                 ),
             )

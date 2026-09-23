@@ -546,7 +546,7 @@ class SøknadRepositoryTest {
     }
 
     @Test
-    fun `hentSoknaderForIdent returnerer tom søknadVedtak når søknaden ikke har status`() {
+    fun `hentSoknaderForIdent returnerer null som søknadVedtak når søknaden ikke har status`() {
         val søknadUtenStatus = randomUUID()
         val søknadMedStatus = randomUUID()
         søknadRepository.opprett(Søknad(søknadUtenStatus, ident))
@@ -566,7 +566,7 @@ class SøknadRepositoryTest {
         val søknader = søknadRepository.hentSoknaderForIdent(ident)
 
         søknader.size shouldBe 2
-        søknader.single { it.søknadId == søknadUtenStatus }.søknadVedtak shouldBe ""
+        søknader.single { it.søknadId == søknadUtenStatus }.søknadVedtak shouldBe null
         søknader.single { it.søknadId == søknadMedStatus }.søknadVedtak shouldBe Status.Innvilgelse.name
     }
 
