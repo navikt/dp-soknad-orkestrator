@@ -23,7 +23,7 @@ import no.nav.dagpenger.soknad.orkestrator.behov.SøknadsdataBehovMottak
 import no.nav.dagpenger.soknad.orkestrator.config.configure
 import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
-import no.nav.dagpenger.soknad.orkestrator.opplysning.AaregClient
+import no.nav.dagpenger.soknad.orkestrator.opplysning.AaregKlient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.DpBehandlingKlient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
 import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepositoryPostgres
@@ -113,8 +113,8 @@ internal class ApplicationBuilder(
             dpBehandlingScope = Configuration.miljøVariabler.dpBehandlingScope,
         )
 
-    private val aaregClient: AaregClient =
-        AaregClient(
+    private val aaregKlient: AaregKlient =
+        AaregKlient(
             aaregUrl = Configuration.aaregUrl,
             tokenProvider = tokenXClient(audience = Configuration.aaregAudience),
         )
@@ -147,7 +147,7 @@ internal class ApplicationBuilder(
                                 tokenX()
                             }
                         }
-                        opplysningApi(opplysningService)
+                        opplysningApi(opplysningService, aaregKlient)
                         søknadApi(søknadService, seksjonService)
                         seksjonApi(seksjonService)
                         personaliaApi(personaliaService)

@@ -18,7 +18,7 @@ import no.nav.dagpenger.soknad.orkestrator.Configuration
 import no.nav.dagpenger.soknad.orkestrator.utils.configureHttpClient
 import java.time.LocalDate
 
-internal class AaregClient(
+internal class AaregKlient(
     private val aaregUrl: String = Configuration.aaregUrl,
     private val tokenProvider: (String) -> String,
     val httpKlient: HttpClient = configureHttpClient(),
@@ -39,6 +39,7 @@ internal class AaregClient(
             if (response.status.value == 200) {
                 logger.info { "Kall til AAREG gikk OK" }
                 val arbeidsforholdJson = jacksonObjectMapper().readTree(response.bodyAsText())
+                logger.info { arbeidsforholdJson.toString() }
                 arbeidsforholdJson.map { toArbeidsforhold(it) }
 
                 // Map the JSON to your data class here
