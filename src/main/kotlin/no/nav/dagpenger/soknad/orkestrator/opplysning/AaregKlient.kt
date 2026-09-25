@@ -5,13 +5,15 @@ import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
-import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.parameter
+import io.ktor.client.request.post
+import io.ktor.client.request.setBody
 import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
 import io.ktor.http.URLBuilder
 import io.ktor.http.appendEncodedPathSegments
+import io.ktor.http.contentType
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import no.nav.dagpenger.soknad.orkestrator.Configuration
@@ -29,14 +31,16 @@ internal class AaregKlient(
     ) = withContext(Dispatchers.IO) {
         val urlBuilder = URLBuilder(aaregUrl).appendEncodedPathSegments(API_PATH, ARBEIDSFORHOLD_PATH).build()
         logger.info { "aareg url: $urlBuilder" }
+        logger.info { "token fra frontend: $token" }
+        val tokenTilAareg = tokenProvider.invoke(token)
+        logger.info { "tokenTilAareg: $tokenTilAareg" }
 
         try {
             val response: HttpResponse =
-                httpKlient.get(urlBuilder) {
-                    header("Authorization", "Bearer ${tokenProvider.invoke(token)}")
-                    header("Nav-Personident", fnr)
-                    parameter("arbeidsforholdstatus", "AKTIV, AVSLUTTET")
-                    parameter("historikk", "true")
+                httpKlient.post(urlBuilder) {
+                    header("Authorization", "Bearer $tokenTilAareg")
+                    contentType(ContentType.Application.Json)
+                    setBody(ArbeidsforholdRequest(arbeidstakerId = fnr))
                 }
             if (response.status.value == 200) {
                 logger.info { "Kall til AAREG gikk OK" }
@@ -62,6 +66,20 @@ internal class AaregKlient(
         private val logger = KotlinLogging.logger {}
     }
 }
+
+internal data class ArbeidsforholdRequest(
+    val arbeidstakerId: String,
+    val historikk: Boolean = true,
+    val rapporteringsordninger: List<String> = listOf("A_ORDNINGEN"),
+    val arbeidsforholdstatuser: List<String> = listOf("AKTIV", "AVSLUTTET"),
+    val arbeidsforholdtyper: List<String> =
+        listOf(
+            "ordinaertArbeidsforhold",
+            "maritimtArbeidsforhold",
+            "forenkletOppgjoersordning",
+            "frilanserOppdragstakerHonorarPersonerMm",
+        ),
+)
 
 data class ArbeidsforholdResponse(
     @get:JsonProperty("id")
