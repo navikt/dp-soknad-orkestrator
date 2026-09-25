@@ -28,7 +28,7 @@ internal class AaregKlient(
         token: String,
     ) = withContext(Dispatchers.IO) {
         val urlBuilder = URLBuilder(aaregUrl).appendEncodedPathSegments(API_PATH, ARBEIDSFORHOLD_PATH).build()
-        logger.info{"aareg url: $urlBuilder"}
+        logger.info { "aareg url: $urlBuilder" }
 
         try {
             val response: HttpResponse =
