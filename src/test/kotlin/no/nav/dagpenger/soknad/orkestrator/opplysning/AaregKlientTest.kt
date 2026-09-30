@@ -43,13 +43,36 @@ internal class AaregKlientTest {
                         organisasjonsnummer = "910825518",
                         startdato = LocalDate.parse("2014-01-01"),
                         sluttdato = null,
+                        sluttårsak = null,
+                        arbeidstidsordning = "ikkeSkift",
                     ),
                     Arbeidsforhold(
                         id = "34567",
                         organisasjonsnummer = null,
                         startdato = LocalDate.parse("2020-01-01"),
                         sluttdato = LocalDate.parse("2020-01-03"),
+                        sluttårsak = null,
+                        arbeidstidsordning = "Ukjent",
                     ),
+                )
+
+            val førsteArbeidsforhold =
+                Arbeidsforhold(
+                    id = "12345",
+                    organisasjonsnummer = "910825518",
+                    startdato = LocalDate.parse("2014-01-01"),
+                    sluttdato = null,
+                    sluttårsak = null,
+                    arbeidstidsordning = "ikkeSkift",
+                )
+            førsteArbeidsforhold.toResponse("Eksempel AS") shouldBe
+                ArbeidsforholdResponse(
+                    id = "12345",
+                    startdato = LocalDate.parse("2014-01-01"),
+                    sluttdato = null,
+                    sluttårsak = null,
+                    arbeidstidsordning = "ikkeSkift",
+                    organisasjonsnavn = "Eksempel AS",
                 )
         }
     }
@@ -72,6 +95,15 @@ internal class AaregKlientTest {
                 "ansettelsesperiode": {
                   "startdato": "2014-01-01"
                 },
+                "ansettelsesdetaljer": [
+                  {
+                    "type": "Ordinaer",
+                    "arbeidstidsordning": {
+                      "kode": "ikkeSkift",
+                      "beskrivelse": "Ikke skift"
+                    }
+                  }
+                ],
                 "navArbeidsforholdId": 12345
               },
               {
@@ -89,6 +121,11 @@ internal class AaregKlientTest {
                   "startdato": "2020-01-01",
                   "sluttdato": "2020-01-03"
                 },
+                "ansettelsesdetaljer": [
+                  {
+                    "type": "Forenklet"
+                  }
+                ],
                 "navArbeidsforholdId": 34567
               }
             ]

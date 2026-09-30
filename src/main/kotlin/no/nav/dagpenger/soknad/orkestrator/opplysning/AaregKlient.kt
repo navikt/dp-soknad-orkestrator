@@ -88,6 +88,10 @@ data class ArbeidsforholdResponse(
     val startdato: java.time.LocalDate,
     @get:JsonProperty("sluttdato")
     val sluttdato: java.time.LocalDate? = null,
+    @get:JsonProperty("sluttårsak")
+    val sluttårsak: String? = null,
+    @get:JsonProperty("arbeidstidsordning")
+    val arbeidstidsordning: String,
     @get:JsonProperty("organisasjonsnavn")
     val organisasjonsnavn: kotlin.String? = null,
 )
@@ -97,12 +101,16 @@ internal data class Arbeidsforhold(
     val organisasjonsnummer: String?,
     val startdato: LocalDate,
     val sluttdato: LocalDate?,
+    val sluttårsak: String?,
+    val arbeidstidsordning: String,
 ) {
     internal fun toResponse(organisasjonsnavn: String?) =
         ArbeidsforholdResponse(
             id = id,
             startdato = startdato,
             sluttdato = sluttdato,
+            sluttårsak = sluttårsak,
+            arbeidstidsordning = arbeidstidsordning,
             organisasjonsnavn = organisasjonsnavn,
         )
 }
@@ -113,6 +121,17 @@ private fun toArbeidsforhold(aaregArbeidsforhold: JsonNode): Arbeidsforhold =
         organisasjonsnummer = toOrganisasjonsnummer(aaregArbeidsforhold["arbeidssted"]),
         startdato = aaregArbeidsforhold["ansettelsesperiode"]["startdato"].asLocalDate(),
         sluttdato = aaregArbeidsforhold["ansettelsesperiode"]["sluttdato"].asNullableLocalDate(),
+        sluttårsak =
+            aaregArbeidsforhold["ansettelsesperiode"]
+                .get("sluttaarsak")
+                ?.get("kode")
+                ?.asString(),
+        arbeidstidsordning =
+            aaregArbeidsforhold["ansettelsesdetaljer"]
+                .firstOrNull()
+                ?.get("arbeidstidsordning")
+                ?.get("kode")
+                ?.asString() ?: "Ukjent",
     )
 
 private fun JsonNode?.asLocalDate(): LocalDate =
