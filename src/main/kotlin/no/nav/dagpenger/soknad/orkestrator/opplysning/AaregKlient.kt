@@ -1,8 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.request.header
@@ -18,6 +16,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import no.nav.dagpenger.soknad.orkestrator.Configuration
 import no.nav.dagpenger.soknad.orkestrator.utils.configureHttpClient
+import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
 import java.time.LocalDate
 
 internal class AaregKlient(
@@ -25,40 +25,40 @@ internal class AaregKlient(
     private val tokenProvider: (String) -> String,
     val httpKlient: HttpClient = configureHttpClient(),
 ) {
+    private val mapper = jacksonObjectMapper()
+
     suspend fun hentArbeidsforhold(
         fnr: String,
         token: String,
-    ) = withContext(Dispatchers.IO) {
-        val urlBuilder = URLBuilder(aaregUrl).appendEncodedPathSegments(API_PATH, ARBEIDSFORHOLD_PATH).build()
-        logger.info { "aareg url: $urlBuilder" }
-        logger.info { "token fra frontend: $token" }
-        val tokenTilAareg = tokenProvider.invoke(token)
-        logger.info { "tokenTilAareg: $tokenTilAareg" }
+    ): List<Arbeidsforhold> =
+        withContext(Dispatchers.IO) {
+            val urlBuilder = URLBuilder(aaregUrl).appendEncodedPathSegments(API_PATH, ARBEIDSFORHOLD_PATH).build()
+            logger.info { "aareg url: $urlBuilder" }
+            logger.info { "token fra frontend: $token" }
+            val tokenTilAareg = tokenProvider.invoke(token)
+            logger.info { "tokenTilAareg: $tokenTilAareg" }
 
-        try {
-            val response: HttpResponse =
-                httpKlient.post(urlBuilder) {
-                    header("Authorization", "Bearer $tokenTilAareg")
-                    contentType(ContentType.Application.Json)
-                    setBody(ArbeidsforholdRequest(arbeidstakerId = fnr))
+            try {
+                val response: HttpResponse =
+                    httpKlient.post(urlBuilder) {
+                        header("Authorization", "Bearer $tokenTilAareg")
+                        contentType(ContentType.Application.Json)
+                        setBody(ArbeidsforholdRequest(arbeidstakerId = fnr))
+                    }
+                if (response.status.value == 200) {
+                    logger.info { "Kall til AAREG gikk OK" }
+                    val arbeidsforholdJson = mapper.readTree(response.bodyAsText()).values()
+                    logger.info { arbeidsforholdJson.toString() }
+                    arbeidsforholdJson.map(::toArbeidsforhold)
+                } else {
+                    logger.warn { "Kall til AAREG feilet med status ${response.status}" }
+                    emptyList()
                 }
-            if (response.status.value == 200) {
-                logger.info { "Kall til AAREG gikk OK" }
-                val arbeidsforholdJson = jacksonObjectMapper().readTree(response.bodyAsText())
-                logger.info { arbeidsforholdJson.toString() }
-                arbeidsforholdJson.map { toArbeidsforhold(it) }
-
-                // Map the JSON to your data class here
-                // Example: jacksonObjectMapper().readValue(arbeidsforholdJson, Array<Arbeidsforhold>::class.java).toList()
-            } else {
-                logger.warn { "Kall til AAREG feilet med status ${response.status}" }
-                emptyList<String>()
+            } catch (e: Exception) {
+                logger.warn { "Henting eller mapping av arbeidsforhold fra AAREG feilet: " + e }
+                emptyList()
             }
-        } catch (e: Exception) {
-            logger.warn { "Henting eller mapping av arbeidsforhold fra AAREG feilet: " + e }
-            emptyList<String>()
         }
-    }
 
     companion object {
         private const val API_PATH = "api"
@@ -109,17 +109,21 @@ internal data class Arbeidsforhold(
 
 private fun toArbeidsforhold(aaregArbeidsforhold: JsonNode): Arbeidsforhold =
     Arbeidsforhold(
-        id = aaregArbeidsforhold["navArbeidsforholdId"].asText(),
+        id = aaregArbeidsforhold["navArbeidsforholdId"].asString(),
         organisasjonsnummer = toOrganisasjonsnummer(aaregArbeidsforhold["arbeidssted"]),
         startdato = aaregArbeidsforhold["ansettelsesperiode"]["startdato"].asLocalDate(),
-        sluttdato = aaregArbeidsforhold["ansettelsesperiode"]["sluttdato"].asLocalDate(),
+        sluttdato = aaregArbeidsforhold["ansettelsesperiode"]["sluttdato"].asNullableLocalDate(),
     )
 
 private fun JsonNode?.asLocalDate(): LocalDate =
-    this?.asText()?.let { LocalDate.parse(it) } ?: throw IllegalArgumentException("Dato kan ikke være null")
+    this?.asString()?.let { LocalDate.parse(it) } ?: throw IllegalArgumentException("Dato kan ikke være null")
 
-private fun toOrganisasjonsnummer(arbeidssted: JsonNode): String? =
-    arbeidssted["identer"]
-        .firstOrNull { it["type"].asText() == "ORGANISASJONSNUMMER" }
+private fun JsonNode?.asNullableLocalDate(): LocalDate? =
+    this?.takeUnless { it.isNull || it.isMissingNode }?.asString()?.let(LocalDate::parse)
+
+private fun toOrganisasjonsnummer(arbeidssted: JsonNode?): String? =
+    arbeidssted
+        ?.get("identer")
+        ?.firstOrNull { it["type"].asString() == "ORGANISASJONSNUMMER" }
         ?.get("ident")
-        ?.asText()
+        ?.asString()
