@@ -96,6 +96,12 @@ data class ArbeidsforholdResponse(
     val organisasjonsnavn: kotlin.String? = null,
 )
 
+internal data class Permittering(
+    val kode: String,
+    val startdato: LocalDate,
+    val prosent: Double,
+)
+
 internal data class Arbeidsforhold(
     val id: String,
     val organisasjonsnummer: String?,
@@ -103,6 +109,7 @@ internal data class Arbeidsforhold(
     val sluttdato: LocalDate?,
     val sluttårsak: String?,
     val arbeidstidsordning: String,
+    val permitteringer: List<Permittering> = emptyList(),
 ) {
     internal fun toResponse(organisasjonsnavn: String?) =
         ArbeidsforholdResponse(
@@ -132,6 +139,16 @@ private fun toArbeidsforhold(aaregArbeidsforhold: JsonNode): Arbeidsforhold =
                 ?.get("arbeidstidsordning")
                 ?.get("kode")
                 ?.asString() ?: "Ukjent",
+        permitteringer =
+            aaregArbeidsforhold["permitteringer"]
+                ?.values()
+                ?.map {
+                    Permittering(
+                        kode = it["type"]["kode"].asString(),
+                        startdato = it["startdato"].asLocalDate(),
+                        prosent = it["prosent"].asDouble(),
+                    )
+                } ?: emptyList(),
     )
 
 private fun JsonNode?.asLocalDate(): LocalDate =

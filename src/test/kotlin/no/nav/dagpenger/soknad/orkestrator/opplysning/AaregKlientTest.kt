@@ -45,6 +45,7 @@ internal class AaregKlientTest {
                         sluttdato = null,
                         sluttårsak = null,
                         arbeidstidsordning = "ikkeSkift",
+                        permitteringer = emptyList(),
                     ),
                     Arbeidsforhold(
                         id = "34567",
@@ -53,6 +54,23 @@ internal class AaregKlientTest {
                         sluttdato = LocalDate.parse("2020-01-03"),
                         sluttårsak = null,
                         arbeidstidsordning = "Ukjent",
+                        permitteringer = emptyList(),
+                    ),
+                    Arbeidsforhold(
+                        id = "3186991",
+                        organisasjonsnummer = "839942907",
+                        startdato = LocalDate.parse("2026-09-01"),
+                        sluttdato = null,
+                        sluttårsak = null,
+                        arbeidstidsordning = "ikkeSkift",
+                        permitteringer =
+                            listOf(
+                                Permittering(
+                                    kode = "permittering",
+                                    startdato = LocalDate.parse("2026-10-01"),
+                                    prosent = 100.0,
+                                ),
+                            ),
                     ),
                 )
 
@@ -64,6 +82,7 @@ internal class AaregKlientTest {
                     sluttdato = null,
                     sluttårsak = null,
                     arbeidstidsordning = "ikkeSkift",
+                    permitteringer = emptyList(),
                 )
             førsteArbeidsforhold.toResponse("Eksempel AS") shouldBe
                 ArbeidsforholdResponse(
@@ -126,7 +145,64 @@ internal class AaregKlientTest {
                     "type": "Forenklet"
                   }
                 ],
-                "navArbeidsforholdId": 34567
+                "navArbeidsforholdId": 34567,
+                "permitteringer": []
+              },
+              {
+                "id": "4",
+                "type": {
+                  "kode": "ordinaertArbeidsforhold",
+                  "beskrivelse": "Ordinært arbeidsforhold"
+                },
+                "arbeidssted": {
+                  "type": "Underenhet",
+                  "identer": [
+                    {
+                      "type": "ORGANISASJONSNUMMER",
+                      "ident": "839942907"
+                    }
+                  ]
+                },
+                "ansettelsesperiode": {
+                  "startdato": "2026-09-01"
+                },
+                "ansettelsesdetaljer": [
+                  {
+                    "type": "Ordinaer",
+                    "arbeidstidsordning": {
+                      "kode": "ikkeSkift",
+                      "beskrivelse": "Ikke skift"
+                    },
+                    "ansettelsesform": {
+                      "kode": "fast",
+                      "beskrivelse": "Fast ansettelse"
+                    },
+                    "yrke": {
+                      "kode": "5141103",
+                      "beskrivelse": "FRISØR"
+                    },
+                    "antallTimerPrUke": 37.5,
+                    "avtaltStillingsprosent": 100.0,
+                    "sisteStillingsprosentendring": "2026-10-01",
+                    "sisteLoennsendring": "2026-10-01",
+                    "rapporteringsmaaneder": {
+                      "fra": "2026-09",
+                      "til": null
+                    }
+                  }
+                ],
+                "permitteringer": [
+                  {
+                    "id": "1",
+                    "type": {
+                      "kode": "permittering",
+                      "beskrivelse": "Permittering"
+                    },
+                    "startdato": "2026-10-01",
+                    "prosent": 100.0
+                  }
+                ],
+                "navArbeidsforholdId": 3186991
               }
             ]
             """.trimIndent()
