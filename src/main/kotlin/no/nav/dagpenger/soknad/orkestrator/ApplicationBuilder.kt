@@ -25,6 +25,7 @@ import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
 import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
 import no.nav.dagpenger.soknad.orkestrator.opplysning.AaregKlient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.DpBehandlingKlient
+import no.nav.dagpenger.soknad.orkestrator.opplysning.EnhetsregisterKlient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
 import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.opplysning.landApi
@@ -117,6 +118,11 @@ internal class ApplicationBuilder(
         AaregKlient(
             aaregUrl = Configuration.aaregUrl,
             tokenProvider = tokenXClient(audience = Configuration.aaregAudience),
+        )
+
+    private val enhetsregisterKlient: EnhetsregisterKlient =
+        EnhetsregisterKlient(
+            enhetsregisterUrl = Configuration.enhetsregisteretUrl,
         )
 
     private val saksbehandlerBarnRepository = SaksbehandlerBarnRepositoryPostgres(dataSource)

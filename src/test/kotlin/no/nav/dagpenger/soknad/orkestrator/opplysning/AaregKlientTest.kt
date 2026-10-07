@@ -41,6 +41,7 @@ internal class AaregKlientTest {
                     Arbeidsforhold(
                         id = "12345",
                         organisasjonsnummer = "910825518",
+                        organisasjonsnavn = "",
                         startdato = LocalDate.parse("2014-01-01"),
                         sluttdato = null,
                         sluttårsak = null,
@@ -50,6 +51,7 @@ internal class AaregKlientTest {
                     Arbeidsforhold(
                         id = "34567",
                         organisasjonsnummer = null,
+                        organisasjonsnavn = "",
                         startdato = LocalDate.parse("2020-01-01"),
                         sluttdato = LocalDate.parse("2020-01-03"),
                         sluttårsak = null,
@@ -59,6 +61,7 @@ internal class AaregKlientTest {
                     Arbeidsforhold(
                         id = "3186991",
                         organisasjonsnummer = "839942907",
+                        organisasjonsnavn = "",
                         startdato = LocalDate.parse("2026-09-01"),
                         sluttdato = null,
                         sluttårsak = null,
@@ -78,6 +81,7 @@ internal class AaregKlientTest {
                 Arbeidsforhold(
                     id = "12345",
                     organisasjonsnummer = "910825518",
+                    organisasjonsnavn = "",
                     startdato = LocalDate.parse("2014-01-01"),
                     sluttdato = null,
                     sluttårsak = null,

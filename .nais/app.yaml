@@ -69,6 +69,9 @@ spec:
       value: {{AAREG_URL}}
     - name: AAREG_AUDIENCE
       value: {{AAREG_AUDIENCE}}
+    - name: ENHETSREGISTERET_URL
+      value: {{ENHETSREGISTERET_URL}}
+
   azure:
     application:
       enabled: true

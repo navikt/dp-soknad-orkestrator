@@ -105,6 +105,7 @@ internal data class Permittering(
 internal data class Arbeidsforhold(
     val id: String,
     val organisasjonsnummer: String?,
+    val organisasjonsnavn: String?,
     val startdato: LocalDate,
     val sluttdato: LocalDate?,
     val sluttårsak: String?,
@@ -126,6 +127,7 @@ private fun toArbeidsforhold(aaregArbeidsforhold: JsonNode): Arbeidsforhold =
     Arbeidsforhold(
         id = aaregArbeidsforhold["navArbeidsforholdId"].asString(),
         organisasjonsnummer = toOrganisasjonsnummer(aaregArbeidsforhold["arbeidssted"]),
+        organisasjonsnavn = "",
         startdato = aaregArbeidsforhold["ansettelsesperiode"]["startdato"].asLocalDate(),
         sluttdato = aaregArbeidsforhold["ansettelsesperiode"]["sluttdato"].asNullableLocalDate(),
         sluttårsak =
