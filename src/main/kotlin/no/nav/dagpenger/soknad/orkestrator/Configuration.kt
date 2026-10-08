@@ -39,9 +39,17 @@ internal object Configuration {
     val safUrl by lazy { properties[Key("SAF_URL", stringType)] }
     val safScope by lazy { properties[Key("SAF_SCOPE", stringType)] }
 
-    val aaregUrl by lazy { properties[Key("AAREG_URL", stringType)] }
+    val aaregUrl by lazy {
+        properties[Key("AAREG_URL", stringType)].let {
+            "https://$it"
+        }
+    }
     val aaregAudience by lazy { properties[Key("AAREG_AUDIENCE", stringType)] }
-    val enhetsregisteretUrl by lazy { properties[Key("ENHETSREGISTERET_URL", stringType)] }
+    val enhetsregisteretUrl by lazy {
+        properties[Key("ENHETSREGISTERET_URL", stringType)].let {
+            "https://$it"
+        }
+    }
 
     val miljøVariabler =
         Variabler(

@@ -105,6 +105,7 @@ spec:
       external:
         - host: {{PDL_API_HOST}}
         - host: {{SAF_INGRESS}}
+        - host: data.brreg.no
   tokenx:
     enabled: true
   {{#if ingresses}}
