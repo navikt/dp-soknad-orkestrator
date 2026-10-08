@@ -9,12 +9,11 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.soknad.orkestrator.utils.configureHttpClient
-import java.time.LocalDate
 import kotlin.test.Test
 
 internal class AaregKlientTest {
     @Test
-    fun `mapper arbeidsforhold fra AAREG-respons`() {
+    fun `returnerer arbeidsforhold fra AAREG`() {
         runBlocking {
             val klient =
                 AaregKlient(
@@ -36,67 +35,7 @@ internal class AaregKlientTest {
                         ),
                 )
 
-            klient.hentArbeidsforhold("12345678910", "token") shouldBe
-                listOf(
-                    Arbeidsforhold(
-                        id = "12345",
-                        organisasjonsnummer = "910825518",
-                        organisasjonsnavn = "",
-                        startdato = LocalDate.parse("2014-01-01"),
-                        sluttdato = null,
-                        sluttårsak = null,
-                        arbeidstidsordning = "ikkeSkift",
-                        permitteringer = emptyList(),
-                    ),
-                    Arbeidsforhold(
-                        id = "34567",
-                        organisasjonsnummer = null,
-                        organisasjonsnavn = "",
-                        startdato = LocalDate.parse("2020-01-01"),
-                        sluttdato = LocalDate.parse("2020-01-03"),
-                        sluttårsak = null,
-                        arbeidstidsordning = "Ukjent",
-                        permitteringer = emptyList(),
-                    ),
-                    Arbeidsforhold(
-                        id = "3186991",
-                        organisasjonsnummer = "839942907",
-                        organisasjonsnavn = "",
-                        startdato = LocalDate.parse("2026-09-01"),
-                        sluttdato = null,
-                        sluttårsak = null,
-                        arbeidstidsordning = "ikkeSkift",
-                        permitteringer =
-                            listOf(
-                                Permittering(
-                                    kode = "permittering",
-                                    startdato = LocalDate.parse("2026-10-01"),
-                                    prosent = 100.0,
-                                ),
-                            ),
-                    ),
-                )
-
-            val førsteArbeidsforhold =
-                Arbeidsforhold(
-                    id = "12345",
-                    organisasjonsnummer = "910825518",
-                    organisasjonsnavn = "",
-                    startdato = LocalDate.parse("2014-01-01"),
-                    sluttdato = null,
-                    sluttårsak = null,
-                    arbeidstidsordning = "ikkeSkift",
-                    permitteringer = emptyList(),
-                )
-            førsteArbeidsforhold.toResponse("Eksempel AS") shouldBe
-                ArbeidsforholdResponse(
-                    id = "12345",
-                    startdato = LocalDate.parse("2014-01-01"),
-                    sluttdato = null,
-                    sluttårsak = null,
-                    arbeidstidsordning = "ikkeSkift",
-                    organisasjonsnavn = "Eksempel AS",
-                )
+            klient.hentArbeidsforhold("12345678910", "token") shouldBe aaregResponse
         }
     }
 

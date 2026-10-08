@@ -134,6 +134,8 @@ internal class ApplicationBuilder(
             søknadRepository = søknadRepository,
             saksbehandlerBarnRepository = saksbehandlerBarnRepository,
             seksjonRepository = seksjonRepository,
+            aaregKlient = aaregKlient,
+            enhetsregisterKlient = enhetsregisterKlient,
         )
 
     private val rapidsConnection =
@@ -153,7 +155,7 @@ internal class ApplicationBuilder(
                                 tokenX()
                             }
                         }
-                        opplysningApi(opplysningService, aaregKlient)
+                        opplysningApi(opplysningService)
                         søknadApi(søknadService, seksjonService)
                         seksjonApi(seksjonService)
                         personaliaApi(personaliaService)

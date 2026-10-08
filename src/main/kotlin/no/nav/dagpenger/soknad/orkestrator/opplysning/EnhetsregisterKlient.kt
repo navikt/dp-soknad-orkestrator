@@ -12,7 +12,7 @@ import no.nav.dagpenger.soknad.orkestrator.utils.configureHttpClient
 import tools.jackson.module.kotlin.jacksonObjectMapper
 import tools.jackson.module.kotlin.readValue
 
-internal class EnhetsregisterKlient(
+class EnhetsregisterKlient(
     private val enhetsregisterUrl: String = Configuration.enhetsregisteretUrl,
     val httpKlient: HttpClient = configureHttpClient(),
 ) {

@@ -22,10 +22,7 @@ import java.util.UUID
 
 private val sikkerlogg = KotlinLogging.logger("tjenestekall.OpplysningApi")
 
-internal fun Application.opplysningApi(
-    opplysningService: OpplysningService,
-    aaregKlient: AaregKlient,
-) {
+internal fun Application.opplysningApi(opplysningService: OpplysningService) {
     routing {
         get("/") { call.respond(HttpStatusCode.OK) }
 
@@ -34,8 +31,7 @@ internal fun Application.opplysningApi(
                 get {
                     val ident = call.ident()
                     val token = call.request.jwt()
-                    val arbeidsforhold = aaregKlient.hentArbeidsforhold(ident, token)
-
+                    val arbeidsforhold = opplysningService.hentArbeidsforhold(ident, token)
                     call.respond(HttpStatusCode.OK, arbeidsforhold)
                 }
             }

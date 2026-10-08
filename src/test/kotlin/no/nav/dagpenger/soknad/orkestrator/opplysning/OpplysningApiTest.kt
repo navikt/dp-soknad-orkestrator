@@ -43,6 +43,7 @@ class OpplysningApiTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     private val aaregKlient = mockk<AaregKlient>()
+    private val enhetsregisterKlient = mockk<EnhetsregisterKlient>(relaxed = true)
     val saksbehandlerBarnRepository =
         mockk<SaksbehandlerBarnRepository>(relaxed = true).also { mock ->
             val storedBarn = mutableMapOf<UUID, List<BarnSvar>>()
@@ -59,6 +60,8 @@ class OpplysningApiTest {
             søknadRepository = søknadRepository,
             saksbehandlerBarnRepository = saksbehandlerBarnRepository,
             seksjonRepository = seksjonRepository,
+            aaregKlient = aaregKlient,
+            enhetsregisterKlient = enhetsregisterKlient,
         )
     val søknadId = UUID.randomUUID()
     val søknadbarnId = UUID.randomUUID()
@@ -73,7 +76,7 @@ class OpplysningApiTest {
                 tokenX()
             }
         }
-        opplysningApi(opplysningService, aaregKlient)
+        opplysningApi(opplysningService)
     }
 
     @BeforeEach
