@@ -39,7 +39,7 @@ class SøknadsdataBehovMottak(
         private val logger = KotlinLogging.logger {}
         private val behovIdSkipSet =
             setOf(
-                "93fe996c-2ead-4e67-b6dc-cac88cf16954",
+                "7121373b-fae2-41a1-a502-c86f24ffafdb",
             )
     }
 
