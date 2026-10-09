@@ -57,6 +57,25 @@ class SafKlientTest {
         resultat.toString() shouldBe "550e8400-e29b-41d4-a716-446655440000"
         antallRequests shouldBe 2
     }
+
+    @Test
+    fun `skal returnere null når søknad_uuid mangler i SAF-dokumentet`() {
+        var antallRequests = 0
+        val mockEngine =
+            MockEngine { _ ->
+                antallRequests++
+                respond(
+                    content = if (antallRequests == 1) vanligSøknadGraphQlRespons else "{}",
+                    status = HttpStatusCode.OK,
+                    headers = headersOf(HttpHeaders.ContentType, ContentType.Application.Json.toString()),
+                )
+            }
+
+        val resultat = lagSafKlient(mockEngine).hentSøknadUuid("123456789")
+
+        resultat shouldBe null
+        antallRequests shouldBe 2
+    }
 }
 
 private val vanligSøknadGraphQlRespons =

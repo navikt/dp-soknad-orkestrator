@@ -55,11 +55,14 @@ class SafKlient(
 
                 val søknadsData = hentSøknadsData(journalpostId, dokumentInfoId)
                 sikkerlogg.info { "Søknadsdata fra SAF for journalpostId: $journalpostId: $søknadsData" }
-                val søknadUuid =
-                    søknadsData["søknad_uuid"]?.textValue()
-                        ?: throw IllegalStateException(
-                            "Fant ikke søknad_uuid i SAF-dokument for journalpostId: $journalpostId",
-                        )
+                val søknadUuid = søknadsData["søknad_uuid"]?.textValue()
+
+                if (søknadUuid == null) {
+                    logger.warn {
+                        "Fant ikke søknad_uuid i SAF-dokument for journalpostId: $journalpostId, vi antar det er fyllut-sendinn og returnerer null"
+                    }
+                    return@runBlocking null
+                }
 
                 UUID.fromString(søknadUuid)
             } catch (e: ClientRequestException) {
