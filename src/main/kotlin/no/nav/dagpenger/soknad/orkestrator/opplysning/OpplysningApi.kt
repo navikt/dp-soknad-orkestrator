@@ -12,6 +12,8 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.put
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import no.nav.dagpenger.soknad.orkestrator.api.auth.ident
+import no.nav.dagpenger.soknad.orkestrator.api.auth.jwt
 import no.nav.dagpenger.soknad.orkestrator.api.auth.saksbehandlerId
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.SlettBarnRequestDTO
@@ -23,6 +25,17 @@ private val sikkerlogg = KotlinLogging.logger("tjenestekall.OpplysningApi")
 internal fun Application.opplysningApi(opplysningService: OpplysningService) {
     routing {
         get("/") { call.respond(HttpStatusCode.OK) }
+
+        authenticate("tokenX") {
+            route("/arbeidsforhold") {
+                get {
+                    val ident = call.ident()
+                    val token = call.request.jwt()
+                    val arbeidsforhold = opplysningService.hentArbeidsforhold(ident, token)
+                    call.respond(HttpStatusCode.OK, arbeidsforhold)
+                }
+            }
+        }
 
         authenticate("azureAd") {
             route("/opplysninger") {

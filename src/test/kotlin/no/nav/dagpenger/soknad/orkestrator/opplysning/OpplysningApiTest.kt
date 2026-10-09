@@ -17,6 +17,7 @@ import io.ktor.server.testing.testApplication
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
+import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnDataDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnResponseDTO
@@ -41,6 +42,8 @@ import kotlin.test.Test
 class OpplysningApiTest {
     val opplysningRepository = InMemoryQuizOpplysningRepository()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
+    private val aaregKlient = mockk<AaregKlient>()
+    private val enhetsregisterKlient = mockk<EnhetsregisterKlient>(relaxed = true)
     val saksbehandlerBarnRepository =
         mockk<SaksbehandlerBarnRepository>(relaxed = true).also { mock ->
             val storedBarn = mutableMapOf<UUID, List<BarnSvar>>()
@@ -57,6 +60,8 @@ class OpplysningApiTest {
             søknadRepository = søknadRepository,
             saksbehandlerBarnRepository = saksbehandlerBarnRepository,
             seksjonRepository = seksjonRepository,
+            aaregKlient = aaregKlient,
+            enhetsregisterKlient = enhetsregisterKlient,
         )
     val søknadId = UUID.randomUUID()
     val søknadbarnId = UUID.randomUUID()
@@ -66,6 +71,9 @@ class OpplysningApiTest {
         install(Authentication) {
             jwt("azureAd") {
                 azureAd()
+            }
+            jwt(name = "tokenX") {
+                tokenX()
             }
         }
         opplysningApi(opplysningService)

@@ -65,6 +65,13 @@ spec:
       value: "https://{{SAF_INGRESS}}"
     - name: SAF_SCOPE
       value: "{{SAF_SCOPE}}"
+    - name: AAREG_URL
+      value: {{AAREG_URL}}
+    - name: AAREG_AUDIENCE
+      value: {{AAREG_AUDIENCE}}
+    - name: ENHETSREGISTERET_URL
+      value: {{ENHETSREGISTERET_URL}}
+
   azure:
     application:
       enabled: true
@@ -98,6 +105,7 @@ spec:
       external:
         - host: {{PDL_API_HOST}}
         - host: {{SAF_INGRESS}}
+        - host: data.brreg.no
   tokenx:
     enabled: true
   {{#if ingresses}}
