@@ -28,7 +28,7 @@ class JournalføringService {
         // TODO: Finn riktig brevkode
         val skjemakode = "04-01.03"
 
-        logger.info("Sender journalføringsbehov for minidialog $dialogId, søknad $søknadId")
+        logger.info { "Sender journalføringsbehov for minidialog $dialogId, søknad $søknadId" }
 
         val behovNavn = "JournalføreMinidialog"
         val behovParams =
@@ -53,7 +53,7 @@ class JournalføringService {
         try {
             rapidsConnection.publish(ident, behov.toJson())
         } catch (e: Exception) {
-            logger.error("Kunne ikke sende journalføringsbehov for dialog $dialogId, søknad $søknadId", e)
+            logger.error(e) { "Kunne ikke sende journalføringsbehov for dialog $dialogId, søknad $søknadId" }
 
             throw Exception(e)
         }
