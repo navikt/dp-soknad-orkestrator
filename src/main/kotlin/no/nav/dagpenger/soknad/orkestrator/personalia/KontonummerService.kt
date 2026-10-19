@@ -46,9 +46,10 @@ class KontonummerService(
                 .let { map(it) }
         } catch (e: ClientRequestException) {
             if (e.response.status == NotFound) {
-                logger.warn("Kontonummer ikke funnet for bruker")
+                logger.warn { "Kontonummer ikke funnet for bruker" }
             } else {
-                logger.warn("Kall mot $kontoRegisterUrl feilet med klientfeil \"${e.response.status} ${e.response.bodyAsText()}\".", e)
+                val responseBody = e.response.bodyAsText()
+                logger.warn(e) { "Kall mot $kontoRegisterUrl feilet med klientfeil \"${e.response.status} $responseBody\"." }
             }
             KontonummerDto.TOM
         }
