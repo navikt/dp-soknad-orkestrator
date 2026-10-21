@@ -33,6 +33,8 @@ class OpplysningServiceTest {
             every { it.hentBarn(any()) } returns null
         }
     private val seksjonRepository = mockk<no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository>(relaxed = true)
+    private val aaregKlient = mockk<AaregKlient>(relaxed = true)
+    private val enhetsregisterKlient = mockk<EnhetsregisterKlient>(relaxed = true)
     private val opplysningService =
         OpplysningService(
             opplysningRepository = opplysningRepository,
@@ -40,6 +42,8 @@ class OpplysningServiceTest {
             søknadRepository = søknadRepository,
             saksbehandlerBarnRepository = saksbehandlerBarnRepository,
             seksjonRepository = seksjonRepository,
+            aaregKlient = aaregKlient,
+            enhetsregisterKlient = enhetsregisterKlient,
         )
 
     @Test

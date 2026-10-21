@@ -1,6 +1,6 @@
 package no.nav.dagpenger.soknad.orkestrator.opplysning
 
-import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
+import com.fasterxml.jackson.annotation.JsonProperty
 import io.github.oshai.kotlinlogging.KotlinLogging
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnDataDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BarnOpplysningDTO
@@ -21,6 +21,8 @@ import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepos
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import tools.jackson.databind.JsonNode
+import tools.jackson.module.kotlin.jacksonObjectMapper
+import java.time.LocalDate
 import java.util.UUID
 
 class OpplysningService(
@@ -29,7 +31,11 @@ class OpplysningService(
     val søknadRepository: SøknadRepository,
     val saksbehandlerBarnRepository: SaksbehandlerBarnRepository,
     val seksjonRepository: SeksjonRepository,
+    val aaregKlient: AaregKlient,
+    val enhetsregisterKlient: EnhetsregisterKlient,
 ) {
+    private val mapper = jacksonObjectMapper()
+
     fun hentBarn(søknadId: UUID): List<BarnResponseDTO> = hentAlleBarnSvar(søknadId).map { it.tilBarnResponseDTO() }
 
     internal fun hentAlleBarnSvar(søknadId: UUID): List<BarnSvar> {
@@ -387,4 +393,118 @@ class OpplysningService(
         fun tidligsteBarnetilleggFom(barn: List<BarnSvar>) =
             barn.filter { it.kvalifisererTilBarnetillegg }.mapNotNull { it.barnetilleggFom }.minOrNull()
     }
+
+    suspend fun hentArbeidsforhold(
+        fnr: String,
+        token: String,
+    ): List<Arbeidsforhold> {
+        val arbeidsforholdResponse = aaregKlient.hentArbeidsforhold(fnr, token)
+        val arbeidsforhold: List<Arbeidsforhold> =
+            mapper
+                .readTree(arbeidsforholdResponse)
+                .values()
+                .map {
+                    toArbeidsforhold(it)
+                }.plus(
+                    // Legger til et dummy-arbeidsforhold for å håndtere tilfeller der søker ikke har registrerte arbeidsforhold i AAREG
+                    Arbeidsforhold(
+                        id = "dummy",
+                        organisasjonsnummer = "991644474",
+                        organisasjonsnavn = "",
+                        startdato = LocalDate.now(),
+                        sluttdato = LocalDate.now(),
+                        sluttårsak = "dummy",
+                        arbeidstidsordning = "Ukjent",
+                    ),
+                )
+        arbeidsforhold.map {
+            it.organisasjonsnavn = enhetsregisterKlient.hentOrganisasjon(it.organisasjonsnummer!!)
+        }
+        return arbeidsforhold
+    }
+
+    data class ArbeidsforholdResponse(
+        @get:JsonProperty("id")
+        val id: kotlin.String,
+        @get:JsonProperty("startdato")
+        val startdato: java.time.LocalDate,
+        @get:JsonProperty("sluttdato")
+        val sluttdato: java.time.LocalDate? = null,
+        @get:JsonProperty("sluttårsak")
+        val sluttårsak: String? = null,
+        @get:JsonProperty("arbeidstidsordning")
+        val arbeidstidsordning: String,
+        @get:JsonProperty("organisasjonsnavn")
+        val organisasjonsnavn: kotlin.String? = null,
+    )
+
+    data class Permittering(
+        val kode: String,
+        val startdato: LocalDate,
+        val prosent: Double,
+    )
+
+    data class Arbeidsforhold(
+        val id: String,
+        val organisasjonsnummer: String?,
+        var organisasjonsnavn: String? = "",
+        val startdato: LocalDate,
+        val sluttdato: LocalDate?,
+        val sluttårsak: String?,
+        val arbeidstidsordning: String,
+        val permitteringer: List<Permittering> = emptyList(),
+    ) {
+        internal fun toResponse(organisasjonsnavn: String?) =
+            ArbeidsforholdResponse(
+                id = id,
+                startdato = startdato,
+                sluttdato = sluttdato,
+                sluttårsak = sluttårsak,
+                arbeidstidsordning = arbeidstidsordning,
+                organisasjonsnavn = organisasjonsnavn,
+            )
+    }
+
+    private fun toArbeidsforhold(aaregArbeidsforhold: JsonNode): Arbeidsforhold =
+        Arbeidsforhold(
+            id = aaregArbeidsforhold["navArbeidsforholdId"].asString(),
+            organisasjonsnummer = toOrganisasjonsnummer(aaregArbeidsforhold["arbeidssted"]),
+            organisasjonsnavn = "",
+            startdato = aaregArbeidsforhold["ansettelsesperiode"]["startdato"].asLocalDate(),
+            sluttdato = aaregArbeidsforhold["ansettelsesperiode"]["sluttdato"].asNullableLocalDate(),
+            sluttårsak =
+                aaregArbeidsforhold["ansettelsesperiode"]
+                    .get("sluttaarsak")
+                    ?.get("kode")
+                    ?.asString(),
+            arbeidstidsordning =
+                aaregArbeidsforhold["ansettelsesdetaljer"]
+                    .firstOrNull()
+                    ?.get("arbeidstidsordning")
+                    ?.get("kode")
+                    ?.asString() ?: "Ukjent",
+            permitteringer =
+                aaregArbeidsforhold["permitteringer"]
+                    ?.values()
+                    ?.map {
+                        Permittering(
+                            kode = it["type"]["kode"].asString(),
+                            startdato = it["startdato"].asLocalDate(),
+                            prosent = it["prosent"].asDouble(),
+                        )
+                    } ?: emptyList(),
+        )
+
+    private fun JsonNode?.asLocalDate(): LocalDate =
+        this?.asString()?.let { LocalDate.parse(it) } ?: throw IllegalArgumentException("Dato kan ikke være null")
+
+    private fun JsonNode?.asNullableLocalDate(): LocalDate? =
+        this?.takeUnless { it.isNull || it.isMissingNode }?.asString()?.let(LocalDate::parse)
+
+    private fun toOrganisasjonsnummer(arbeidssted: JsonNode?): String? =
+        arbeidssted
+            ?.get("identer")
+            ?.firstOrNull { it["type"].asString() == "ORGANISASJONSNUMMER" }
+            ?.get("ident")
+            ?.asString()
 }
