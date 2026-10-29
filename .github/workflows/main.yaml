@@ -7,13 +7,19 @@ on:
 
 permissions:
   contents: "read"
-  id-token: "write"
-  checks: "write"
-  pull-requests: "write"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   build:
     name: Build and publish Docker image
+    permissions:
+      contents: read
+      id-token: write
+      checks: write
+      pull-requests: write
     uses: ./.github/workflows/build.yaml
     secrets:
       NAIS_WORKLOAD_IDENTITY_PROVIDER: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
@@ -23,11 +29,15 @@ jobs:
     needs: [ build ]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
+      contents: read
       id-token: write
     environment: dev-gcp
     steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: dev-gcp
@@ -37,14 +47,18 @@ jobs:
 
   deploy-prod:
     name: Deploy to prod
-    needs: [ build, deploy-dev ]
+    needs: [ build ]
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
+      contents: read
       id-token: write
     environment: prod-gcp
     steps:
       - uses: actions/checkout@v7.0.1
+        with:
+          persist-credentials: false
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: prod-gcp
