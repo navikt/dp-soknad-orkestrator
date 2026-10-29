@@ -23,19 +23,23 @@ Begge flytene bruker `soknad`-tabellen.
 | **Nye søknader** | Tas ikke lenger imot | `POST /soknad` fra frontend |
 | **Opplysninger** | `quiz_opplysning`-tabeller (historiske data) | `seksjon_v2`-tabellen |
 | **Innsending** | – | `POST /soknad/{søknadId}` → `SøknadService.sendInn()` |
-| **Sletting** | Kafka `søknad_slettet` fra dp-soknad | `DELETE /soknad/{søknadId}` og automatisk etter 7 dager |
+| **Sletting** | Kafka-mottaket finnes, men service-laget sletter bare `PÅBEGYNT` | `DELETE /soknad/{søknadId}` for `PÅBEGYNT`, og automatisk etter 7 dager uten aktivitet |
 | **Journalføring** | – | PDF-behovkjeden (se under) |
 
 ---
 
 ## Gammel quiz-flyt
 
-Det eneste som fortsatt skjer med quiz-søknader i denne appen er sletting:
+Quiz-data leses fortsatt av behovløsere og barneredigering. Mottaket for slettemeldinger fra
+dp-soknad finnes også:
 
 ```
 dp-soknad → Kafka: søknad_slettet
   → SøknadSlettetMottak → søknadService.slettSøknadOgInkrementerMetrikk(..., kilde = "quiz")
 ```
+
+Service-metoden sletter bare søknader i `PÅBEGYNT`. Historiske quiz-søknader i `INNSENDT`
+slettes derfor ikke gjennom denne veien. Et mottatt event betyr ikke at søknaden er slettet.
 
 ### Nøkkelfiler
 
@@ -76,7 +80,8 @@ dp-behandling
 
 Sletting av ny søknad:
 
-- **Brukeren sletter:** `DELETE /soknad/{søknadId}` → `slettSøknadOgInkrementerMetrikk(..., kilde = "ny")`
+- **Brukeren sletter:** `DELETE /soknad/{søknadId}` → `slettSøknadOgInkrementerMetrikk(..., kilde = "ny")`.
+  Service-metoden sletter bare søknader i `PÅBEGYNT`.
 - **Automatisk etter 7 dager i PÅBEGYNT:** `SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb`
   kaller `SøknadService.slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()`
 
@@ -165,7 +170,7 @@ Gamle quiz-søknader startet i `INNSENDT`. Ny flyt starter i `PÅBEGYNT`, og hap
 
 Ny søknad kan også avsluttes uten å gå hele happy path:
 
-- **Brukeren sletter:** hard delete og `søknad_endret_tilstand` med `nyTilstand = "Slettet"`
+- **Brukeren sletter en PÅBEGYNT søknad:** hard delete og `søknad_endret_tilstand` med `nyTilstand = "Slettet"`
 - **Automatisk sletting:** `søknadRepository.slettSøknadSomSystem()` setter tilstanden til `SLETTET_AV_SYSTEM`
 
 Vedtaksstatus (`Status`) er ikke en tilstand. Den ligger i `soknad_status`.
@@ -182,7 +187,7 @@ Alle metrikker ligger i `metrikker/Metrikker.kt` med namespace `dp_soknad_orkest
 |---|---|
 | `antall_soknader_opprettet` | `SøknadService.opprett()` |
 | `antall_soknader_mottatt{kilde="ny"}` | `SøknadService.sendInn()` |
-| `antall_soknader_slettet{kilde}` | `kilde="ny"`: REST DELETE og automatisk sletting. `kilde="quiz"`: `SøknadSlettetMottak` |
+| `antall_soknader_slettet{kilde}` | Ved sletting, ikke ved avvist sletting. `kilde="ny"`: REST DELETE og automatisk sletting. `kilde="quiz"`: via `SøknadSlettetMottak`, bare for `PÅBEGYNT` |
 | `antall_soknader_journalfort` | `SøknadPdfOgVedleggJournalførtMottak` |
 
 ### Behov og barn

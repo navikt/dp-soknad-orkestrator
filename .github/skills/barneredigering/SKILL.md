@@ -26,6 +26,8 @@ Når appen henter barn, sjekker den kildene i denne rekkefølgen:
    `barnLagtManuelt`.
 
 Når en saksbehandler har gjort én endring, skygger `saksbehandler_barn` for den opprinnelige kilden.
+Et tomt snapshot (`[]`) betyr at søknaden ikke har barn, og stopper videre oppslag.
+Bare `null` fra `saksbehandlerBarnRepository.hentBarn()` betyr at neste kilde skal prøves.
 
 ### Skriveflyt
 
@@ -33,8 +35,11 @@ Når en saksbehandler har gjort én endring, skygger `saksbehandler_barn` for de
 
 1. Les nåværende barn etter leserekkefølgen over
 2. Gjør endringen (oppdater, legg til eller fjern)
-3. INSERT et fullt snapshot (alle barn) i `saksbehandler_barn`
-4. Send til dp-behandling med POST
+3. Send til dp-behandling med POST
+4. INSERT et fullt snapshot (alle barn) i `saksbehandler_barn`
+
+Hvis kallet til dp-behandling feiler, lagres ikke snapshotet. Unntaket er `leggTilBarn` uten
+`behandlingId`: da hoppes HTTP-kallet over, og snapshotet lagres lokalt.
 
 Appen skriver aldri til `quiz_opplysning`. `saksbehandler_barn` er eneste skrivemål.
 
@@ -80,7 +85,7 @@ Kolonnen bruker `JSON` (ikke `JSONB`) for å være lik `seksjon_v2` og bevare re
   request- og response-skjemaer. Frontend (dp-saksbehandling-frontend) bruker disse endepunktene.
   DTO-ene i `openapi/build/generated/` genereres fra spesifikasjonen.
   - **`BarnRequest`**: felles request-wrapper for POST og PUT. Har `barn: BarnData`
-    og valgfri `behandlingId: UUID?`.
+    og valgfri `behandlingId: UUID?` i skjemaet. Oppdatering krever likevel ID-en i service-laget.
   - **`BarnData`**: feltene for barnet (fornavnOgMellomnavn, etternavn, fodselsdato og så videre).
     Har ikke `barnId`, den ligger i stien for PUT.
   - **`SlettBarnRequest`**: request-body for sletting. Har `behandlingId: UUID` (påkrevd)
@@ -133,46 +138,14 @@ Kolonnen bruker `JSON` (ikke `JSONB`) for å være lik `seksjon_v2` og bevare re
 
 ## Datatyper
 
-### BarnSvar (intern domenemodell)
-```kotlin
-data class BarnSvar(
-    val barnSvarId: UUID,
-    val fornavnOgMellomnavn: String,
-    val etternavn: String,
-    val fødselsdato: LocalDate,
-    val statsborgerskap: String,        // Landkode, f.eks. "NOR"
-    val forsørgerBarnet: Boolean,
-    val fraRegister: Boolean,           // true = fra PDL, false = lagt til manuelt
-    val kvalifisererTilBarnetillegg: Boolean,
-    val barnetilleggFom: LocalDate?,    // = fødselsdato når kvalifiserer = true
-    val barnetilleggTom: LocalDate?,    // = fødselsdato + 18 år
-    val endretAv: String?,              // Saksbehandler-ID
-    val begrunnelse: String?,
-)
-```
+Se `quizOpplysning/datatyper/Barn.kt` for `BarnSvar` og
+`behov/løsere/BarnetilleggV2BehovLøser.kt` for `LøsningsbarnV2` og `BarnetilleggV2Løsning`.
 
-### LøsningsbarnV2 (sendes til dp-behandling i BarnetilleggV2Løsning.barn)
-```kotlin
-internal data class LøsningsbarnV2(
-    val fornavnOgMellomnavn: String,
-    val etternavn: String,
-    val fødselsdato: LocalDate,
-    val statsborgerskap: String,
-    val kvalifiserer: Boolean,
-    val barnetilleggFom: LocalDate?,
-    val barnetilleggTom: LocalDate?,
-    val endretAv: String?,
-    val begrunnelse: String?,
-)
-```
-
-### BarnetilleggV2Løsning (wrapper med søknadbarnId)
-```kotlin
-internal data class BarnetilleggV2Løsning(
-    val søknadbarnId: UUID?,
-    val barn: List<LøsningsbarnV2>,
-)
-```
+- `barnSvarId` identifiserer ett barn. `søknadbarnId` i `BarnetilleggV2Løsning` identifiserer
+  koblingen til søknaden, ikke et enkelt barn.
+- `fraRegister` angir om barnet kommer fra PDL. `endretAv` angir saksbehandleren som endret barnet.
+- `BarnSvar.kvalifisererTilBarnetillegg` mappes til `LøsningsbarnV2.kvalifiserer`.
+  Perioden, `endretAv` og `begrunnelse` følger med i løsningen.
 
 ## Barn i seksjon_v2
 
@@ -232,11 +205,13 @@ Krever `System.setProperty("Grupper.saksbehandler", "saksbehandler")` i oppsette
 
 ## Viktige konvensjoner
 
-- `behandlingId` kan være null i `BarnRequestDTO`. Da hopper appen over kallet til dp-behandling.
+- `behandlingId` kan være null ved `leggTilBarn`. Da hopper appen over kallet til dp-behandling.
+  Ved `oppdaterBarn` krever `sendbarnTilDpBehandling()` ID-en og kaster hvis den mangler.
 - `behandlingId` er påkrevd i `SlettBarnRequestDTO`. Sletting uten synk mot dp-behandling støttes ikke.
 - `barnId` er en path-parameter for PUT og slett, ikke en del av request-body.
-- `barnetilleggFom` og `barnetilleggTom` settes fra `Barn.barnetilleggperiode(fødselsdato)` bare når
-  `kvalifisererTilBarnetillegg == true`. Ellers er de null.
+- Ved `leggTilBarn` og lesing fra seksjon beregnes `barnetilleggFom` og `barnetilleggTom` med
+  `Barn.barnetilleggperiode(fødselsdato)` når barnet kvalifiserer. Ellers er de null.
+  Ved `oppdaterBarn` brukes datoene fra requesten, uten ny beregning fra fødselsdato.
 - Begrunnelsen ligger per barn (inne i JSON), ikke per snapshot.
 - `barn_soknad_mapping` kobler `søknadbarnId` til `søknadId` for dp-behandling.
 - objectMapper-oppsett: `FAIL_ON_UNKNOWN_PROPERTIES = false`, datoer som ISO-strenger.
