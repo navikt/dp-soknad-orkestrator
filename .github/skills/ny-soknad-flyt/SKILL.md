@@ -1,42 +1,50 @@
 ---
 name: ny-soknad-flyt
 description: |
-  Arkitektur og mønstre for ny søknad-flyt (orkestrator) vs gammel quiz-flyt i dp-soknad-orkestrator.
-  Bruk denne skillen når du jobber med søknad-livssyklus, tilstander, metrikker, Kafka-meldinger
-  eller REST-endepunkter for søknader — spesielt under og etter utrulling av ny søknad-flyt.
+  Arkitektur og mønstre for ny søknad-flyt (orkestrator) og den gamle quiz-flyten i dp-soknad-orkestrator.
+  Bruk denne skillen når du jobber med søknad-livssyklus, tilstander, vedtaksstatus, dokumentasjonskrav,
+  ettersending, metrikker, Kafka-meldinger eller REST-endepunkter for søknader.
 ---
 
-# Ny søknad-flyt vs gammel quiz-flyt
+# Ny søknad-flyt og gammel quiz-flyt
+
+Sist verifisert mot koden: oktober 2026.
 
 ## Oversikt
 
-Det finnes to søknad-flyter i dp-soknad-orkestrator som eksisterer parallelt under utrullingen
-av ny søknad. Begge flytene bruker samme `soknad`-tabell i databasen.
+Appen tar bare imot nye søknader via REST fra frontend (ny flyt). Mottaket av quiz-søknader
+(`SøknadMottak` og `SøknadMapper`) ble fjernet i #431. Quiz-data finnes fortsatt i databasen for
+historiske søknader, og behovløsere og barneredigering leser dem som fallback.
 
-| | Gammel flyt (quiz)         | Ny flyt (orkestrator) |
-|---|----------------------------|---|
-| **Opprinnelse** | -                          | REST API fra frontend |
-| **Trigger** | -                          | `POST /soknad` |
-| **Mottak** | -                          | `SøknadApi` + `SøknadService.opprett()` |
-| **Opplysninger** | `quiz_opplysning`-tabeller | `seksjon_v2`-tabell |
-| **Innsending** | -                          | `POST /soknad/{id}` → `sendInn()` |
-| **Journalføring** | -                          | Via PDF-behov-kjede |
+Begge flytene bruker `soknad`-tabellen.
+
+| | Gammel flyt (quiz) | Ny flyt (orkestrator) |
+|---|---|---|
+| **Nye søknader** | Tas ikke lenger imot | `POST /soknad` fra frontend |
+| **Opplysninger** | `quiz_opplysning`-tabeller (historiske data) | `seksjon_v2`-tabellen |
+| **Innsending** | – | `POST /soknad/{søknadId}` → `SøknadService.sendInn()` |
+| **Sletting** | Kafka-mottaket finnes, men service-laget sletter bare `PÅBEGYNT` | `DELETE /soknad/{søknadId}` for `PÅBEGYNT`, og automatisk etter 7 dager uten aktivitet |
+| **Journalføring** | – | PDF-behovkjeden (se under) |
 
 ---
 
 ## Gammel quiz-flyt
 
-### Livssyklus
+Quiz-data leses fortsatt av behovløsere og barneredigering. Mottaket for slettemeldinger fra
+dp-soknad finnes også:
 
-Sletting av gammel søknad skjer via Kafka:
 ```
 dp-soknad → Kafka: søknad_slettet
-  → SøknadSlettetMottak → søknadService.slettSøknadOgInkrementerMetrikk(..., kilde="quiz")
+  → SøknadSlettetMottak → søknadService.slettSøknadOgInkrementerMetrikk(..., kilde = "quiz")
 ```
 
+Service-metoden sletter bare søknader i `PÅBEGYNT`. Historiske quiz-søknader i `INNSENDT`
+slettes derfor ikke gjennom denne veien. Et mottatt event betyr ikke at søknaden er slettet.
+
 ### Nøkkelfiler
-- `søknad/mottak/SøknadSlettetMottak.kt` — Kafka-lytter for `søknad_slettet`
-- `quizOpplysning/` — Alle datatyper og repository for quiz-opplysninger
+
+- `søknad/mottak/SøknadSlettetMottak.kt`: Kafka-lytter for `søknad_slettet`
+- `quizOpplysning/`: datatyper og repository for quiz-opplysninger
 
 ---
 
@@ -50,32 +58,99 @@ Frontend
     → SøknadService.opprett()                  → Tilstand: PÅBEGYNT
     → Kafka: søknad_endret_tilstand (PÅBEGYNT)
 
-  → PUT /seksjon/{søknadId}/{seksjonId}        → SeksjonService lagrer svar
-  → POST /soknad/{id}                          → SøknadService.sendInn()
+  → PUT /seksjon/{søknadId}/{seksjonId}        → SeksjonService.lagre()
+    → Kafka: paabegynt_soknad_seksjon          (statistikk, SeksjonDataTilStatistikk)
+
+  → POST /soknad/{søknadId}                    → SøknadService.sendInn()
     → Kafka: søknad_klar_til_journalføring
       → MeldingOmSøknadKlarTilJournalføringMottak
         → søknadRepository.markerSøknadSomInnsendt() → Tilstand: INNSENDT
+        → Kafka: søknad_endret_tilstand (INNSENDT)
+        → Kafka: dokumentkrav_innsendt
         → Kafka: behov generer_og_mellomlagre_søknad_pdf
           → SøknadPdfGenerertOgMellomlagretMottak
             → Kafka: behov journalfør_søknad_pdf_og_vedlegg
               → SøknadPdfOgVedleggJournalførtMottak
                 → søknadRepository.markerSøknadSomJournalført() → Tilstand: JOURNALFØRT
+
+dp-behandling
+  → Kafka: søknadsbehandling_ferdig
+    → SøknadsbehandlingFerdigMottak → søknadStatusRepository.lagre()  (tabellen soknad_status)
 ```
 
 Sletting av ny søknad:
-- **Bruker-initiert:** `DELETE /soknad/{id}` → `slettSøknadOgInkrementerMetrikk(..., kilde="ny")`
-- **Automatisk (7 dager påbegynt):** `slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()`
+
+- **Brukeren sletter:** `DELETE /soknad/{søknadId}` → `slettSøknadOgInkrementerMetrikk(..., kilde = "ny")`.
+  Service-metoden sletter bare søknader i `PÅBEGYNT`.
+- **Automatisk etter 7 dager i PÅBEGYNT:** `SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb`
+  kaller `SøknadService.slettSøknaderSomErPåbegyntOgIkkeOppdatertPå7Dager()`
+
+### Ettersending av dokumentasjon
+
+Etter innsending kan brukeren ettersende dokumentasjon:
+
+```
+Frontend
+  → PUT /seksjon/{søknadId}/{seksjonId}/dokumentasjonskrav/ettersending
+    → SeksjonService.lagreDokumentasjonskravEttersending()
+      (krever tilstand INNSENDT eller JOURNALFØRT)
+      → Kafka: behov journalfør_ettersending_av_dokumentasjon  (type ETTERSENDING_TIL_DIALOG)
+        → MeldingOmEttersendingMottak (på løsningen)
+          → seksjonRepository.lagreDokumentasjonskravEttersending()
+          → søknadRepository.lagreEttersendingJournalpostId()
+          → Kafka: dokumentkrav_innsendt
+```
+
+### Vedtaksstatus
+
+`SøknadsbehandlingFerdigMottak` lytter på `søknadsbehandling_ferdig` fra dp-behandling og lagrer
+resultatet i `soknad_status` via `SøknadStatusRepository`. Feltet `førteTil` mappes til
+`Status`-enumen: `Innvilgelse`, `Avslag`, `Stans`, `Gjenopptak`, `Endring` eller `Ukjent`.
+Ukjente verdier lagres som `Ukjent`. Meldingen ignoreres hvis identen ikke eier søknaden.
+
+`GET /soknad/mine-soknader` returnerer siste status som `søknadVedtak` i `SøknadForIdent`.
+
+### REST-endepunkter
+
+`søknad/SøknadApi.kt`:
+
+| Metode og sti | Formål |
+|---|---|
+| `POST /soknad` | Oppretter søknad |
+| `GET /soknad/mine-soknader` | Søknader for innlogget bruker, med tittel, manglende dokumentasjonskrav og `søknadVedtak` |
+| `POST /soknad/{søknadId}` | Sender inn søknaden |
+| `DELETE /soknad/{søknadId}` | Sletter søknaden |
+| `GET /soknad/{søknadId}/progress` | Seksjons-ID-er som er lagret |
+| `GET /soknad/{søknadId}/dokumentasjonskrav` | Dokumentasjonskrav for søknaden |
+| `PUT /soknad/{søknadId}/personalia` | Lagrer personalia |
+| `GET /soknad/{søknadId}/sistoppdatert` | Sist oppdatert-tidspunkt |
+
+`søknad/seksjon/SeksjonApi.kt`:
+
+| Metode og sti | Formål |
+|---|---|
+| `PUT /seksjon/{søknadId}/{seksjonId}` | Lagrer seksjonssvar, dokumentasjonskrav og PDF-grunnlag |
+| `GET /seksjon/{søknadId}/{seksjonId}` | Henter én seksjon |
+| `PUT /seksjon/{søknadId}/{seksjonId}/dokumentasjonskrav` | Lagrer dokumentasjonskrav før innsending |
+| `PUT /seksjon/{søknadId}/{seksjonId}/dokumentasjonskrav/ettersending` | Ettersender dokumentasjon |
+| `GET /seksjon/{søknadId}` | Henter alle seksjoner |
 
 ### Nøkkelfiler
 
-- `søknad/SøknadApi.kt` — REST-endepunkter: `POST /soknad`, `DELETE /soknad/{id}`, `POST /soknad/{id}`
-- `søknad/SøknadService.kt` — Forretningslogikk for opprett, sendInn, slett
-- `søknad/seksjon/SeksjonApi.kt` — REST-endepunkter for seksjon-svar under `/seksjon/{søknadId}/{seksjonId}`
-- `søknad/seksjon/SeksjonService.kt` — Lagring og henting av seksjoner
-- `søknad/seksjon/SeksjonRepository.kt` — DB-tilgang mot `seksjon_v2`-tabellen
-- `søknad/melding/MeldingOmSøknadKlarTilJournalføringMottak.kt` — Starter PDF-kjeden
-- `søknad/mottak/SøknadPdfGenerertOgMellomlagretMottak.kt` — Mellomsteg i PDF-kjeden
-- `søknad/mottak/SøknadPdfOgVedleggJournalførtMottak.kt` — Avslutter journalføring
+- `søknad/SøknadApi.kt`: REST-endepunkter under `/soknad`
+- `søknad/SøknadService.kt`: opprett, sendInn, slett, mine søknader, skjemakode
+- `søknad/seksjon/SeksjonApi.kt`: REST-endepunkter under `/seksjon`
+- `søknad/seksjon/SeksjonService.kt`: lagring av seksjoner, dokumentasjonskrav og ettersending
+- `søknad/seksjon/SeksjonRepository.kt`: DB-tilgang mot `seksjon_v2`
+- `søknad/melding/MeldingOmSøknadKlarTilJournalføringMottak.kt`: starter PDF-kjeden
+- `søknad/mottak/SøknadPdfGenerertOgMellomlagretMottak.kt`: mellomsteg i PDF-kjeden
+- `søknad/mottak/SøknadPdfOgVedleggJournalførtMottak.kt`: avslutter journalføringen
+- `søknad/mottak/MeldingOmEttersendingMottak.kt`: tar imot løsningen på ettersending
+- `søknad/mottak/SøknadsbehandlingFerdigMottak.kt`: lagrer vedtaksstatus
+- `søknad/db/SøknadStatusRepository.kt`: DB-tilgang mot `soknad_status`
+- `søknad/jobb/SlettSøknaderSomErPåbegyntOgIkkeOppdatertPå7DagerJobb.kt`: automatisk sletting
+- `søknad/jobb/RekjørJournalføringForSøknaderJobb.kt`: engangsjobb med hardkodet liste over
+  søknad-ID-er som skal journalføres på nytt. Startes fra `ApplicationBuilder`.
 
 ---
 
@@ -83,48 +158,53 @@ Sletting av ny søknad:
 
 ```kotlin
 enum class Tilstand {
-    PÅBEGYNT,           // Ny flyt: opprettet men ikke sendt inn
-    INNSENDT,           // Begge flyter: innsendt/mottatt
-    JOURNALFØRT,        // Begge flyter: journalført
-    SLETTET_AV_SYSTEM,  // Automatisk slettet etter 7 dager uten aktivitet
+    PÅBEGYNT,           // Opprettet, ikke sendt inn
+    INNSENDT,           // Sendt inn
+    JOURNALFØRT,        // Journalført
+    SLETTET_AV_SYSTEM,  // Slettet automatisk etter 7 dager uten aktivitet
 }
 ```
 
-Gammel flyt starter direkte i `INNSENDT` (quiz-søknaden er allerede innsendt når den ankommer).
-Ny flyt starter i `PÅBEGYNT`. Happy path er `PÅBEGYNT → INNSENDT → JOURNALFØRT`.
+Gamle quiz-søknader startet i `INNSENDT`. Ny flyt starter i `PÅBEGYNT`, og happy path er
+`PÅBEGYNT → INNSENDT → JOURNALFØRT`.
 
 Ny søknad kan også avsluttes uten å gå hele happy path:
 
-- **Bruker-initiert sletting:** hard delete + `søknad_endret_tilstand` med `nyTilstand = "Slettet"`
-- **Automatisk sletting:** `slettSøknadSomSystem()` setter tilstand til `SLETTET_AV_SYSTEM`
+- **Brukeren sletter en PÅBEGYNT søknad:** hard delete og `søknad_endret_tilstand` med `nyTilstand = "Slettet"`
+- **Automatisk sletting:** `søknadRepository.slettSøknadSomSystem()` setter tilstanden til `SLETTET_AV_SYSTEM`
+
+Vedtaksstatus (`Status`) er ikke en tilstand. Den ligger i `soknad_status`.
 
 ---
 
 ## Metrikker
 
-Alle metrikker er under namespace `dp_soknad_orkestrator`.
+Alle metrikker ligger i `metrikker/Metrikker.kt` med namespace `dp_soknad_orkestrator`.
 
-### Delte metrikker (med `kilde`-label)
+### Søknad (`SøknadMetrikker`)
 
-| Metrikk | `kilde="ny"` | `kilde="quiz"` |
-|---|---|---|
-| `antall_soknader_mottatt{kilde}` | `SøknadService.sendInn()` |
-| `antall_soknader_slettet{kilde}` | REST DELETE + auto-slett | `SøknadSlettetMottak` |
-
-### Ny flyt-spesifikke metrikker
-
-| Metrikk | Når |
+| Metrikk | Økes i |
 |---|---|
-| `antall_soknader_opprettet` | `SøknadService.opprett()` — søknad i PÅBEGYNT |
-| `antall_soknader_journalfort` | `SøknadPdfOgVedleggJournalførtMottak` — vellykket journalføring |
+| `antall_soknader_opprettet` | `SøknadService.opprett()` |
+| `antall_soknader_mottatt{kilde="ny"}` | `SøknadService.sendInn()` |
+| `antall_soknader_slettet{kilde}` | Ved sletting, ikke ved avvist sletting. `kilde="ny"`: REST DELETE og automatisk sletting. `kilde="quiz"`: via `SøknadSlettetMottak`, bare for `PÅBEGYNT` |
+| `antall_soknader_journalfort` | `SøknadPdfOgVedleggJournalførtMottak` |
 
-### Gammel flyt-spesifikke metrikker
+### Behov og barn
 
-| Metrikk | Når |
+| Metrikk | Økes i |
 |---|---|
-| `antall_soknader_varslet` | `publiserMeldingOmSøknadInnsendt()` |
-| `antall_soknader_dekomponert` | `SøknadMapper` — vellykket dekomponering |
-| `antall_soknader_dekomponering_feilet` | `SøknadMapper` — feilet dekomponering |
+| `antall_behov_mottatt{behov}` (`BehovMetrikker.mottatt`) | `BehovMottak` |
+| `antall_behov_lost{behov}` (`BehovMetrikker.løst`) | `Behovløser.publiserLøsning()` |
+| `antall_endringer_barn` (`OpplysningMetrikker.endringBarn`) | `OpplysningApi`, ved endring av barn |
+
+### Metrikker uten aktive kallere
+
+Disse er definert i `SøknadMetrikker`, men ingen kode øker dem etter at quiz-mottaket ble fjernet i #431.
+Avklar med teamet om de fortsatt brukes i Grafana før du sletter dem eller bygger på dem.
+
+- `antall_soknader_varslet`: økes bare i `SøknadService.publiserMeldingOmSøknadInnsendt()`, som ikke har kallere
+- `antall_soknader_dekomponert` og `antall_soknader_dekomponering_feilet`: ble økt i `SøknadMapper`, som er slettet
 
 ### Typisk Grafana-funnel for ny søknad
 
@@ -132,59 +212,66 @@ Alle metrikker er under namespace `dp_soknad_orkestrator`.
 opprettet → mottatt{kilde="ny"} → journalfort
 ```
 
-Under gradvis utrulling, sammenlign:
-```
-mottatt{kilde="ny"} vs mottatt{kilde="quiz"}
-```
-
 ---
 
 ## Database
 
-Begge flyter bruker `soknad`-tabellen (`SøknadTabell`). Skillet:
+| Tabell | Innhold |
+|---|---|
+| `soknad` (`SøknadTabell`) | Søknaden, tilstand og tidspunkter. Delt av begge flyter |
+| `seksjon_v2` (`SeksjonV2Tabell`) | Seksjonssvar, dokumentasjonskrav og PDF-grunnlag for ny flyt |
+| `soknad_status` (`SøknadStatusTabell`) | Vedtaksstatus fra `søknadsbehandling_ferdig` |
+| `quiz_opplysning`-tabellene | Historiske quiz-opplysninger |
 
-- **Gammel flyt:** Bruker også `quiz_opplysning`-tabellene. `søknad.opplysninger` er ikke-tom.
-- **Ny flyt:** Bruker `seksjon_v2`-tabellen. `søknad.opplysninger` er alltid tom.
+Slik skiller du flytene når du har en `Søknad`-instans:
 
 ```kotlin
-// Praktisk heuristikk for gammel quiz-søknad:
+// Gammel quiz-søknad
 søknad.opplysninger.isNotEmpty()
 
-// Praktisk heuristikk for ny søknad:
+// Ny søknad
 søknad.opplysninger.isEmpty()
 ```
 
-Dette er en nyttig heuristikk når du allerede har en `Søknad`-instans, men det er ikke et
-eksplisitt kildefelt i domenemodellen.
+Dette er en heuristikk. Domenemodellen har ikke et eget kildefelt.
 
 ---
 
 ## Kafka-meldinger
 
-### Gammel flyt — inn
+### Inn
 
-| Event | Kilde | Håndteres av |
+| Event / behov | Kilde | Håndteres av |
 |---|---|---|
 | `søknad_slettet` | dp-soknad | `SøknadSlettetMottak` |
+| `søknad_klar_til_journalføring` | denne appen | `MeldingOmSøknadKlarTilJournalføringMottak` |
+| løsning på `generer_og_mellomlagre_søknad_pdf` | ekstern behovløser | `SøknadPdfGenerertOgMellomlagretMottak` |
+| løsning på `journalfør_søknad_pdf_og_vedlegg` | ekstern behovløser | `SøknadPdfOgVedleggJournalførtMottak` |
+| løsning på `journalfør_ettersending_av_dokumentasjon` | ekstern behovløser | `MeldingOmEttersendingMottak` |
+| `søknadsbehandling_ferdig` | dp-behandling | `SøknadsbehandlingFerdigMottak` |
 
-### Ny flyt — ut
+### Ut
 
-| Event | Utgiver | Innhold |
+| Event / behov | Sendes fra | Innhold |
 |---|---|---|
-| `søknad_endret_tilstand` | `SøknadService` | Tilstandsendring (PÅBEGYNT/INNSENDT/Slettet) |
-| `søknad_klar_til_journalføring` | `SøknadService.sendInn()` | Trigger for PDF-kjeden |
-| `behov generer_og_mellomlagre_søknad_pdf` | `MeldingOmSøknadKlarTilJournalføringMottak` | PDF-generering |
-| `behov journalfør_søknad_pdf_og_vedlegg` | `SøknadPdfGenerertOgMellomlagretMottak` | Journalføring |
-| `dokumentkrav_innsendt` | `MeldingOmSøknadKlarTilJournalføringMottak` | Dokumentasjonskrav |
+| `søknad_endret_tilstand` | `SøknadService`, `MeldingOmSøknadKlarTilJournalføringMottak` | Tilstandsendring (PÅBEGYNT, INNSENDT, Slettet) |
+| `paabegynt_soknad_seksjon` | `SeksjonService.lagre()` | Statistikk om lagrede seksjoner |
+| `søknad_klar_til_journalføring` | `SøknadService.sendInn()` | Starter PDF-kjeden |
+| behov `generer_og_mellomlagre_søknad_pdf` | `MeldingOmSøknadKlarTilJournalføringMottak` | PDF-generering |
+| behov `journalfør_søknad_pdf_og_vedlegg` | `SøknadPdfGenerertOgMellomlagretMottak` | Journalføring |
+| `dokumentkrav_innsendt` | `MeldingOmSøknadKlarTilJournalføringMottak`, `MeldingOmEttersendingMottak` | Dokumentasjonskrav |
+| behov `journalfør_ettersending_av_dokumentasjon` | `SeksjonService` | Ettersending |
 
 ---
 
 ## Viktige konvensjoner
 
-- Begge flyter bruker `slettSøknadOgInkrementerMetrikk(søknadId, ident, kilde)` — pass alltid
-  riktig `kilde` (`"ny"` eller `"quiz"`) siden dette driver metrikk-labelen.
-- Auto-sletting (7 dager) bruker `slettSøknadSomSystem()` + `SøknadMetrikker.slettet.labelValues("ny")` —
-  disse søknadene er alltid ny flyt siden gammel flyt aldri er i PÅBEGYNT.
-- `hentSøknaderForIdent()` bruker inner join med `seksjon_v2` — derfor vises ikke søknader uten
-  rader i `seksjon_v2` i oversikten. Det gjelder både gamle quiz-søknader og nye søknader som er
-  opprettet, men som ennå ikke har lagret noen seksjoner.
+- `slettSøknadOgInkrementerMetrikk(søknadId, ident, kilde)` brukes av begge flyter. Send alltid riktig
+  `kilde` (`"ny"` eller `"quiz"`), siden den styrer metrikk-labelen.
+- Automatisk sletting bruker `slettSøknadSomSystem()` og `SøknadMetrikker.slettet.labelValues("ny")`.
+  Disse søknadene er alltid ny flyt, siden gamle søknader aldri var i PÅBEGYNT.
+- `SøknadRepository.hentSoknaderForIdent()` gjør inner join med `seksjon_v2` og left join med
+  `soknad_status`. Søknader uten rader i `seksjon_v2` vises derfor ikke i mine søknader. Det gjelder
+  gamle quiz-søknader og nye søknader uten lagrede seksjoner.
+- Mottak som får `søknadId` og `ident` fra Kafka sjekker at identen eier søknaden før de skriver.
+  Følg samme mønster i nye mottak.

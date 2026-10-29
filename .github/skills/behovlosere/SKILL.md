@@ -8,6 +8,8 @@ description: |
 
 # Behovløsere i dp-soknad-orkestrator
 
+Sist verifisert mot koden: oktober 2026.
+
 ## Hva er en behovløser?
 
 En behovløser lytter på Kafka etter meldinger med `@event_name: "behov"` som inneholder et spesifikt
@@ -35,6 +37,10 @@ For **vanlige behovløsere** er datakilde-prioriteten som regel:
 1. **`quiz_opplysning`-tabellen** — quiz-søknad (gammel flyt). Hentes via `opplysningRepository.hent(beskrivendeId, ident, søknadId)`.
 2. **`seksjon_v2`-tabellen** — ny søknad-flyt. Hentes via `seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, seksjonId)`.
 
+Appen tar ikke lenger imot quiz-søknader (fjernet i #431), så quiz-oppslaget treffer bare historiske
+søknader. Nye søknader har bare data i `seksjon_v2`. Basisklassen krever likevel en `beskrivendeId`,
+og quiz-fallbacken må beholdes så lenge behov for gamle søknader kan komme inn.
+
 Seksjonsdata er JSON med struktur `{ "seksjonId": "...", "seksjonsvar": { ... }, "versjon": N }`.
 Feltverdiene ligger inne i `seksjonsvar`. Koden bruker Jacksons `findPath(feltNavn)` som søker
 rekursivt — du trenger ikke navigere ned til `seksjonsvar` manuelt.
@@ -60,7 +66,8 @@ Alle løsninger publiseres med dette formatet:
 ```
 
 `gjelderFra` settes automatisk til søknadstidspunktet (fra quiz-opplysning `søknadstidspunkt` eller
-`søknadRepository.hent(søknadId)?.innsendtTidspunkt`).
+`søknadRepository.hent(søknadId)?.innsendtTidspunkt`). Mangler tidspunktet, blir verdien `null`.
+Unntaket er `Søknadsdata`: overloaden med `SøknadBehovmelding` setter alltid `gjelderFra = null`.
 
 ## Typer behovløsere
 
@@ -71,13 +78,13 @@ Bruker basisklassemetoden `løsBehovFraSeksjonsData`. Prøver quiz-repo først, 
 **Eksempel:** `KanJobbeHvorSomHelstBehovløser`, `EgetGårdsbrukBehovløser`, `EgenNæringsvirksomhetBehovløser`
 
 ```kotlin
-class MittBehovBehovløser(
+class MittNyttBehovBehovløser(
     rapidsConnection: RapidsConnection,
     opplysningRepository: QuizOpplysningRepository,
     søknadRepository: SøknadRepository,
     seksjonRepository: SeksjonRepository,
 ) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository) {
-    override val behov = MittBehov.name
+    override val behov = MittNyttBehov.name
     override val beskrivendeId = "faktum.mitt-faktum-id"   // Fra quiz-appen, ikke finn opp nye
 
     override fun løs(behovmelding: Behovmelding) {
@@ -140,6 +147,11 @@ Kjennetegn:
 - behovet ligger **ikke** i `BehovløserFactory.Behov`
 - du bruker `override fun løs(behovmelding: SøknadBehovmelding)`
 - du trenger et eget mottak som registreres i `ApplicationBuilder`
+- testmeldinger lages med `lagBehovmeldingUtenSøknadId(ident)` fra `PacketGenerator.kt`
+
+`SøknadsdataBehovMottak` har en hardkodet `behovIdSkipSet` med `@behovId`-er som ignoreres. Den brukes
+til å hoppe over enkeltmeldinger som feiler i prod (#516). Dette er et midlertidig driftstiltak.
+Avklar endringer i listen særskilt med teamet, ikke endre den som del av generell opprydding.
 
 ## Steg-for-steg: Legge til en ny behovløser
 
@@ -154,33 +166,10 @@ Start alltid med dette:
 
 ### 1. Lag behovløseren
 
-Opprett `src/main/kotlin/.../behov/løsere/MittNyttBehovBehovløser.kt`:
-
-```kotlin
-package no.nav.dagpenger.soknad.orkestrator.behov.løsere
-
-import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
-import no.nav.dagpenger.soknad.orkestrator.behov.Behovløser
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.MittNyttBehov
-import no.nav.dagpenger.soknad.orkestrator.behov.Behovmelding
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.db.QuizOpplysningRepository
-import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
-import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
-
-class MittNyttBehovBehovløser(
-    rapidsConnection: RapidsConnection,
-    opplysningRepository: QuizOpplysningRepository,
-    søknadRepository: SøknadRepository,
-    seksjonRepository: SeksjonRepository,
-) : Behovløser(rapidsConnection, opplysningRepository, søknadRepository, seksjonRepository) {
-    override val behov = MittNyttBehov.name
-    override val beskrivendeId = "faktum.mitt-faktum-id"
-
-    override fun løs(behovmelding: Behovmelding) {
-        løsBehovFraSeksjonsData(behovmelding, "seksjon-id", "feltNavn")
-    }
-}
-```
+Opprett `src/main/kotlin/.../behov/løsere/MittNyttBehovBehovløser.kt`.
+For en enkel boolean, bruk eksemplet under Type 1 og
+`behov/løsere/KanJobbeHvorSomHelstBehovløser.kt` som utgangspunkt.
+Bruk verifiserte verdier for `beskrivendeId`, seksjons-ID og feltnavn.
 
 ### 2. Legg til i `Behov`-enum i `BehovløserFactory.kt`
 
@@ -223,97 +212,17 @@ behovløserFactory.behov().shouldContainExactlyInAnyOrder(
 
 ### 5. Skriv test
 
-Opprett `src/test/kotlin/.../behov/løsere/MittNyttBehovBehovløserTest.kt`:
+Opprett `src/test/kotlin/.../behov/løsere/MittNyttBehovBehovløserTest.kt`.
+Følg `src/test/kotlin/no/nav/dagpenger/soknad/orkestrator/behov/løsere/KanJobbeHvorSomHelstBehovløserTest.kt`
+for en enkel boolean med quiz/seksjon-fallback. Den viser oppsett med `TestRapid`,
+quiz-data og mockede seksjonsdata.
 
-```kotlin
-package no.nav.dagpenger.soknad.orkestrator.behov.løsere
-
-import com.github.navikt.tbd_libs.rapids_and_rivers.asLocalDate
-import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
-import io.kotest.matchers.shouldBe
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
-import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Boolsk
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Tekst
-import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
-import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
-import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
-import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
-import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
-import java.time.ZonedDateTime
-import java.util.UUID
-import kotlin.test.Test
-
-class MittNyttBehovBehovløserTest {
-    val opplysningRepository = InMemoryQuizOpplysningRepository()
-    val testRapid = TestRapid()
-    val søknadRepository = mockk<SøknadRepository>(relaxed = true)
-    val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
-    val behovløser = MittNyttBehovBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
-    val ident = "12345678910"
-    val søknadId = UUID.randomUUID()
-
-    @Test
-    fun `skal publisere løsning fra quiz-opplysning`() {
-        opplysningRepository.lagre(
-            QuizOpplysning(
-                beskrivendeId = behovløser.beskrivendeId,
-                type = Boolsk,
-                svar = true,
-                ident = ident,
-                søknadId = søknadId,
-            ),
-        )
-        val søknadstidspunkt = ZonedDateTime.now()
-        opplysningRepository.lagre(
-            QuizOpplysning(
-                beskrivendeId = "søknadstidspunkt",
-                type = Tekst,
-                svar = søknadstidspunkt.toString(),
-                ident = ident,
-                søknadId = søknadId,
-            ),
-        )
-
-        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.MittNyttBehov))
-
-        testRapid.inspektør.message(0)["@løsning"]["MittNyttBehov"].also { løsning ->
-            løsning["verdi"].asBoolean() shouldBe true
-            løsning["gjelderFra"].asLocalDate() shouldBe søknadstidspunkt.toLocalDate()
-        }
-    }
-
-    @Test
-    fun `skal publisere løsning fra seksjonsdata`() {
-        every { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) } returns
-            """
-            {
-              "seksjonId": "seksjon-id",
-              "seksjonsvar": { "feltNavn": "ja" },
-              "versjon": 1
-            }
-            """.trimIndent()
-        every { søknadRepository.hent(any()) } returns
-            Søknad(
-                søknadId = søknadId,
-                ident = ident,
-                tilstand = Tilstand.INNSENDT,
-                innsendtTidspunkt = ZonedDateTime.now().toLocalDateTime(),
-            )
-
-        behovløser.løs(lagBehovmelding(ident, søknadId, BehovløserFactory.Behov.MittNyttBehov))
-
-        verify { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "seksjon-id") }
-        testRapid.inspektør.message(0)["@løsning"]["MittNyttBehov"]["verdi"].asBoolean() shouldBe true
-    }
-}
-```
+Dekk løsning fra hver støttet kilde, forventet `verdi` og `gjelderFra`, og oppførselen ved
+manglende data etter behovets kontrakt.
 
 Test-hjelpere tilgjengelig:
 - `lagBehovmelding(ident, søknadId, behov)` — fra `PacketGenerator.kt`
+- `lagBehovmeldingUtenSøknadId(ident)` — fra `PacketGenerator.kt`, for behov av type 4
 - `InMemoryQuizOpplysningRepository` — in-memory repo for quiz-opplysninger
 - bruk eksplisitt `Søknad(...)` når testen trenger fallback til `gjelderFra` fra `søknadRepository`
 
@@ -328,7 +237,8 @@ Test-hjelpere tilgjengelig:
 | `behov/FellesBehovløserLøsninger.kt` | Delt logikk for EØS, verneplikt, søknadsdato |
 | `behov/Behovmelding.kt` | Wrappere rundt `JsonMessage`: `Behovmelding` for vanlige behov og `SøknadBehovmelding` for behov uten `søknadId` |
 | `behov/løsere/*.kt` | Én fil per behovløser |
-| `test/.../behov/løsere/PacketGenerator.kt` | `lagBehovmelding(...)` test-helper |
+| `test/.../behov/løsere/PacketGenerator.kt` | `lagBehovmelding(...)` og `lagBehovmeldingUtenSøknadId(...)` |
+| `metrikker/Metrikker.kt` | `BehovMetrikker.mottatt` (i `BehovMottak`) og `BehovMetrikker.løst` (i `publiserLøsning`) |
 | `test/.../utils/InMemoryQuizOpplysningRepository.kt` | In-memory repo for tester |
 
 ## Viktige konvensjoner
@@ -336,24 +246,17 @@ Test-hjelpere tilgjengelig:
 - **`beskrivendeId`-verdier** (f.eks. `faktum.jobbe-hele-norge`) defineres av quiz-appen. Ikke finn opp nye — bruk det som allerede finnes i inkommende data.
 - **Feilhåndtering følger behovets kontrakt**: mange boolean-behov kaster `IllegalStateException`, men noen behov har bevisste defaults eller tomme svar (`ØnsketArbeidstid`, `Barnetillegg`, `Søknadsdata`).
 - **Boolean i seksjonsvar** er strenger `"ja"`/`"nei"` — bruk `it.erBoolean()` (extension i `utils/`).
-- **`gjelderFra`** trenger du ikke sette manuelt — `publiserLøsning` gjør det via `finnGjelderFraDato`.
+- **`gjelderFra`** settes av `publiserLøsning` via `finnGjelderFraDato` for vanlige behov.
+  For `SøknadBehovmelding` settes verdien alltid til `null`.
 - **`Søknadsdata` er et unntak** — det bruker `SøknadBehovmelding`, eget mottak og ligger ikke i `BehovløserFactory.Behov`.
 - **Logger:** bruk `logger` for normal logging, `sikkerlogg` hvis du logger persondata (ident, svar).
 - **Navngivning:** klassen heter `<BehovNavn>Behovløser`, filen tilsvarende. Unntak: `BarnetilleggBehovLøser` / `BarnetilleggV2BehovLøser` bruker `BehovLøser` (historisk inkonsistens — følg `Behovløser`-mønsteret for nye).
 
-## Åpne spørsmål
+## Håndtering av manglende seksjoner
 
-### Håndtering av manglende seksjoner
-
-Det er ikke en enhetlig strategi i kodebasen for hva som skal skje når en seksjon mangler:
-
-- Noen behovløsere kaster exception (`hentSeksjonsvarEllerKastException`) — appen feiler og det blir synlig
-- Noen returnerer en fallback-verdi (f.eks. `false`) — stille og usynlig
-- Noen har domenespesifikke defaults (f.eks. tom liste)
-
-**Spørsmål som bør avklares:** Når er det riktig å feile hardt vs. falle tilbake til en default?
-Avhenger trolig av om behovet er et filter (der `false` er en meningsfull verdi) eller et faktum
-(der manglende data er et tegn på noe galt). Bør diskuteres og standardiseres.
+Bevar oppførselen til det konkrete behovet. Noen behovløsere kaster exception, mens andre
+returnerer `false` eller en tom liste. Avklar behovets kontrakt før du innfører eller endrer
+en default. Ikke standardiser feilhåndteringen på tvers av behov som del av en avgrenset endring.
 
 ## Feil å unngå
 

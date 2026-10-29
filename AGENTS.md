@@ -79,7 +79,8 @@ the incoming data from the quiz.
 
 - Tables are defined as Exposed `Table` objects (e.g., `SaksbehandlerBarnTabell`)
 - Repositories use Exposed DSL for queries
-- Migrations: Flyway-style via Exposed
+- Migrations: Flyway SQL scripts in `src/main/resources/db/migration/` (`V<n>__DESCRIPTION.sql`),
+  run by `PostgresDataSourceBuilder`
 - Always wrap DB operations in `transaction { }`
 
 ### Configuration

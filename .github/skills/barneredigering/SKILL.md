@@ -1,174 +1,155 @@
 ---
 name: barneredigering
 description: |
-  Barn (child) editing for saksbehandlere in dp-soknad-orkestrator.
-  Use this skill when working on barn-related features: editing, adding, deleting, or fetching
-  children in søknader, the saksbehandler_barn table, barn behovløsere, or the
-  dp-behandling integration for barn opplysninger.
+  Saksbehandlers redigering av barn i dp-soknad-orkestrator.
+  Bruk denne skillen når du jobber med barn i søknader: redigere, legge til, slette eller hente barn,
+  tabellen saksbehandler_barn, barn-behovløsere eller integrasjonen mot dp-behandling for barn-opplysninger.
 ---
 
-# Barneredigering — Saksbehandler barn editing
+# Barneredigering for saksbehandlere
 
-## Architecture overview
+Sist verifisert mot koden: oktober 2026.
 
-Saksbehandlere can view, edit, add, and delete barn (children) for a søknad. The system supports
-both the old quiz-søknad and the new seksjon_v2 søknad format through a unified read/write
-layer.
+## Arkitektur
 
-### Read priority chain
+Saksbehandlere kan se, endre, legge til og slette barn i en søknad. Samme lese- og skrivelag
+håndterer både gamle quiz-søknader og nye søknader i `seksjon_v2`.
 
-When fetching barn, these sources are checked in order:
+### Leserekkefølge
 
-1. **`saksbehandler_barn` table** — Latest snapshot of saksbehandler edits. If present, this
-   is the source of truth.
-2. **`quiz_opplysning` tables** — Old søknad: register barn (`faktum.register.barn-liste`) +
+Når appen henter barn, sjekker den kildene i denne rekkefølgen:
+
+1. **`saksbehandler_barn`**: siste snapshot av saksbehandlers endringer. Finnes det en rad, er den fasit.
+2. **`quiz_opplysning`-tabellene**: gammel søknad. Registerbarn (`faktum.register.barn-liste`) og
    egne barn (`faktum.barn-liste`).
-3. **`seksjon_v2` table** — New søknad: barnetillegg seksjon JSON with `barnFraPdl` and
-   `barnLagtManuelt` arrays.
+3. **`seksjon_v2`**: ny søknad. Barnetillegg-seksjonen har JSON med listene `barnFraPdl` og
+   `barnLagtManuelt`.
 
-Once a saksbehandler makes any edit, `saksbehandler_barn` shadows the original source for
-that søknad.
+Når en saksbehandler har gjort én endring, skygger `saksbehandler_barn` for den opprinnelige kilden.
+Et tomt snapshot (`[]`) betyr at søknaden ikke har barn, og stopper videre oppslag.
+Bare `null` fra `saksbehandlerBarnRepository.hentBarn()` betyr at neste kilde skal prøves.
 
-### Write flow
+### Skriveflyt
 
-`oppdaterBarn`, `leggTilBarn`, and `slettBarn` all follow this pattern:
-1. Read current barn from the priority chain above
-2. Apply the edit (update, append, or remove)
-3. INSERT a full snapshot (all barn) into `saksbehandler_barn`
-4. Send to dp-behandling via POST
+`oppdaterBarn`, `leggTilBarn` og `slettBarn` følger samme mønster:
 
-Writes never go to `quiz_opplysning` — `saksbehandler_barn` is the only write target.
+1. Les nåværende barn etter leserekkefølgen over
+2. Gjør endringen (oppdater, legg til eller fjern)
+3. Send til dp-behandling med POST
+4. INSERT et fullt snapshot (alle barn) i `saksbehandler_barn`
 
-### saksbehandler_barn table (append-only)
+Hvis kallet til dp-behandling feiler, lagres ikke snapshotet. Unntaket er `leggTilBarn` uten
+`behandlingId`: da hoppes HTTP-kallet over, og snapshotet lagres lokalt.
 
-Each row stores the **complete barn list** as JSON. No UPDATEs, only INSERTs. Latest row
-per søknad = current state. All previous rows = edit history.
+Appen skriver aldri til `quiz_opplysning`. `saksbehandler_barn` er eneste skrivemål.
+
+### Tabellen saksbehandler_barn (append-only)
+
+Hver rad lagrer **hele barnelista** som JSON. Bare INSERT, aldri UPDATE. Siste rad per søknad er
+gjeldende tilstand, og tidligere rader er endringshistorikken.
 
 ```sql
 CREATE TABLE saksbehandler_barn (
     id        BIGSERIAL PRIMARY KEY,
     soknad_id UUID NOT NULL REFERENCES soknad(soknad_id),
-    barn      JSON NOT NULL,         -- Full List<BarnSvar> as JSON array
-    endret_av TEXT NOT NULL,         -- Saksbehandler ID
+    barn      JSON NOT NULL,         -- Hele List<BarnSvar> som JSON-array
+    endret_av TEXT NOT NULL,         -- Saksbehandler-ID
     opprettet TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 ```
 
-Uses `JSON` (not `JSONB`) for consistency with `seksjon_v2` and to preserve key order.
+Migrasjonen ligger i `src/main/resources/db/migration/V22__CREATE_TABLE_SAKSBEHANDLER_BARN.sql`.
+Kolonnen bruker `JSON` (ikke `JSONB`) for å være lik `seksjon_v2` og bevare rekkefølgen på nøklene.
 
-## Key files
+## Nøkkelfiler
 
-### Service layer
-- `src/main/kotlin/.../opplysning/OpplysningService.kt` — Core barn CRUD. Contains
-  `hentBarn`, `hentAlleBarnSvar` (priority chain), `oppdaterBarn`, `leggTilBarn`,
-  `slettBarn`, `sendbarnTilDpBehandling`, `tidligsteBarnetilleggFom`,
-  `hentBarnFraQuizOpplysninger`, `hentBarnFraSeksjon`.
+### Service-laget
+- `src/main/kotlin/.../opplysning/OpplysningService.kt`: kjernelogikken for barn. Inneholder
+  `hentBarn`, `hentAlleBarnSvar` (leserekkefølgen), `erEndret`, `oppdaterBarn`, `leggTilBarn`,
+  `slettBarn`, `sendbarnTilDpBehandling`, `mapTilSøknadId`, `tidligsteBarnetilleggFom`,
+  `hentBarnFraQuizOpplysninger` og `hentBarnFraSeksjon`.
 
 ### Repositories
-- `src/main/kotlin/.../opplysning/SaksbehandlerBarnRepository.kt` — Interface:
-  `hentBarn(søknadId): List<BarnSvar>?` and `lagreBarn(søknadId, barn, endretAv)`.
-- `src/main/kotlin/.../opplysning/SaksbehandlerBarnRepositoryPostgres.kt` — Exposed ORM
-  implementation. Reads latest row by `opprettet DESC`, inserts new snapshot rows.
-- `src/main/kotlin/.../opplysning/SaksbehandlerBarnTabell.kt` — Exposed table object.
-- `src/main/kotlin/.../quizOpplysning/db/QuizOpplysningRepository.kt` — Old quiz repo
-  (still used for reading barn from old søknad via fallback).
+- `src/main/kotlin/.../opplysning/SaksbehandlerBarnRepository.kt`: interface med
+  `hentBarn(søknadId): List<BarnSvar>?` og `lagreBarn(søknadId, barn, endretAv)`.
+- `src/main/kotlin/.../opplysning/SaksbehandlerBarnRepositoryPostgres.kt`: Exposed-implementasjon.
+  Leser siste rad sortert på `opprettet DESC` og setter inn nye snapshot-rader.
+- `src/main/kotlin/.../opplysning/SaksbehandlerBarnTabell.kt`: Exposed-tabellobjektet.
+- `src/main/kotlin/.../quizOpplysning/db/QuizOpplysningRepository.kt`: quiz-repoet. Brukes fortsatt
+  til å lese barn fra gamle søknader og til `mapTilSøknadId`.
+- `src/main/kotlin/.../quizOpplysning/db/Tabeller.kt`: `BarnSøknadMappingTabell`
+  (`barn_soknad_mapping`), som kobler `søknadbarnId` til `søknadId`.
 
-### API spec
-- `openapi/src/main/resources/soknad-orkestrator-api.yaml` — OpenAPI spec defining all
-  request/response schemas. The frontend (dp-saksbehandling-frontend) consumes these
-  endpoints. DTOs in `openapi/build/generated/` are auto-generated from this spec.
-  - **`BarnRequest`** — Unified request wrapper for both POST and PUT. Contains `barn: BarnData`
-    and optional `behandlingId: UUID?`.
-  - **`BarnData`** — The barn fields (fornavnOgMellomnavn, etternavn, fodselsdato, etc.).
-    No `barnId` — that's in the path for PUT.
-  - **`SlettBarnRequest`** — Request body for DELETE. Contains `behandlingId: UUID` (required)
-    and `begrunnelse: String` (required).
+### API-spesifikasjon
+- `openapi/src/main/resources/soknad-orkestrator-api.yaml`: OpenAPI-spesifikasjonen for alle
+  request- og response-skjemaer. Frontend (dp-saksbehandling-frontend) bruker disse endepunktene.
+  DTO-ene i `openapi/build/generated/` genereres fra spesifikasjonen.
+  - **`BarnRequest`**: felles request-wrapper for POST og PUT. Har `barn: BarnData`
+    og valgfri `behandlingId: UUID?` i skjemaet. Oppdatering krever likevel ID-en i service-laget.
+  - **`BarnData`**: feltene for barnet (fornavnOgMellomnavn, etternavn, fodselsdato og så videre).
+    Har ikke `barnId`, den ligger i stien for PUT.
+  - **`SlettBarnRequest`**: request-body for sletting. Har `behandlingId: UUID` (påkrevd)
+    og `begrunnelse: String` (påkrevd).
 
 ### API
-- `src/main/kotlin/.../opplysning/OpplysningApi.kt` — Route handlers. Endpoints:
-  - `GET /opplysninger/{soknadId}/barn` — Fetch barn by søknadId (deprecated)
-  - `PUT /opplysninger/{soknadId}/barn/oppdater` — Deprecated, returns 400
-  - `GET /opplysninger/barn/{soknadbarnId}` — Fetch barn by søknadbarnId
-  - `PUT /opplysninger/barn/{soknadbarnId}/{barnId}` — Update specific barn
-  - `POST /opplysninger/barn/{soknadbarnId}` — Add new barn
-  - `POST /opplysninger/barn/{soknadbarnId}/{barnId}/slett` — Delete specific barn
-- Authentication: Azure AD (`saksbehandler` group required)
+- `src/main/kotlin/.../opplysning/OpplysningApi.kt`: route-handlere. Endepunkter:
+  - `GET /opplysninger/{soknadId}/barn`: henter barn med søknadId (deprecated)
+  - `PUT /opplysninger/{soknadId}/barn/oppdater`: deprecated, returnerer 400
+  - `GET /opplysninger/barn/{soknadbarnId}`: henter barn med søknadbarnId
+  - `PUT /opplysninger/barn/{soknadbarnId}/{barnId}`: oppdaterer ett barn
+  - `POST /opplysninger/barn/{soknadbarnId}`: legger til et barn
+  - `POST /opplysninger/barn/{soknadbarnId}/{barnId}/slett`: sletter ett barn
+- Autentisering: Azure AD, krever gruppen `saksbehandler`
+- PUT returnerer uten endring hvis `erEndret` er `false`.
 
-### dp-behandling integration
-- `src/main/kotlin/.../opplysning/DpBehandlingKlient.kt` — HTTP client.
+### Integrasjon mot dp-behandling
+- `src/main/kotlin/.../opplysning/DpBehandlingKlient.kt`: HTTP-klient med
   `oppdaterBarnOpplysning(behandlingId, dpBehandlingOpplysning, token)`.
-  - Endpoint: `POST /behandling/{behandlingId}/opplysning/`
+  - Endepunkt: `POST /behandling/{behandlingId}/opplysning/`
   - Body: `NyOpplysningDTO(opplysningstype: UUID, verdi: String, begrunnelse: String,
     gyldigFraOgMed: LocalDate?, gyldigTilOgMed: LocalDate?)`
-  - `verdi` is a JSON-serialized `BarnetilleggV2Løsning`
-  - `gyldigFraOgMed` is set to `tidligsteBarnetilleggFom(alleBarn)` — the minimum
-    `barnetilleggFom` among barn where `kvalifisererTilBarnetillegg == true`. `null` if
-    no barn qualify.
-  - `gyldigTilOgMed` is always `null` (not sent)
-  - Hardcoded barn opplysningstype: `0194881f-9428-74d5-b160-f63a4c61a23b`
-  - Uses OBO token flow via Azure AD
+  - `verdi` er en JSON-serialisert `BarnetilleggV2Løsning`
+  - `gyldigFraOgMed` settes til `tidligsteBarnetilleggFom(alleBarn)`: minste
+    `barnetilleggFom` blant barn med `kvalifisererTilBarnetillegg == true`. `null` hvis
+    ingen barn kvalifiserer.
+  - `gyldigTilOgMed` er alltid `null` (sendes ikke)
+  - Hardkodet opplysningstype for barn: `0194881f-9428-74d5-b160-f63a4c61a23b` (`BARN_OPPLYSNINGSTYPE_ID`)
+  - Bruker OBO-token via Azure AD
 
 ### Behovløsere
-- `src/main/kotlin/.../behov/løsere/BarnetilleggV2BehovLøser.kt` — Resolves
-  `BarnetilleggV2` behov. Same read priority chain as OpplysningService. Contains the
-  internal data classes `BarnetilleggV2Løsning` and `LøsningsbarnV2`.
-- `src/main/kotlin/.../behov/løsere/BarnetilleggBehovLøser.kt` — Old V1 resolver.
-  Has companion constants `BESKRIVENDE_ID_PDL_BARN` and `BESKRIVENDE_ID_EGNE_BARN`.
+- `src/main/kotlin/.../behov/løsere/BarnetilleggV2BehovLøser.kt`: løser behovet
+  `BarnetilleggV2`. Samme leserekkefølge som `OpplysningService`. Inneholder de interne
+  dataklassene `BarnetilleggV2Løsning` og `LøsningsbarnV2`.
+- `src/main/kotlin/.../behov/løsere/BarnetilleggBehovLøser.kt`: gammel V1-løser.
+  Har konstantene `BESKRIVENDE_ID_PDL_BARN` og `BESKRIVENDE_ID_EGNE_BARN` i companion object.
 
-### Domain model
-- `src/main/kotlin/.../quizOpplysning/datatyper/Barn.kt` — `BarnSvar` data class and
-  `Barn.barnetilleggperiode(fødselsdato)` which returns `fødselsdato to fødselsdato + 18 years`.
+### Domenemodell
+- `src/main/kotlin/.../quizOpplysning/datatyper/Barn.kt`: dataklassen `BarnSvar` og
+  `Barn.barnetilleggperiode(fødselsdato)`, som returnerer `fødselsdato to fødselsdato + 18 år`.
+
+### Metrikk
+- `OpplysningMetrikker.endringBarn` (`dp_soknad_orkestrator_antall_endringer_barn`) økes i
+  `OpplysningApi` når et barn oppdateres (bare hvis `erEndret`) eller slettes. Den økes ikke når
+  et barn legges til.
 
 ### Wiring
-- `src/main/kotlin/.../ApplicationBuilder.kt` — Creates repositories and wires them into
-  `OpplysningService` and `BehovløserFactory`.
+- `src/main/kotlin/.../ApplicationBuilder.kt`: lager repositoriene og sender dem inn i
+  `OpplysningService` og `BehovløserFactory`.
 
-## Key data types
+## Datatyper
 
-### BarnSvar (internal domain model)
-```kotlin
-data class BarnSvar(
-    val barnSvarId: UUID,
-    val fornavnOgMellomnavn: String,
-    val etternavn: String,
-    val fødselsdato: LocalDate,
-    val statsborgerskap: String,        // Country code, e.g. "NOR"
-    val forsørgerBarnet: Boolean,
-    val fraRegister: Boolean,           // true = from PDL, false = manually added
-    val kvalifisererTilBarnetillegg: Boolean,
-    val barnetilleggFom: LocalDate?,    // = fødselsdato when kvalifiserer=true
-    val barnetilleggTom: LocalDate?,    // = fødselsdato + 18 years
-    val endretAv: String?,              // Saksbehandler ID
-    val begrunnelse: String?,
-)
-```
+Se `quizOpplysning/datatyper/Barn.kt` for `BarnSvar` og
+`behov/løsere/BarnetilleggV2BehovLøser.kt` for `LøsningsbarnV2` og `BarnetilleggV2Løsning`.
 
-### LøsningsbarnV2 (sent to dp-behandling inside BarnetilleggV2Løsning.barn)
-```kotlin
-internal data class LøsningsbarnV2(
-    val fornavnOgMellomnavn: String,
-    val etternavn: String,
-    val fødselsdato: LocalDate,
-    val statsborgerskap: String,
-    val kvalifiserer: Boolean,
-    val barnetilleggFom: LocalDate?,
-    val barnetilleggTom: LocalDate?,
-    val endretAv: String?,
-    val begrunnelse: String?,
-)
-```
+- `barnSvarId` identifiserer ett barn. `søknadbarnId` i `BarnetilleggV2Løsning` identifiserer
+  koblingen til søknaden, ikke et enkelt barn.
+- `fraRegister` angir om barnet kommer fra PDL. `endretAv` angir saksbehandleren som endret barnet.
+- `BarnSvar.kvalifisererTilBarnetillegg` mappes til `LøsningsbarnV2.kvalifiserer`.
+  Perioden, `endretAv` og `begrunnelse` følger med i løsningen.
 
-### BarnetilleggV2Løsning (wrapper with søknadbarnId)
-```kotlin
-internal data class BarnetilleggV2Løsning(
-    val søknadbarnId: UUID?,
-    val barn: List<LøsningsbarnV2>,
-)
-```
+## Barn i seksjon_v2
 
-## Seksjon v2 barn JSON structure
-
-The barnetillegg seksjon stores barn like this:
+Barnetillegg-seksjonen lagrer barn slik:
 ```json
 {
   "barnFraPdl": [
@@ -193,23 +174,23 @@ The barnetillegg seksjon stores barn like this:
 }
 ```
 
-Note: `barnLagtManuelt` entries may lack `forsørgerDuBarnet`. The `id` field is used as
-`barnSvarId`. Field `bostedsland` maps to `statsborgerskap`.
+Elementer i `barnLagtManuelt` kan mangle `forsørgerDuBarnet`. Feltet `id` brukes som
+`barnSvarId`, og `bostedsland` mappes til `statsborgerskap`.
 
-## Testing patterns
+## Testmønstre
 
 ### OpplysningServiceTest
-Uses mockk for all repositories. Key pattern for saksbehandlerBarnRepository:
+Bruker mockk for alle repositoriene. Standardoppsett for `saksbehandlerBarnRepository`:
 ```kotlin
 private val saksbehandlerBarnRepository = mockk<SaksbehandlerBarnRepository>(relaxed = true).also {
-    every { it.hentBarn(any()) } returns null  // Default: no saksbehandler edits
+    every { it.hentBarn(any()) } returns null  // Standard: ingen endringer fra saksbehandler
 }
 ```
-Override per test when testing saksbehandler_barn priority.
+Overstyr per test når du tester at `saksbehandler_barn` har forrang.
 
 ### OpplysningApiTest
-Uses `InMemoryQuizOpplysningRepository` for quiz repo + mockk for others. The
-saksbehandlerBarnRepository mock captures saves and returns them on subsequent reads:
+Bruker `InMemoryQuizOpplysningRepository` for quiz-repoet og mockk for resten. Mocken for
+`saksbehandlerBarnRepository` tar vare på lagrede barn og returnerer dem ved neste lesing:
 ```kotlin
 val saksbehandlerBarnRepository = mockk<SaksbehandlerBarnRepository>(relaxed = true).also { mock ->
     val storedBarn = mutableMapOf<UUID, List<BarnSvar>>()
@@ -218,20 +199,21 @@ val saksbehandlerBarnRepository = mockk<SaksbehandlerBarnRepository>(relaxed = t
 }
 ```
 
-### Auth in API tests
-Uses `TestApplication.withMockAuthServerAndTestApplication()` and `testAzureADToken`.
-Requires `System.setProperty("Grupper.saksbehandler", "saksbehandler")` in setup.
+### Auth i API-tester
+Bruker `TestApplication.withMockAuthServerAndTestApplication()` og `testAzureADToken`.
+Krever `System.setProperty("Grupper.saksbehandler", "saksbehandler")` i oppsettet.
 
-## Important conventions
+## Viktige konvensjoner
 
-- `behandlingId` can be null in `BarnRequestDTO`. When null, skip the dp-behandling call.
-- `behandlingId` is required in `SlettBarnRequestDTO` — sletting without syncing to
-  dp-behandling is not supported.
-- `barnId` is a path parameter for PUT and slett, not in the request body.
-- `barnetilleggFom`/`Tom` are set from `Barn.barnetilleggperiode(fødselsdato)` only when
-  `kvalifisererTilBarnetillegg == true`. Otherwise null.
-- Begrunnelse is per-barn (inside JSON), not per-snapshot.
-- The `barn_soknad_mapping` table maps `søknadbarnId ↔ søknadId` for dp-behandling.
-- objectMapper config: `FAIL_ON_UNKNOWN_PROPERTIES = false`, dates as ISO strings.
-- `gyldigFraOgMed` sent to dp-behandling is always the **minimum** `barnetilleggFom` among
-  qualifying barn, not the individual barn's fom. `gyldigTilOgMed` is never sent.
+- `behandlingId` kan være null ved `leggTilBarn`. Da hopper appen over kallet til dp-behandling.
+  Ved `oppdaterBarn` krever `sendbarnTilDpBehandling()` ID-en og kaster hvis den mangler.
+- `behandlingId` er påkrevd i `SlettBarnRequestDTO`. Sletting uten synk mot dp-behandling støttes ikke.
+- `barnId` er en path-parameter for PUT og slett, ikke en del av request-body.
+- Ved `leggTilBarn` og lesing fra seksjon beregnes `barnetilleggFom` og `barnetilleggTom` med
+  `Barn.barnetilleggperiode(fødselsdato)` når barnet kvalifiserer. Ellers er de null.
+  Ved `oppdaterBarn` brukes datoene fra requesten, uten ny beregning fra fødselsdato.
+- Begrunnelsen ligger per barn (inne i JSON), ikke per snapshot.
+- `barn_soknad_mapping` kobler `søknadbarnId` til `søknadId` for dp-behandling.
+- objectMapper-oppsett: `FAIL_ON_UNKNOWN_PROPERTIES = false`, datoer som ISO-strenger.
+- `gyldigFraOgMed` som sendes til dp-behandling er alltid **minste** `barnetilleggFom` blant barn som
+  kvalifiserer, ikke fom for barnet som ble endret. `gyldigTilOgMed` sendes aldri.
