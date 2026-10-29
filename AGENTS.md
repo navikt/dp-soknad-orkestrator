@@ -11,8 +11,8 @@ Instructions for AI coding agents working in this repository.
 ./gradlew ktlintCheck        # Check formatting without fixing
 ```
 
-`ktlintFormat` runs automatically before Kotlin compilation, so `./gradlew build` always
-formats first.
+Run `./gradlew ktlintFormat` explicitly to format code locally. `./gradlew build` checks
+formatting without changing source files.
 
 ## Stack
 

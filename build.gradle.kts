@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 val exposedVersion: String by project
 val pamGeographyVersion: String by project
 val pdlVersion: String by project
@@ -34,10 +32,6 @@ application {
 
 tasks.test {
     useJUnitPlatform()
-}
-
-tasks.withType<KotlinCompile>().configureEach {
-    dependsOn("ktlintFormat")
 }
 
 repositories {
