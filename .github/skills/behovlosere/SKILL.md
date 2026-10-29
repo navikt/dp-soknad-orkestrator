@@ -8,6 +8,8 @@ description: |
 
 # Behovløsere i dp-soknad-orkestrator
 
+Sist verifisert mot koden: oktober 2026.
+
 ## Hva er en behovløser?
 
 En behovløser lytter på Kafka etter meldinger med `@event_name: "behov"` som inneholder et spesifikt
@@ -34,6 +36,10 @@ For **vanlige behovløsere** er datakilde-prioriteten som regel:
 
 1. **`quiz_opplysning`-tabellen** — quiz-søknad (gammel flyt). Hentes via `opplysningRepository.hent(beskrivendeId, ident, søknadId)`.
 2. **`seksjon_v2`-tabellen** — ny søknad-flyt. Hentes via `seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, seksjonId)`.
+
+Appen tar ikke lenger imot quiz-søknader (fjernet i #431), så quiz-oppslaget treffer bare historiske
+søknader. Nye søknader har bare data i `seksjon_v2`. Basisklassen krever likevel en `beskrivendeId`,
+og quiz-fallbacken må beholdes så lenge behov for gamle søknader kan komme inn.
 
 Seksjonsdata er JSON med struktur `{ "seksjonId": "...", "seksjonsvar": { ... }, "versjon": N }`.
 Feltverdiene ligger inne i `seksjonsvar`. Koden bruker Jacksons `findPath(feltNavn)` som søker
@@ -140,6 +146,10 @@ Kjennetegn:
 - behovet ligger **ikke** i `BehovløserFactory.Behov`
 - du bruker `override fun løs(behovmelding: SøknadBehovmelding)`
 - du trenger et eget mottak som registreres i `ApplicationBuilder`
+- testmeldinger lages med `lagBehovmeldingUtenSøknadId(ident)` fra `PacketGenerator.kt`
+
+`SøknadsdataBehovMottak` har en hardkodet `behovIdSkipSet` med `@behovId`-er som ignoreres. Den brukes
+til å hoppe over enkeltmeldinger som feiler i prod (#516). Bytt eller fjern ID-en når problemet er løst.
 
 ## Steg-for-steg: Legge til en ny behovløser
 
@@ -314,6 +324,7 @@ class MittNyttBehovBehovløserTest {
 
 Test-hjelpere tilgjengelig:
 - `lagBehovmelding(ident, søknadId, behov)` — fra `PacketGenerator.kt`
+- `lagBehovmeldingUtenSøknadId(ident)` — fra `PacketGenerator.kt`, for behov av type 4
 - `InMemoryQuizOpplysningRepository` — in-memory repo for quiz-opplysninger
 - bruk eksplisitt `Søknad(...)` når testen trenger fallback til `gjelderFra` fra `søknadRepository`
 
@@ -328,7 +339,8 @@ Test-hjelpere tilgjengelig:
 | `behov/FellesBehovløserLøsninger.kt` | Delt logikk for EØS, verneplikt, søknadsdato |
 | `behov/Behovmelding.kt` | Wrappere rundt `JsonMessage`: `Behovmelding` for vanlige behov og `SøknadBehovmelding` for behov uten `søknadId` |
 | `behov/løsere/*.kt` | Én fil per behovløser |
-| `test/.../behov/løsere/PacketGenerator.kt` | `lagBehovmelding(...)` test-helper |
+| `test/.../behov/løsere/PacketGenerator.kt` | `lagBehovmelding(...)` og `lagBehovmeldingUtenSøknadId(...)` |
+| `metrikker/Metrikker.kt` | `BehovMetrikker.mottatt` (i `BehovMottak`) og `BehovMetrikker.løst` (i `publiserLøsning`) |
 | `test/.../utils/InMemoryQuizOpplysningRepository.kt` | In-memory repo for tester |
 
 ## Viktige konvensjoner
