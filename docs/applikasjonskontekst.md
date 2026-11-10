@@ -19,7 +19,7 @@ hvordan skjermbildene ser ut, eller hvordan dp-behandling fatter vedtak.
 |---|---|
 | `dp-brukerdialog-frontend` | Oppretter søknad, lagrer seksjoner, viser framdrift og sender inn |
 | `dp-mine-dagpenger-frontend` | Henter egne søknader og dokumentasjonskrav |
-| `dp-behandling` | Ber om opplysninger, mottar saksbehandlerendringer for barn og melder `søknadsbehandling_ferdig` |
+| `dp-behandling` | Ber om opplysninger, mottar saksbehandlerendringer for barn (utfaset) og melder `søknadsbehandling_ferdig` |
 | Rapids & Rivers på `teamdagpenger.rapid.v1` | Transport for behov, løsninger og søknadshendelser |
 | PDL | Henter personalia og barn for innbygger |
 | Person-/kontoregisteret | Henter aktivt kontonummer |
@@ -35,7 +35,7 @@ Appen har ansvar for:
 - overgangsstøtte mellom quiz-opplysninger og `seksjon_v2`
 - å svare på behov fra dp-behandling med data fra riktig kilde
 - å publisere hendelser om søknader, tilstander og dokumentasjonskrav
-- saksbehandleres CRUD for barn, med historikk i `saksbehandler_barn`
+- saksbehandleres CRUD for barn, med historikk i `saksbehandler_barn` (utfaset, koden er ikke fjernet ennå)
 - ettersending av dokumentasjon og kobling mot journalpost
 
 Appen har ikke ansvar for:
@@ -90,7 +90,7 @@ quiz-opplysninger først, før det falles tilbake til `seksjon_v2`.
 | Ettersending | `PUT /seksjon/{søknadId}/{seksjonId}/dokumentasjonskrav/ettersending` | TokenX | Starte journalføring av ettersendt dokumentasjon |
 | Personalia | `GET /personalia` | TokenX | Hente personalia og kontonummer |
 | Barn | `GET /barn` | TokenX | Hente barn fra PDL |
-| Saksbehandler-barn | `/opplysninger/barn/...` | Azure AD | Lese og endre barn på en søknad |
+| Saksbehandler-barn (utfaset) | `/opplysninger/barn/...` | Azure AD | Lese og endre barn på en søknad |
 | Land | `GET /land` | TokenX | Hente landliste |
 
 OpenAPI-spesifikasjonen i `openapi/src/main/resources/soknad-orkestrator-api.yaml`
@@ -106,9 +106,9 @@ er kilden for genererte DTO-er. Genererte filer skal ikke endres direkte.
 | Vedtaksstatus | `soknad_status` | Ja, fylt av `søknadsbehandling_ferdig` |
 | Dokumentasjonskrav | `seksjon_v2.dokumentasjonskrav` | Ja |
 | Gamle quiz-svar | `quiz_opplysning` | Ja, for lesing og kompatibilitet |
-| Saksbehandlerens barn | `saksbehandler_barn` | Ja, append-only snapshot |
+| Saksbehandlerens barn (utfaset) | `saksbehandler_barn` | Ja, append-only snapshot |
 | Barn og persondata | PDL og kontoregister | Nei, eksterne kilder |
-| Behandlingens opplysning om barn | dp-behandling | Nei, denne appen skriver via klient |
+| Behandlingens opplysning om barn (utfaset) | dp-behandling | Nei, denne appen skriver via klient |
 | Journalpost og dokument | Journalføring/SAF | Nei |
 
 `SøknadRepository.hentSoknaderForIdent()` bruker en inner join mot `seksjon_v2`. Søknader uten
@@ -172,7 +172,7 @@ Appen kan ikke alene endre tekst, plassering eller påminnelser i brukergrensesn
 - Azure AD beskytter saksbehandlerendepunktene.
 - Fødselsnummer, ident og svar skal ikke logges i vanlig logg. Kode som trenger
   persondata bruker sikkerlogg.
-- Barnendringer skriver en komplett ny snapshot til `saksbehandler_barn`.
+- Utfaset: Barnendringer fra saksbehandler skriver en komplett ny snapshot til `saksbehandler_barn`.
   Tabellen skal ikke oppdateres rad for rad.
 - Endringer i OpenAPI- eller AsyncAPI-kontrakter må vurderes mot alle konsumenter.
 - Behovløsere må beholde støtte for både quiz-opplysninger og `seksjon_v2` så lenge
@@ -206,7 +206,7 @@ analysehendelser.
 | Seksjoner og dokumentasjonskrav | `søknad/seksjon/SeksjonApi.kt`, `SeksjonService.kt` |
 | PDF og journalføring | `søknad/melding/`, `søknad/mottak/`, `søknad/pdf/` |
 | Behov og svar | `behov/BehovMottak.kt`, `behov/BehovløserFactory.kt`, `behov/løsere/` |
-| Barn og dp-behandling | `opplysning/OpplysningService.kt`, `opplysning/DpBehandlingKlient.kt` |
+| Saksbehandler-barn og dp-behandling (utfaset) | `opplysning/OpplysningService.kt`, `opplysning/DpBehandlingKlient.kt` |
 | Vedtaksstatus | `søknad/mottak/SøknadsbehandlingFerdigMottak.kt`, `søknad/db/SøknadStatusRepository.kt` |
 | Auth og eksterne klienter | `api/auth/`, `ApplicationBuilder.kt`, `Configuration.kt` |
 | Kontrakter | `openapi/src/main/resources/`, `asyncapi/src/main/resources/` |
