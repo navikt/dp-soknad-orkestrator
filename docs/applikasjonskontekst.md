@@ -19,7 +19,6 @@ hvordan skjermbildene ser ut, eller hvordan dp-behandling fatter vedtak.
 |---|---|
 | `dp-brukerdialog-frontend` | Oppretter søknad, lagrer seksjoner, viser framdrift og sender inn |
 | `dp-mine-dagpenger-frontend` | Henter egne søknader og dokumentasjonskrav |
-| `dp-saksbehandling-frontend` | Henter og redigerer opplysninger om barn |
 | `dp-behandling` | Ber om opplysninger, mottar saksbehandlerendringer for barn og melder `søknadsbehandling_ferdig` |
 | Rapids & Rivers på `teamdagpenger.rapid.v1` | Transport for behov, løsninger og søknadshendelser |
 | PDL | Henter personalia og barn for innbygger |
