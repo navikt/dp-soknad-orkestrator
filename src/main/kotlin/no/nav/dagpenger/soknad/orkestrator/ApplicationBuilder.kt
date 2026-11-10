@@ -21,8 +21,6 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.behov.SøknadsdataBehovMottak
 import no.nav.dagpenger.soknad.orkestrator.config.configure
-import no.nav.dagpenger.soknad.orkestrator.journalføring.JournalføringService
-import no.nav.dagpenger.soknad.orkestrator.journalføring.MinidialogJournalførtMottak
 import no.nav.dagpenger.soknad.orkestrator.opplysning.DpBehandlingKlient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
 import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepositoryPostgres
@@ -103,8 +101,6 @@ internal class ApplicationBuilder(
             },
         )
 
-    private val journalføringService = JournalføringService()
-
     private val dpBehandlingKlient =
         DpBehandlingKlient(
             azureAdKlient = azureAdClient,
@@ -151,7 +147,6 @@ internal class ApplicationBuilder(
             ).also { rapidsConnection ->
                 søknadService.setRapidsConnection(rapidsConnection)
                 seksjonService.setRapidsConnection(rapidsConnection)
-                journalføringService.setRapidsConnection(rapidsConnection)
                 MeldingOmSøknadKlarTilJournalføringMottak(
                     rapidsConnection,
                     søknadRepository,
@@ -160,7 +155,6 @@ internal class ApplicationBuilder(
                 )
                 SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection, søknadService, seksjonService)
                 SøknadPdfOgVedleggJournalførtMottak(rapidsConnection, søknadRepository)
-                MinidialogJournalførtMottak(rapidsConnection)
                 BehovMottak(
                     rapidsConnection = rapidsConnection,
                     behovløserFactory =
