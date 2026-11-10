@@ -2,11 +2,15 @@ package no.nav.dagpenger.soknad.orkestrator
 
 import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson3.jackson
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.response.respond
+import io.ktor.server.routing.get
+import io.ktor.server.routing.routing
 import no.nav.dagpenger.pdl.createPersonOppslag
 import no.nav.dagpenger.pdl.createPersonOppslagBolk
 import no.nav.dagpenger.soknad.orkestrator.Configuration.azureAdClient
@@ -21,11 +25,8 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.behov.SøknadsdataBehovMottak
 import no.nav.dagpenger.soknad.orkestrator.config.configure
-import no.nav.dagpenger.soknad.orkestrator.opplysning.DpBehandlingKlient
-import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
 import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.opplysning.landApi
-import no.nav.dagpenger.soknad.orkestrator.opplysning.opplysningApi
 import no.nav.dagpenger.soknad.orkestrator.personalia.KontonummerService
 import no.nav.dagpenger.soknad.orkestrator.personalia.PersonService
 import no.nav.dagpenger.soknad.orkestrator.personalia.PersonaliaService
@@ -101,23 +102,7 @@ internal class ApplicationBuilder(
             },
         )
 
-    private val dpBehandlingKlient =
-        DpBehandlingKlient(
-            azureAdKlient = azureAdClient,
-            dpBehandlingBaseUrl = Configuration.miljøVariabler.dpBehandlingBaseUrl,
-            dpBehandlingScope = Configuration.miljøVariabler.dpBehandlingScope,
-        )
-
     private val saksbehandlerBarnRepository = SaksbehandlerBarnRepositoryPostgres(dataSource)
-
-    private val opplysningService: OpplysningService =
-        OpplysningService(
-            opplysningRepository = quizOpplysningRepositoryPostgres,
-            dpBehandlingKlient = dpBehandlingKlient,
-            søknadRepository = søknadRepository,
-            saksbehandlerBarnRepository = saksbehandlerBarnRepository,
-            seksjonRepository = seksjonRepository,
-        )
 
     private val rapidsConnection =
         RapidApplication
@@ -136,7 +121,9 @@ internal class ApplicationBuilder(
                                 tokenX()
                             }
                         }
-                        opplysningApi(opplysningService)
+                        routing {
+                            get("/") { call.respond(HttpStatusCode.OK) }
+                        }
                         søknadApi(søknadService, seksjonService)
                         seksjonApi(seksjonService)
                         personaliaApi(personaliaService)

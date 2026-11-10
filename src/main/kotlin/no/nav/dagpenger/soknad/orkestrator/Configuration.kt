@@ -16,8 +16,6 @@ internal object Configuration {
     private val defaultProperties =
         ConfigurationMap(
             mapOf(
-                "DP_BEHANDLING_BASE_URL" to "http://dp-behandling",
-                "DP_BEHANDLING_SCOPE" to "api://dev-gcp.teamdagpenger.dp-behandling/.default",
                 "PERSON_KONTO_REGISTER_URL" to "http://sokos-kontoregister-person.okonomi/api/borger/v1/hent-aktiv-konto",
             ),
         )
@@ -37,12 +35,6 @@ internal object Configuration {
 
     val safUrl by lazy { properties[Key("SAF_URL", stringType)] }
     val safScope by lazy { properties[Key("SAF_SCOPE", stringType)] }
-
-    val miljøVariabler =
-        Variabler(
-            dpBehandlingBaseUrl = properties[Key("DP_BEHANDLING_BASE_URL", stringType)],
-            dpBehandlingScope = properties[Key("DP_BEHANDLING_SCOPE", stringType)],
-        )
 
     object Grupper : PropertyGroup() {
         val saksbehandler by stringType
@@ -72,14 +64,4 @@ internal object Configuration {
                     audience = audience,
                 ).access_token ?: throw RuntimeException("Klarte ikke hente token")
         }
-}
-
-data class Variabler(
-    val dpBehandlingBaseUrl: String,
-    val dpBehandlingScope: String,
-) {
-    init {
-        require(dpBehandlingScope.isNotBlank()) { "DP_BEHANDLING_SCOPE er ikke satt" }
-        require(dpBehandlingBaseUrl.isNotBlank()) { "DP_BEHANDLING_BASE_URL er ikke satt" }
-    }
 }

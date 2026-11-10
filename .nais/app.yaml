@@ -51,8 +51,6 @@ spec:
   env:
     - name: GRUPPER_SAKSBEHANDLER
       value: {{azure.grupper.saksbehandler}}
-    - name: DP_BEHANDLING_SCOPE
-      value: {{DP_BEHANDLING_SCOPE}}
     - name: PDL_API_HOST
       value: {{PDL_API_HOST}}
     - name: PDL_API_USER_SCOPE
@@ -90,7 +88,6 @@ spec:
         {{/if}}
     outbound:
       rules:
-        - application: dp-behandling
         - application: sokos-kontoregister-person
           namespace: okonomi
         - application: logging
