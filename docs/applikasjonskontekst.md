@@ -125,7 +125,6 @@ lagrede seksjoner blir derfor ikke med i oversikten over mine søknader.
 - løsning på `journalfør_ettersending_av_dokumentasjon`
 - behov fra dp-behandling, blant annet barn, arbeid, permittering og andre
   søknadsopplysninger
-- behovet `JournalføreMinidialog`
 - `søknadsbehandling_ferdig` fra dp-behandling, som lagrer vedtaksstatus i `soknad_status`
 
 ### Appen publiserer
