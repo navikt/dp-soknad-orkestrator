@@ -7,6 +7,8 @@ replicas:
 
 azure:
   tenant: nav.no
+  grupper:
+    saksbehandler: "2e9c63d8-322e-4c1f-b500-a0abb812761c" # 0000-GA-Dagpenger-Saksbehandler
 
 PERSON_KONTO_REGISTER_SCOPE: "prod-gcp:okonomi:sokos-kontoregister-person"
 PDL_API_HOST: "pdl-api.prod-fss-pub.nais.io"

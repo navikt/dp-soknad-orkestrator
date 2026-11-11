@@ -90,7 +90,7 @@ quiz-opplysninger først, før det falles tilbake til `seksjon_v2`.
 | Ettersending | `PUT /seksjon/{søknadId}/{seksjonId}/dokumentasjonskrav/ettersending` | TokenX | Starte journalføring av ettersendt dokumentasjon |
 | Personalia | `GET /personalia` | TokenX | Hente personalia og kontonummer |
 | Barn | `GET /barn` | TokenX | Hente barn fra PDL |
-| Land | `GET /land` | TokenX | Hente landliste |
+| Land | `GET /land` | Ingen | Hente landliste. Brukes av dp-saksbehandling-frontend |
 
 OpenAPI-spesifikasjonen i `openapi/src/main/resources/soknad-orkestrator-api.yaml`
 er kilden for genererte DTO-er. Genererte filer skal ikke endres direkte.
@@ -167,7 +167,8 @@ Appen kan ikke alene endre tekst, plassering eller påminnelser i brukergrensesn
 
 - TokenX beskytter innbyggerendepunktene.
 - Azure AD brukes bare for tjeneste-til-tjeneste-kall ut fra appen (for eksempel SAF). Appen har ingen
-  Azure AD-beskyttede endepunkter.
+  Azure AD-beskyttede endepunkter. Gruppen `saksbehandler` står igjen i Nais-manifestet fordi den styrer
+  hvem som får OBO-token for appen. Frontendens tokenutveksling for `/land` må fjernes før gruppen kan fjernes.
 - Fødselsnummer, ident og svar skal ikke logges i vanlig logg. Kode som trenger
   persondata bruker sikkerlogg.
 - Barn-behovløserne leser siste snapshot fra `saksbehandler_barn`. Appen skriver ikke lenger nye snapshots.
