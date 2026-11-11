@@ -166,7 +166,8 @@ Appen kan ikke alene endre tekst, plassering eller påminnelser i brukergrensesn
 ## Tilgang, personvern og endringsgrenser
 
 - TokenX beskytter innbyggerendepunktene.
-- Azure AD beskytter saksbehandlerendepunktene.
+- Azure AD brukes bare for tjeneste-til-tjeneste-kall ut fra appen (for eksempel SAF). Appen har ingen
+  Azure AD-beskyttede endepunkter.
 - Fødselsnummer, ident og svar skal ikke logges i vanlig logg. Kode som trenger
   persondata bruker sikkerlogg.
 - Barn-behovløserne leser siste snapshot fra `saksbehandler_barn`. Appen skriver ikke lenger nye snapshots.

@@ -15,7 +15,6 @@ class TestContext(
 
 object TestApplication {
     private const val TOKENX_ISSUER_ID = "tokenx"
-    private const val AZUREAD_ISSUER_ID = "azureAd"
     private const val CLIENT_ID = "dp-soknad-orkestrator"
     const val DEFAULT_DUMMY_FODSELSNUMMER = "12345678910"
 
@@ -34,27 +33,12 @@ object TestApplication {
             ).serialize()
     }
 
-    internal val testAzureADToken: String by lazy {
-        mockOAuth2Server
-            .issueToken(
-                issuerId = AZUREAD_ISSUER_ID,
-                audience = CLIENT_ID,
-                claims =
-                    mapOf(
-                        "NAVident" to "123",
-                        "groups" to listOf("saksbehandler"),
-                    ),
-            ).serialize()
-    }
-
     internal fun withMockAuthServerAndTestApplication(
         moduleFunction: Application.() -> Unit,
         test: suspend TestContext.() -> Unit,
     ) {
         System.setProperty("token-x.client-id", CLIENT_ID)
         System.setProperty("token-x.well-known-url", "${mockOAuth2Server.wellKnownUrl(TOKENX_ISSUER_ID)}")
-        System.setProperty("azure-app.client-id", CLIENT_ID)
-        System.setProperty("azure-app.well-known-url", "${mockOAuth2Server.wellKnownUrl(AZUREAD_ISSUER_ID)}")
 
         testApplication {
             application {
