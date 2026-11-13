@@ -22,7 +22,6 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.behov.SøknadsdataBehovMottak
 import no.nav.dagpenger.soknad.orkestrator.config.configure
-import no.nav.dagpenger.soknad.orkestrator.opplysning.DpBehandlingKlient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.opplysning.landApi
 import no.nav.dagpenger.soknad.orkestrator.personalia.KontonummerService
@@ -98,13 +97,6 @@ internal class ApplicationBuilder(
                         scope = Configuration.pdlApiSystemScope,
                     ).access_token ?: throw RuntimeException("Kunne ikke hente token")
             },
-        )
-
-    private val dpBehandlingKlient =
-        DpBehandlingKlient(
-            azureAdKlient = azureAdClient,
-            dpBehandlingBaseUrl = Configuration.miljøVariabler.dpBehandlingBaseUrl,
-            dpBehandlingScope = Configuration.miljøVariabler.dpBehandlingScope,
         )
 
     private val saksbehandlerBarnRepository = SaksbehandlerBarnRepositoryPostgres(dataSource)

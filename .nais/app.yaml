@@ -51,8 +51,6 @@ spec:
   env:
     - name: GRUPPER_SAKSBEHANDLER
       value: {{azure.grupper.saksbehandler}}
-    - name: DP_BEHANDLING_SCOPE
-      value: {{DP_BEHANDLING_SCOPE}}
     - name: PDL_API_HOST
       value: {{PDL_API_HOST}}
     - name: PDL_API_USER_SCOPE
@@ -70,6 +68,7 @@ spec:
       enabled: true
       tenant: {{azure.tenant}}
       allowAllUsers: false
+      # Gruppen gir også tilgang til OBO-token. dp-saksbehandling-frontend henter OBO-token før den kaller /land.
       claims:
         extra:
           - NAVident
@@ -90,7 +89,6 @@ spec:
         {{/if}}
     outbound:
       rules:
-        - application: dp-behandling
         - application: sokos-kontoregister-person
           namespace: okonomi
         - application: logging

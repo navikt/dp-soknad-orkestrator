@@ -19,7 +19,7 @@ hvordan skjermbildene ser ut, eller hvordan dp-behandling fatter vedtak.
 |---|---|
 | `dp-brukerdialog-frontend` | Oppretter søknad, lagrer seksjoner, viser framdrift og sender inn |
 | `dp-mine-dagpenger-frontend` | Henter egne søknader og dokumentasjonskrav |
-| `dp-behandling` | Ber om opplysninger, mottar saksbehandlerendringer for barn (utfaset) og melder `søknadsbehandling_ferdig` |
+| `dp-behandling` | Ber om opplysninger og melder `søknadsbehandling_ferdig` |
 | Rapids & Rivers på `teamdagpenger.rapid.v1` | Transport for behov, løsninger og søknadshendelser |
 | PDL | Henter personalia og barn for innbygger |
 | Person-/kontoregisteret | Henter aktivt kontonummer |
@@ -35,7 +35,7 @@ Appen har ansvar for:
 - overgangsstøtte mellom quiz-opplysninger og `seksjon_v2`
 - å svare på behov fra dp-behandling med data fra riktig kilde
 - å publisere hendelser om søknader, tilstander og dokumentasjonskrav
-- saksbehandleres CRUD for barn, med historikk i `saksbehandler_barn` (utfaset, koden er ikke fjernet ennå)
+- lesing av historiske barneendringer fra `saksbehandler_barn` i barn-behovløserne (skriveflyten er avviklet)
 - ettersending av dokumentasjon og kobling mot journalpost
 
 Appen har ikke ansvar for:
@@ -90,8 +90,7 @@ quiz-opplysninger først, før det falles tilbake til `seksjon_v2`.
 | Ettersending | `PUT /seksjon/{søknadId}/{seksjonId}/dokumentasjonskrav/ettersending` | TokenX | Starte journalføring av ettersendt dokumentasjon |
 | Personalia | `GET /personalia` | TokenX | Hente personalia og kontonummer |
 | Barn | `GET /barn` | TokenX | Hente barn fra PDL |
-| Saksbehandler-barn (utfaset) | `/opplysninger/barn/...` | Azure AD | Lese og endre barn på en søknad |
-| Land | `GET /land` | TokenX | Hente landliste |
+| Land | `GET /land` | Ingen | Hente landliste. Brukes av dp-saksbehandling-frontend |
 
 OpenAPI-spesifikasjonen i `openapi/src/main/resources/soknad-orkestrator-api.yaml`
 er kilden for genererte DTO-er. Genererte filer skal ikke endres direkte.
@@ -106,9 +105,8 @@ er kilden for genererte DTO-er. Genererte filer skal ikke endres direkte.
 | Vedtaksstatus | `soknad_status` | Ja, fylt av `søknadsbehandling_ferdig` |
 | Dokumentasjonskrav | `seksjon_v2.dokumentasjonskrav` | Ja |
 | Gamle quiz-svar | `quiz_opplysning` | Ja, for lesing og kompatibilitet |
-| Saksbehandlerens barn (utfaset) | `saksbehandler_barn` | Ja, append-only snapshot |
+| Saksbehandlerens barn (historikk, avviklet skriveflyt) | `saksbehandler_barn` | Ja, append-only snapshot, bare lesing |
 | Barn og persondata | PDL og kontoregister | Nei, eksterne kilder |
-| Behandlingens opplysning om barn (utfaset) | dp-behandling | Nei, denne appen skriver via klient |
 | Journalpost og dokument | Journalføring/SAF | Nei |
 
 `SøknadRepository.hentSoknaderForIdent()` bruker en inner join mot `seksjon_v2`. Søknader uten
@@ -168,10 +166,12 @@ Appen kan ikke alene endre tekst, plassering eller påminnelser i brukergrensesn
 ## Tilgang, personvern og endringsgrenser
 
 - TokenX beskytter innbyggerendepunktene.
-- Azure AD beskytter saksbehandlerendepunktene.
+- Azure AD brukes bare for tjeneste-til-tjeneste-kall ut fra appen (for eksempel SAF). Appen har ingen
+  Azure AD-beskyttede endepunkter. Gruppen `saksbehandler` står igjen i Nais-manifestet fordi den styrer
+  hvem som får OBO-token for appen. Frontendens tokenutveksling for `/land` må fjernes før gruppen kan fjernes.
 - Fødselsnummer, ident og svar skal ikke logges i vanlig logg. Kode som trenger
   persondata bruker sikkerlogg.
-- Utfaset: Barnendringer fra saksbehandler skriver en komplett ny snapshot til `saksbehandler_barn`.
+- Barn-behovløserne leser siste snapshot fra `saksbehandler_barn`. Appen skriver ikke lenger nye snapshots.
   Tabellen skal ikke oppdateres rad for rad.
 - Endringer i OpenAPI- eller AsyncAPI-kontrakter må vurderes mot alle konsumenter.
 - Behovløsere må beholde støtte for både quiz-opplysninger og `seksjon_v2` så lenge
@@ -189,7 +189,6 @@ Metrikkene ligger under `dp_soknad_orkestrator`. De viktigste for søknadstrakte
 - `antall_soknader_slettet{kilde="ny"}`
 - `antall_behov_mottatt{behov}`
 - `antall_behov_lost{behov}`
-- `antall_endringer_barn`
 - `antall_soknader_varslet`
 - `antall_soknader_dekomponert` og `antall_soknader_dekomponering_feilet`
 
@@ -205,7 +204,7 @@ analysehendelser.
 | Seksjoner og dokumentasjonskrav | `søknad/seksjon/SeksjonApi.kt`, `SeksjonService.kt` |
 | PDF og journalføring | `søknad/melding/`, `søknad/mottak/`, `søknad/pdf/` |
 | Behov og svar | `behov/BehovMottak.kt`, `behov/BehovløserFactory.kt`, `behov/løsere/` |
-| Saksbehandler-barn og dp-behandling (utfaset) | `opplysning/OpplysningService.kt`, `opplysning/DpBehandlingKlient.kt` |
+| Historiske barn (bare lesing) | `opplysning/SaksbehandlerBarnRepository.kt`, `behov/løsere/BarnetilleggV2BehovLøser.kt` |
 | Vedtaksstatus | `søknad/mottak/SøknadsbehandlingFerdigMottak.kt`, `søknad/db/SøknadStatusRepository.kt` |
 | Auth og eksterne klienter | `api/auth/`, `ApplicationBuilder.kt`, `Configuration.kt` |
 | Kontrakter | `openapi/src/main/resources/`, `asyncapi/src/main/resources/` |
