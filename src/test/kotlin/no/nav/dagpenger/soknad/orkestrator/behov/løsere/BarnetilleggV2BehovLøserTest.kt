@@ -273,6 +273,38 @@ class BarnetilleggV2BehovLøserTest {
         løsteBarn[0]["begrunnelse"].asString() shouldBe "Endret av saksbehandler"
     }
 
+    @Test
+    fun `lagret tomt snapshot gir ingen barn selv om quiz-opplysninger har barn`() {
+        every { saksbehandlerBarnRepository.hentBarn(søknadId) } returns emptyList()
+        opplysningRepository.lagre(
+            QuizOpplysning(
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
+                type = Barn,
+                ident = ident,
+                søknadId = søknadId,
+                svar =
+                    listOf(
+                        BarnSvar(
+                            barnSvarId = randomUUID(),
+                            fornavnOgMellomnavn = "Quiz",
+                            etternavn = "Barn",
+                            fødselsdato = 1.januar(2000),
+                            statsborgerskap = "NOR",
+                            forsørgerBarnet = false,
+                            fraRegister = true,
+                            kvalifisererTilBarnetillegg = false,
+                        ),
+                    ),
+            ),
+        )
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, BarnetilleggV2))
+
+        val løsning = testRapid.inspektør.field(0, "@løsning")[BarnetilleggV2.name]["verdi"]
+        løsning["barn"].shouldBeEmpty()
+        verify(exactly = 0) { seksjonRepository.hentSeksjonsvar(any(), any(), any()) }
+    }
+
     @Language("JSON")
     val barnetilleggseksjonsvar = """
 {

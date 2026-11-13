@@ -213,6 +213,72 @@ class BarnetilleggBehovLøserTest {
         verify(exactly = 0) { quizOpplysningRepositorySpy.hentEllerOpprettSøknadbarnId(any()) }
         løsteBarn.shouldBeEmpty()
     }
+
+    @Test
+    fun `lagret snapshot har prioritet over quiz-opplysninger`() {
+        every { saksbehandlerBarnRepository.hentBarn(søknadId) } returns
+            listOf(
+                BarnSvar(
+                    barnSvarId = randomUUID(),
+                    fornavnOgMellomnavn = "Lagret",
+                    etternavn = "Barn",
+                    fødselsdato = 1.januar(2010),
+                    statsborgerskap = "NOR",
+                    forsørgerBarnet = true,
+                    fraRegister = true,
+                    kvalifisererTilBarnetillegg = true,
+                    barnetilleggFom = 1.januar(2010),
+                    barnetilleggTom = 1.januar(2028),
+                    endretAv = "Z991234",
+                    begrunnelse = "Lagret snapshot",
+                ),
+            )
+        lagreQuizBarn()
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Barnetillegg))
+
+        val løsteBarn = testRapid.inspektør.field(0, "@løsning")[Barnetillegg.name]["verdi"]
+        løsteBarn.size() shouldBe 1
+        løsteBarn[0]["fornavnOgMellomnavn"].asString() shouldBe "Lagret"
+        løsteBarn[0]["kvalifiserer"].asBoolean() shouldBe true
+        løsteBarn[0]["endretAv"].asString() shouldBe "Z991234"
+    }
+
+    @Test
+    fun `lagret tomt snapshot gir ingen barn selv om quiz-opplysninger har barn`() {
+        every { saksbehandlerBarnRepository.hentBarn(søknadId) } returns emptyList()
+        lagreQuizBarn()
+
+        behovløser.løs(lagBehovmelding(ident, søknadId, Barnetillegg))
+
+        val løsteBarn = testRapid.inspektør.field(0, "@løsning")[Barnetillegg.name]["verdi"]
+        løsteBarn.shouldBeEmpty()
+        verify(exactly = 0) { seksjonRepository.hentSeksjonsvar(any(), any(), any()) }
+    }
+
+    private fun lagreQuizBarn() {
+        opplysningRepository.lagre(
+            QuizOpplysning(
+                beskrivendeId = BESKRIVENDE_ID_PDL_BARN,
+                type = Barn,
+                ident = ident,
+                søknadId = søknadId,
+                svar =
+                    listOf(
+                        BarnSvar(
+                            barnSvarId = randomUUID(),
+                            fornavnOgMellomnavn = "Quiz",
+                            etternavn = "Barn",
+                            fødselsdato = 1.januar(2000),
+                            statsborgerskap = "NOR",
+                            forsørgerBarnet = false,
+                            fraRegister = true,
+                            kvalifisererTilBarnetillegg = false,
+                        ),
+                    ),
+            ),
+        )
+    }
 }
 
 val barnetilleggseksjonsvar = """
