@@ -13,7 +13,6 @@ import no.nav.dagpenger.soknad.orkestrator.Configuration.azureAdClient
 import no.nav.dagpenger.soknad.orkestrator.Configuration.tokenXClient
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
-import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
 import no.nav.dagpenger.soknad.orkestrator.api.rotApi
 import no.nav.dagpenger.soknad.orkestrator.barn.BarnService
@@ -111,9 +110,6 @@ internal class ApplicationBuilder(
                             jackson { configure() }
                         }
                         install(Authentication) {
-                            jwt("azureAd") {
-                                azureAd()
-                            }
                             jwt("tokenX") {
                                 tokenX()
                             }

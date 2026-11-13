@@ -8,7 +8,6 @@ import io.ktor.server.auth.jwt.JWTPayloadHolder
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.auth.parseAuthorizationHeader
 import io.ktor.server.request.ApplicationRequest
-import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.issuerFromString
 
 internal fun validator(jwtCredential: JWTCredential): JWTPrincipal {
     requirePid(jwtCredential)
@@ -29,11 +28,3 @@ internal fun ApplicationRequest.jwt(): String =
 
 internal fun ApplicationCall.optionalIdent(): String? =
     requireNotNull(this.authentication.principal<JWTPrincipal>()).payload.claims["pid"]?.asString()
-
-internal fun ApplicationCall.issuer() =
-    issuerFromString(
-        this.authentication
-            .principal<JWTPrincipal>()
-            ?.payload
-            ?.issuer,
-    )

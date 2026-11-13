@@ -4,7 +4,6 @@ import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
-import com.natpryce.konfig.PropertyGroup
 import com.natpryce.konfig.getValue
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
@@ -35,10 +34,6 @@ internal object Configuration {
 
     val safUrl by lazy { properties[Key("SAF_URL", stringType)] }
     val safScope by lazy { properties[Key("SAF_SCOPE", stringType)] }
-
-    object Grupper : PropertyGroup() {
-        val saksbehandler by stringType
-    }
 
     val azureAdClient: CachedOauth2Client by lazy {
         val azureAdConfig = OAuth2Config.AzureAd(properties)
