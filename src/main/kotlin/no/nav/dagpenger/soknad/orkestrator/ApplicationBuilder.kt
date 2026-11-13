@@ -15,6 +15,7 @@ import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
+import no.nav.dagpenger.soknad.orkestrator.api.rotApi
 import no.nav.dagpenger.soknad.orkestrator.barn.BarnService
 import no.nav.dagpenger.soknad.orkestrator.barn.barnApi
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
@@ -22,10 +23,8 @@ import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
 import no.nav.dagpenger.soknad.orkestrator.behov.SøknadsdataBehovMottak
 import no.nav.dagpenger.soknad.orkestrator.config.configure
 import no.nav.dagpenger.soknad.orkestrator.opplysning.DpBehandlingKlient
-import no.nav.dagpenger.soknad.orkestrator.opplysning.OpplysningService
 import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepositoryPostgres
 import no.nav.dagpenger.soknad.orkestrator.opplysning.landApi
-import no.nav.dagpenger.soknad.orkestrator.opplysning.opplysningApi
 import no.nav.dagpenger.soknad.orkestrator.personalia.KontonummerService
 import no.nav.dagpenger.soknad.orkestrator.personalia.PersonService
 import no.nav.dagpenger.soknad.orkestrator.personalia.PersonaliaService
@@ -110,15 +109,6 @@ internal class ApplicationBuilder(
 
     private val saksbehandlerBarnRepository = SaksbehandlerBarnRepositoryPostgres(dataSource)
 
-    private val opplysningService: OpplysningService =
-        OpplysningService(
-            opplysningRepository = quizOpplysningRepositoryPostgres,
-            dpBehandlingKlient = dpBehandlingKlient,
-            søknadRepository = søknadRepository,
-            saksbehandlerBarnRepository = saksbehandlerBarnRepository,
-            seksjonRepository = seksjonRepository,
-        )
-
     private val rapidsConnection =
         RapidApplication
             .create(
@@ -136,7 +126,7 @@ internal class ApplicationBuilder(
                                 tokenX()
                             }
                         }
-                        opplysningApi(opplysningService)
+                        rotApi()
                         søknadApi(søknadService, seksjonService)
                         seksjonApi(seksjonService)
                         personaliaApi(personaliaService)
