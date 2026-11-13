@@ -49,8 +49,6 @@ spec:
     enabled: true
     path: /metrics
   env:
-    - name: GRUPPER_SAKSBEHANDLER
-      value: {{azure.grupper.saksbehandler}}
     - name: PDL_API_HOST
       value: {{PDL_API_HOST}}
     - name: PDL_API_USER_SCOPE
@@ -70,8 +68,6 @@ spec:
       allowAllUsers: false
       # Gruppen gir også tilgang til OBO-token. dp-saksbehandling-frontend henter OBO-token før den kaller /land.
       claims:
-        extra:
-          - NAVident
         groups:
           - id: {{azure.grupper.saksbehandler}}
   accessPolicy:

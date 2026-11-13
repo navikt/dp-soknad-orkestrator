@@ -95,15 +95,14 @@ See `Configuration.kt` for all config keys.
 - **Mocking:** MockK (`mockk<T>()`, `every { } returns`, `verify { }`)
 - **HTTP tests:** Ktor `testApplication { }` with `TestApplication` helpers
 - **DB tests:** Postgres testcontainers
-- **Auth tests:** `mock-oauth2-server` with `testAzureADToken` helper
+- **Auth tests:** `mock-oauth2-server` with `testTokenXToken` helper
 
 Tests mirror the main source structure under `src/test/kotlin/`.
 
 ### Auth in tests
 
 ```kotlin
-System.setProperty("Grupper.saksbehandler", "saksbehandler")
-TestApplication.withMockAuthServerAndTestApplication { }
+TestApplication.withMockAuthServerAndTestApplication(moduleFunction = { }) { }
 ```
 
 ## Code style

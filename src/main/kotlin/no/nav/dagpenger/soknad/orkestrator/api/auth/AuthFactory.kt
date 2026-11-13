@@ -12,8 +12,6 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.serialization.jackson3.jackson
 import io.ktor.server.auth.jwt.JWTAuthenticationProvider
-import io.ktor.server.auth.jwt.JWTCredential
-import io.ktor.server.auth.jwt.JWTPrincipal
 import kotlinx.coroutines.runBlocking
 import no.nav.dagpenger.soknad.orkestrator.Configuration
 import tools.jackson.databind.DeserializationFeature
@@ -28,43 +26,11 @@ object AuthFactory {
         val client_id by stringType
     }
 
-    @Suppress("ClassName")
-    private object azure_app : PropertyGroup() {
-        val well_known_url by stringType
-        val client_id by stringType
-    }
-
     private val tokenXConfiguration: OpenIdConfiguration by lazy {
         runBlocking {
             httpClient.get(Configuration.properties[token_x.well_known_url]).body()
         }
     }
-
-    private val azureAdConfiguration: OpenIdConfiguration by lazy {
-        runBlocking {
-            httpClient.get(Configuration.properties[azure_app.well_known_url]).body()
-        }
-    }
-
-    enum class Issuer {
-        TokenX,
-        AzureAD,
-    }
-
-    fun issuerFromString(issuer: String?) =
-        when (issuer) {
-            tokenXConfiguration.issuer -> {
-                Issuer.TokenX
-            }
-
-            azureAdConfiguration.issuer -> {
-                Issuer.AzureAD
-            }
-
-            else -> {
-                throw IllegalArgumentException("Ikke støttet issuer: $issuer")
-            }
-        }
 
     fun JWTAuthenticationProvider.Config.tokenX() {
         verifier(
@@ -78,31 +44,6 @@ object AuthFactory {
             validator(credentials)
         }
     }
-
-    fun JWTAuthenticationProvider.Config.azureAd() {
-        realm = Configuration.APP_NAME
-        verifier(
-            jwkProvider = jwkProvider(URI(azureAdConfiguration.jwksUri).toURL()),
-            issuer = azureAdConfiguration.issuer,
-            configure = {
-                withAudience(Configuration.properties[azure_app.client_id])
-            },
-        )
-
-        val saksbehandlerGruppe: String = Configuration.properties[Configuration.Grupper.saksbehandler]
-
-        validate { jwtClaims ->
-            jwtClaims.måInneholde(ADGruppe = saksbehandlerGruppe)
-            JWTPrincipal(jwtClaims.payload)
-        }
-    }
-
-    private fun JWTCredential.måInneholde(ADGruppe: String) =
-        require(
-            this.payload.claims["groups"]
-                ?.asList(String::class.java)
-                ?.contains(ADGruppe) ?: false,
-        ) { "Mangler tilgang" }
 
     private fun jwkProvider(url: URL) =
         JwkProviderBuilder(url)
