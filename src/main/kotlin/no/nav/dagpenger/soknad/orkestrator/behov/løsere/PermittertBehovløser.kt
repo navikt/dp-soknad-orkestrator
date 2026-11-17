@@ -35,9 +35,9 @@ class PermittertBehovløser(
         val arbeidsforholdOpplysning = opplysningRepository.hent(beskrivendeId, ident, søknadId)
 
         if (arbeidsforholdOpplysning != null) {
-            return arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>().any {
-                it.sluttårsak == Sluttårsak.PERMITTERT
-            }
+            val arbeidsforhold = arbeidsforholdOpplysning.svar.asListOf<ArbeidsforholdSvar>()
+            return arbeidsforhold.any { it.sluttårsak == Sluttårsak.PERMITTERT } &&
+                arbeidsforhold.none { it.sluttårsak == Sluttårsak.PERMITTERT_FISKEFOREDLING }
         }
 
         val seksjonsSvar =
@@ -54,9 +54,8 @@ class PermittertBehovløser(
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
-                    return it.any { arbeidsforhold ->
-                        arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asString() == "jegErPermittert"
-                    }
+                    return it.any { arbeidsforhold -> arbeidsforhold.erPermittert() } &&
+                        it.none { arbeidsforhold -> arbeidsforhold.erFiskepermittert() }
                 }
             }
         }

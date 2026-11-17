@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Permittert
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
@@ -273,6 +274,99 @@ class PermittertBehovløserTest {
             )
         } throws IllegalStateException("Fant ingen seksjonsvar på arbeidsforhold for søknad=$søknadId")
         behovløser.rettTilDagpengerUnderPermittering(ident, søknadId) shouldBe false
+    }
+
+    @Test
+    fun `quiz med vanlig permittering og fiskepermittering gir false`() {
+        opplysningRepository.lagre(
+            opplysning(listOf(arbeidsforhold(Sluttårsak.PERMITTERT), arbeidsforhold(Sluttårsak.PERMITTERT_FISKEFOREDLING))),
+        )
+
+        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+
+        resultat shouldBe false
+    }
+
+    @Test
+    fun `quiz med bare fiskepermittering gir false`() {
+        opplysningRepository.lagre(opplysning(listOf(arbeidsforhold(Sluttårsak.PERMITTERT_FISKEFOREDLING))))
+
+        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+
+        resultat shouldBe false
+    }
+
+    @Test
+    fun `seksjon med vanlig permittering og fiskepermittering gir false`() {
+        mockSeksjonssvar(listOf(seksjonsarbeidsforhold(fisk = "nei"), seksjonsarbeidsforhold(fisk = "ja")))
+
+        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+
+        resultat shouldBe false
+    }
+
+    @Test
+    fun `seksjon med bare fiskepermittering gir false`() {
+        mockSeksjonssvar(listOf(seksjonsarbeidsforhold(fisk = "ja")))
+
+        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+
+        resultat shouldBe false
+    }
+
+    @Test
+    fun `seksjon med vanlig permittering og fiskefelt nei gir true`() {
+        mockSeksjonssvar(listOf(seksjonsarbeidsforhold(fisk = "nei")))
+
+        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+
+        resultat shouldBe true
+    }
+
+    @Test
+    fun `skal ignorere fiskesvar på arbeidsforhold som ikke er permittert`() {
+        mockSeksjonssvar(
+            listOf(
+                seksjonsarbeidsforhold(endring = "arbeidsgiverErKonkurs", fisk = "ja"),
+                seksjonsarbeidsforhold(),
+            ),
+        )
+
+        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+
+        resultat shouldBe true
+    }
+
+    @Test
+    fun `quiz har prioritet over seksjonsdata også med tom quizliste`() {
+        opplysningRepository.lagre(opplysning(emptyList()))
+        mockSeksjonssvar(listOf(seksjonsarbeidsforhold(fisk = "nei")))
+
+        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+
+        resultat shouldBe false
+        verify(exactly = 0) { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) }
+    }
+
+    private fun arbeidsforhold(sluttårsak: Sluttårsak) = ArbeidsforholdSvar(navn = "arbeidsforhold", land = "NOR", sluttårsak = sluttårsak)
+
+    private fun seksjonsarbeidsforhold(
+        endring: String = "jegErPermittert",
+        fisk: String? = "nei",
+    ) = mapOf(
+        "hvordanHarDetteArbeidsforholdetEndretSeg" to endring,
+        "permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien" to fisk,
+    )
+
+    private fun mockSeksjonssvar(arbeidsforhold: List<Map<String, String?>>) {
+        every { seksjonRepository.hentSeksjonsvarEllerKastException(ident, søknadId, "arbeidsforhold") } returns
+            objectMapper.writeValueAsString(
+                mapOf(
+                    "seksjonId" to "arbeidsforhold",
+                    "seksjonsvar" to mapOf("registrerteArbeidsforhold" to arbeidsforhold),
+                    "versjon" to 1,
+                ),
+            )
     }
 
     private fun opplysning(
