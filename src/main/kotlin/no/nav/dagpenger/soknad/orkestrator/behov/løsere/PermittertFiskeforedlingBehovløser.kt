@@ -52,11 +52,7 @@ class PermittertFiskeforedlingBehovløser(
         objectMapper.readTree(seksjonsSvar).let { seksjonsJson ->
             seksjonsJson.findPath("registrerteArbeidsforhold")?.let {
                 if (!it.isMissingOrNull()) {
-                    return it
-                        .any { arbeidsforhold ->
-                            arbeidsforhold["hvordanHarDetteArbeidsforholdetEndretSeg"]?.asString() == "jegErPermittert" &&
-                                arbeidsforhold["permittertErDuPermittertFraFiskeforedlingsEllerFiskeoljeindustrien"]?.asString() == "ja"
-                        }
+                    return it.any { arbeidsforhold -> arbeidsforhold.erFiskepermittert() }
                 }
             }
         }
