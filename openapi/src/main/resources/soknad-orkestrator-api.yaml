@@ -23,8 +23,58 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Land'
+  /behov/{behovNavn}:
+    post:
+      summary: Løs et behov synkront (maskin-til-maskin)
+      description: Krever Entra ID-token med idtyp=app. Svarer det samme som Kafka-behovløseren, men uten gjelderFra.
+      parameters:
+        - name: behovNavn
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/BehovNavn'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BehovRequest'
+      responses:
+        '200':
+          description: Løsning på behovet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BehovResponse'
+        '400':
+          description: Ukjent behov, behov som ikke kan løses synkront, eller ugyldig forespørsel
+        '401':
+          description: Mangler eller ugyldig app-token
 components:
   schemas:
+    BehovNavn:
+      type: string
+      enum:
+        - Permittert
+        - PermittertFiskeforedling
+    BehovRequest:
+      type: object
+      properties:
+        ident:
+          type: string
+        søknadId:
+          type: string
+          format: uuid
+      required:
+        - ident
+        - søknadId
+    BehovResponse:
+      type: object
+      properties:
+        verdi:
+          type: boolean
+      required:
+        - verdi
     Opplysning:
       type: object
       properties:
