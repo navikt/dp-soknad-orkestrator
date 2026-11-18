@@ -47,6 +47,14 @@ object TestApplication {
             ).serialize()
     }
 
+    internal fun testAzureADMaskinToken(claims: Map<String, Any> = mapOf("idtyp" to "app")): String =
+        mockOAuth2Server
+            .issueToken(
+                issuerId = AZUREAD_ISSUER_ID,
+                audience = CLIENT_ID,
+                claims = claims,
+            ).serialize()
+
     internal fun withMockAuthServerAndTestApplication(
         moduleFunction: Application.() -> Unit,
         test: suspend TestContext.() -> Unit,

@@ -81,6 +81,7 @@ spec:
         - application: dp-brukerdialog-frontend
         - application: dp-saksbehandling-frontend
         - application: dp-mine-dagpenger-frontend
+        - application: dp-permittering-statistikk
         {{#if wonderwalled}}
         - application: tokenx-token-generator
           namespace: nais

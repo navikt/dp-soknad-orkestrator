@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.natpryce.konfig.PropertyGroup
 import com.natpryce.konfig.getValue
 import com.natpryce.konfig.stringType
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -33,6 +34,8 @@ object AuthFactory {
         val well_known_url by stringType
         val client_id by stringType
     }
+
+    private val logger = KotlinLogging.logger {}
 
     private val tokenXConfiguration: OpenIdConfiguration by lazy {
         runBlocking {
@@ -95,6 +98,27 @@ object AuthFactory {
             jwtClaims.måInneholde(ADGruppe = saksbehandlerGruppe)
             JWTPrincipal(jwtClaims.payload)
         }
+    }
+
+    fun JWTAuthenticationProvider.Config.azureAdMaskin() {
+        realm = Configuration.APP_NAME
+        verifier(
+            jwkProvider = jwkProvider(URI(azureAdConfiguration.jwksUri).toURL()),
+            issuer = azureAdConfiguration.issuer,
+            configure = {
+                withAudience(Configuration.properties[azure_app.client_id])
+            },
+        )
+
+        validate { credential ->
+            if (credential.erApp()) JWTPrincipal(credential.payload) else null
+        }
+    }
+
+    private fun JWTCredential.erApp(): Boolean {
+        val erApp = payload.getClaim("idtyp").asString() == "app"
+        if (!erApp) logger.warn { "Credential inneholder ikke idtyp med verdi app" }
+        return erApp
     }
 
     private fun JWTCredential.måInneholde(ADGruppe: String) =
