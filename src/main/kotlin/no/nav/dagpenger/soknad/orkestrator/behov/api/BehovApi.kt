@@ -19,7 +19,10 @@ internal fun Application.behovApi(synkronBehovløser: SynkronBehovløser) {
             post("/behov/{behovNavn}") {
                 val behov = Behov.entries.firstOrNull { it.name == call.parameters["behovNavn"] }
                 when (behov) {
-                    null -> call.respond(HttpStatusCode.BadRequest, "Ugyldig behov")
+                    null -> {
+                        call.respond(HttpStatusCode.BadRequest, "Ugyldig behov")
+                    }
+
                     else -> {
                         val request = call.receive<BehovRequestDTO>()
                         try {
