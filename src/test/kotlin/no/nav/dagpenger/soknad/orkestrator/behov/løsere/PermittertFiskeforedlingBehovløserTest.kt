@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.PermittertFiskeforedling
+import no.nav.dagpenger.soknad.orkestrator.behov.permittering.PermittertFiskeforedlingVurdering
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
@@ -26,7 +27,9 @@ class PermittertFiskeforedlingBehovløserTest {
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
     val testRapid = TestRapid()
-    val behovløser = PermittertFiskeforedlingBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
+    val fiskepermittering = PermittertFiskeforedlingVurdering(opplysningRepository, seksjonRepository)
+    val behovløser =
+        PermittertFiskeforedlingBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
 
@@ -253,7 +256,7 @@ class PermittertFiskeforedlingBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning(svar = svarMedEttPermittertFiskeforedlingArbeidsforhold))
-        behovløser.rettTilDagpengerUnderPermitteringFraFiskeindustri(ident, søknadId) shouldBe true
+        fiskepermittering.rettTilDagpenger(ident, søknadId) shouldBe true
     }
 
     @Test
@@ -268,7 +271,7 @@ class PermittertFiskeforedlingBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning(svar = svarUtenPermittertFiskeforedlingArbeidsforhold))
-        behovløser.rettTilDagpengerUnderPermitteringFraFiskeindustri(ident, søknadId) shouldBe false
+        fiskepermittering.rettTilDagpenger(ident, søknadId) shouldBe false
     }
 
     @Test
@@ -280,7 +283,7 @@ class PermittertFiskeforedlingBehovløserTest {
                 any(),
             )
         } throws IllegalStateException("Fant ingen seksjonsvar på arbeidsforhold for søknad=$søknadId")
-        behovløser.rettTilDagpengerUnderPermitteringFraFiskeindustri(ident, søknadId) shouldBe false
+        fiskepermittering.rettTilDagpenger(ident, søknadId) shouldBe false
     }
 
     private fun opplysning(

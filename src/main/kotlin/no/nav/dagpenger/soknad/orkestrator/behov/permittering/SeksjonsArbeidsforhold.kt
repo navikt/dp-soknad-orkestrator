@@ -1,4 +1,4 @@
-package no.nav.dagpenger.soknad.orkestrator.behov.løsere
+package no.nav.dagpenger.soknad.orkestrator.behov.permittering
 
 import tools.jackson.databind.JsonNode
 
