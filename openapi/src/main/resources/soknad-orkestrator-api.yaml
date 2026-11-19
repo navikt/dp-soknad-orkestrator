@@ -50,6 +50,8 @@ paths:
           description: Ukjent behov, behov som ikke kan løses synkront, eller ugyldig forespørsel
         '401':
           description: Mangler eller ugyldig app-token
+        '404':
+          description: Søknaden finnes ikke, eller tilhører ikke oppgitt ident
 components:
   schemas:
     BehovNavn:

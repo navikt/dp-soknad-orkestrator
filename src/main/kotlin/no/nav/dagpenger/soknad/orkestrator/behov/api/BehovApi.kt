@@ -12,6 +12,7 @@ import no.nav.dagpenger.soknad.orkestrator.api.models.BehovResponseDTO
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov
 import no.nav.dagpenger.soknad.orkestrator.behov.IkkeStøttetBehov
 import no.nav.dagpenger.soknad.orkestrator.behov.SynkronBehovløser
+import no.nav.dagpenger.soknad.orkestrator.behov.SøknadFinnesIkke
 
 internal fun Application.behovApi(synkronBehovløser: SynkronBehovløser) {
     routing {
@@ -30,6 +31,8 @@ internal fun Application.behovApi(synkronBehovløser: SynkronBehovløser) {
                             call.respond(HttpStatusCode.OK, BehovResponseDTO(verdi = verdi))
                         } catch (_: IkkeStøttetBehov) {
                             call.respond(HttpStatusCode.BadRequest, "Ugyldig behov")
+                        } catch (_: SøknadFinnesIkke) {
+                            call.respond(HttpStatusCode.NotFound, "Fant ikke søknad")
                         }
                     }
                 }

@@ -138,7 +138,7 @@ internal class ApplicationBuilder(
                         personaliaApi(personaliaService)
                         barnApi(barnService)
                         landApi()
-                        behovApi(SynkronBehovløser(quizOpplysningRepositoryPostgres, seksjonRepository))
+                        behovApi(SynkronBehovløser(quizOpplysningRepositoryPostgres, seksjonRepository, søknadRepository))
                     }
                 },
             ).also { rapidsConnection ->

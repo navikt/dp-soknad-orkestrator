@@ -12,17 +12,15 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.Authentication
 import io.ktor.server.auth.jwt.jwt
+import io.mockk.every
 import io.mockk.mockk
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAdMaskin
 import no.nav.dagpenger.soknad.orkestrator.api.models.BehovRequestDTO
 import no.nav.dagpenger.soknad.orkestrator.api.models.BehovResponseDTO
+import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov
+import no.nav.dagpenger.soknad.orkestrator.behov.IkkeStøttetBehov
 import no.nav.dagpenger.soknad.orkestrator.behov.SynkronBehovløser
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.ArbeidsforholdSvar
-import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Sluttårsak
-import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
-import no.nav.dagpenger.soknad.orkestrator.utils.InMemoryQuizOpplysningRepository
+import no.nav.dagpenger.soknad.orkestrator.behov.SøknadFinnesIkke
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.testAzureADMaskinToken
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.testAzureADToken
 import no.nav.dagpenger.soknad.orkestrator.utils.TestApplication.withMockAuthServerAndTestApplication
@@ -31,7 +29,7 @@ import org.junit.jupiter.api.Test
 import java.util.UUID
 
 class BehovApiTest {
-    private val opplysningRepository = InMemoryQuizOpplysningRepository()
+    private val synkronBehovløser = mockk<SynkronBehovløser>()
     private val ident = "12345678910"
     private val søknadId = UUID.randomUUID()
 
@@ -39,13 +37,13 @@ class BehovApiTest {
         install(Authentication) {
             jwt("azureAd-maskin") { azureAdMaskin() }
         }
-        behovApi(SynkronBehovløser(opplysningRepository, mockk<SeksjonRepository>(relaxed = true)))
+        behovApi(synkronBehovløser)
     }
 
     @Test
-    fun `Permittert svarer true for vanlig permittering`() =
+    fun `svarer med verdien fra SynkronBehovløser`() =
         withMockAuthServerAndTestApplication(testModul) {
-            lagreArbeidsforhold(Sluttårsak.PERMITTERT)
+            every { synkronBehovløser.løs(Behov.Permittert, ident, søknadId) } returns true
 
             val response = postBehov("Permittert")
 
@@ -54,17 +52,18 @@ class BehovApiTest {
         }
 
     @Test
-    fun `PermittertFiskeforedling svarer true for fiskepermittering`() =
+    fun `søknad som ikke finnes gir 404`() =
         withMockAuthServerAndTestApplication(testModul) {
-            lagreArbeidsforhold(Sluttårsak.PERMITTERT_FISKEFOREDLING)
+            every { synkronBehovløser.løs(any(), any(), any()) } throws SøknadFinnesIkke(søknadId)
 
-            postBehov("PermittertFiskeforedling").body<BehovResponseDTO>().verdi shouldBe true
-            postBehov("Permittert").body<BehovResponseDTO>().verdi shouldBe false
+            postBehov("Permittert").status shouldBe HttpStatusCode.NotFound
         }
 
     @Test
-    fun `behov som ikke er implementert synkront gir 400`() =
+    fun `behov som ikke støttes synkront gir 400`() =
         withMockAuthServerAndTestApplication(testModul) {
+            every { synkronBehovløser.løs(any(), any(), any()) } throws IkkeStøttetBehov(Behov.Ordinær)
+
             postBehov("Ordinær").status shouldBe HttpStatusCode.BadRequest
         }
 
@@ -105,23 +104,10 @@ class BehovApiTest {
             client.post("/behov/Permittert").status shouldBe HttpStatusCode.Unauthorized
         }
 
-    private suspend fun TestContext.postBehov(
-        behovNavn: String,
-        request: BehovRequestDTO = BehovRequestDTO(ident, søknadId),
-    ) = client.post("/behov/$behovNavn") {
-        bearerAuth(testAzureADMaskinToken())
-        contentType(ContentType.Application.Json)
-        setBody(request)
-    }
-
-    private fun lagreArbeidsforhold(sluttårsak: Sluttårsak) =
-        opplysningRepository.lagre(
-            QuizOpplysning(
-                beskrivendeId = "faktum.arbeidsforhold",
-                type = Arbeidsforhold,
-                svar = listOf(ArbeidsforholdSvar(navn = "arbeidsforhold", land = "NOR", sluttårsak = sluttårsak)),
-                ident = ident,
-                søknadId = søknadId,
-            ),
-        )
+    private suspend fun TestContext.postBehov(behovNavn: String) =
+        client.post("/behov/$behovNavn") {
+            bearerAuth(testAzureADMaskinToken())
+            contentType(ContentType.Application.Json)
+            setBody(BehovRequestDTO(ident, søknadId))
+        }
 }
