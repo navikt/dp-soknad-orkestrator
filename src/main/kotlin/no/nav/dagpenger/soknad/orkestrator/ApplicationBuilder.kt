@@ -14,13 +14,16 @@ import no.nav.dagpenger.soknad.orkestrator.Configuration.tokenXClient
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.dataSource
 import no.nav.dagpenger.soknad.orkestrator.PostgresDataSourceBuilder.runMigration
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAd
+import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.azureAdMaskin
 import no.nav.dagpenger.soknad.orkestrator.api.auth.AuthFactory.tokenX
 import no.nav.dagpenger.soknad.orkestrator.api.rotApi
 import no.nav.dagpenger.soknad.orkestrator.barn.BarnService
 import no.nav.dagpenger.soknad.orkestrator.barn.barnApi
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovMottak
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory
+import no.nav.dagpenger.soknad.orkestrator.behov.SynkronBehovløser
 import no.nav.dagpenger.soknad.orkestrator.behov.SøknadsdataBehovMottak
+import no.nav.dagpenger.soknad.orkestrator.behov.api.behovApi
 import no.nav.dagpenger.soknad.orkestrator.config.configure
 import no.nav.dagpenger.soknad.orkestrator.opplysning.DpBehandlingKlient
 import no.nav.dagpenger.soknad.orkestrator.opplysning.SaksbehandlerBarnRepositoryPostgres
@@ -125,6 +128,9 @@ internal class ApplicationBuilder(
                             jwt("tokenX") {
                                 tokenX()
                             }
+                            jwt("azureAd-maskin") {
+                                azureAdMaskin()
+                            }
                         }
                         rotApi()
                         søknadApi(søknadService, seksjonService)
@@ -132,6 +138,7 @@ internal class ApplicationBuilder(
                         personaliaApi(personaliaService)
                         barnApi(barnService)
                         landApi()
+                        behovApi(SynkronBehovløser(quizOpplysningRepositoryPostgres, seksjonRepository, søknadRepository))
                     }
                 },
             ).also { rapidsConnection ->

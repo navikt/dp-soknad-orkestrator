@@ -7,6 +7,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import no.nav.dagpenger.soknad.orkestrator.behov.BehovløserFactory.Behov.Permittert
+import no.nav.dagpenger.soknad.orkestrator.behov.permittering.PermittertVurdering
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.QuizOpplysning
 import no.nav.dagpenger.soknad.orkestrator.quizOpplysning.datatyper.Arbeidsforhold
@@ -27,6 +28,7 @@ class PermittertBehovløserTest {
     val testRapid = TestRapid()
     val søknadRepository = mockk<SøknadRepository>(relaxed = true)
     val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
+    val permittering = PermittertVurdering(opplysningRepository, seksjonRepository)
     val behovløser = PermittertBehovløser(testRapid, opplysningRepository, søknadRepository, seksjonRepository)
     val ident = "12345678910"
     val søknadId = UUID.randomUUID()
@@ -246,7 +248,7 @@ class PermittertBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning(svar = svarMedEttPermittertArbeidsforhold))
-        behovløser.rettTilDagpengerUnderPermittering(ident, søknadId) shouldBe true
+        permittering.rettTilDagpenger(ident, søknadId) shouldBe true
     }
 
     @Test
@@ -261,7 +263,7 @@ class PermittertBehovløserTest {
             )
 
         opplysningRepository.lagre(opplysning(svar = svarUtenPermittertArbeidsforhold))
-        behovløser.rettTilDagpengerUnderPermittering(ident, søknadId) shouldBe false
+        permittering.rettTilDagpenger(ident, søknadId) shouldBe false
     }
 
     @Test
@@ -273,7 +275,7 @@ class PermittertBehovløserTest {
                 any(),
             )
         } throws IllegalStateException("Fant ingen seksjonsvar på arbeidsforhold for søknad=$søknadId")
-        behovløser.rettTilDagpengerUnderPermittering(ident, søknadId) shouldBe false
+        permittering.rettTilDagpenger(ident, søknadId) shouldBe false
     }
 
     @Test
@@ -282,7 +284,7 @@ class PermittertBehovløserTest {
             opplysning(listOf(arbeidsforhold(Sluttårsak.PERMITTERT), arbeidsforhold(Sluttårsak.PERMITTERT_FISKEFOREDLING))),
         )
 
-        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+        val resultat = permittering.rettTilDagpenger(ident, søknadId)
 
         resultat shouldBe false
     }
@@ -291,7 +293,7 @@ class PermittertBehovløserTest {
     fun `quiz med bare fiskepermittering gir false`() {
         opplysningRepository.lagre(opplysning(listOf(arbeidsforhold(Sluttårsak.PERMITTERT_FISKEFOREDLING))))
 
-        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+        val resultat = permittering.rettTilDagpenger(ident, søknadId)
 
         resultat shouldBe false
     }
@@ -300,7 +302,7 @@ class PermittertBehovløserTest {
     fun `seksjon med vanlig permittering og fiskepermittering gir false`() {
         mockSeksjonssvar(listOf(seksjonsarbeidsforhold(fisk = "nei"), seksjonsarbeidsforhold(fisk = "ja")))
 
-        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+        val resultat = permittering.rettTilDagpenger(ident, søknadId)
 
         resultat shouldBe false
     }
@@ -309,7 +311,7 @@ class PermittertBehovløserTest {
     fun `seksjon med bare fiskepermittering gir false`() {
         mockSeksjonssvar(listOf(seksjonsarbeidsforhold(fisk = "ja")))
 
-        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+        val resultat = permittering.rettTilDagpenger(ident, søknadId)
 
         resultat shouldBe false
     }
@@ -318,7 +320,7 @@ class PermittertBehovløserTest {
     fun `seksjon med vanlig permittering og fiskefelt nei gir true`() {
         mockSeksjonssvar(listOf(seksjonsarbeidsforhold(fisk = "nei")))
 
-        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+        val resultat = permittering.rettTilDagpenger(ident, søknadId)
 
         resultat shouldBe true
     }
@@ -332,7 +334,7 @@ class PermittertBehovløserTest {
             ),
         )
 
-        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+        val resultat = permittering.rettTilDagpenger(ident, søknadId)
 
         resultat shouldBe true
     }
@@ -342,7 +344,7 @@ class PermittertBehovløserTest {
         opplysningRepository.lagre(opplysning(emptyList()))
         mockSeksjonssvar(listOf(seksjonsarbeidsforhold(fisk = "nei")))
 
-        val resultat = behovløser.rettTilDagpengerUnderPermittering(ident, søknadId)
+        val resultat = permittering.rettTilDagpenger(ident, søknadId)
 
         resultat shouldBe false
         verify(exactly = 0) { seksjonRepository.hentSeksjonsvarEllerKastException(any(), any(), any()) }
