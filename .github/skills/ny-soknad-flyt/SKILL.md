@@ -14,7 +14,7 @@ Sist verifisert mot koden: oktober 2026.
 
 Appen tar bare imot nye søknader via REST fra frontend (ny flyt). Mottaket av quiz-søknader
 (`SøknadMottak` og `SøknadMapper`) ble fjernet i #431. Quiz-data finnes fortsatt i databasen for
-historiske søknader, og behovløsere og barneredigering leser dem som fallback.
+historiske søknader, og behovløsere og barn-behovløserne leser dem som fallback.
 
 Begge flytene bruker `soknad`-tabellen.
 
@@ -30,7 +30,7 @@ Begge flytene bruker `soknad`-tabellen.
 
 ## Gammel quiz-flyt
 
-Quiz-data leses fortsatt av behovløsere og barneredigering. Mottaket for slettemeldinger fra
+Quiz-data leses fortsatt av behovløsere. Mottaket for slettemeldinger fra
 dp-soknad finnes også:
 
 ```
@@ -196,7 +196,6 @@ Alle metrikker ligger i `metrikker/Metrikker.kt` med namespace `dp_soknad_orkest
 |---|---|
 | `antall_behov_mottatt{behov}` (`BehovMetrikker.mottatt`) | `BehovMottak` |
 | `antall_behov_lost{behov}` (`BehovMetrikker.løst`) | `Behovløser.publiserLøsning()` |
-| `antall_endringer_barn` (`OpplysningMetrikker.endringBarn`) | `OpplysningApi`, ved endring av barn |
 
 ### Metrikker uten aktive kallere
 
