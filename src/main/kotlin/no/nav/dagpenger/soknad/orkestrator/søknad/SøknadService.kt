@@ -317,4 +317,22 @@ class SøknadService(
         }
         return false
     }
+
+    fun erSøknadFerdigBesvart(
+        søknadId: UUID,
+        ident: String,
+    ): Boolean {
+        val dokumentasjonskrav = seksjonRepository.hentDokumentasjonskrav(søknadId, ident)
+        if (dokumentasjonskrav.isEmpty()) {
+            return true
+        }
+        val alleDokumentasjonskravBesvart =
+            dokumentasjonskrav.all { dokumentasjonskravJson ->
+                objectMapper.readTree(dokumentasjonskravJson).all { dokumentasjonskravNode ->
+                    val svar = dokumentasjonskravNode.findPath("svar")
+                    !svar.isMissingOrNull() && svar.asString() != "dokumentkravSvarSenderSenere"
+                }
+            }
+        return alleDokumentasjonskravBesvart
+    }
 }

@@ -149,6 +149,7 @@ internal class ApplicationBuilder(
                     søknadRepository,
                     seksjonRepository,
                     PdfPayloadService(søknadRepository, søknadPersonaliaRepository, seksjonRepository),
+                    søknadService,
                 )
                 SøknadPdfGenerertOgMellomlagretMottak(rapidsConnection, søknadService, seksjonService)
                 SøknadPdfOgVedleggJournalførtMottak(rapidsConnection, søknadRepository)
@@ -176,7 +177,7 @@ internal class ApplicationBuilder(
                     ),
                 )
                 SøknadSlettetMottak(rapidsConnection, søknadService)
-                MeldingOmEttersendingMottak(rapidsConnection, søknadRepository, seksjonRepository)
+                MeldingOmEttersendingMottak(rapidsConnection, søknadRepository, seksjonRepository, søknadService)
                 SøknadsbehandlingFerdigMottak(
                     rapidsConnection,
                     søknadRepository,

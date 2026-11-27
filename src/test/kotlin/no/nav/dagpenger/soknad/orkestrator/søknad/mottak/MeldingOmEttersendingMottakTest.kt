@@ -3,9 +3,12 @@ package no.nav.dagpenger.soknad.orkestrator.søknad.mottak
 import com.github.navikt.tbd_libs.rapids_and_rivers.test_support.TestRapid
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import io.mockk.verifyOrder
 import no.nav.dagpenger.soknad.orkestrator.søknad.Søknad
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.mottak.MeldingOmEttersendingMottak.Companion.BEHOV
@@ -29,7 +32,13 @@ class MeldingOmEttersendingMottakTest {
     private val seksjonRepository = mockk<SeksjonRepository>(relaxed = true)
 
     init {
-        MeldingOmEttersendingMottak(rapidsConnection, søknadRepository, seksjonRepository)
+        MeldingOmEttersendingMottak(
+            rapidsConnection,
+            søknadRepository,
+            seksjonRepository,
+            SøknadService(søknadRepository, mockk(relaxed = true), seksjonRepository),
+        )
+        every { seksjonRepository.hentDokumentasjonskrav(søknadId, ident) } returns listOf(seksjonDataMini)
     }
 
     @Test
@@ -60,12 +69,37 @@ class MeldingOmEttersendingMottakTest {
         dokumentKravInnsendtMelding["ident"].asString() shouldBe ident
         dokumentKravInnsendtMelding["søknad_uuid"].asString() shouldBe søknadId.toString()
         dokumentKravInnsendtMelding["innsendingsType"].asString() shouldBe "ETTERSENDT"
-        dokumentKravInnsendtMelding["ferdigBesvart"].asString() shouldBe "true"
+        dokumentKravInnsendtMelding["ferdigBesvart"].isBoolean shouldBe true
+        dokumentKravInnsendtMelding["ferdigBesvart"].asBoolean() shouldBe true
         dokumentKravInnsendtMelding["kilde"].asString() shouldBe "orkestrator"
         dokumentKravInnsendtMelding["dokumentkrav"].size() shouldBe 1
         dokumentKravInnsendtMelding["dokumentkrav"][0]["dokumentnavn"].asString() shouldBe "ArbeidsforholdArbeidsavtale"
         dokumentKravInnsendtMelding["dokumentkrav"][0]["skjemakode"].asString() shouldBe "O2"
         dokumentKravInnsendtMelding["dokumentkrav"][0]["valg"].asString() shouldBe "ETTERSENDT"
+        verifyOrder {
+            seksjonRepository.lagreDokumentasjonskravEttersending(søknadId, ident, seksjonId, seksjonDataMini, any())
+            seksjonRepository.hentDokumentasjonskrav(søknadId, ident)
+        }
+    }
+
+    @Test
+    fun `dokumentkrav_innsendt har ferdigBesvart false når en annen seksjon fortsatt har krav som skal sendes senere`() {
+        every { søknadRepository.hent(søknadId) } returns
+            Søknad(ident = ident, søknadId = søknadId, tilstand = Tilstand.JOURNALFØRT)
+        every { seksjonRepository.hentDokumentasjonskrav(søknadId, ident) } returns
+            listOf(
+                seksjonDataMini,
+                """[{"seksjonId":"reell-arbeidssoker","svar":"dokumentkravSvarSenderSenere"}]""",
+            )
+
+        rapidsConnection.sendTestMessage(journalførSøknadPdfOgVedleggMelding())
+
+        val melding = rapidsConnection.inspektør.message(0)
+        melding["@event_name"].asString() shouldBe "dokumentkrav_innsendt"
+        melding["ferdigBesvart"].isBoolean shouldBe true
+        melding["ferdigBesvart"].asBoolean() shouldBe false
+        melding["dokumentkrav"].size() shouldBe 1
+        melding["dokumentkrav"][0]["valg"].asString() shouldBe "ETTERSENDT"
     }
 
     @Test

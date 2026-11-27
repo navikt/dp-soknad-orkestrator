@@ -4,7 +4,9 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
 import io.mockk.verify
+import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
 import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import java.time.LocalDateTime
@@ -149,6 +151,28 @@ class SeksjonServiceTest {
             seksjonRepository.lagre(søknadId, ident, seksjonId, seksjonsvar, null, pdfGrunnlag)
             rapidsConnection.publish(ident, any())
         }
+    }
+
+    @Test
+    fun `ettersendingsbehov inneholder ikke ferdigBesvart`() {
+        val søknadId = UUID.randomUUID()
+        val ident = "12345678900"
+        val melding = slot<String>()
+        every { søknadService.finnSkjemaKode(any(), any(), any()) } returns "04-01.03"
+
+        seksjonService.lagreDokumentasjonskravEttersending(
+            søknadId,
+            ident,
+            "arbeidsforhold",
+            dokumentasjonskravMedToDokumenter,
+        )
+
+        verify { rapidsConnection.publish(ident, capture(melding)) }
+        val json = objectMapper.readTree(melding.captured)
+        json["@behov"][0].asString() shouldBe "journalfør_ettersending_av_dokumentasjon"
+        json.has("ferdigBesvart") shouldBe false
+        json["journalfør_ettersending_av_dokumentasjon"].has("ferdigBesvart") shouldBe false
+        verify(exactly = 0) { søknadService.erSøknadFerdigBesvart(any(), any()) }
     }
 
     @Test

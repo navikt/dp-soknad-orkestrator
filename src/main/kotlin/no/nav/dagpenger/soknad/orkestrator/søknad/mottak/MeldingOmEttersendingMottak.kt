@@ -8,6 +8,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.github.oshai.kotlinlogging.withLoggingContext
 import io.micrometer.core.instrument.MeterRegistry
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.melding.DokumentKravInnsendtMelding
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
@@ -18,6 +19,7 @@ internal class MeldingOmEttersendingMottak(
     val rapidsConnection: RapidsConnection,
     val søknadRepository: SøknadRepository,
     val seksjonRepository: SeksjonRepository,
+    private val søknadService: SøknadService,
 ) : River.PacketListener {
     companion object {
         private val logg = KotlinLogging.logger {}
@@ -90,6 +92,7 @@ internal class MeldingOmEttersendingMottak(
                         dokumenter = listOf(dokumentasjonskravJson),
                         innsendtTidspunkt = oppdatertTidspunkt,
                         tilstand = it.tilstand,
+                        ferdigBesvart = søknadService.erSøknadFerdigBesvart(søknadId, ident),
                     )
                 rapidsConnection.publish(
                     ident,

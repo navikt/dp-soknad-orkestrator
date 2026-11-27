@@ -10,6 +10,7 @@ import com.github.navikt.tbd_libs.rapids_and_rivers_api.RapidsConnection
 import io.github.oshai.kotlinlogging.KotlinLogging
 import io.micrometer.core.instrument.MeterRegistry
 import no.nav.dagpenger.soknad.orkestrator.config.objectMapper
+import no.nav.dagpenger.soknad.orkestrator.søknad.SøknadService
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand
 import no.nav.dagpenger.soknad.orkestrator.søknad.Tilstand.PÅBEGYNT
 import no.nav.dagpenger.soknad.orkestrator.søknad.behov.BehovForGenereringOgMellomlagringAvSøknadPdf
@@ -24,6 +25,7 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
     private val søknadRepository: SøknadRepository,
     private val seksjonRepository: SeksjonRepository,
     private val pdfPayloadService: PdfPayloadService,
+    private val søknadService: SøknadService,
 ) : River.PacketListener {
     companion object {
         private val logg = KotlinLogging.logger {}
@@ -143,6 +145,7 @@ class MeldingOmSøknadKlarTilJournalføringMottak(
                                 dokumenter = dokumentasjonsKravLister,
                                 innsendtTidspunkt = innsendtTidspunkt,
                                 tilstand = Tilstand.INNSENDT,
+                                ferdigBesvart = søknadService.erSøknadFerdigBesvart(søknadId, ident),
                             )
                         rapidsConnection.publish(
                             ident,

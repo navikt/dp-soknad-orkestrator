@@ -27,24 +27,9 @@ class DokumentKravInnsendtMelding(
     private val dokumenter: List<String>,
     private val innsendtTidspunkt: LocalDateTime,
     private val tilstand: Tilstand,
+    private val ferdigBesvart: Boolean,
 ) {
     val alleDokumentasjonskrav = lagDokumentKravListe()
-    val erFerdigBesvart = erDokumentasjonskravFerdigBesvart()
-
-    private fun erDokumentasjonskravFerdigBesvart(): Boolean {
-        // TODO: Returverdien av all {} brukes ikke — funksjonen returnerer alltid true.
-        //  For at logikken skal fungere må dette fikses. I tillegg er filer alltid en tom liste
-        //  fordi elementene i JSON-arrayen er objekter, ikke tekststrenger — urn må trolig
-        //  ekstraheres eksplisitt fra hvert filobjekt for at isNotEmpty()-sjekken skal gi mening.
-        alleDokumentasjonskrav.all {
-            when (it.valg) {
-                "SEND_NÅ", "ETTERSENDT" -> it.filer.isNotEmpty() && it.bundle != null
-                "SEND_SENERE", "SEND_TIDLIGERE", "SENDER_IKKE" -> it.begrunnelse != null
-                else -> false
-            }
-        }
-        return true
-    }
 
     fun asMessage(): JsonMessage =
         JsonMessage.newMessage(
@@ -56,7 +41,7 @@ class DokumentKravInnsendtMelding(
                     "søknadType" to "Dagpenger",
                     "innsendingsType" to finnInnsendingsType(),
                     "innsendttidspunkt" to innsendtTidspunkt,
-                    "ferdigBesvart" to erFerdigBesvart,
+                    "ferdigBesvart" to ferdigBesvart,
                     "hendelseId" to UUID.randomUUID(),
                     "kilde" to "orkestrator",
                     "dokumentkrav" to

@@ -21,6 +21,7 @@ import no.nav.dagpenger.soknad.orkestrator.søknad.db.SøknadRepository
 import no.nav.dagpenger.soknad.orkestrator.søknad.seksjon.SeksjonRepository
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
+import tools.jackson.databind.node.ObjectNode
 import java.time.LocalDateTime
 import java.util.UUID.randomUUID
 import kotlin.test.Test
@@ -490,6 +491,63 @@ class SøknadServiceTest {
 
         søknader shouldNotBe null
         søknader!!.tittel shouldBe "Søknad om dagpenger (ikke permittert)"
+    }
+
+    @Test
+    fun `erSøknadFerdigBesvart returnerer false når ett dokumentasjonskrav skal sendes senere`() {
+        val søknadId = randomUUID()
+        every { seksjonRepository.hentDokumentasjonskrav(søknadId, ident) } returns
+            dokumentasjonskravMedBlantAnnetSendSenereSvar
+
+        søknadService.erSøknadFerdigBesvart(søknadId, ident) shouldBe false
+    }
+
+    @Test
+    fun `erSøknadFerdigBesvart returnerer true når alle krav er ettersendt`() {
+        val søknadId = randomUUID()
+
+        every { seksjonRepository.hentDokumentasjonskrav(søknadId, ident) } returns
+            dokumentasjonskravUtenSendSenere
+
+        søknadService.erSøknadFerdigBesvart(søknadId, ident) shouldBe true
+    }
+
+    @Test
+    fun `erSøknadFerdigBesvart returnerer false når et dokumentasjonskrav mangler svar`() {
+        val søknadId = randomUUID()
+        val dokumentasjonskrav = objectMapper.readTree(dokumentasjonskravUtenSendSenere.first())
+        (dokumentasjonskrav[0] as ObjectNode).remove("svar")
+        every { seksjonRepository.hentDokumentasjonskrav(søknadId, ident) } returns
+            listOf(dokumentasjonskrav.toString())
+
+        søknadService.erSøknadFerdigBesvart(søknadId, ident) shouldBe false
+    }
+
+    @Test
+    fun `erSøknadFerdigBesvart returnerer false når et dokumentasjonskrav har null som svar`() {
+        val søknadId = randomUUID()
+        val dokumentasjonskrav = objectMapper.readTree(dokumentasjonskravUtenSendSenere.first())
+        (dokumentasjonskrav[0] as ObjectNode).putNull("svar")
+        every { seksjonRepository.hentDokumentasjonskrav(søknadId, ident) } returns
+            listOf(dokumentasjonskrav.toString())
+
+        søknadService.erSøknadFerdigBesvart(søknadId, ident) shouldBe false
+    }
+
+    @Test
+    fun `erSøknadFerdigBesvart returnerer true når søknaden ikke har dokumentasjonskrav`() {
+        val søknadId = randomUUID()
+        every { seksjonRepository.hentDokumentasjonskrav(søknadId, ident) } returns emptyList()
+
+        søknadService.erSøknadFerdigBesvart(søknadId, ident) shouldBe true
+    }
+
+    @Test
+    fun `erSøknadFerdigBesvart returnerer true når alle dokumentasjonskrav i alle seksjoner er besvart`() {
+        val søknadId = randomUUID()
+        every { seksjonRepository.hentDokumentasjonskrav(søknadId, ident) } returns dokumentasjonskravUtenSendSenere
+
+        søknadService.erSøknadFerdigBesvart(søknadId, ident) shouldBe true
     }
 
     private val quizSeksjoner =

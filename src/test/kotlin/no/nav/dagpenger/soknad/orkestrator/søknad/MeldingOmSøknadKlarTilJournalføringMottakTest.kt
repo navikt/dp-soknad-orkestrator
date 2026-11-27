@@ -32,6 +32,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
             søknadRepository,
             seksjonRepository,
             pdfPayloadService,
+            SøknadService(søknadRepository, mockk(relaxed = true), seksjonRepository),
         )
     }
 
@@ -68,7 +69,7 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
 
         rapidsConnection.inspektør.message(2)["@event_name"].asString() shouldBe "dokumentkrav_innsendt"
         rapidsConnection.inspektør.message(2)["innsendingsType"].asString() shouldBe "INNSENDT"
-        rapidsConnection.inspektør.message(2)["ferdigBesvart"].asBoolean() shouldBe true
+        rapidsConnection.inspektør.message(2)["ferdigBesvart"].asBoolean() shouldBe false
         rapidsConnection.inspektør.message(2)["kilde"].asString() shouldBe "orkestrator"
 
         val dokumenstasjonskrav = rapidsConnection.inspektør.message(2)["dokumentkrav"]
@@ -78,6 +79,18 @@ class MeldingOmSøknadKlarTilJournalføringMottakTest {
         dokumenstasjonskrav[2]["valg"].asString() shouldBe "SENDER_IKKE"
         dokumenstasjonskrav[3]["valg"].asString() shouldBe "SEND_NÅ"
         dokumenstasjonskrav[4]["valg"].asString() shouldBe "ETTERSENDT"
+    }
+
+    @Test
+    fun `dokumentkrav_innsendt har ferdigBesvart true når alle dokumentasjonskrav er besvart`() {
+        coEvery { søknadRepository.hent(søknadId) } returns Søknad(søknadId, ident)
+        coEvery { seksjonRepository.hentDokumentasjonskrav(søknadId, ident) } returns
+            dokumentasjonskrav.map { it.replace("dokumentkravSvarSenderSenere", "dokumentkravEttersendt") }
+
+        rapidsConnection.sendTestMessage(søknadKlarTilJournalføringEvent)
+
+        rapidsConnection.inspektør.message(2)["@event_name"].asString() shouldBe "dokumentkrav_innsendt"
+        rapidsConnection.inspektør.message(2)["ferdigBesvart"].asBoolean() shouldBe true
     }
 
     @Test
