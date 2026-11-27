@@ -5,10 +5,4 @@ import java.util.UUID
 
 interface SaksbehandlerBarnRepository {
     fun hentBarn(søknadId: UUID): List<BarnSvar>?
-
-    fun lagreBarn(
-        søknadId: UUID,
-        barn: List<BarnSvar>,
-        endretAv: String,
-    )
 }

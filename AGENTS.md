@@ -35,7 +35,7 @@ src/main/kotlin/no/nav/dagpenger/soknad/orkestrator/
 ├── journalføring/    # Archival/journaling
 ├── land/             # Country/location data
 ├── metrikker/        # Prometheus metrics
-├── opplysning/       # Core opplysning (information) service and barn CRUD
+├── opplysning/       # Land API and read-only access to historical saksbehandler_barn
 ├── personalia/       # Personal data (name, address, bank account)
 ├── quizOpplysning/   # Quiz-based data collection + DB repositories
 ├── søknad/           # Søknad (application) lifecycle, PDF, messaging
@@ -119,7 +119,8 @@ TestApplication.withMockAuthServerAndTestApplication { }
   OpenAPI YAML spec
 - **Never commit** secrets or credentials
 - **Do not modify** `.nais/` deployment configs without understanding the NAIS platform
-- **Preserve** the append-only pattern for `saksbehandler_barn` (inserts only, no updates)
+- **Preserve** the append-only pattern for `saksbehandler_barn` (no updates). Child editing is retired, so
+  nothing writes to the table now; the behovløsere still read the latest snapshot.
 
 ## Deployment
 
